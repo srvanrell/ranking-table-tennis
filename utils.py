@@ -1,32 +1,6 @@
 __author__ = 'sebastian'
 
-
-class Player:
-    """
-    Model for a player
-    """
-
-    def __init__(self, nid, name, rating=0.0):
-        self.nid = nid
-        self.name = name
-        self.email = "user@host.com"
-        self.rating = rating
-        self.association = "Association"
-
-    def __str__(self):
-        return "Player nid={0:d}, name={1:s}, rating={2:d}".format(self.nid, self.name, self.rating)
-
-    def __repr__(self):
-        return "<Player nid={0:d}, name={1:s}, rating={2:d}>".format(self.nid, self.name, self.rating)
-
-
-class Match:
-    """
-    Model for a match, were there is a winner and a loser player
-    """
-    def __init__(self):
-        self.winner = -1
-        self.looser = -1
+import csv
 
 ##############################
 # Tables to assign points
@@ -68,7 +42,7 @@ round_points = {'z': 1,
 
 
 def points_to_assign(rating_winner, rating_loser):
-    """Return points to assign to each player rating given """
+    """Return points to assign to each player given"""
     rating_diff = rating_winner - rating_loser
 
     assignation_table = expected_result
@@ -82,13 +56,15 @@ def points_to_assign(rating_winner, rating_loser):
 
     points_to_winner = assignation_table[i][1]
     points_to_loser = assignation_table[i][2]
-    print "diff:%d, to_winner:%d, to_loser:%d" % (rating_diff, points_to_winner, points_to_loser)
+    #print "diff:%d, to_winner:%d, to_loser:%d" % (rating_diff, points_to_winner, points_to_loser)
 
     return [points_to_winner, points_to_loser]
+
 
 # TODO ranking model, get_rating, update_rating
 def get_rating(player_id, ranking):
     return ranking[player_id]
+
 
 def get_new_ranking(old_ranking, matches_list):
     # TODO make a better way to copy a list, maybe the db saves me
@@ -122,3 +98,26 @@ def get_new_ranking(old_ranking, matches_list):
 
     return new_ranking
 
+
+def save_csv(filename, headers, list_to_save):
+    with open(filename, 'w') as outcsv:
+        writer = csv.writer(outcsv)
+        writer.writerow(headers)
+        writer.writerows(list_to_save)
+
+
+def load_csv(filename):
+    with open(filename, 'r') as incsv:
+        reader = csv.reader(incsv)
+        aux = [row for row in reader]
+        header = aux[0]
+        list_to_return = []
+        for row in aux[1:]:
+            aux_row = []
+            for item in row:
+                if item.isdigit():
+                    aux_row.append(int(item))
+                else:
+                    aux_row.append(item)
+            list_to_return.append(aux_row)
+        return list_to_return
