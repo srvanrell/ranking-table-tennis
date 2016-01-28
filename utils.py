@@ -2,6 +2,29 @@ __author__ = 'sebastian'
 
 import csv
 
+def save_csv(filename, headers, list_to_save):
+    with open(filename, 'w') as outcsv:
+        writer = csv.writer(outcsv)
+        writer.writerow(headers)
+        writer.writerows(list_to_save)
+
+
+def load_csv(filename):
+    with open(filename, 'r') as incsv:
+        reader = csv.reader(incsv)
+        aux = [row for row in reader]
+        header = aux[0]
+        list_to_return = []
+        for row in aux[1:]:
+            aux_row = []
+            for item in row:
+                if item.isdigit():
+                    aux_row.append(int(item))
+                else:
+                    aux_row.append(item)
+            list_to_return.append(aux_row)
+        return list_to_return
+
 ##############################
 # Tables to assign points
 ##############################
@@ -9,36 +32,19 @@ import csv
 # Expected result table
 # TODO, falta chequear
 # difference, points to winner, points to loser
-expected_result = [[24, 9, 9],
-                   [49, 8, 8],
-                   [99, 7, 7],
-                   [149, 6, 6],
-                   [199, 5, 5],
-                   [299, 4, 4],
-                   [399, 3, 3],
-                   [499, 2, 2],
-                   [999, 1, 1]]
+expected_result = load_csv("expected_result.csv")
+
 
 # TODO, falta chequear
 # difference (should be negative), points to winner, points to loser
-unexpected_result = [[24, 10, 9],
-                     [49, 11, 10],
-                     [99, 13, 11],
-                     [149, 15, 12],
-                     [199, 18, 14],
-                     [299, 21, 16],
-                     [399, 24, 18],
-                     [499, 28, 21],
-                     [999, 32, 25]]
+unexpected_result = load_csv("unexpected_result.csv")
 
 # points to be assigned by round
-# TODO, falta chequear
-round_points = {'z': 1,
-                'o': 2,
-                'q': 4,
-                's': 8,
-                '2': 10,
-                '1': 12}
+aux_round_points = load_csv("points_per_round.csv")
+round_points = {}
+for reached_round, points in aux_round_points:
+    print reached_round, points
+    round_points[reached_round] = points
 
 
 def points_to_assign(rating_winner, rating_loser):
@@ -97,27 +103,3 @@ def get_new_ranking(old_ranking, matches_list):
         new_ranking[player_id][1] += best_round_to_assign[player_id]
 
     return new_ranking
-
-
-def save_csv(filename, headers, list_to_save):
-    with open(filename, 'w') as outcsv:
-        writer = csv.writer(outcsv)
-        writer.writerow(headers)
-        writer.writerows(list_to_save)
-
-
-def load_csv(filename):
-    with open(filename, 'r') as incsv:
-        reader = csv.reader(incsv)
-        aux = [row for row in reader]
-        header = aux[0]
-        list_to_return = []
-        for row in aux[1:]:
-            aux_row = []
-            for item in row:
-                if item.isdigit():
-                    aux_row.append(int(item))
-                else:
-                    aux_row.append(item)
-            list_to_return.append(aux_row)
-        return list_to_return

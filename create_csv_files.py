@@ -22,7 +22,7 @@ utils.save_csv("lista_jugadores.csv",
 # they correspond to zone, octave-finals, quarter-finals, semifinal, second, first
 #
 # Each match contains winner_id, loser_id, match_round
-matches_list = [[i, j, 'q'] for i in range(10) for j in range(i)]
+matches_list = [[i, j, 'zone'] for i in range(10) for j in range(i)]
 # Creating a csv file with the list of matches
 utils.save_csv("lista_partidos.csv",
                ["winner_id", "loser_id", "match_round"],
