@@ -1,7 +1,8 @@
-__author__ = 'sebastian'
 # -*- coding: utf-8 -*-
 
 import csv
+
+__author__ = 'sebastian'
 
 
 def save_csv(filename, headers, list_to_save):
@@ -26,6 +27,7 @@ def load_csv(filename):
                     aux_row.append(item)
             list_to_return.append(aux_row)
         return list_to_return
+
 
 ##############################
 # Tables to assign points
@@ -175,4 +177,3 @@ def name2playerid(name, players_list):
             return row[0]
     print "Jugador desconocido"
     return None
-
