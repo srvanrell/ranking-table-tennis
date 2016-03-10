@@ -39,3 +39,26 @@ class PlayersList:
         print "Jugador desconocido"
         return None
 
+    # TODO add to list and load from list functions
+    def to_list(self):
+        # Todo return a list to be saved as csv
+        return self.players
+
+    def load_list(self):
+        # Load from a list saved as csv
+        return self.get_player(1)
+
+
+class RankingEntry:
+    def __init__(self):
+        self.pid = {}
+        self.rating = {}
+
+
+class Ranking:
+    # TODO ranking model and managment
+    def __init__(self):
+        self.ranking = {}
+
+
+
