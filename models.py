@@ -9,7 +9,7 @@ class Player:
         self.city = city
 
     def __repr__(self):
-        return ",".join([str(self.pid), self.name, self.association, self.city])
+        return ";".join([str(self.pid), self.name, self.association, self.city])
 
 
 class PlayersList:
@@ -32,6 +32,9 @@ class PlayersList:
         if player.pid not in self.players:
             self.players[player.pid] = player
 
+    # def __contains__(self, ):
+
+
     def get_pid(self, name):
         for player in self.players.itervalues():
             if name == player.name:
@@ -50,15 +53,29 @@ class PlayersList:
 
 
 class RankingEntry:
-    def __init__(self):
-        self.pid = {}
-        self.rating = {}
+    def __init__(self, pid, rating, bonus):
+        self.pid = pid
+        self.rating = rating
+        self.bonus = bonus
 
 
 class Ranking:
     # TODO ranking model and managment
     def __init__(self):
         self.ranking = {}
+        self.date = ""
+        self.tournament = ""
+
+    def add_entry(self, pid, rating, bonus):
+        self.ranking[pid] = RankingEntry(pid, rating, bonus)
+
+    def get_entry(self, pid):
+        return self.ranking[pid]
+
+    def __repr__(self):
+        return "\n".join(str(self.get_entry(re)) for re in self.ranking)
+
+
 
 
 
