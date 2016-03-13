@@ -69,10 +69,10 @@ class RankingEntry:
 
 
 class Ranking:
-    def __init__(self):
+    def __init__(self, date="", tournament_name=""):
         self.ranking = {}
-        self.date = ""
-        self.tournament = ""
+        self.date = date
+        self.tournament_name = tournament_name
 
     def add_entry(self, pid, rating, bonus):
         if pid not in self.ranking:
@@ -87,9 +87,16 @@ class Ranking:
         return self.get_entry(pid)
 
     def __repr__(self):
-        return "\n".join(str(self.get_entry(re)) for re in self.ranking)
-
-
-
+        aux = "%s (%s)\n" % (self.tournament_name, self.date)
+        return  aux + "\n".join(str(self.get_entry(re)) for re in self.ranking)
+        
+    def load_list(self, ranking_list):
+        for pid, rating in ranking_list:
+            # TODO add bonus points support
+            self.add_entry(pid, rating, 0) 
+    
+    def to_list(self):
+        ranking_list = [[p.pid, p.rating, p.bonus] for p in self.ranking.itervalues()]
+        return ranking_list
 
 

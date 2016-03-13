@@ -37,8 +37,14 @@ players.load_list(utils.load_csv(players_info_filename))
 list_to_save = [[p[0], 0, p[1], p[3]] for p in players.to_list()]
 
 ranking_filename = "Liga Dos Orillas 2016 - Ranking Mayores - inicial.csv"
+raw_ranking = utils.load_csv(ranking_filename)
 
-utils.save_csv(ranking_filename, ["PID", "Rating", "Jugador", "Ciudad"], list_to_save)
+print raw_ranking
+ranking = models.Ranking("01/01/2016", "ranking inicial")
+ranking.load_list([[r[0], r[1]] for r in raw_ranking])
+print ranking
+
+#utils.save_csv(ranking_filename, ["PID", "Rating", "Jugador", "Ciudad"], list_to_save)
 #tournament2_filename = "Liga Dos Orillas - Torneos Disputados 2016 - 2do Torneo 2016.csv"
 #tournament2 = utils.load_tournament_csv(tournament2_filename)
 
