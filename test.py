@@ -24,21 +24,27 @@ for tournament_filename in tournament_filenames:
     for name in tournament["players"]:
         if players.get_pid(name) is None:
             players.add_new_player(name)
-
+    
+    # TODO sort list by name to easily detect duplicates
     utils.save_csv(players_info_filename, 
-                   ["PID", "Nombre", "Asociación", "Ciudad"], 
+                   ["PID", "Jugador", "Asociación", "Ciudad"], 
                    players.to_list())
 
+# Loading players list
+players = models.PlayersList()
+players.load_list(utils.load_csv(players_info_filename))
 
+list_to_save = [[p[0], 0, p[1], p[3]] for p in players.to_list()]
+
+ranking_filename = "Liga Dos Orillas 2016 - Ranking Mayores - inicial.csv"
+
+utils.save_csv(ranking_filename, ["PID", "Rating", "Jugador", "Ciudad"], list_to_save)
 #tournament2_filename = "Liga Dos Orillas - Torneos Disputados 2016 - 2do Torneo 2016.csv"
 #tournament2 = utils.load_tournament_csv(tournament2_filename)
 
 
-#allplayers = list(set(tournament1["players"]).union(set(tournament2["players"])))
 
-#players = [[num+1, player, "Asociación"] for num, player in enumerate(allplayers)]
 #ratings = [[pid, 1000, name] for pid, name, asociation in players]
 
-#utils.save_csv("jugadores_dos_orillas.csv", ["player_id", "name", "association"], players)
 #utils.save_csv("ranking_inicial_dos_orillas.csv", ["player_id", "rating", "name"], ratings)
 
