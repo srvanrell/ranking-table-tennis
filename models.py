@@ -125,6 +125,8 @@ class Ranking:
             self[loser_pid].rating -= to_loser
 
         # TODO create a log with matches points description
+        # FIXME está sumando 3 de más en algunos casos, revisar como asigna los puntos bonus, fijar preferencia manual
+        # TODO desacoplar puntos bonus de calculo de rating
 
         # TODO add points per best round reached
         best_round_to_assign = {}
