@@ -83,15 +83,14 @@ class Ranking:
     def __iter__(self):
         return self.ranking.itervalues()
 
-    # TODO change to Ranking entry instead of list of inputs
-    def add_entry(self, pid, rating, bonus):
-        if pid not in self.ranking:
-            self.ranking[pid] = RankingEntry(pid, rating, bonus)
+    def add_entry(self, rank_entry):
+        if rank_entry.pid not in self.ranking:
+            self.ranking[rank_entry.pid] = rank_entry
         else:
-            print "WARNING: Already exists an entry for pid:", pid
+            print "WARNING: Already exists an entry for pid:", rank_entry.pid
 
     def add_new_entry(self, pid):
-        self.add_entry(pid, 0, 0)
+        self.add_entry(RankingEntry(pid, 0, 0))
 
     def get_entry(self, pid):
         return self.ranking.get(pid)
@@ -106,7 +105,7 @@ class Ranking:
     def load_list(self, ranking_list):
         for pid, rating in ranking_list:
             # TODO add bonus points support
-            self.add_entry(pid, rating, 0) 
+            self.add_entry(RankingEntry(pid, rating, 0))
     
     def to_list(self):
         ranking_list = [[p.pid, p.rating, p.bonus] for p in self.ranking.itervalues()]
@@ -116,7 +115,7 @@ class Ranking:
         # TODO make a better way to copy a ranking object
         self.tournament_name.replace("old_", "")
         for entry in old_ranking:
-            self.add_entry(entry.pid, entry.rating, entry.bonus)
+            self.add_entry(entry)
 
         for winner_pid, loser_pid, unused in matches:
             [to_winner, to_loser] = utils.points_to_assign(old_ranking[winner_pid].rating,
