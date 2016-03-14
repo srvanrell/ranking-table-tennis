@@ -68,9 +68,10 @@ class RankingEntry:
         self.pid = pid
         self.rating = rating
         self.bonus = bonus
+        self.total = rating + bonus
         
     def __repr__(self):
-        return ";".join([str(self.pid), str(self.rating), str(self.bonus)])
+        return ";".join([str(self.pid), str(self.total), str(self.rating), str(self.bonus)])
 
 
 class Ranking:
@@ -93,7 +94,10 @@ class Ranking:
         self.add_entry(RankingEntry(pid, 0, 0))
 
     def get_entry(self, pid):
-        return self.ranking.get(pid)
+        entry = self.ranking.get(pid)
+        if entry:
+            entry.total = entry.rating + entry.bonus
+        return entry
         
     def __getitem__(self, pid):
         return self.get_entry(pid)
@@ -103,12 +107,11 @@ class Ranking:
         return aux + "\n".join(str(self.get_entry(re)) for re in self.ranking)
         
     def load_list(self, ranking_list):
-        for pid, rating in ranking_list:
-            # TODO add bonus points support
-            self.add_entry(RankingEntry(pid, rating, 0))
+        for pid, total, rating, bonus in ranking_list:
+            self.add_entry(RankingEntry(pid, rating, bonus))
     
     def to_list(self):
-        ranking_list = [[p.pid, p.rating, p.bonus] for p in self.ranking.itervalues()]
+        ranking_list = [[p.pid, p.rating, p.bonus] for p in self]
         return ranking_list
 
     def compute_new_ratings(self, old_ranking, matches):
@@ -126,7 +129,6 @@ class Ranking:
 
     def compute_bonus_points(self, matches):
         # FIXME está sumando 3 de más en algunos casos, revisar como asigna los puntos bonus, fijar preferencia manual
-        # TODO desacoplar puntos bonus de calculo de rating
 
         # TODO add points per best round reached
         best_round_to_assign = {}

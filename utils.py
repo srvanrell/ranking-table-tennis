@@ -145,7 +145,7 @@ def load_ranking_csv(filename):
     #     ranking.load_list([[r[0], r[1]] for r in raw_ranking])
     raw_ranking = load_csv(filename)
     ranking = models.Ranking("fecha", "nombre ranking")
-    ranking.load_list([[r[0], r[1]] for r in raw_ranking])
+    ranking.load_list([[r[0], r[1], r[2], r[3]] for r in raw_ranking])
     return ranking
 
 
@@ -191,11 +191,3 @@ def load_tournament_csv(filename):
                       "matches": matches_list}
 
         return tournament
-
-
-def name2playerid(name, players_list):
-    for row in players_list:
-        if name == row[1]:
-            return row[0]
-    print "Jugador desconocido"
-    return None

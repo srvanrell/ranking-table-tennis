@@ -53,13 +53,15 @@ for i, tournament_filename in enumerate(tournament_filenames):
     # TODO make a better way to copy models
     new_ranking = models.Ranking(tournament["name"], tournament["date"], tournament["location"])
     new_ranking.tournament_name.replace("old_", "")
-    new_ranking.compute_new_ranking(old_ranking, matches)
+    new_ranking.compute_new_ratings(old_ranking, matches)
+    new_ranking.compute_bonus_points(matches)
 
     # Saving initial rankings for all known players
-    list_to_save = [[e.pid, e.rating, players[e.pid].name, players[e.pid].association,
+    list_to_save = [[e.pid, e.total, e.rating, e.bonus, players[e.pid].name, players[e.pid].association,
                      players[e.pid].city] for e in new_ranking]
+
     utils.save_csv(data_folder + tournament_filename.replace("Partidos", "Ranking"),
-                   ["PID", "Rating", "Jugador", "Asociación", "Ciudad"],
+                   ["PID", "Total puntos", "Nivel de juego", "Puntos bonus", "Jugador", "Asociación", "Ciudad"],
                    sorted(list_to_save, key=lambda l: l[1], reverse=True))
 
 
