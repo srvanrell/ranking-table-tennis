@@ -52,6 +52,7 @@ for i, tournament_filename in enumerate(tournament_filenames):
 
     # TODO make a better way to copy models
     new_ranking = models.Ranking(tournament["name"], tournament["date"], tournament["location"])
+    new_ranking.tournament_name.replace("old_", "")
     new_ranking.compute_new_ranking(old_ranking, matches)
 
     # Saving initial rankings for all known players

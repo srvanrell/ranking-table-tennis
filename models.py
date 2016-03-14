@@ -111,9 +111,8 @@ class Ranking:
         ranking_list = [[p.pid, p.rating, p.bonus] for p in self.ranking.itervalues()]
         return ranking_list
 
-    def compute_new_ranking(self, old_ranking, matches):
+    def compute_new_ratings(self, old_ranking, matches):
         # TODO make a better way to copy a ranking object
-        self.tournament_name.replace("old_", "")
         for entry in old_ranking:
             self.add_entry(entry)
 
@@ -124,6 +123,8 @@ class Ranking:
             self[loser_pid].rating -= to_loser
 
         # TODO create a log with matches points description
+
+    def compute_bonus_points(self, matches):
         # FIXME está sumando 3 de más en algunos casos, revisar como asigna los puntos bonus, fijar preferencia manual
         # TODO desacoplar puntos bonus de calculo de rating
 
@@ -166,7 +167,6 @@ class Ranking:
                     best_round_to_assign[loser] = round_points[round_match]
 
         for pid in best_round_to_assign:
-            # TODO modified and change it to bonus
-            self[pid].rating += best_round_to_assign[pid]
+            self[pid].bonus += best_round_to_assign[pid]
 
 
