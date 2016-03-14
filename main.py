@@ -52,7 +52,7 @@ for i, tournament_filename in enumerate(tournament_filenames):
     new_ranking = models.Ranking(tournament["name"], tournament["date"], tournament["location"])
     new_ranking.tournament_name.replace("old_", "")
     assigned_points_per_match = new_ranking.compute_new_ratings(old_ranking, matches)
-    new_ranking.compute_bonus_points(matches)
+    assigned_points_per_best_round = new_ranking.compute_bonus_points(matches)
 
     # Saving new ranking
     list_to_save = [[e.pid, e.total, e.rating, e.bonus, players[e.pid].name, players[e.pid].association,
@@ -66,8 +66,16 @@ for i, tournament_filename in enumerate(tournament_filenames):
     points_log_to_save = [[players[winner_pid].name, players[loser_pid].name, winner_points, loser_points]
                           for winner_pid, loser_pid, winner_points, loser_points in assigned_points_per_match]
 
-    utils.save_csv(data_folder + tournament_filename.replace("Partidos", "Detalles Puntos"),
+    utils.save_csv(data_folder + tournament_filename.replace("Partidos", "Detalles Puntos Rating"),
                    ["Ganador", "Perdedor", "Puntos Ganador", "Puntos Perdedor"],
+                   points_log_to_save)
+
+    # Saving points assigned per best round reached
+    points_log_to_save = [[players[pid].name, points, best_round] for pid, points, best_round
+                          in assigned_points_per_best_round]
+
+    utils.save_csv(data_folder + tournament_filename.replace("Partidos", "Detalles Puntos Bonus"),
+                   ["Jugador", "Puntos Bonus", "Mejor Ronda"],
                    points_log_to_save)
 
 

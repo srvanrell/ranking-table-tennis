@@ -136,46 +136,43 @@ class Ranking:
 
     def compute_bonus_points(self, matches):
         # FIXME está sumando 3 de más en algunos casos, revisar como asigna los puntos bonus, fijar preferencia manual
-
-        # TODO add points per best round reached
-        best_round_to_assign = {}
+        best_round = {}
 
         # FIXME maybe should not be read at utils and here instead
         round_points = utils.round_points
+        round_priority = utils.rounds_priority
 
         for winner, loser, round_match in matches:
-            if best_round_to_assign.get(winner):
-                if best_round_to_assign.get(winner) < round_points[round_match]:
-                    if round_match == "final":
-                        best_round_to_assign[winner] = round_points["primero"]
-                    elif round_match == "tercer puesto":
-                        best_round_to_assign[winner] = round_points["tercero"]
-                    else:
-                        best_round_to_assign[winner] = round_points[round_match]
+            # changing labels of finals round match
+            if round_match == "final":
+                winner_round_match = "primero"
+                loser_round_match = "segundo"
+            elif round_match == "tercer puesto":
+                winner_round_match = "tercero"
+                loser_round_match = "cuarto"
             else:
-                if round_match == "final":
-                    best_round_to_assign[winner] = round_points["primero"]
-                elif round_match == "tercer puesto":
-                    best_round_to_assign[winner] = round_points["tercero"]
-                else:
-                    best_round_to_assign[winner] = round_points[round_match]
-            if best_round_to_assign.get(loser):
-                if best_round_to_assign.get(loser) < round_points[round_match]:
-                    if round_match == "final":
-                        best_round_to_assign[loser] = round_points["segundo"]
-                    elif round_match == "tercer puesto":
-                        best_round_to_assign[loser] = round_points["cuarto"]
-                    else:
-                        best_round_to_assign[loser] = round_points[round_match]
-            else:
-                if round_match == "final":
-                    best_round_to_assign[loser] = round_points["segundo"]
-                elif round_match == "tercer puesto":
-                    best_round_to_assign[loser] = round_points["cuarto"]
-                else:
-                    best_round_to_assign[loser] = round_points[round_match]
+                winner_round_match = round_match
+                loser_round_match = round_match
 
-        for pid in best_round_to_assign:
-            self[pid].bonus += best_round_to_assign[pid]
+            # winner
+            if best_round.get(winner):
+                if best_round.get(winner) < round_priority[winner_round_match]:
+                    best_round[winner] = round_priority[winner_round_match]
+            else:
+                best_round[winner] = round_priority[winner_round_match]
+
+            # loser
+            if best_round.get(winner):
+                if best_round.get(winner) < round_priority[loser_round_match]:
+                    best_round[winner] = round_priority[loser_round_match]
+            else:
+                best_round[winner] = round_priority[loser_round_match]
+
+        # List of points assigned in each match
+        assigned_points = []
+        for pid in best_round:
+            self[pid].bonus += round_points[best_round[pid]]
+            assigned_points.append([pid, round_points[best_round[pid]], best_round[pid]])
+        return assigned_points
 
 

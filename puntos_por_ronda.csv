@@ -1,11 +1,11 @@
-round_reached,points_to_assign
-zona,5
-octavos,7
-cuartos,9
-semifinal,15
-tercer puesto,0
-final,0
-cuarto,12
-tercero,15
-segundo,20
-primero,28
+priority,round_reached,points_to_assign
+0,zona,5
+1,octavos,7
+2,cuartos,9
+3,semifinal,15
+4,tercer puesto,0
+5,cuarto,12
+6,tercero,15
+7,final,0
+8,segundo,20
+9,primero,28

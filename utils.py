@@ -46,9 +46,10 @@ unexpected_result = load_csv("unexpected_result.csv")
 # points to be assigned by round
 aux_round_points = load_csv("puntos_por_ronda.csv")
 round_points = {}
-for reached_round, points in aux_round_points:
-    # print reached_round, points
+rounds_priority = {}
+for priority, reached_round, points in aux_round_points:
     round_points[reached_round] = points
+    rounds_priority[reached_round] = priority
 
 
 def points_to_assign(rating_winner, rating_loser):
