@@ -57,6 +57,9 @@ class PlayersList:
         for pid, name, association, city in players_list:
             self.add_player(Player(pid, name, association, city))
 
+    def __iter__(self):
+        return self.players.itervalues()
+
 
 class RankingEntry:
     def __init__(self, pid, rating, bonus):
@@ -80,15 +83,18 @@ class Ranking:
         else:
             print "WARNING: Already exists an entry for pid:", pid
 
+    def add_new_entry(self, pid):
+        self.add_entry(pid, 0, 0)
+
     def get_entry(self, pid):
-        return self.ranking[pid]
+        return self.ranking.get(pid)
         
     def __getitem__(self, pid):
         return self.get_entry(pid)
 
     def __repr__(self):
         aux = "%s (%s)\n" % (self.tournament_name, self.date)
-        return  aux + "\n".join(str(self.get_entry(re)) for re in self.ranking)
+        return aux + "\n".join(str(self.get_entry(re)) for re in self.ranking)
         
     def load_list(self, ranking_list):
         for pid, rating in ranking_list:
@@ -98,5 +104,3 @@ class Ranking:
     def to_list(self):
         ranking_list = [[p.pid, p.rating, p.bonus] for p in self.ranking.itervalues()]
         return ranking_list
-
-
