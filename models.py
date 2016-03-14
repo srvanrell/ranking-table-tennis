@@ -35,13 +35,13 @@ class PlayersList:
             self.players[player.pid] = player
         else:
             print "WARNING: Already exists a player for that pid. Check:", str(player)
-    
+
     def add_new_player(self, name):
         pid = 0
         while pid in self.players:
             pid += 1
         self.add_player(Player(pid, name))
-    
+
     # def __contains__(self, ):
 
     def get_pid(self, name):
@@ -69,7 +69,7 @@ class RankingEntry:
         self.rating = rating
         self.bonus = bonus
         self.total = rating + bonus
-        
+
     def __repr__(self):
         return ";".join([str(self.pid), str(self.total), str(self.rating), str(self.bonus)])
 
@@ -98,26 +98,31 @@ class Ranking:
         if entry:
             entry.total = entry.rating + entry.bonus
         return entry
-        
+
     def __getitem__(self, pid):
         return self.get_entry(pid)
 
     def __repr__(self):
         aux = "%s (%s - %s)\n" % (self.tournament_name, self.location, self.date)
         return aux + "\n".join(str(self.get_entry(re)) for re in self.ranking)
-        
+
     def load_list(self, ranking_list):
         for pid, total, rating, bonus in ranking_list:
             self.add_entry(RankingEntry(pid, rating, bonus))
-    
+
     def to_list(self):
         ranking_list = [[p.pid, p.rating, p.bonus] for p in self]
         return ranking_list
 
     def compute_new_ratings(self, old_ranking, matches):
+        """return assigned points per match
+        (a list containing [winner_pid, loser_pid, points_to_winner, points_to_loser])"""
         # TODO make a better way to copy a ranking object
         for entry in old_ranking:
             self.add_entry(entry)
+
+        # List of points assigned in each match
+        assigned_points = []
 
         for winner_pid, loser_pid, unused in matches:
             [to_winner, to_loser] = utils.points_to_assign(old_ranking[winner_pid].rating,
@@ -125,7 +130,9 @@ class Ranking:
             self[winner_pid].rating += to_winner
             self[loser_pid].rating -= to_loser
 
-        # TODO create a log with matches points description
+            assigned_points.append([winner_pid, loser_pid, to_winner, -to_loser])
+
+        return assigned_points
 
     def compute_bonus_points(self, matches):
         # FIXME está sumando 3 de más en algunos casos, revisar como asigna los puntos bonus, fijar preferencia manual

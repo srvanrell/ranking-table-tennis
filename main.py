@@ -48,20 +48,26 @@ for i, tournament_filename in enumerate(tournament_filenames):
                         players.get_pid(loser_name),
                         match_round])
 
-    # TODO add a detailed report of played matches including points to winner and loser
-
     # TODO make a better way to copy models
     new_ranking = models.Ranking(tournament["name"], tournament["date"], tournament["location"])
     new_ranking.tournament_name.replace("old_", "")
-    new_ranking.compute_new_ratings(old_ranking, matches)
+    assigned_points_per_match = new_ranking.compute_new_ratings(old_ranking, matches)
     new_ranking.compute_bonus_points(matches)
 
-    # Saving initial rankings for all known players
+    # Saving new ranking
     list_to_save = [[e.pid, e.total, e.rating, e.bonus, players[e.pid].name, players[e.pid].association,
                      players[e.pid].city] for e in new_ranking]
 
     utils.save_csv(data_folder + tournament_filename.replace("Partidos", "Ranking"),
                    ["PID", "Total puntos", "Nivel de juego", "Puntos bonus", "Jugador", "Asociación", "Ciudad"],
                    sorted(list_to_save, key=lambda l: l[1], reverse=True))
+
+    # Saving points assigned in each match
+    points_log_to_save = [[players[winner_pid].name, players[loser_pid].name, winner_points, loser_points]
+                          for winner_pid, loser_pid, winner_points, loser_points in assigned_points_per_match]
+
+    utils.save_csv(data_folder + tournament_filename.replace("Partidos", "Detalles Puntos"),
+                   ["Ganador", "Perdedor", "Puntos Ganador", "Puntos Perdedor"],
+                   points_log_to_save)
 
 
