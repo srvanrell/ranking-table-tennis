@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import utils
+
 
 class Player:
     def __init__(self, pid=-1, name="Apellido, Nombre", association="Asociación", city="Ciudad"):
@@ -72,11 +74,16 @@ class RankingEntry:
 
 
 class Ranking:
-    def __init__(self, date="", tournament_name=""):
+    def __init__(self, tournament_name="", date="", location=""):
         self.ranking = {}
         self.date = date
         self.tournament_name = tournament_name
+        self.location = location
 
+    def __iter__(self):
+        return self.ranking.itervalues()
+
+    # TODO change to Ranking entry instead of list of inputs
     def add_entry(self, pid, rating, bonus):
         if pid not in self.ranking:
             self.ranking[pid] = RankingEntry(pid, rating, bonus)
@@ -93,7 +100,7 @@ class Ranking:
         return self.get_entry(pid)
 
     def __repr__(self):
-        aux = "%s (%s)\n" % (self.tournament_name, self.date)
+        aux = "%s (%s - %s)\n" % (self.tournament_name, self.location, self.date)
         return aux + "\n".join(str(self.get_entry(re)) for re in self.ranking)
         
     def load_list(self, ranking_list):
@@ -104,3 +111,61 @@ class Ranking:
     def to_list(self):
         ranking_list = [[p.pid, p.rating, p.bonus] for p in self.ranking.itervalues()]
         return ranking_list
+
+    def compute_new_ranking(self, old_ranking, matches):
+        # TODO make a better way to copy a ranking object
+        self.tournament_name.replace("old_", "")
+        for entry in old_ranking:
+            self.add_entry(entry.pid, entry.rating, entry.bonus)
+
+        for winner_pid, loser_pid, unused in matches:
+            [to_winner, to_loser] = utils.points_to_assign(old_ranking[winner_pid].rating,
+                                                           old_ranking[loser_pid].rating)
+            self[winner_pid].rating += to_winner
+            self[loser_pid].rating -= to_loser
+
+        # TODO create a log with matches points description
+
+        # TODO add points per best round reached
+        best_round_to_assign = {}
+
+        # FIXME maybe should not be read at utils and here instead
+        round_points = utils.round_points
+
+        for winner, loser, round_match in matches:
+            if best_round_to_assign.get(winner):
+                if best_round_to_assign.get(winner) < round_points[round_match]:
+                    if round_match == "final":
+                        best_round_to_assign[winner] = round_points["primero"]
+                    elif round_match == "tercer puesto":
+                        best_round_to_assign[winner] = round_points["tercero"]
+                    else:
+                        best_round_to_assign[winner] = round_points[round_match]
+            else:
+                if round_match == "final":
+                    best_round_to_assign[winner] = round_points["primero"]
+                elif round_match == "tercer puesto":
+                    best_round_to_assign[winner] = round_points["tercero"]
+                else:
+                    best_round_to_assign[winner] = round_points[round_match]
+            if best_round_to_assign.get(loser):
+                if best_round_to_assign.get(loser) < round_points[round_match]:
+                    if round_match == "final":
+                        best_round_to_assign[loser] = round_points["segundo"]
+                    elif round_match == "tercer puesto":
+                        best_round_to_assign[loser] = round_points["cuarto"]
+                    else:
+                        best_round_to_assign[loser] = round_points[round_match]
+            else:
+                if round_match == "final":
+                    best_round_to_assign[loser] = round_points["segundo"]
+                elif round_match == "tercer puesto":
+                    best_round_to_assign[loser] = round_points["cuarto"]
+                else:
+                    best_round_to_assign[loser] = round_points[round_match]
+
+        for pid in best_round_to_assign:
+            # TODO modified and change it to bonus
+            self[pid].rating += best_round_to_assign[pid]
+
+

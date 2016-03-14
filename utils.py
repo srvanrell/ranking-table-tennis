@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import csv
+import models
 
 __author__ = 'sebastian'
 
 
+# TODO add support for multiple rows header
 def save_csv(filename, headers, list_to_save):
     with open(filename, 'w') as outcsv:
         writer = csv.writer(outcsv)
@@ -125,6 +127,26 @@ def get_new_ranking(old_ranking, matches_list):
         new_ranking[player_id][1] += best_round_to_assign[player_id]
 
     return new_ranking
+
+
+def load_ranking_csv(filename):
+    # TODO add support for rankings csvs with expanded header
+    # """Loads an csv and return a preprocessed ranking (name, date, ranking_list)"""
+    # with open(filename, 'r') as incsv:
+    #     reader = csv.reader(incsv)
+    #     aux = [row for row in reader]
+    #
+    #     name = aux[0][1]
+    #     date = aux[1][1]
+    #     location = aux[2][1]
+    #
+    #     raw_ranking = aux[4:]
+    #     ranking = models.Ranking(name, date)
+    #     ranking.load_list([[r[0], r[1]] for r in raw_ranking])
+    raw_ranking = load_csv(filename)
+    ranking = models.Ranking("fecha", "nombre ranking")
+    ranking.load_list([[r[0], r[1]] for r in raw_ranking])
+    return ranking
 
 
 def load_tournament_csv(filename):
