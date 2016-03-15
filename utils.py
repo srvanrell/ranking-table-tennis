@@ -145,9 +145,9 @@ def load_ranking_csv(filename):
     #     ranking = models.Ranking(name, date)
     #     ranking.load_list([[r[0], r[1]] for r in raw_ranking])
     raw_ranking = load_csv(filename)
-    ranking = models.Ranking("fecha", "nombre ranking")
-    ranking.load_list([[r[0], r[2], r[3]] for r in raw_ranking])
-    return ranking
+    # TODO name date and location should be read from file
+    ranking_list = [[r[0], r[2], r[3]] for r in raw_ranking]
+    return ranking_list
 
 
 def load_tournament_csv(filename):

@@ -123,7 +123,7 @@ class Ranking:
         # List of points assigned in each match.add_entry(
         assigned_points = []
 
-        for winner_pid, loser_pid, unused in matches:
+        for winner_pid, loser_pid, unused, unused2 in matches:
             [to_winner, to_loser] = utils.points_to_assign(old_ranking[winner_pid].rating,
                                                            old_ranking[loser_pid].rating)
             self[winner_pid].rating += to_winner
@@ -134,15 +134,13 @@ class Ranking:
         return assigned_points
 
     def compute_bonus_points(self, matches):
-        # FIXME falta considerar la suma de las distintas categorías
-        # FIXME está sumando 3 de más en algunos casos, revisar como asigna los puntos bonus, fijar preferencia manual
         best_round = {}
 
         # FIXME maybe should not be read at utils and here instead
         round_points = utils.round_points
         round_priority = utils.rounds_priority
 
-        for winner, loser, round_match in matches:
+        for winner, loser, round_match, category in matches:
             # changing labels of finals round match
             if round_match == "final":
                 winner_round_match = "primero"
@@ -154,25 +152,22 @@ class Ranking:
                 winner_round_match = round_match
                 loser_round_match = round_match
 
-            # winner
-            if best_round.get(winner):
-                if round_priority[best_round.get(winner)] < round_priority[winner_round_match]:
-                    best_round[winner] = winner_round_match
-            else:
-                best_round[winner] = winner_round_match
-
-            # loser
-            if best_round.get(loser):
-                if round_priority[best_round.get(loser)] < round_priority[loser_round_match]:
-                    best_round[loser] = loser_round_match
-            else:
-                best_round[loser] = loser_round_match
+            # finding best round per category of each player
+            for pid, played_round in [(winner, winner_round_match),
+                                      (loser, loser_round_match)]:
+                categpid = "%s-%d" % (category, pid)
+                if best_round.get(categpid):
+                    if round_priority[best_round.get(categpid)] < round_priority[played_round]:
+                        best_round[categpid] = played_round
+                else:
+                    best_round[categpid] = played_round
 
         # List of points assigned in each match
         assigned_points = []
-        for pid in best_round:
-            self[pid].bonus += round_points[best_round[pid]]
-            assigned_points.append([pid, round_points[best_round[pid]], best_round[pid]])
+        for categpid in best_round:
+            category = categpid.split("-")[0]
+            pid = int(categpid.split("-")[1])
+            self[pid].bonus += round_points[best_round[categpid]]
+            assigned_points.append([pid, round_points[best_round[categpid]], best_round[categpid], category])
         return assigned_points
-
 
