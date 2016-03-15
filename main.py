@@ -55,7 +55,7 @@ for i, tournament_filename in enumerate(tournament_filenames):
     assigned_points_per_best_round = new_ranking.compute_bonus_points(matches)
 
     # Saving new ranking
-    list_to_save = [[e.pid, e.total, e.rating, e.bonus, players[e.pid].name, players[e.pid].association,
+    list_to_save = [[e.pid, e.get_total(), e.rating, e.bonus, players[e.pid].name, players[e.pid].association,
                      players[e.pid].city] for e in new_ranking]
 
     utils.save_csv(data_folder + tournament_filename.replace("Partidos", "Ranking"),

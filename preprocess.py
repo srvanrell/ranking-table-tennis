@@ -24,7 +24,7 @@ players.load_list(utils.load_csv(data_folder + players_info_filename))
 raw_ranking = utils.load_csv(data_folder + initial_ranking_filename)
 ranking = models.Ranking("01/01/2016", "ranking inicial", "no aplica")
 # FIXME not reading bonus points from initial ranking
-ranking.load_list([[r[0], r[1]] for r in raw_ranking])
+ranking.load_list([[r[0], r[2], r[3]] for r in raw_ranking])
 
 for tournament_filename in tournament_filenames:
     # Loading tournament info
@@ -46,7 +46,7 @@ utils.save_csv(data_folder + players_info_filename,
                sorted(players.to_list(), key=lambda l: l[1]))
 
 # Saving initial rankings for all known players
-list_to_save = [[p.pid, ranking[p.pid].total, ranking[p.pid].rating, ranking[p.pid].bonus,
+list_to_save = [[p.pid, ranking[p.pid].get_total(), ranking[p.pid].rating, ranking[p.pid].bonus,
                  p.name, p.association, p.city] for p in players]
 
 utils.save_csv(data_folder + initial_ranking_filename,

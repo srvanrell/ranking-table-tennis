@@ -68,10 +68,12 @@ class RankingEntry:
         self.pid = pid
         self.rating = rating
         self.bonus = bonus
-        self.total = rating + bonus
+
+    def get_total(self):
+        return self.bonus + self.rating
 
     def __repr__(self):
-        return ";".join([str(self.pid), str(self.total), str(self.rating), str(self.bonus)])
+        return ";".join([str(self.pid), str(self.get_total()), str(self.rating), str(self.bonus)])
 
 
 class Ranking:
@@ -84,20 +86,17 @@ class Ranking:
     def __iter__(self):
         return self.ranking.itervalues()
 
-    def add_entry(self, rank_entry):
-        if rank_entry.pid not in self.ranking:
-            self.ranking[rank_entry.pid] = rank_entry
+    def add_entry(self, entry):
+        if entry.pid not in self.ranking:
+            self.ranking[entry.pid] = RankingEntry(entry.pid, entry.rating, entry.bonus)
         else:
-            print "WARNING: Already exists an entry for pid:", rank_entry.pid
+            print "WARNING: Already exists an entry for pid:", entry.pid
 
     def add_new_entry(self, pid):
         self.add_entry(RankingEntry(pid, 0, 0))
 
     def get_entry(self, pid):
-        entry = self.ranking.get(pid)
-        if entry:
-            entry.total = entry.rating + entry.bonus
-        return entry
+        return self.ranking.get(pid)
 
     def __getitem__(self, pid):
         return self.get_entry(pid)
@@ -107,7 +106,7 @@ class Ranking:
         return aux + "\n".join(str(self.get_entry(re)) for re in self.ranking)
 
     def load_list(self, ranking_list):
-        for pid, total, rating, bonus in ranking_list:
+        for pid, rating, bonus in ranking_list:
             self.add_entry(RankingEntry(pid, rating, bonus))
 
     def to_list(self):
@@ -121,7 +120,7 @@ class Ranking:
         for entry in old_ranking:
             self.add_entry(entry)
 
-        # List of points assigned in each match
+        # List of points assigned in each match.add_entry(
         assigned_points = []
 
         for winner_pid, loser_pid, unused in matches:
@@ -135,6 +134,7 @@ class Ranking:
         return assigned_points
 
     def compute_bonus_points(self, matches):
+        # FIXME falta considerar la suma de las distintas categorías
         # FIXME está sumando 3 de más en algunos casos, revisar como asigna los puntos bonus, fijar preferencia manual
         best_round = {}
 
@@ -156,17 +156,17 @@ class Ranking:
 
             # winner
             if best_round.get(winner):
-                if best_round.get(winner) < round_priority[winner_round_match]:
-                    best_round[winner] = round_priority[winner_round_match]
+                if round_priority[best_round.get(winner)] < round_priority[winner_round_match]:
+                    best_round[winner] = winner_round_match
             else:
-                best_round[winner] = round_priority[winner_round_match]
+                best_round[winner] = winner_round_match
 
             # loser
-            if best_round.get(winner):
-                if best_round.get(winner) < round_priority[loser_round_match]:
-                    best_round[winner] = round_priority[loser_round_match]
+            if best_round.get(loser):
+                if round_priority[best_round.get(loser)] < round_priority[loser_round_match]:
+                    best_round[loser] = loser_round_match
             else:
-                best_round[winner] = round_priority[loser_round_match]
+                best_round[loser] = loser_round_match
 
         # List of points assigned in each match
         assigned_points = []
