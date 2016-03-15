@@ -5,6 +5,7 @@ import models
 
 __author__ = 'sebastian'
 
+# TODO add xlsx support to read/write multiple sheets from/to a single file 
 
 # TODO add support for multiple rows header
 def save_csv(filename, headers, list_to_save):
@@ -70,64 +71,6 @@ def points_to_assign(rating_winner, rating_loser):
     # print "diff:%d, to_winner:%d, to_loser:%d" % (rating_diff, points_to_winner, points_to_loser)
 
     return [points_to_winner, points_to_loser]
-
-
-# TODO ranking model, get_rating, update_rating
-def get_rating(player_id, ranking):
-    return ranking[player_id]
-
-
-def get_new_ranking(old_ranking, matches_list):
-    # TODO make a better way to copy a list, maybe the db saves me
-    new_ranking = [list(item) for item in old_ranking]
-    # TODO add new players
-
-    for winner, loser, unused in matches_list:
-        # TODO change the way to read old ratings
-        [to_winner, to_loser] = points_to_assign(old_ranking[winner][1], old_ranking[loser][1])
-        # TODO change the way to read new ratings
-        new_ranking[winner][1] += to_winner
-        new_ranking[loser][1] -= to_loser
-
-    # TODO add points per best round reached
-    best_round_to_assign = {}
-
-    for winner, loser, round_match in matches_list:
-        if best_round_to_assign.get(winner):
-            if best_round_to_assign.get(winner) < round_points[round_match]:
-                if round_match == "final":
-                    best_round_to_assign[winner] = round_points["primero"]
-                elif round_match == "tercer puesto":
-                    best_round_to_assign[winner] = round_points["tercero"]
-                else:
-                    best_round_to_assign[winner] = round_points[round_match]
-        else:
-            if round_match == "final":
-                best_round_to_assign[winner] = round_points["primero"]
-            elif round_match == "tercer puesto":
-                best_round_to_assign[winner] = round_points["tercero"]
-            else:
-                best_round_to_assign[winner] = round_points[round_match]
-        if best_round_to_assign.get(loser):
-            if best_round_to_assign.get(loser) < round_points[round_match]:
-                if round_match == "final":
-                    best_round_to_assign[loser] = round_points["segundo"]
-                elif round_match == "tercer puesto":
-                    best_round_to_assign[loser] = round_points["cuarto"]
-                else:
-                    best_round_to_assign[loser] = round_points[round_match]
-        else:
-            if round_match == "final":
-                best_round_to_assign[loser] = round_points["segundo"]
-            elif round_match == "tercer puesto":
-                best_round_to_assign[loser] = round_points["cuarto"]
-            else:
-                best_round_to_assign[loser] = round_points[round_match]
-
-    for player_id in best_round_to_assign:
-        new_ranking[player_id][1] += best_round_to_assign[player_id]
-
-    return new_ranking
 
 
 def load_ranking_csv(filename):
