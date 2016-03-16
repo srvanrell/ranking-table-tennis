@@ -137,7 +137,6 @@ class Ranking:
         best_round = {}
 
         # FIXME maybe should not be read at utils and here instead
-        round_points = utils.round_points
         round_priority = utils.rounds_priority
 
         for winner, loser, round_match, category in matches:
@@ -167,6 +166,8 @@ class Ranking:
         for categpid in best_round:
             category = categpid.split("-")[0]
             pid = int(categpid.split("-")[1])
+            # FIXME maybe should not be read at utils and here instead
+            round_points = utils.round_points[category]
             self[pid].bonus += round_points[best_round[categpid]]
             assigned_points.append([pid, round_points[best_round[categpid]], best_round[categpid], category])
         return assigned_points
