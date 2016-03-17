@@ -2,10 +2,22 @@
 
 import csv
 import models
+from openpyxl import Workbook, load_workbook
 
 __author__ = 'sebastian'
 
-# TODO add xlsx support to read/write multiple sheets from/to a single file 
+
+# TODO add xlsx support to read/write multiple sheets from/to a single file
+def load_league_workbook(filename):
+    wb = load_workbook(filename, read_only=True)
+    snames = wb.sheetnames
+
+    print [sname for sname in snames if "Partidos" in sname]
+
+    ws = wb.get_sheet_by_name(snames[7])
+
+    print ws
+
 
 # TODO add support for multiple rows header
 def save_csv(filename, headers, list_to_save):
@@ -98,45 +110,59 @@ def load_ranking_csv(filename):
     return ranking_list
 
 
+def load_tournament_sheet(filename):
+    wb = load_workbook(filename, read_only=True)
+    snames = wb.sheetnames
+
+    print [sname for sname in snames if "Partidos" in sname]
+
+    ws = wb.get_sheet_by_name(snames[7])
+
+    print ws
+
+
 def load_tournament_csv(filename):
     """Loads an csv and return a preprocessed match list (winner, loser, round, category) and a list of players"""
     with open(filename, 'r') as incsv:
         reader = csv.reader(incsv)
-        aux = [row for row in reader]
+        tournament_list = [row for row in reader]
+        return load_tournament_list(tournament_list)
 
-        name = aux[0][1]
-        date = aux[1][1]
-        location = aux[2][1]
 
-        # Processing matches
-        raw_match_list = aux[5:]
+def load_tournament_list(tournament_list):
+    name = tournament_list[0][1]
+    date = tournament_list[1][1]
+    location = tournament_list[2][1]
 
-        # Ordered list of the players of the tournament
-        players_list = set()
-        for row in raw_match_list:
-            players_list.add(row[0])
-            players_list.add(row[1])
-        players_list = list(players_list)
-        players_list.sort()
+    # Processing matches
+    raw_match_list = tournament_list[5:]
 
-        # Reformated list of matches
-        matches_list = []
-        for player1, player2, set1, set2, round_match, category in raw_match_list:
-            if int(set1) > int(set2):
-                winner = player1
-                loser = player2
-            elif int(set1) < int(set2):
-                winner = player2
-                loser = player1
-            else:
-                print("Error al procesar los partidos, se encontró un empate entre %s y %s" % (player1, player2))
-                break
-            matches_list.append([winner, loser, round_match, category])
+    # Ordered list of the players of the tournament
+    players_list = set()
+    for row in raw_match_list:
+        players_list.add(row[0])
+        players_list.add(row[1])
+    players_list = list(players_list)
+    players_list.sort()
 
-        tournament = {"name": name,
-                      "date": date,
-                      "location": location,
-                      "players": players_list,
-                      "matches": matches_list}
+    # Reformated list of matches
+    matches_list = []
+    for player1, player2, set1, set2, round_match, category in raw_match_list:
+        if int(set1) > int(set2):
+            winner = player1
+            loser = player2
+        elif int(set1) < int(set2):
+            winner = player2
+            loser = player1
+        else:
+            print("Error al procesar los partidos, se encontró un empate entre %s y %s" % (player1, player2))
+            break
+        matches_list.append([winner, loser, round_match, category])
 
-        return tournament
+    tournament = {"name": name,
+                  "date": date,
+                  "location": location,
+                  "players": players_list,
+                  "matches": matches_list}
+
+    return tournament
