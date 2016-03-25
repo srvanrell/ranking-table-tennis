@@ -3,7 +3,7 @@
 import csv
 import models
 import os
-from openpyxl import Workbook, load_workbook
+from openpyxl import Workbook, load_workbook, worksheet
 
 __author__ = 'sebastian'
 
@@ -13,11 +13,36 @@ def load_league_workbook(filename):
     wb = load_workbook(filename, read_only=True)
     snames = wb.sheetnames
 
+
+    print snames
+
     print [sname for sname in snames if "Partidos" in sname]
 
     ws = wb.get_sheet_by_name(snames[7])
 
     print ws
+
+
+def load_sheet_workbook(filename, sheetname):
+    wb = load_workbook(filename, read_only=True)
+    ws = wb.get_sheet_by_name(sheetname)
+
+    ws.calculate_dimension(force=True)
+    print ws.dimensions
+
+    list_to_return = []
+    # max_column = 0
+    for row in ws.rows:
+        # if not max_column:
+        #     max_column = 1
+        aux_row = []
+        for cell in row:
+            if cell.value is None:
+                aux_row.append("")
+            else:
+                aux_row.append(cell.value)
+        list_to_return.append(aux_row)
+    return list_to_return[1:]
 
 
 # TODO add support for multiple rows header
