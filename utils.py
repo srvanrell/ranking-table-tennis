@@ -2,6 +2,7 @@
 
 import csv
 import models
+import os
 from openpyxl import Workbook, load_workbook
 
 __author__ = 'sebastian'
@@ -50,14 +51,15 @@ def load_csv(filename):
 
 # Expected result table
 # TODO, falta chequear
+config_folder = os.path.dirname(__file__) + "/config/"
 # difference, points to winner, points to loser
-expected_result = load_csv("expected_result.csv")
+expected_result = load_csv(config_folder + "expected_result.csv")
 
 # negative difference, points to winner, points to loser
-unexpected_result = load_csv("unexpected_result.csv")
+unexpected_result = load_csv(config_folder + "unexpected_result.csv")
 
 # points to be assigned by round
-aux_round_points = load_csv("puntos_por_ronda.csv")
+aux_round_points = load_csv(config_folder + "puntos_por_ronda.csv")
 round_points = {}
 rounds_priority = {}
 for i, category in enumerate(["primera", "segunda", "tercera"]):
@@ -108,17 +110,6 @@ def load_ranking_csv(filename):
     # TODO name date and location should be read from file
     ranking_list = [[r[0], r[2], r[3]] for r in raw_ranking]
     return ranking_list
-
-
-def load_tournament_sheet(filename):
-    wb = load_workbook(filename, read_only=True)
-    snames = wb.sheetnames
-
-    print [sname for sname in snames if "Partidos" in sname]
-
-    ws = wb.get_sheet_by_name(snames[7])
-
-    print ws
 
 
 def load_tournament_csv(filename):
