@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import utils
 
 
@@ -34,7 +32,7 @@ class PlayersList:
         if player.pid not in self.players:
             self.players[player.pid] = player
         else:
-            print "WARNING: Already exists a player for that pid. Check:", str(player)
+            print("WARNING: Already exists a player for that pid. Check:", str(player))
 
     def add_new_player(self, name):
         pid = 0
@@ -48,7 +46,7 @@ class PlayersList:
         for player in self.players.itervalues():
             if name == player.name:
                 return player.pid
-        print "WARNING: Unknown player:", name
+        print("WARNING: Unknown player:", name)
         return None
 
     def to_list(self):
@@ -90,7 +88,7 @@ class Ranking:
         if entry.pid not in self.ranking:
             self.ranking[entry.pid] = RankingEntry(entry.pid, entry.rating, entry.bonus)
         else:
-            print "WARNING: Already exists an entry for pid:", entry.pid
+            print("WARNING: Already exists an entry for pid:", entry.pid)
 
     def add_new_entry(self, pid):
         self.add_entry(RankingEntry(pid, 0, 0))

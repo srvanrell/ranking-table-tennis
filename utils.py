@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import csv
 import models
 import os
@@ -14,13 +12,13 @@ def load_league_workbook(filename):
     snames = wb.sheetnames
 
 
-    print snames
+    print(snames)
 
-    print [sname for sname in snames if "Partidos" in sname]
+    print([sname for sname in snames if "Partidos" in sname])
 
     ws = wb.get_sheet_by_name(snames[7])
 
-    print ws
+    print(ws)
 
 
 def load_sheet_workbook(filename, sheetname):
@@ -28,7 +26,7 @@ def load_sheet_workbook(filename, sheetname):
     ws = wb.get_sheet_by_name(sheetname)
 
     ws.calculate_dimension(force=True)
-    print ws.dimensions
+    print(ws.dimensions)
 
     list_to_return = []
     # max_column = 0
