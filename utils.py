@@ -19,9 +19,15 @@ def load_league_workbook(filename):
     ws = wb.get_sheet_by_name(snames[7])
 
     print(ws)
+    
 
+def get_ordered_sheet_names(filename, filter_key = ""):
+    wb = load_workbook(filename, read_only=True)
+    snames = [s for s in wb.sheetnames if filter_key in s]
 
-def load_sheet_workbook(filename, sheetname):
+    return snames
+
+def load_sheet_workbook(filename, sheetname, first_row=1):
     wb = load_workbook(filename, read_only=True)
     ws = wb.get_sheet_by_name(sheetname)
 
@@ -40,7 +46,7 @@ def load_sheet_workbook(filename, sheetname):
             else:
                 aux_row.append(cell.value)
         list_to_return.append(aux_row)
-    return list_to_return[1:]
+    return list_to_return[first_row:]
 
 
 # TODO add support for multiple rows header
@@ -51,13 +57,11 @@ def save_csv(filename, headers, list_to_save):
         writer.writerows(list_to_save)
 
 
-def load_csv(filename):
+def load_csv(filename, first_row=1):
     with open(filename, 'r') as incsv:
         reader = csv.reader(incsv)
-        aux = [row for row in reader]
-        header = aux[0]
         list_to_return = []
-        for row in aux[1:]:
+        for row in reader:
             aux_row = []
             for item in row:
                 if item.isdigit():
@@ -65,7 +69,7 @@ def load_csv(filename):
                 else:
                     aux_row.append(item)
             list_to_return.append(aux_row)
-        return list_to_return
+        return list_to_return[first_row:]
 
 
 ##############################
@@ -143,6 +147,11 @@ def load_tournament_csv(filename):
         return load_tournament_list(tournament_list)
 
 
+def load_tournament_xlsx(filename, sheet_name):
+    """Loads an xlsx sheet and return a preprocessed match list (winner, loser, round, category) and a list of players"""
+    return load_tournament_list(load_sheet_workbook(filename, sheet_name, 0))
+
+
 def load_tournament_list(tournament_list):
     name = tournament_list[0][1]
     date = tournament_list[1][1]
@@ -180,3 +189,4 @@ def load_tournament_list(tournament_list):
                   "matches": matches_list}
 
     return tournament
+    
