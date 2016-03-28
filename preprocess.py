@@ -38,7 +38,7 @@ for tournament_filename in tournament_filenames:
 
         if ranking.get_entry(pid) is None:
             ranking.add_new_entry(pid)
-            print "WARNING: Added player without rating: %s (%d)" % (name, pid)
+            print("WARNING: Added player without rating: %s (%d)" % (name, pid))
 
 # Saving complete list of players, including new ones
 utils.save_csv(data_folder + players_info_filename,

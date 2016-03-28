@@ -43,14 +43,14 @@ class PlayersList:
     # def __contains__(self, ):
 
     def get_pid(self, name):
-        for player in self.players.itervalues():
+        for player in self:
             if name == player.name:
                 return player.pid
         print("WARNING: Unknown player:", name)
         return None
 
     def to_list(self):
-        players_list = [[p.pid, p.name, p.association, p.city] for p in self.players.itervalues()]
+        players_list = [[p.pid, p.name, p.association, p.city] for p in self]
         return players_list
 
     def load_list(self, players_list):
@@ -58,7 +58,7 @@ class PlayersList:
             self.add_player(Player(pid, name, association, city))
 
     def __iter__(self):
-        return self.players.itervalues()
+        return self.players.values()
 
 
 class RankingEntry:
@@ -82,7 +82,7 @@ class Ranking:
         self.location = location
 
     def __iter__(self):
-        return self.ranking.itervalues()
+        return self.ranking.values()
 
     def add_entry(self, entry):
         if entry.pid not in self.ranking:
@@ -169,4 +169,3 @@ class Ranking:
             self[pid].bonus += round_points[best_round[categpid]]
             assigned_points.append([pid, round_points[best_round[categpid]], best_round[categpid], category])
         return assigned_points
-

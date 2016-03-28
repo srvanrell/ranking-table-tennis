@@ -1,7 +1,7 @@
 import csv
 import models
 import os
-from openpyxl import Workbook, load_workbook, worksheet
+from openpyxl import Workbook, load_workbook
 
 __author__ = 'sebastian'
 
@@ -11,7 +11,6 @@ def load_league_workbook(filename):
     wb = load_workbook(filename, read_only=True)
     snames = wb.sheetnames
 
-
     print(snames)
 
     print([sname for sname in snames if "Partidos" in sname])
@@ -19,13 +18,14 @@ def load_league_workbook(filename):
     ws = wb.get_sheet_by_name(snames[7])
 
     print(ws)
-    
 
-def get_ordered_sheet_names(filename, filter_key = ""):
+
+def get_ordered_sheet_names(filename, filter_key=""):
     wb = load_workbook(filename, read_only=True)
     snames = [s for s in wb.sheetnames if filter_key in s]
 
     return snames
+
 
 def load_sheet_workbook(filename, sheetname, first_row=1):
     wb = load_workbook(filename, read_only=True)
@@ -89,13 +89,13 @@ unexpected_result = load_csv(config_folder + "unexpected_result.csv")
 aux_round_points = load_csv(config_folder + "puntos_por_ronda.csv")
 round_points = {}
 rounds_priority = {}
-for i, category in enumerate(["primera", "segunda", "tercera"]):
-    round_points[category] = {}
-    for row in aux_round_points:
-        priority = row[0]
-        reached_round = row[1]
-        points = row[2+i]
-        round_points[category][reached_round] = points
+for i, categ in enumerate(["primera", "segunda", "tercera"]):
+    round_points[categ] = {}
+    for r in aux_round_points:
+        priority = r[0]
+        reached_round = r[1]
+        points = r[2 + i]
+        round_points[categ][reached_round] = points
         rounds_priority[reached_round] = priority
 
 
@@ -108,12 +108,12 @@ def points_to_assign(rating_winner, rating_loser):
         rating_diff *= -1.0
         assignation_table = unexpected_result
 
-    i = 0
-    while rating_diff > assignation_table[i][0]:
-        i += 1
+    j = 0
+    while rating_diff > assignation_table[j][0]:
+        j += 1
 
-    points_to_winner = assignation_table[i][1]
-    points_to_loser = assignation_table[i][2]
+    points_to_winner = assignation_table[j][1]
+    points_to_loser = assignation_table[j][2]
     # print "diff:%d, to_winner:%d, to_loser:%d" % (rating_diff, points_to_winner, points_to_loser)
 
     return [points_to_winner, points_to_loser]
@@ -135,7 +135,7 @@ def load_ranking_csv(filename):
     #     ranking.load_list([[r[0], r[1]] for r in raw_ranking])
     raw_ranking = load_csv(filename)
     # TODO name date and location should be read from file
-    ranking_list = [[r[0], r[2], r[3]] for r in raw_ranking]
+    ranking_list = [[rr[0], rr[2], rr[3]] for rr in raw_ranking]
     return ranking_list
 
 
@@ -148,7 +148,8 @@ def load_tournament_csv(filename):
 
 
 def load_tournament_xlsx(filename, sheet_name):
-    """Loads an xlsx sheet and return a preprocessed match list (winner, loser, round, category) and a list of players"""
+    """Loads an xlsx sheet and return a preprocessed match list (winner, loser, round, category)
+    and a list of players"""
     return load_tournament_list(load_sheet_workbook(filename, sheet_name, 0))
 
 
@@ -189,4 +190,3 @@ def load_tournament_list(tournament_list):
                   "matches": matches_list}
 
     return tournament
-    

@@ -1,5 +1,5 @@
-#import sys
-#print sys.path
+# import sys
+# print sys.path
 
 import utils
 import models
@@ -32,5 +32,3 @@ print(snames)
 for i, s in enumerate(snames):
     t = utils.load_tournament_xlsx(data_folder + league_filename, s)
     print(i, t["date"])
-
-

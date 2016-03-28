@@ -75,5 +75,3 @@ for i, tournament_filename in enumerate(tournament_filenames):
     utils.save_csv(data_folder + tournament_filename.replace("Partidos", "Detalles Puntos Bonus"),
                    ["Jugador", "Puntos Bonus", "Mejor Ronda", "Categoría"],
                    points_log_to_save)
-
-
