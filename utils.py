@@ -2,6 +2,7 @@ import csv
 import models
 import os
 from openpyxl import Workbook, load_workbook
+from openpyxl.styles import Font
 
 __author__ = 'sebastian'
 
@@ -47,6 +48,29 @@ def load_sheet_workbook(filename, sheetname, first_row=1):
                 aux_row.append(cell.value)
         list_to_return.append(aux_row)
     return list_to_return[first_row:]
+
+
+def save_sheet_workbook(filename, sheetname, headers, list_to_save, overwrite=False):
+    if os.path.isfile(filename):
+        wb = load_workbook(filename)
+        if overwrite and sheetname in wb:
+            wb.remove_sheet(wb.get_sheet_by_name(sheetname))
+        ws = wb.create_sheet()
+    else:
+        wb = Workbook()
+        ws = wb.active
+
+    ws.title = sheetname
+
+    ws.append(headers)
+    for col in range(1, ws.max_column+1):
+        cell = ws.cell(column=col+1, row=1)
+        cell.font = Font(bold=True)
+
+    for row in list_to_save:
+        ws.append(row)
+
+    wb.save(filename)
 
 
 # TODO add support for multiple rows header
