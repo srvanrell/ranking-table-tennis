@@ -8,6 +8,10 @@ __author__ = 'sebastian'
 # Codigo para inicializar dos orillas
 
 data_folder = "data/"
+xlsx_filename = "Liga Dos Orillas 2016 - Categorías Mayores.xlsx"
+out_filename = "prueba.xlsx"
+players_sheetname = "Jugadores"
+ranking_sheetname = "Ranking inicial"
 
 tournament_filenames = ["Liga Dos Orillas 2016 - Categorías Mayores - Partidos 1er Torneo 2016.csv",
                         "Liga Dos Orillas 2016 - Categorías Mayores - Partidos 2do Torneo 2016.csv",
@@ -18,7 +22,9 @@ initial_ranking_filename = "Liga Dos Orillas 2016 - Categorías Mayores - Rankin
 
 # Loading and completing the players list
 players = models.PlayersList()
-players.load_list(utils.load_csv(data_folder + players_info_filename))
+# players.load_list(utils.load_csv(data_folder + players_info_filename))
+players.load_list(utils.load_sheet_workbook(data_folder + xlsx_filename, players_sheetname))
+
 
 # Loading initial ranking and adding new players with 0
 raw_ranking = utils.load_csv(data_folder + initial_ranking_filename)

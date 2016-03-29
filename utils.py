@@ -33,7 +33,7 @@ def load_sheet_workbook(filename, sheetname, first_row=1):
     ws = wb.get_sheet_by_name(sheetname)
 
     ws.calculate_dimension(force=True)
-    print(ws.dimensions)
+    # print(ws.dimensions)
 
     list_to_return = []
     # max_column = 0
