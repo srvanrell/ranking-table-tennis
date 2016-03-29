@@ -8,8 +8,8 @@ class Player:
         self.association = association
         self.city = city
 
-    # def __repr__(self):
-    #     return ";".join([str(self.pid), self.name, self.association, self.city])
+    def __str__(self):
+        return ";".join([str(self.pid), self.name, self.association, self.city])
 
 
 class PlayersList:
@@ -22,11 +22,11 @@ class PlayersList:
     def __len__(self):
         return len(self.players)
 
-    # def __repr__(self):
-    #     return "\n".join(str(self.get_player(p)) for p in self.players)
+    def __str__(self):
+        return "\n".join(str(self.get_player(p)) for p in self.players)
 
     def __iter__(self):
-        return self.players.values()
+        return iter(self.players.values())
 
     def get_player(self, pid):
         return self.players.get(pid)
@@ -44,15 +44,14 @@ class PlayersList:
         self.add_player(Player(pid, name))
 
     def get_pid(self, name):
-        print(self.players.values())
-        for player in self.players.values():
+        for player in self:
             if name == player.name:
                 return player.pid
         print("WARNING: Unknown player:", name)
         return None
 
     def to_list(self):
-        players_list = [[p.pid, p.name, p.association, p.city] for p in self.players.values()]
+        players_list = [[p.pid, p.name, p.association, p.city] for p in self]
         print(players_list)
         return players_list
 
@@ -70,7 +69,7 @@ class RankingEntry:
     def get_total(self):
         return self.bonus + self.rating
 
-    def __repr__(self):
+    def __str__(self):
         return ";".join([str(self.pid), str(self.get_total()), str(self.rating), str(self.bonus)])
 
 
@@ -82,7 +81,7 @@ class Ranking:
         self.location = location
 
     def __iter__(self):
-        return self.ranking.values()
+        return iter(self.ranking.values())
 
     def add_entry(self, entry):
         if entry.pid not in self.ranking:
@@ -99,7 +98,7 @@ class Ranking:
     def __getitem__(self, pid):
         return self.get_entry(pid)
 
-    def __repr__(self):
+    def __str__(self):
         aux = "%s (%s - %s)\n" % (self.tournament_name, self.location, self.date)
         return aux + "\n".join(str(self.get_entry(re)) for re in self.ranking)
 
