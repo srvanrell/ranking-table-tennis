@@ -23,7 +23,7 @@ class PlayersList:
         return len(self.players)
 
     def __str__(self):
-        return "\n".join(str(self.get_player(p)) for p in self.players)
+        return "\n".join(str(p) for p in self)
 
     def __iter__(self):
         return iter(self.players.values())
@@ -52,7 +52,6 @@ class PlayersList:
 
     def to_list(self):
         players_list = [[p.pid, p.name, p.association, p.city] for p in self]
-        print(players_list)
         return players_list
 
     def load_list(self, players_list):
@@ -100,7 +99,7 @@ class Ranking:
 
     def __str__(self):
         aux = "%s (%s - %s)\n" % (self.tournament_name, self.location, self.date)
-        return aux + "\n".join(str(self.get_entry(re)) for re in self.ranking)
+        return aux + "\n".join(str(re) for re in self)
 
     def load_list(self, ranking_list):
         for pid, rating, bonus in ranking_list:

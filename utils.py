@@ -64,7 +64,7 @@ def save_sheet_workbook(filename, sheetname, headers, list_to_save, overwrite=Fa
 
     ws.append(headers)
     for col in range(1, ws.max_column+1):
-        cell = ws.cell(column=col+1, row=1)
+        cell = ws.cell(column=col, row=1)
         cell.font = Font(bold=True)
 
     for row in list_to_save:
