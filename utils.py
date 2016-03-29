@@ -2,7 +2,7 @@ import csv
 import models
 import os
 from openpyxl import Workbook, load_workbook
-from openpyxl.styles import Font
+from openpyxl.styles import Font, Alignment
 
 __author__ = 'sebastian'
 
@@ -162,6 +162,58 @@ def load_ranking_csv(filename):
     ranking_list = [[rr[0], rr[2], rr[3]] for rr in raw_ranking]
     return ranking_list
 
+
+def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=False):
+    if os.path.isfile(filename):
+        wb = load_workbook(filename)
+        if overwrite and sheetname in wb:
+            wb.remove_sheet(wb.get_sheet_by_name(sheetname))
+        ws = wb.create_sheet()
+    else:
+        wb = Workbook()
+        ws = wb.active
+
+    ws.title = sheetname
+
+    ws["A1"] = "Nombre del torneo"
+    ws["B1"] = ranking.tournament_name
+    ws.merge_cells('B1:G1')
+    ws["A2"] = "Fecha"
+    ws["B2"] = ranking.date
+    ws.merge_cells('B2:G2')
+    ws["A3"] = "Lugar"
+    ws["B3"] = ranking.location
+    ws.merge_cells('B3:G3')
+    ws["A4"] = "Lista de partidos"
+    ws.merge_cells('A4:G4')
+
+    ws.append(["PID", "Total puntos", "Nivel de juego", "Puntos bonus", "Jugador", "Asociación", "Ciudad"])
+
+    to_bold = ["A1", "A2", "A3", "A4",
+               "A5", "B5", "C5", "D5", "E5", "F5", "G5"]
+
+    for colrow in to_bold:
+        cell = ws.cell(colrow)
+        cell.font = Font(bold=True)
+        # TODO add width adaptation instead of shrink
+        cell.alignment = Alignment(horizontal='center', shrink_to_fit=True)
+
+    list_to_save = [[e.pid, e.get_total(), e.rating, e.bonus, players[e.pid].name, players[e.pid].association,
+                     players[e.pid].city] for e in ranking]
+
+    for row in sorted(list_to_save, key=lambda l: l[1], reverse=True):
+        ws.append(row)
+
+    wb.save(filename)
+
+
+def load_ranking_sheet(filename, sheetname):
+    # """Loads an csv and return a preprocessed ranking (name, date, ranking_list)"""
+    # TODO check if date is being read properly
+    raw_ranking = load_sheet_workbook(filename, sheetname)
+    ranking = models.Ranking(raw_ranking[0][1], raw_ranking[1][1], raw_ranking[2][1])
+    ranking.load_list([[rr[0], rr[2], rr[3]] for rr in raw_ranking[5:]])
+    return ranking
 
 def load_tournament_csv(filename):
     """Loads an csv and return a preprocessed match list (winner, loser, round, category) and a list of players"""
