@@ -53,6 +53,7 @@ def load_sheet_workbook(filename, sheetname, first_row=1):
 def save_sheet_workbook(filename, sheetname, headers, list_to_save, overwrite=False):
     if os.path.isfile(filename):
         wb = load_workbook(filename)
+        # TODO if I want to append info to a sheet, currently I cannot => split and
         if overwrite and sheetname in wb:
             wb.remove_sheet(wb.get_sheet_by_name(sheetname))
         ws = wb.create_sheet()
@@ -144,19 +145,6 @@ def points_to_assign(rating_winner, rating_loser):
 
 
 def load_ranking_csv(filename):
-    # TODO add support for rankings csvs with expanded header
-    # """Loads an csv and return a preprocessed ranking (name, date, ranking_list)"""
-    # with open(filename, 'r') as incsv:
-    #     reader = csv.reader(incsv)
-    #     aux = [row for row in reader]
-    #
-    #     name = aux[0][1]
-    #     date = aux[1][1]
-    #     location = aux[2][1]
-    #
-    #     raw_ranking = aux[4:]
-    #     ranking = models.Ranking(name, date)
-    #     ranking.load_list([[r[0], r[1]] for r in raw_ranking])
     raw_ranking = load_csv(filename)
     # TODO name date and location should be read from file
     ranking_list = [[rr[0], rr[2], rr[3]] for rr in raw_ranking]
@@ -184,19 +172,20 @@ def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=False):
     ws["A3"] = "Lugar"
     ws["B3"] = ranking.location
     ws.merge_cells('B3:G3')
-    ws["A4"] = "Lista de partidos"
-    ws.merge_cells('A4:G4')
 
     ws.append(["PID", "Total puntos", "Nivel de juego", "Puntos bonus", "Jugador", "Asociación", "Ciudad"])
 
-    to_bold = ["A1", "A2", "A3", "A4",
-               "A5", "B5", "C5", "D5", "E5", "F5", "G5"]
+    to_bold = ["A1", "A2", "A3",
+               "A4", "B4", "C4", "D4", "E4", "F4", "G4"]
+    to_center = to_bold + ["B1", "B2", "B3"]
 
     for colrow in to_bold:
         cell = ws.cell(colrow)
         cell.font = Font(bold=True)
+    for colrow in to_center:
+        cell = ws.cell(colrow)
         # TODO add width adaptation instead of shrink
-        cell.alignment = Alignment(horizontal='center', shrink_to_fit=True)
+        cell.alignment = Alignment(horizontal='center')
 
     list_to_save = [[e.pid, e.get_total(), e.rating, e.bonus, players[e.pid].name, players[e.pid].association,
                      players[e.pid].city] for e in ranking]
@@ -210,10 +199,11 @@ def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=False):
 def load_ranking_sheet(filename, sheetname):
     # """Loads an csv and return a preprocessed ranking (name, date, ranking_list)"""
     # TODO check if date is being read properly
-    raw_ranking = load_sheet_workbook(filename, sheetname)
+    raw_ranking = load_sheet_workbook(filename, sheetname, first_row=0)
     ranking = models.Ranking(raw_ranking[0][1], raw_ranking[1][1], raw_ranking[2][1])
-    ranking.load_list([[rr[0], rr[2], rr[3]] for rr in raw_ranking[5:]])
+    ranking.load_list([[rr[0], rr[2], rr[3]] for rr in raw_ranking[4:]])
     return ranking
+
 
 def load_tournament_csv(filename):
     """Loads an csv and return a preprocessed match list (winner, loser, round, category) and a list of players"""
