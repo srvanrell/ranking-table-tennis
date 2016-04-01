@@ -124,6 +124,7 @@ class Ranking:
                                                            old_ranking[loser_pid].rating)
             self[winner_pid].rating += to_winner
             self[loser_pid].rating -= to_loser
+            self[loser_pid].rating = max(0, self[loser_pid].rating)
 
             assigned_points.append([winner_pid, loser_pid, to_winner, -to_loser])
 
