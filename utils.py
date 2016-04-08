@@ -7,25 +7,13 @@ from openpyxl.styles import Font, Alignment
 __author__ = 'sebastian'
 
 
-# TODO add xlsx support to read/write multiple sheets from/to a single file
-def load_league_workbook(filename):
+def get_sheetnames_by_date(filename, filter_key=""):
     wb = load_workbook(filename, read_only=True)
-    snames = wb.sheetnames
+    sheetnames = [s for s in wb.sheetnames if filter_key in s]
+    namesdates = [(name, load_tournament_xlsx(filename, name)["date"]) for name in sheetnames]
+    namesdates.sort(key=lambda p: p[1])
 
-    print(snames)
-
-    print([sname for sname in snames if "Partidos" in sname])
-
-    ws = wb.get_sheet_by_name(snames[7])
-
-    print(ws)
-
-
-def get_ordered_sheet_names(filename, filter_key=""):
-    wb = load_workbook(filename, read_only=True)
-    snames = [s for s in wb.sheetnames if filter_key in s]
-
-    return snames
+    return [name for name, date in namesdates]
 
 
 def load_sheet_workbook(filename, sheetname, first_row=1):
@@ -74,7 +62,6 @@ def save_sheet_workbook(filename, sheetname, headers, list_to_save, overwrite=Fa
     wb.save(filename)
 
 
-# TODO add support for multiple rows header
 def save_csv(filename, headers, list_to_save):
     with open(filename, 'w') as outcsv:
         writer = csv.writer(outcsv)
