@@ -29,11 +29,4 @@ initial_ranking.load_list([[r[0], r[2], r[3]] for r in raw_ranking])
 snames = utils.get_ordered_sheet_names(data_folder + league_filename, "Partidos")
 # print(snames)
 
-to_order = []
-for i, s in enumerate(snames):
-    t = utils.load_tournament_xlsx(data_folder + league_filename, s)
-    to_order.append((6 - i, t["date"]))
-
-print(sorted(to_order, key=lambda p: p[1]))
-
-utils.save_sheet_workbook(data_folder + "pruebaa.xlsx", "nombre", ["aa", "bb"], [[1, 2], ["e", 4]], overwrite=True)
+# utils.save_sheet_workbook(data_folder + "pruebaa.xlsx", "nombre", ["aa", "bb"], [[1, 2], ["e", 4]], overwrite=True)

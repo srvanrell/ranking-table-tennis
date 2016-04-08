@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from _socket import if_nameindex
 
 import utils
 import models
@@ -9,14 +8,14 @@ __author__ = 'sebastian'
 # Codigo para inicializar dos orillas
 
 data_folder = "data/"
-xlsx_filename = "Liga Dos Orillas 2016 - Categorías Mayores - excel.xlsx"
-out_filename = "Liga Dos Orillas 2016 - Categorías Mayores - excel.xlsx"
+xlsx_filename = "Liga Dos Orillas 2016 - Categorías Mayores - Partidos.xlsx"
+out_filename = "Liga Dos Orillas 2016 - Categorías Mayores - Partidos.xlsx"
 players_sheetname = "Jugadores"
 ranking_sheetname = "Ranking inicial"
-tournament_sheetnames = ["Partidos 1er Torneo 2016",
-                         "Partidos 2do Torneo 2016",
-                         "Partidos 3er Torneo 2016"
-                         ]
+tournaments_key = "Partidos"
+
+# Listing tournament sheetnames by increasing date
+tournament_sheetnames = utils.get_sheetnames_by_date(data_folder + xlsx_filename, tournaments_key)
 
 # Loading and completing the players list
 players = models.PlayersList()
@@ -47,4 +46,3 @@ utils.save_sheet_workbook(data_folder + out_filename, players_sheetname,
 
 # Saving initial rankings for all known players
 utils.save_ranking_sheet(data_folder + out_filename, ranking_sheetname, ranking, players, True)
-

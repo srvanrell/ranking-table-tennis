@@ -4,22 +4,15 @@ import models
 __author__ = 'sebastian'
 
 data_folder = "data/"
-xlsx_filename = "Liga Dos Orillas 2016 - Categorías Mayores - repetido.xlsx"
-out_filename = "prueba.xlsx"
+xlsx_filename = "Liga Dos Orillas 2016 - Categorías Mayores - Partidos.xlsx"
+out_filename = "Liga Dos Orillas 2016 - Categorías Mayores - Rankings crudos.xlsx"
 log_filename = "log.xlsx"
 players_sheetname = "Jugadores"
 ranking_sheetname = "Ranking inicial"
-tournament_sheetnames = ["Partidos 1er Torneo 2016",
-                         "Partidos 2do Torneo 2016",
-                         "Partidos 3er Torneo 2016",
-                         "Partidos 4to Torneo 2016",
-                         "Partidos 5to Torneo 2016",
-                         "Partidos 6to Torneo 2016",
-                         "Partidos 7mo Torneo 2016",
-                         "Partidos 8vo Torneo 2016",
-                         "Partidos 9no Torneo 2016",
-                         "Partidos 10m Torneo 2016",
-                         ]
+tournaments_key = "Partidos"
+
+# Listing tournament sheetnames by increasing date
+tournament_sheetnames = utils.get_sheetnames_by_date(data_folder + xlsx_filename, tournaments_key)
 
 # Loading players info list
 players = models.PlayersList()
@@ -37,7 +30,7 @@ for i, tournament_sheetname in enumerate(tournament_sheetnames):
     # Load previous ranking if exists
     if i-1 >= 0:
         old_ranking = utils.load_ranking_sheet(data_folder + out_filename,
-                                               tournament_sheetnames[i-1].replace("Partidos", "Ranking"))
+                                               tournament_sheetnames[i-1].replace(tournaments_key, "Ranking"))
 
     # Load initial rankings for new players
     for name in tournament["players"]:
@@ -59,14 +52,15 @@ for i, tournament_sheetname in enumerate(tournament_sheetnames):
     assigned_points_per_best_round = new_ranking.compute_bonus_points(matches)
 
     # Saving new ranking
-    utils.save_ranking_sheet(data_folder + out_filename, tournament_sheetname.replace("Partidos", "Ranking"),
+    utils.save_ranking_sheet(data_folder + out_filename, tournament_sheetname.replace(tournaments_key, "Ranking"),
                              new_ranking, players, True)
 
     # Saving points assigned in each match
     points_log_to_save = [[players[winner_pid].name, players[loser_pid].name, winner_points, loser_points]
                           for winner_pid, loser_pid, winner_points, loser_points in assigned_points_per_match]
 
-    utils.save_sheet_workbook(data_folder + log_filename, tournament_sheetname.replace("Partidos", "Detalles Rating"),
+    utils.save_sheet_workbook(data_folder + log_filename,
+                              tournament_sheetname.replace(tournaments_key, "Detalles Rating"),
                               ["Ganador", "Perdedor", "Puntos Ganador", "Puntos Perdedor"],
                               points_log_to_save, True)
 
@@ -74,6 +68,7 @@ for i, tournament_sheetname in enumerate(tournament_sheetnames):
     points_log_to_save = [[players[pid].name, points, best_round, category] for pid, points, best_round, category
                           in assigned_points_per_best_round]
 
-    utils.save_sheet_workbook(data_folder + log_filename, tournament_sheetname.replace("Partidos", "Detalles Bonus"),
+    utils.save_sheet_workbook(data_folder + log_filename,
+                              tournament_sheetname.replace(tournaments_key, "Detalles Bonus"),
                               ["Jugador", "Puntos Bonus", "Mejor Ronda", "Categoría"],
                               points_log_to_save, True)
