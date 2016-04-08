@@ -109,6 +109,25 @@ class Ranking:
         ranking_list = [[p.pid, p.rating, p.bonus] for p in self]
         return ranking_list
 
+    @staticmethod
+    def _points_to_assign(rating_winner, rating_loser):
+        """Returns points to add to winner and to deduce from loser, given ratings of winner and loser."""
+        rating_diff = rating_winner - rating_loser
+
+        assignation_table = utils.expected_result
+        if rating_diff < 0:
+            rating_diff *= -1.0
+            assignation_table = utils.unexpected_result
+
+        j = 0
+        while rating_diff > assignation_table[j][0]:
+            j += 1
+
+        points_to_winner = assignation_table[j][1]
+        points_to_loser = assignation_table[j][2]
+
+        return [points_to_winner, points_to_loser]
+
     def compute_new_ratings(self, old_ranking, matches):
         """return assigned points per match
         (a list containing [winner_pid, loser_pid, points_to_winner, points_to_loser])"""

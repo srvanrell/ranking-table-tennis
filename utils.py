@@ -111,26 +111,6 @@ for i, categ in enumerate(["primera", "segunda", "tercera"]):
         rounds_priority[reached_round] = priority
 
 
-def points_to_assign(rating_winner, rating_loser):
-    """Return points to assign to each player given"""
-    rating_diff = rating_winner - rating_loser
-
-    assignation_table = expected_result
-    if rating_diff < 0:
-        rating_diff *= -1.0
-        assignation_table = unexpected_result
-
-    j = 0
-    while rating_diff > assignation_table[j][0]:
-        j += 1
-
-    points_to_winner = assignation_table[j][1]
-    points_to_loser = assignation_table[j][2]
-    # print "diff:%d, to_winner:%d, to_loser:%d" % (rating_diff, points_to_winner, points_to_loser)
-
-    return [points_to_winner, points_to_loser]
-
-
 def load_ranking_csv(filename):
     raw_ranking = load_csv(filename)
     # TODO name date and location should be read from file
