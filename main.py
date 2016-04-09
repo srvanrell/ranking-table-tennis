@@ -40,10 +40,9 @@ for i, tournament_sheetname in enumerate(tournament_sheetnames):
 
     # Creating matches list with pid
     matches = []
-    for winner_name, loser_name, match_round, category in tournament.matches:
-        matches.append([players.get_pid(winner_name),
-                        players.get_pid(loser_name),
-                        match_round, category])
+    for match in tournament.matches:
+        matches.append([players.get_pid(match.winner_name), players.get_pid(match.loser_name),
+                        match.round, match.category])
 
     # TODO make a better way to copy models
     new_ranking = models.Ranking(tournament.name, tournament.date, tournament.location)

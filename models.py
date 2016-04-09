@@ -241,14 +241,14 @@ class Ranking:
 
 
 class Match:
-    def __init__(self, winner, loser, match_round, category):
-        self.winner = winner
-        self.loser = loser
+    def __init__(self, winner_name, loser_name, match_round, category):
+        self.winner_name = winner_name
+        self.loser_name = loser_name
         self.round = match_round
         self.category = category
 
     def __str__(self):
-        return ";".join([self.winner, self.loser, self.round, self.category])
+        return ";".join([self.winner_name, self.loser_name, self.round, self.category])
 
 
 class Tournament:
@@ -260,7 +260,10 @@ class Tournament:
 
     def get_players_names(self):
         players_set = set()
-        for winner, loser, match_round, category in self.matches:
-            players_set.add(winner)
-            players_set.add(loser)
+        for match in self.matches:
+            players_set.add(match.winner_name)
+            players_set.add(match.loser_name)
         return sorted(list(players_set))
+
+    def add_match(self, winner_name, loser_name, match_round, category):
+        self.matches.append(Match(winner_name, loser_name, match_round, category))

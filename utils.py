@@ -141,21 +141,19 @@ def load_tournament_list(tournament_list):
     date = tournament_list[1][1]
     location = tournament_list[2][1]
 
+    tournament = models.Tournament(name, date, location)
+
     # Reformated list of matches
-    matches_list = []
     for player1, player2, sets1, sets2, round_match, category in tournament_list[5:]:
         if int(sets1) > int(sets2):
-            winner = player1
-            loser = player2
+            winner_name = player1
+            loser_name = player2
         elif int(sets1) < int(sets2):
-            winner = player2
-            loser = player1
+            winner_name = player2
+            loser_name = player1
         else:
             print("Error al procesar los partidos, se encontró un empate entre %s y %s" % (player1, player2))
             break
-        matches_list.append([winner, loser, round_match, category])
+        tournament.add_match(winner_name, loser_name, round_match, category)
 
-    tour = models.Tournament(name, date, location)
-    tour.matches = matches_list
-
-    return tour
+    return tournament
