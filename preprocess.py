@@ -28,7 +28,7 @@ for tournament_sheetname in tournament_sheetnames:
     # Loading tournament info
     tournament = utils.load_tournament_xlsx(data_folder + xlsx_filename, tournament_sheetname)
 
-    for name in tournament["players"]:
+    for name in tournament.get_players_names():
         if players.get_pid(name) is None:
             players.add_new_player(name)
 

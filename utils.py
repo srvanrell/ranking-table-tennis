@@ -10,7 +10,7 @@ __author__ = 'sebastian'
 def get_sheetnames_by_date(filename, filter_key=""):
     wb = load_workbook(filename, read_only=True)
     sheetnames = [s for s in wb.sheetnames if filter_key in s]
-    namesdates = [(name, load_tournament_xlsx(filename, name)["date"]) for name in sheetnames]
+    namesdates = [(name, load_tournament_xlsx(filename, name).date) for name in sheetnames]
     namesdates.sort(key=lambda p: p[1])
 
     return [name for name, date in namesdates]
@@ -108,7 +108,7 @@ def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=False):
 
 
 def load_ranking_sheet(filename, sheetname):
-    # """Loads an csv and return a preprocessed ranking (name, date, ranking_list)"""
+    """Load a ranking in a xlxs sheet and return a Ranking object"""
     # TODO check if date is being read properly
     raw_ranking = load_sheet_workbook(filename, sheetname, first_row=0)
     ranking = models.Ranking(raw_ranking[0][1], raw_ranking[1][1], raw_ranking[2][1])
@@ -117,7 +117,7 @@ def load_ranking_sheet(filename, sheetname):
 
 
 def load_tournament_csv(filename):
-    """Loads an csv and return a preprocessed match list (winner, loser, round, category) and a list of players"""
+    """Load a tournament csv and return a Tournament object"""
     with open(filename, 'r') as incsv:
         reader = csv.reader(incsv)
         tournament_list = [row for row in reader]
@@ -125,34 +125,29 @@ def load_tournament_csv(filename):
 
 
 def load_tournament_xlsx(filename, sheet_name):
-    """Loads an xlsx sheet and return a preprocessed match list (winner, loser, round, category)
-    and a list of players"""
+    """Load a tournament xlsx sheet and return a Tournament object"""
     return load_tournament_list(load_sheet_workbook(filename, sheet_name, 0))
 
 
 def load_tournament_list(tournament_list):
+    """Load a tournament list sheet and return a Tournament object
+    name = cell(B1)
+    date = cell(B2)
+    location = cell(B3)
+    matches should be from sixth row containing:
+    player1, player2, sets1, sets2, match_round, category
+    """
     name = tournament_list[0][1]
     date = tournament_list[1][1]
     location = tournament_list[2][1]
 
-    # Processing matches
-    raw_match_list = tournament_list[5:]
-
-    # Ordered list of the players of the tournament
-    players_list = set()
-    for row in raw_match_list:
-        players_list.add(row[0])
-        players_list.add(row[1])
-    players_list = list(players_list)
-    players_list.sort()
-
     # Reformated list of matches
     matches_list = []
-    for player1, player2, set1, set2, round_match, category in raw_match_list:
-        if int(set1) > int(set2):
+    for player1, player2, sets1, sets2, round_match, category in tournament_list[5:]:
+        if int(sets1) > int(sets2):
             winner = player1
             loser = player2
-        elif int(set1) < int(set2):
+        elif int(sets1) < int(sets2):
             winner = player2
             loser = player1
         else:
@@ -160,10 +155,7 @@ def load_tournament_list(tournament_list):
             break
         matches_list.append([winner, loser, round_match, category])
 
-    tournament = {"name": name,
-                  "date": date,
-                  "location": location,
-                  "players": players_list,
-                  "matches": matches_list}
+    tour = models.Tournament(name, date, location)
+    tour.matches = matches_list
 
-    return tournament
+    return tour

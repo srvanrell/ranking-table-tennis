@@ -238,3 +238,29 @@ class Ranking:
         for entry in self:
             entry.rating += entry.bonus
             entry.bonus = 0
+
+
+class Match:
+    def __init__(self, winner, loser, match_round, category):
+        self.winner = winner
+        self.loser = loser
+        self.round = match_round
+        self.category = category
+
+    def __str__(self):
+        return ";".join([self.winner, self.loser, self.round, self.category])
+
+
+class Tournament:
+    def __init__(self, name="", date="", location=""):
+        self.name = name
+        self.date = date
+        self.location = location
+        self.matches = []
+
+    def get_players_names(self):
+        players_set = set()
+        for winner, loser, match_round, category in self.matches:
+            players_set.add(winner)
+            players_set.add(loser)
+        return sorted(list(players_set))
