@@ -62,62 +62,6 @@ def save_sheet_workbook(filename, sheetname, headers, list_to_save, overwrite=Fa
     wb.save(filename)
 
 
-def save_csv(filename, headers, list_to_save):
-    with open(filename, 'w') as outcsv:
-        writer = csv.writer(outcsv)
-        writer.writerow(headers)
-        writer.writerows(list_to_save)
-
-
-def load_csv(filename, first_row=1):
-    with open(filename, 'r') as incsv:
-        reader = csv.reader(incsv)
-        list_to_return = []
-        for row in reader:
-            aux_row = []
-            for item in row:
-                if item.isdigit():
-                    aux_row.append(int(item))
-                else:
-                    aux_row.append(item)
-            list_to_return.append(aux_row)
-        return list_to_return[first_row:]
-
-
-##############################
-# Tables to assign points
-##############################
-
-# Expected result table
-# TODO, falta chequear
-config_folder = os.path.dirname(__file__) + "/config/"
-# difference, points to winner, points to loser
-expected_result = load_csv(config_folder + "expected_result.csv")
-
-# negative difference, points to winner, points to loser
-unexpected_result = load_csv(config_folder + "unexpected_result.csv")
-
-# points to be assigned by round
-aux_round_points = load_csv(config_folder + "puntos_por_ronda.csv")
-round_points = {}
-rounds_priority = {}
-for i, categ in enumerate(["primera", "segunda", "tercera"]):
-    round_points[categ] = {}
-    for r in aux_round_points:
-        priority = r[0]
-        reached_round = r[1]
-        points = r[2 + i]
-        round_points[categ][reached_round] = points
-        rounds_priority[reached_round] = priority
-
-
-def load_ranking_csv(filename):
-    raw_ranking = load_csv(filename)
-    # TODO name date and location should be read from file
-    ranking_list = [[rr[0], rr[2], rr[3]] for rr in raw_ranking]
-    return ranking_list
-
-
 def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=False):
     if os.path.isfile(filename):
         wb = load_workbook(filename)
@@ -151,7 +95,7 @@ def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=False):
         cell.font = Font(bold=True)
     for colrow in to_center:
         cell = ws.cell(colrow)
-        # TODO add width adaptation instead of shrink
+        # TODO add width adaptation
         cell.alignment = Alignment(horizontal='center')
 
     list_to_save = [[e.pid, e.get_total(), e.rating, e.bonus, players[e.pid].name, players[e.pid].association,

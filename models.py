@@ -1,4 +1,53 @@
-import utils
+import os
+import csv
+
+
+def save_csv(filename, headers, list_to_save):
+    """Save list into a csv file with given header."""
+    with open(filename, 'w') as outcsv:
+        writer = csv.writer(outcsv)
+        writer.writerow(headers)
+        writer.writerows(list_to_save)
+
+
+def load_csv(filename, first_row=1):
+    """Loads csv table into a list. By default first row is not read"""
+    with open(filename, 'r') as incsv:
+        reader = csv.reader(incsv)
+        list_to_return = []
+        for row in reader:
+            aux_row = []
+            for item in row:
+                if item.isdigit():
+                    aux_row.append(int(item))
+                else:
+                    aux_row.append(item)
+            list_to_return.append(aux_row)
+        return list_to_return[first_row:]
+
+# Tables to assign points
+
+config_folder = os.path.dirname(__file__) + "/config/"
+
+# difference, points to winner, points to loser
+expected_result_table = load_csv(config_folder + "expected_result.csv")
+
+# negative difference, points to winner, points to loser
+unexpected_result_table = load_csv(config_folder + "unexpected_result.csv")
+
+# points to be assigned by round
+raw_bonus_table = load_csv(config_folder + "puntos_por_ronda.csv", first_row=0)
+categories = raw_bonus_table[0][2:]
+bonus_rounds_points = {}
+bonus_rounds_priority = {}
+for i, categ in enumerate(categories):
+    bonus_rounds_points[categ] = {}
+    for bonus_row in raw_bonus_table[1:]:
+        priority = bonus_row[0]
+        reached_round = bonus_row[1]
+        points = bonus_row[2 + i]
+        bonus_rounds_points[categ][reached_round] = points
+        bonus_rounds_priority[reached_round] = priority
 
 
 class Player:
@@ -114,10 +163,10 @@ class Ranking:
         """Returns points to add to winner and to deduce from loser, given ratings of winner and loser."""
         rating_diff = rating_winner - rating_loser
 
-        assignation_table = utils.expected_result
+        assignation_table = expected_result_table
         if rating_diff < 0:
             rating_diff *= -1.0
-            assignation_table = utils.unexpected_result
+            assignation_table = unexpected_result_table
 
         j = 0
         while rating_diff > assignation_table[j][0]:
@@ -135,11 +184,11 @@ class Ranking:
         for entry in old_ranking:
             self.add_entry(entry)
 
-        # List of points assigned in each match.add_entry(
+        # List of points assigned in each match
         assigned_points = []
 
         for winner_pid, loser_pid, unused, unused2 in matches:
-            [to_winner, to_loser] = utils.points_to_assign(old_ranking[winner_pid].rating,
+            [to_winner, to_loser] = self._points_to_assign(old_ranking[winner_pid].rating,
                                                            old_ranking[loser_pid].rating)
             self[winner_pid].rating += to_winner
             self[loser_pid].rating -= to_loser
@@ -151,9 +200,6 @@ class Ranking:
 
     def compute_bonus_points(self, matches):
         best_round = {}
-
-        # FIXME maybe should not be read at utils and here instead
-        round_priority = utils.rounds_priority
 
         for winner, loser, round_match, category in matches:
             # changing labels of finals round match
@@ -172,7 +218,7 @@ class Ranking:
                                       (loser, loser_round_match)]:
                 categpid = "%s-%d" % (category, pid)
                 if best_round.get(categpid):
-                    if round_priority[best_round.get(categpid)] < round_priority[played_round]:
+                    if bonus_rounds_priority[best_round.get(categpid)] < bonus_rounds_priority[played_round]:
                         best_round[categpid] = played_round
                 else:
                     best_round[categpid] = played_round
@@ -182,8 +228,7 @@ class Ranking:
         for categpid in best_round:
             category = categpid.split("-")[0]
             pid = int(categpid.split("-")[1])
-            # FIXME maybe should not be read at utils and here instead
-            round_points = utils.round_points[category]
+            round_points = bonus_rounds_points[category]
             self[pid].bonus += round_points[best_round[categpid]]
             assigned_points.append([pid, round_points[best_round[categpid]], best_round[categpid], category])
         return assigned_points
