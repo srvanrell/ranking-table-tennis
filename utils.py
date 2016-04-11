@@ -24,27 +24,34 @@ def load_sheet_workbook(filename, sheetname, first_row=1):
     # print(ws.dimensions)
 
     list_to_return = []
-    # max_column = 0
+    max_column = 0
     for row in ws.rows:
-        # if not max_column:
-        #     max_column = 1
         aux_row = []
+        empty_row = True
         for cell in row:
+            if cell.column:
+                if cell.column > max_column:
+                    max_column = cell.column
             if cell.value is None:
                 aux_row.append("")
+                # print(cell.column)
             else:
+                empty_row = False
                 aux_row.append(cell.value)
-        list_to_return.append(aux_row)
+        if not empty_row:
+            list_to_return.append(aux_row[:max_column])
     return list_to_return[first_row:]
 
 
 def save_sheet_workbook(filename, sheetname, headers, list_to_save, overwrite=False):
     if os.path.isfile(filename):
         wb = load_workbook(filename)
-        # TODO if I want to append info to a sheet, currently I cannot => split and
         if overwrite and sheetname in wb:
             wb.remove_sheet(wb.get_sheet_by_name(sheetname))
-        ws = wb.create_sheet()
+        if sheetname in wb:
+            ws = wb.get_sheet_by_name(sheetname)
+        else:
+            ws = wb.create_sheet()
     else:
         wb = Workbook()
         ws = wb.active
@@ -59,6 +66,16 @@ def save_sheet_workbook(filename, sheetname, headers, list_to_save, overwrite=Fa
     for row in list_to_save:
         ws.append(row)
 
+    # # Automatically adjust width of columns to its content
+    # # TODO add width adaptation, now it breaks on datetime
+    # dims = {}
+    # for row in ws.rows:
+    #     for cell in row:
+    #         if cell.value:
+    #             dims[cell.column] = max((dims.get(cell.column, 0), len(str(cell.value))))
+    # for col, value in dims.items():
+    #     ws.column_dimensions[col].width = value
+
     wb.save(filename)
 
 
@@ -67,7 +84,10 @@ def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=False):
         wb = load_workbook(filename)
         if overwrite and sheetname in wb:
             wb.remove_sheet(wb.get_sheet_by_name(sheetname))
-        ws = wb.create_sheet()
+        if sheetname in wb:
+            ws = wb.get_sheet_by_name(sheetname)
+        else:
+            ws = wb.create_sheet()
     else:
         wb = Workbook()
         ws = wb.active
@@ -95,7 +115,6 @@ def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=False):
         cell.font = Font(bold=True)
     for colrow in to_center:
         cell = ws.cell(colrow)
-        # TODO add width adaptation
         cell.alignment = Alignment(horizontal='center')
 
     list_to_save = [[e.pid, e.get_total(), e.rating, e.bonus, players[e.pid].name, players[e.pid].association,
