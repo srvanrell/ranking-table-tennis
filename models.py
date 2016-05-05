@@ -188,6 +188,10 @@ class Ranking:
         assigned_points = []
 
         for winner_pid, loser_pid, unused, unused2 in matches:
+            # workaround to add extra bonus points from match list
+            if winner_pid < 0:
+                continue
+
             [to_winner, to_loser] = self._points_to_assign(old_ranking[winner_pid].rating,
                                                            old_ranking[loser_pid].rating)
             self[winner_pid].rating += to_winner
@@ -216,6 +220,10 @@ class Ranking:
             # finding best round per category of each player
             for pid, played_round in [(winner, winner_round_match),
                                       (loser, loser_round_match)]:
+                # workaround to add extra bonus points from match list
+                if pid < 0:
+                    continue
+
                 categpid = "%s-%d" % (category, pid)
                 if best_round.get(categpid):
                     if bonus_rounds_priority[best_round.get(categpid)] < bonus_rounds_priority[played_round]:
@@ -261,7 +269,9 @@ class Tournament:
     def get_players_names(self):
         players_set = set()
         for match in self.matches:
-            players_set.add(match.winner_name)
+            # workaround to add extra bonus points from match list
+            if not match.winner_name == "to_add_bonus_points":
+                players_set.add(match.winner_name)
             players_set.add(match.loser_name)
         return sorted(list(players_set))
 

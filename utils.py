@@ -166,7 +166,7 @@ def load_tournament_list(tournament_list):
     for player1, player2, sets1, sets2, round_match, category in tournament_list[5:]:
         # workaround to add extra bonus points from match list
         if int(sets1) < 0 and int(sets2) < 0:
-            winner_name = "bonuspoints"
+            winner_name = "to_add_bonus_points"
             loser_name = player2
         elif int(sets1) > int(sets2):
             winner_name = player1

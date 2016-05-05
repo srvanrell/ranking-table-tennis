@@ -41,8 +41,12 @@ for i, tournament_sheetname in enumerate(tournament_sheetnames):
     # Creating matches list with pid
     matches = []
     for match in tournament.matches:
-        matches.append([players.get_pid(match.winner_name), players.get_pid(match.loser_name),
-                        match.round, match.category])
+        if match.winner_name == "to_add_bonus_points":
+            matches.append([-1, players.get_pid(match.loser_name),
+                            match.round, match.category])
+        else:
+            matches.append([players.get_pid(match.winner_name), players.get_pid(match.loser_name),
+                            match.round, match.category])
 
     # TODO make a better way to copy models
     new_ranking = models.Ranking(tournament.name, tournament.date, tournament.location)
