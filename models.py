@@ -52,15 +52,17 @@ for i, categ in enumerate(categories):
 # Points for being part of a tournament
 participation_points = int(load_csv(config_folder + "puntos_por_participar.csv").pop().pop())
 
+
 class Player:
     def __init__(self, pid=-1, name="Apellido, Nombre", association="Asociación", city="Ciudad"):
         self.pid = pid
         self.name = name
         self.association = association
         self.city = city
+        self.last_tournament = ""
 
     def __str__(self):
-        return ";".join([str(self.pid), self.name, self.association, self.city])
+        return ";".join([str(self.pid), self.name, self.association, self.city, self.last_tournament])
 
 
 class PlayersList:
