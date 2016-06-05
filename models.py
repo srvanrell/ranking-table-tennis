@@ -54,7 +54,7 @@ participation_points = int(load_csv(config_folder + "puntos_por_participar.csv")
 
 
 class Player:
-    def __init__(self, pid=-1, name="Apellido, Nombre", association="Asociación", city="Ciudad", last_tournament=""):
+    def __init__(self, pid=-1, name="Apellido, Nombre", association="Asociación", city="Ciudad", last_tournament=-1):
         self.pid = pid
         self.name = name
         self.association = association
@@ -62,7 +62,7 @@ class Player:
         self.last_tournament = last_tournament
 
     def __str__(self):
-        return ";".join([str(self.pid), self.name, self.association, self.city, self.last_tournament])
+        return ";".join([str(self.pid), self.name, self.association, self.city, str(self.last_tournament)])
 
 
 class PlayersList:
@@ -90,7 +90,7 @@ class PlayersList:
         else:
             print("WARNING: Already exists a player for that pid. Check:", str(player))
 
-    def add_new_player(self, name, association="", city="", last_tournament=""):
+    def add_new_player(self, name, association="", city="", last_tournament=-1):
         pid = 0
         while pid in self.players:
             pid += 1

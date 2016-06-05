@@ -24,7 +24,7 @@ players.load_list(utils.load_sheet_workbook(data_folder + xlsx_filename, players
 # Loading initial ranking and adding new players with 0
 ranking = utils.load_ranking_sheet(data_folder + xlsx_filename, ranking_sheetname)
 
-for tournament_sheetname in tournament_sheetnames:
+for tid, tournament_sheetname in enumerate(tournament_sheetnames):
     # Loading tournament info
     tournament = utils.load_tournament_xlsx(data_folder + xlsx_filename, tournament_sheetname)
 
@@ -42,6 +42,9 @@ for tournament_sheetname in tournament_sheetnames:
             initial_rating = int(input("Enter the initial ranting points for %s:\n" % name))
             ranking.add_new_entry(pid, initial_rating)
             print(ranking[pid])
+
+        # Log current tournament as the last played tournament
+        players[pid].last_tournament = tid
 
 # Saving complete list of players, including new ones
 utils.save_sheet_workbook(data_folder + out_filename, players_sheetname,

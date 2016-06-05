@@ -21,16 +21,16 @@ players.load_list(utils.load_sheet_workbook(data_folder + xlsx_filename, players
 # Loading initial ranking
 initial_ranking = utils.load_ranking_sheet(data_folder + xlsx_filename, ranking_sheetname)
 
-for i, tournament_sheetname in enumerate(tournament_sheetnames):
+for tid, tournament_sheetname in enumerate(tournament_sheetnames):
 
     tournament = utils.load_tournament_xlsx(data_folder + xlsx_filename, tournament_sheetname)
 
     old_ranking = models.Ranking("pre_" + tournament.name, tournament.date, tournament.location)
 
     # Load previous ranking if exists
-    if i-1 >= 0:
+    if tid-1 >= 0:
         old_ranking = utils.load_ranking_sheet(data_folder + out_filename,
-                                               tournament_sheetnames[i-1].replace(tournaments_key, "Ranking"))
+                                               tournament_sheetnames[tid - 1].replace(tournaments_key, "Ranking"))
 
     # Load initial rankings for new players
     for name in tournament.get_players_names():
