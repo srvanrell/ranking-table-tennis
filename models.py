@@ -86,11 +86,11 @@ class PlayersList:
         else:
             print("WARNING: Already exists a player for that pid. Check:", str(player))
 
-    def add_new_player(self, name):
+    def add_new_player(self, name, association="", city=""):
         pid = 0
         while pid in self.players:
             pid += 1
-        self.add_player(Player(pid, name))
+        self.add_player(Player(pid, name, association, city))
 
     def get_pid(self, name):
         for player in self:
@@ -137,8 +137,8 @@ class Ranking:
         else:
             print("WARNING: Already exists an entry for pid:", entry.pid)
 
-    def add_new_entry(self, pid):
-        self.add_entry(RankingEntry(pid, 0, 0))
+    def add_new_entry(self, pid, initial_rating=0, initial_bonus=0):
+        self.add_entry(RankingEntry(pid, initial_rating, initial_bonus))
 
     def get_entry(self, pid):
         return self.ranking.get(pid)
