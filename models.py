@@ -243,8 +243,11 @@ class Ranking:
 
     def add_participation_points(self, pid_list, participation_points):
         """Add bonus points for each participant given """
+        assigned_points = []
         for pid in pid_list:
             self[pid] += participation_points
+            assigned_points.append([pid, participation_points])
+        return assigned_points
 
     def bonus2rating(self):
         """For each entry, add bonus points to rating and then set bonus to zero."""
