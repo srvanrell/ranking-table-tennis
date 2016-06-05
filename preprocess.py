@@ -45,7 +45,7 @@ for tournament_sheetname in tournament_sheetnames:
 
 # Saving complete list of players, including new ones
 utils.save_sheet_workbook(data_folder + out_filename, players_sheetname,
-                          ["PID", "Jugador", "Asociación", "Ciudad"],
+                          ["PID", "Jugador", "Asociación", "Ciudad", "Último Torneo"],
                           sorted(players.to_list(), key=lambda l: l[1]),
                           True)
 
