@@ -90,11 +90,11 @@ class PlayersList:
         else:
             print("WARNING: Already exists a player for that pid. Check:", str(player))
 
-    def add_new_player(self, name, association="", city=""):
+    def add_new_player(self, name, association="", city="", last_tournament=""):
         pid = 0
         while pid in self.players:
             pid += 1
-        self.add_player(Player(pid, name, association, city))
+        self.add_player(Player(pid, name, association, city, last_tournament))
 
     def get_pid(self, name):
         for player in self:
@@ -104,12 +104,12 @@ class PlayersList:
         return None
 
     def to_list(self):
-        players_list = [[p.pid, p.name, p.association, p.city] for p in self]
+        players_list = [[p.pid, p.name, p.association, p.city, p.last_tournament] for p in self]
         return players_list
 
     def load_list(self, players_list):
-        for pid, name, association, city in players_list:
-            self.add_player(Player(pid, name, association, city))
+        for pid, name, association, city, last_tournament in players_list:
+            self.add_player(Player(pid, name, association, city, last_tournament))
 
 
 class RankingEntry:
