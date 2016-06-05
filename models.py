@@ -49,6 +49,9 @@ for i, categ in enumerate(categories):
         bonus_rounds_points[categ][reached_round] = points
         bonus_rounds_priority[reached_round] = priority
 
+# Points for being part of a tournament
+participation_points = int(load_csv(config_folder + "puntos_por_participar.csv").pop().pop())
+print(repr(participation_points))
 
 class Player:
     def __init__(self, pid=-1, name="Apellido, Nombre", association="Asociación", city="Ciudad"):
@@ -241,7 +244,7 @@ class Ranking:
             assigned_points.append([pid, round_points[best_round[categpid]], best_round[categpid], category])
         return assigned_points
 
-    def add_participation_points(self, pid_list, participation_points):
+    def add_participation_points(self, pid_list):
         """Add bonus points for each participant given """
         assigned_points = []
         for pid in pid_list:
