@@ -51,7 +51,6 @@ for i, categ in enumerate(categories):
 
 # Points for being part of a tournament
 participation_points = int(load_csv(config_folder + "puntos_por_participar.csv").pop().pop())
-print(repr(participation_points))
 
 class Player:
     def __init__(self, pid=-1, name="Apellido, Nombre", association="Asociación", city="Ciudad"):
@@ -248,7 +247,7 @@ class Ranking:
         """Add bonus points for each participant given """
         assigned_points = []
         for pid in pid_list:
-            self[pid] += participation_points
+            self[pid].bonus += participation_points
             assigned_points.append([pid, participation_points])
         return assigned_points
 

@@ -38,6 +38,9 @@ for i, tournament_sheetname in enumerate(tournament_sheetnames):
         if old_ranking.get_entry(pid) is None:
             old_ranking.add_entry(initial_ranking[pid])
 
+    # Create list of players that partipate in the tournament
+    pid_participation_list = [players.get_pid(name) for name in tournament.get_players_names()]
+
     # Creating matches list with pid
     matches = []
     for match in tournament.matches:
@@ -52,6 +55,7 @@ for i, tournament_sheetname in enumerate(tournament_sheetnames):
     new_ranking = models.Ranking(tournament.name, tournament.date, tournament.location)
     assigned_points_per_match = new_ranking.compute_new_ratings(old_ranking, matches)
     assigned_points_per_best_round = new_ranking.compute_bonus_points(matches)
+    assigned_participation_points = new_ranking.add_participation_points(pid_participation_list)
 
     # Saving new ranking
     utils.save_ranking_sheet(data_folder + out_filename, tournament_sheetname.replace(tournaments_key, "Ranking"),
@@ -66,11 +70,13 @@ for i, tournament_sheetname in enumerate(tournament_sheetnames):
                               ["Ganador", "Perdedor", "Puntos Ganador", "Puntos Perdedor"],
                               points_log_to_save, True)
 
-    # Saving points assigned per best round reached
+    # Saving points assigned per best round reached and for participation
     points_log_to_save = [[players[pid].name, points, best_round, category] for pid, points, best_round, category
                           in assigned_points_per_best_round]
+    participation_points_log_to_save = [[players[pid].name, points, "Puntos por participar", ""] for pid, points
+                                        in assigned_participation_points]
 
     utils.save_sheet_workbook(data_folder + log_filename,
                               tournament_sheetname.replace(tournaments_key, "Detalles Bonus"),
                               ["Jugador", "Puntos Bonus", "Mejor Ronda", "Categoría"],
-                              points_log_to_save, True)
+                              points_log_to_save + participation_points_log_to_save, True)
