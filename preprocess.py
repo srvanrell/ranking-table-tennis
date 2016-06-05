@@ -30,13 +30,18 @@ for tournament_sheetname in tournament_sheetnames:
 
     for name in tournament.get_players_names():
         if players.get_pid(name) is None:
-            players.add_new_player(name)
+            association = input("Enter the association of %s:\n" % name)
+            city = input("Enter the city of %s:\n" % name)
+            # Assign a pid for the new given player and add it to the list
+            players.add_new_player(name, association, city)
+            print(players[players.get_pid(name)])
 
         pid = players.get_pid(name)
 
         if ranking.get_entry(pid) is None:
-            ranking.add_new_entry(pid)
-            print("WARNING: Added player without rating: %s (%d)" % (name, pid))
+            initial_rating = int(input("Enter the initial ranting points for %s:\n" % name))
+            ranking.add_new_entry(pid, initial_rating)
+            print(ranking[pid])
 
 # Saving complete list of players, including new ones
 utils.save_sheet_workbook(data_folder + out_filename, players_sheetname,
