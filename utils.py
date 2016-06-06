@@ -104,10 +104,11 @@ def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=False):
     ws["B3"] = ranking.location
     ws.merge_cells('B3:G3')
 
-    ws.append(["PID", "Total puntos", "Nivel de juego", "Puntos bonus", "Jugador", "Asociación", "Ciudad"])
+    ws.append(["PID", "Total puntos", "Nivel de juego", "Puntos bonus",
+               "Jugador", "Asociación", "Ciudad", "Jugador activo"])
 
     to_bold = ["A1", "A2", "A3",
-               "A4", "B4", "C4", "D4", "E4", "F4", "G4"]
+               "A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"]
     to_center = to_bold + ["B1", "B2", "B3"]
 
     for colrow in to_bold:
@@ -118,8 +119,9 @@ def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=False):
         cell.alignment = Alignment(horizontal='center')
 
     list_to_save = [[e.pid, e.get_total(), e.rating, e.bonus, players[e.pid].name, players[e.pid].association,
-                     players[e.pid].city] for e in ranking]
+                     players[e.pid].city, str(ranking.tid - players[e.pid].last_tournament < 2)] for e in ranking]
 
+    # for row in sorted(list_to_save, key=lambda l: (l[-1], l[1]), reverse=True):  # to use Jugador activo
     for row in sorted(list_to_save, key=lambda l: l[1], reverse=True):
         ws.append(row)
 

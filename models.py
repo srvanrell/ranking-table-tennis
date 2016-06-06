@@ -126,11 +126,12 @@ class RankingEntry:
 
 
 class Ranking:
-    def __init__(self, tournament_name="", date="", location=""):
+    def __init__(self, tournament_name="", date="", location="", tid=-1):
         self.ranking = {}
         self.date = date
         self.tournament_name = tournament_name
         self.location = location
+        self.tid = tid
 
     def __iter__(self):
         return iter(self.ranking.values())

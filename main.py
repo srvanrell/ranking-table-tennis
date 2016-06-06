@@ -25,7 +25,7 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames):
 
     tournament = utils.load_tournament_xlsx(data_folder + xlsx_filename, tournament_sheetname)
 
-    old_ranking = models.Ranking("pre_" + tournament.name, tournament.date, tournament.location)
+    old_ranking = models.Ranking("pre_" + tournament.name, tournament.date, tournament.location, tid - 1)
 
     # Load previous ranking if exists
     if tid-1 >= 0:
@@ -41,6 +41,10 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames):
     # Create list of players that partipate in the tournament
     pid_participation_list = [players.get_pid(name) for name in tournament.get_players_names()]
 
+    # Log current tournament as the last played tournament
+    for pid in pid_participation_list:
+        players[pid].last_tournament = tid
+
     # Creating matches list with pid
     matches = []
     for match in tournament.matches:
@@ -52,7 +56,7 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames):
                             match.round, match.category])
 
     # TODO make a better way to copy models
-    new_ranking = models.Ranking(tournament.name, tournament.date, tournament.location)
+    new_ranking = models.Ranking(tournament.name, tournament.date, tournament.location, tid)
     assigned_points_per_match = new_ranking.compute_new_ratings(old_ranking, matches)
     assigned_points_per_best_round = new_ranking.compute_bonus_points(matches)
     assigned_participation_points = new_ranking.add_participation_points(pid_participation_list)
