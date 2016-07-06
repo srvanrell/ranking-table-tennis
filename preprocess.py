@@ -39,7 +39,7 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames):
         pid = players.get_pid(name)
 
         if ranking.get_entry(pid) is None:
-            initial_rating = int(input("Enter the initial ranting points for %s:\n" % name))
+            initial_rating = int(input("Enter the initial rating points for %s:\n" % name))
             ranking.add_new_entry(pid, initial_rating)
             print(ranking[pid])
 
