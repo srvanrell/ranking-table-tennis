@@ -1,6 +1,7 @@
 import utils
 import models
 import yaml
+from utils import cfg
 
 __author__ = 'sebastian'
 
@@ -15,14 +16,7 @@ __author__ = 'sebastian'
 # and saves the result into the same xlsx
 ##########################################
 
-# Loads some names from config.yaml
-with open("config.yaml", 'r') as cfgyaml:
-    try:
-        cfg = yaml.load(cfgyaml)
-    except yaml.YAMLError as exc:
-        print(exc)
-
-xlsx_file = cfg["io"]["data_folder"] + cfg["io"]["xlsx_filename"]
+xlsx_file = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
 
 # Listing tournament sheetnames by increasing date
 tournament_sheetnames = utils.get_sheetnames_by_date(xlsx_file, cfg["sheetnames"]["tournaments_key"])

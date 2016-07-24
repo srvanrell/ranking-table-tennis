@@ -1,11 +1,16 @@
 io:
     data_folder: data/
-    xlsx_filename: Liga Dos Orillas 2016 - Categorías Mayores - Partidos.xlsx
+    tournaments_filename: Liga Dos Orillas 2016 - Categorías Mayores - Partidos.xlsx
+    rankings_filename: Liga Dos Orillas 2016 - Categorías Mayores - Rankings Crudos.xlsx
+    log_filename: log.xlsx
 
 sheetnames:
     players: Jugadores
     initial_ranking: Ranking inicial
     tournaments_key: Partidos
+    bonus_details_key: Detalles Bonus
+    rating_details_key: Detalles Rating
+    rankings_key: Ranking
 
 labels:
     PID: PID
@@ -13,3 +18,12 @@ labels:
     Association: Asociación
     City: Ciudad
     Last Tournament: Último Torneo
+    Bonus Points: Puntos Bonus
+    Rating Points: Nivel de Juego
+    Best Round: Mejor Ronda
+    Winner: Ganador
+    Loser: Perdedor
+    Winner Points: Puntos Ganador
+    Loser Points: Puntos Perdedor
+    Category: Categoría
+    Participation Points: Puntos por participar

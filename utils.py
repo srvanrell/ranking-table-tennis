@@ -1,11 +1,18 @@
 import csv
 import models
 import os
+import yaml
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font, Alignment
 
 __author__ = 'sebastian'
 
+# Loads some names from config.yaml
+with open("config.yaml", 'r') as cfgyaml:
+    try:
+        cfg = yaml.load(cfgyaml)
+    except yaml.YAMLError as exc:
+        print(exc)
 
 def get_sheetnames_by_date(filename, filter_key=""):
     wb = load_workbook(filename, read_only=True)
