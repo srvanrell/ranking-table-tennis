@@ -1,36 +1,46 @@
 import utils
 import models
+from utils import cfg
 
 __author__ = 'sebastian'
 
-data_folder = "data/"
-xlsx_filename = "Liga Dos Orillas 2016 - Categorías Mayores - Partidos.xlsx"
-out_filename = "Liga Dos Orillas 2016 - Categorías Mayores - Rankings crudos.xlsx"
-log_filename = "log.xlsx"
-players_sheetname = "Jugadores"
-ranking_sheetname = "Ranking inicial"
-tournaments_key = "Partidos"
+##########################################
+# Script to run after preprocess.py
+# Input: xlsx tournaments database
+#        config.yaml
+# Output: xlsx rankings database
+#         xlsx log file
+#
+# It looks for unknown or unrated players.
+# It will ask for information not given 
+# and saves the result into the same xlsx
+##########################################
+
+tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
+rankings_xlsx = cfg["io"]["data_folder"] + cfg["io"]["rankings_filename"]
+log_xlsx = cfg["io"]["data_folder"] + cfg["io"]["log_filename"]
 
 # Listing tournament sheetnames by increasing date
-tournament_sheetnames = utils.get_sheetnames_by_date(data_folder + xlsx_filename, tournaments_key)
+tournament_sheetnames = utils.get_sheetnames_by_date(tournaments_xlsx, cfg["sheetnames"]["tournaments_key"])
 
 # Loading players info list
 players = models.PlayersList()
-players.load_list(utils.load_sheet_workbook(data_folder + xlsx_filename, players_sheetname))
+players.load_list(utils.load_sheet_workbook(tournaments_xlsx, cfg["sheetnames"]["players"]))
 
 # Loading initial ranking
-initial_ranking = utils.load_ranking_sheet(data_folder + xlsx_filename, ranking_sheetname)
+initial_ranking = utils.load_ranking_sheet(tournaments_xlsx, cfg["sheetnames"]["initial_ranking"])
 
 for tid, tournament_sheetname in enumerate(tournament_sheetnames):
 
-    tournament = utils.load_tournament_xlsx(data_folder + xlsx_filename, tournament_sheetname)
+    tournament = utils.load_tournament_xlsx(tournaments_xlsx, tournament_sheetname)
 
     old_ranking = models.Ranking("pre_" + tournament.name, tournament.date, tournament.location, tid - 1)
 
     # Load previous ranking if exists
     if tid-1 >= 0:
-        old_ranking = utils.load_ranking_sheet(data_folder + out_filename,
-                                               tournament_sheetnames[tid - 1].replace(tournaments_key, "Ranking"))
+        old_ranking = utils.load_ranking_sheet(rankings_xlsx,
+                                               tournament_sheetnames[tid - 1].replace(cfg["sheetnames"]["tournaments_key"], 
+                                                                                      cfg["sheetnames"]["rankings_key"]))
 
     # Load initial rankings for new players
     for name in tournament.get_players_names():
@@ -62,25 +72,28 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames):
     assigned_participation_points = new_ranking.add_participation_points(pid_participation_list)
 
     # Saving new ranking
-    utils.save_ranking_sheet(data_folder + out_filename, tournament_sheetname.replace(tournaments_key, "Ranking"),
+    utils.save_ranking_sheet(rankings_xlsx, tournament_sheetname.replace(cfg["sheetnames"]["tournaments_key"], 
+                                                                         cfg["sheetnames"]["rankings_key"]),
                              new_ranking, players, True)
 
     # Saving points assigned in each match
     points_log_to_save = [[players[winner_pid].name, players[loser_pid].name, winner_points, loser_points]
                           for winner_pid, loser_pid, winner_points, loser_points in assigned_points_per_match]
 
-    utils.save_sheet_workbook(data_folder + log_filename,
-                              tournament_sheetname.replace(tournaments_key, "Detalles Rating"),
-                              ["Ganador", "Perdedor", "Puntos Ganador", "Puntos Perdedor"],
+    utils.save_sheet_workbook(log_xlsx,
+                              tournament_sheetname.replace(cfg["sheetnames"]["tournaments_key"],
+                                                           cfg["sheetnames"]["rating_details_key"]),
+                              [cfg["labels"][key] for key in ["Winner", "Loser", "Winner Points", "Loser Points"]],
                               points_log_to_save, True)
 
     # Saving points assigned per best round reached and for participation
     points_log_to_save = [[players[pid].name, points, best_round, category] for pid, points, best_round, category
                           in assigned_points_per_best_round]
-    participation_points_log_to_save = [[players[pid].name, points, "Puntos por participar", ""] for pid, points
+    participation_points_log_to_save = [[players[pid].name, points, cfg["labels"]["Participation Points"], ""] for pid, points
                                         in assigned_participation_points]
 
-    utils.save_sheet_workbook(data_folder + log_filename,
-                              tournament_sheetname.replace(tournaments_key, "Detalles Bonus"),
-                              ["Jugador", "Puntos Bonus", "Mejor Ronda", "Categoría"],
+    utils.save_sheet_workbook(log_xlsx,
+                              tournament_sheetname.replace(cfg["sheetnames"]["tournaments_key"], 
+                                                           cfg["sheetnames"]["bonus_details_key"]),
+                              [cfg["labels"][key] for key in ["Player", "Bonus Points", "Best Round", "Category"]],
                               points_log_to_save + participation_points_log_to_save, True)
