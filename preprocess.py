@@ -1,32 +1,41 @@
-# -*- coding: utf-8 -*-
-
 import utils
 import models
+import yaml
 
 __author__ = 'sebastian'
 
-# Codigo para inicializar dos orillas
+##########################################
+# Script to run before computing_all.py
+# Input: xlxs tournaments database
+#        config.yaml
+#
+# It looks for unknown or unrated players.
+# It will ask for information not given 
+# and saves the result into the same xlsx
+##########################################
 
-data_folder = "data/"
-xlsx_filename = "Liga Dos Orillas 2016 - Categorías Mayores - Partidos.xlsx"
-out_filename = "Liga Dos Orillas 2016 - Categorías Mayores - Partidos.xlsx"
-players_sheetname = "Jugadores"
-ranking_sheetname = "Ranking inicial"
-tournaments_key = "Partidos"
+# Loads some names from config.yaml
+with open("config.yaml", 'r') as cfgyaml:
+    try:
+        cfg = yaml.load(cfgyaml)
+    except yaml.YAMLError as exc:
+        print(exc)
+
+xlsx_file = cfg["io"]["data_folder"] + cfg["io"]["xlsx_filename"]
 
 # Listing tournament sheetnames by increasing date
-tournament_sheetnames = utils.get_sheetnames_by_date(data_folder + xlsx_filename, tournaments_key)
+tournament_sheetnames = utils.get_sheetnames_by_date(xlsx_file, cfg["sheetnames"]["tournaments_key"])
 
 # Loading and completing the players list
 players = models.PlayersList()
-players.load_list(utils.load_sheet_workbook(data_folder + xlsx_filename, players_sheetname))
+players.load_list(utils.load_sheet_workbook(xlsx_file, cfg["sheetnames"]["players"]))
 
 # Loading initial ranking and adding new players with 0
-ranking = utils.load_ranking_sheet(data_folder + xlsx_filename, ranking_sheetname)
+ranking = utils.load_ranking_sheet(xlsx_file, cfg["sheetnames"]["initial_ranking"])
 
 for tid, tournament_sheetname in enumerate(tournament_sheetnames):
     # Loading tournament info
-    tournament = utils.load_tournament_xlsx(data_folder + xlsx_filename, tournament_sheetname)
+    tournament = utils.load_tournament_xlsx(xlsx_file, tournament_sheetname)
 
     for name in tournament.get_players_names():
         if players.get_pid(name) is None:
@@ -47,10 +56,10 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames):
         players[pid].last_tournament = tid
 
 # Saving complete list of players, including new ones
-utils.save_sheet_workbook(data_folder + out_filename, players_sheetname,
-                          ["PID", "Jugador", "Asociación", "Ciudad", "Último Torneo"],
+utils.save_sheet_workbook(xlsx_file, cfg["sheetnames"]["players"],
+                          [cfg["labels"][key] for key in ["PID", "Player", "Association", "City", "Last Tournament"]],
                           sorted(players.to_list(), key=lambda l: l[1]),
                           True)
 
 # Saving initial rankings for all known players
-utils.save_ranking_sheet(data_folder + out_filename, ranking_sheetname, ranking, players, True)
+utils.save_ranking_sheet(xlsx_file, cfg["sheetnames"]["initial_ranking"], ranking, players, True)

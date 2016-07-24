@@ -1,0 +1,15 @@
+io:
+    data_folder: data/
+    xlsx_filename: Liga Dos Orillas 2016 - Categorías Mayores - Partidos.xlsx
+
+sheetnames:
+    players: Jugadores
+    initial_ranking: Ranking inicial
+    tournaments_key: Partidos
+
+labels:
+    PID: PID
+    Player: Jugador
+    Association: Asociación
+    City: Ciudad
+    Last Tournament: Último Torneo
