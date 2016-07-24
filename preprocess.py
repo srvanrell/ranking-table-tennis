@@ -6,8 +6,9 @@ __author__ = 'sebastian'
 
 ##########################################
 # Script to run before computing_all.py
-# Input: xlxs tournaments database
+# Input: xlsx tournaments database
 #        config.yaml
+# Output: xlsx tournaments database
 #
 # It looks for unknown or unrated players.
 # It will ask for information not given 
