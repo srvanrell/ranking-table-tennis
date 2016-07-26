@@ -4,7 +4,7 @@ io:
     rankings_filename: Liga Dos Orillas 2016 - Categorías Mayores - Rankings Crudos.xlsx
     log_filename: log.xlsx
 
-sheetnames:
+sheetname:
     players: Jugadores
     initial_ranking: Ranking inicial
     tournaments_key: Partidos

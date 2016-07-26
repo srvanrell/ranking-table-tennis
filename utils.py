@@ -14,6 +14,7 @@ with open("config.yaml", 'r') as cfgyaml:
     except yaml.YAMLError as exc:
         print(exc)
 
+
 def get_sheetnames_by_date(filename, filter_key=""):
     wb = load_workbook(filename, read_only=True)
     sheetnames = [s for s in wb.sheetnames if filter_key in s]
