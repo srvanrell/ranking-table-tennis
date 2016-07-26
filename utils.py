@@ -185,7 +185,7 @@ def load_tournament_list(tournament_list):
             winner_name = player2
             loser_name = player1
         else:
-            print("Error al procesar los partidos, se encontró un empate entre %s y %s" % (player1, player2))
+            print("Failed to process matches, a tie was found between %s and %s" % (player1, player2))
             break
         tournament.add_match(winner_name, loser_name, round_match, category)
 
