@@ -102,18 +102,18 @@ def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=False):
 
     ws.title = sheetname
 
-    ws["A1"] = "Nombre del torneo"
+    ws["A1"] = cfg["labels"]["Tournament name"]
     ws["B1"] = ranking.tournament_name
     ws.merge_cells('B1:G1')
-    ws["A2"] = "Fecha"
+    ws["A2"] = cfg["labels"]["Date"]
     ws["B2"] = ranking.date
     ws.merge_cells('B2:G2')
-    ws["A3"] = "Lugar"
+    ws["A3"] = cfg["labels"]["Location"]
     ws["B3"] = ranking.location
     ws.merge_cells('B3:G3')
 
-    ws.append(["PID", "Total puntos", "Nivel de juego", "Puntos bonus",
-               "Jugador", "Asociación", "Ciudad", "Jugador activo"])
+    ws.append(cfg["labels"][key] for key in ["PID", "Total Points", "Rating Points", "Bonus Points",
+                                             "Player", "Association", "City", "Active Player"])
 
     to_bold = ["A1", "A2", "A3",
                "A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"]
