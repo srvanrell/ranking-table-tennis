@@ -224,45 +224,16 @@ class Ranking:
 
         return assigned_points
 
-    def compute_bonus_points(self, matches):
-        best_round = {}
-
-        for winner, loser, round_match, category in matches:
-            # changing labels of finals round match
-            if round_match == cfg["roundnames"]["final"]:
-                winner_round_match = cfg["roundnames"]["champion"]
-                loser_round_match = cfg["roundnames"]["second"]
-            elif round_match == cfg["roundnames"]["third place playoff"]:
-                winner_round_match = cfg["roundnames"]["third"]
-                loser_round_match = cfg["roundnames"]["fourth"]
-            else:
-                winner_round_match = round_match
-                loser_round_match = round_match
-
-            # finding best round per category of each player
-            for pid, played_round in [(winner, winner_round_match),
-                                      (loser, loser_round_match)]:
-                # workaround to add extra bonus points from match list
-                if pid < 0:
-                    continue
-
-                categpid = "%s-%d" % (category, pid)
-                if best_round.get(categpid):
-                    if bonus_rounds_priority[best_round.get(categpid)] < bonus_rounds_priority[played_round]:
-                        best_round[categpid] = played_round
-                else:
-                    best_round[categpid] = played_round
-
+    def compute_bonus_points(self, best_rounds):
         # List of points assigned in each match
         assigned_points = []
-        for categpid in best_round:
-            category = categpid.split("-")[0]
-            pid = int(categpid.split("-")[1])
+        for category, pid in best_rounds.keys():
+            categpid = (category, pid)
             round_points = bonus_rounds_points[category]
-            self[pid].bonus += round_points[best_round[categpid]]
-            self[pid].best_rounds[category] = best_round[categpid]
-            assigned_points.append([pid, round_points[best_round[categpid]], best_round[categpid], category])
-        return assigned_points
+            self[pid].bonus += round_points[best_rounds[categpid]]
+            self[pid].best_rounds[category] = best_rounds[categpid]
+            assigned_points.append([pid, round_points[best_rounds[categpid]], best_rounds[categpid], category])
+        return sorted(assigned_points, key=lambda l: (l[-1], l[1], l[0]), reverse=True)
 
     def add_participation_points(self, pid_list):
         """Add bonus points for each participant given """
@@ -339,7 +310,7 @@ class Tournament:
 
             # finding best round per category of each player
             for name, played_round in [(match.winner_name, winner_round_match),
-                                      (match.loser_name, loser_round_match)]:
+                                       (match.loser_name, loser_round_match)]:
                 # workaround to add extra bonus points from match list
                 if name == "to_add_bonus_points":
                     continue

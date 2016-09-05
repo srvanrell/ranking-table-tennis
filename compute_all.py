@@ -53,8 +53,8 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames):
     # Get the best round for each player in each category
     # Formatted like: best_rounds[(category, pid)] = best_round_value
     aux_best_rounds = tournament.compute_best_rounds()
-    best_rounds = {(categ, players.get_pid(name)): aux_best_rounds[categ, pid]
-                   for categ, name in aux_best_rounds().keys()}
+    best_rounds = {(categ, players.get_pid(name)): aux_best_rounds[categ, name]
+                   for categ, name in aux_best_rounds.keys()}
 
     # Log current tournament as the last played tournament
     for pid in pid_participation_list:
@@ -73,7 +73,7 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames):
     # TODO make a better way to copy models
     new_ranking = models.Ranking(tournament.name, tournament.date, tournament.location, tid)
     assigned_points_per_match = new_ranking.compute_new_ratings(old_ranking, matches)
-    assigned_points_per_best_round = new_ranking.compute_bonus_points(matches)
+    assigned_points_per_best_round = new_ranking.compute_bonus_points(best_rounds)
     assigned_participation_points = new_ranking.add_participation_points(pid_participation_list)
 
     # Saving new ranking
