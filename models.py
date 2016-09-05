@@ -303,6 +303,9 @@ class Tournament:
         self.location = location
         self.matches = []
 
+    def add_match(self, winner_name, loser_name, match_round, category):
+        self.matches.append(Match(winner_name, loser_name, match_round, category))
+
     def get_players_names(self):
         players_set = set()
         for match in self.matches:
@@ -312,5 +315,40 @@ class Tournament:
             players_set.add(match.loser_name)
         return sorted(list(players_set))
 
-    def add_match(self, winner_name, loser_name, match_round, category):
-        self.matches.append(Match(winner_name, loser_name, match_round, category))
+    def compute_best_rounds(self):
+        """
+        return a dictionary with the best round for each player and category
+
+        The keys of the dictionary are tuples like: (category, player_name)
+
+        To get a value use: best_rounds[(category, player_name)]
+        """
+        best_rounds = {}
+
+        for match in self.matches:
+            # changing labels of finals round match
+            if match.round == cfg["roundnames"]["final"]:
+                winner_round_match = cfg["roundnames"]["champion"]
+                loser_round_match = cfg["roundnames"]["second"]
+            elif match.round == cfg["roundnames"]["third place playoff"]:
+                winner_round_match = cfg["roundnames"]["third"]
+                loser_round_match = cfg["roundnames"]["fourth"]
+            else:
+                winner_round_match = match.round
+                loser_round_match = match.round
+
+            # finding best round per category of each player
+            for name, played_round in [(match.winner_name, winner_round_match),
+                                      (match.loser_name, loser_round_match)]:
+                # workaround to add extra bonus points from match list
+                if name == "to_add_bonus_points":
+                    continue
+
+                catname = (match.category, name)
+                if best_rounds.get(catname):
+                    if bonus_rounds_priority[best_rounds.get(catname)] < bonus_rounds_priority[played_round]:
+                        best_rounds[catname] = played_round
+                else:
+                    best_rounds[catname] = played_round
+
+        return best_rounds
