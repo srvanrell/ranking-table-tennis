@@ -119,7 +119,7 @@ class PlayersList:
 
     def load_list(self, players_list):
         for pid, name, association, city, last_tournament in players_list:
-            self.add_player(Player(pid, name, association, city, last_tournament))
+            self.add_player(Player(int(pid), name, association, city, int(last_tournament)))
 
     def update_history(self, ranking):
         # FIXME avoid empty history entries
@@ -174,7 +174,7 @@ class Ranking:
 
     def load_list(self, ranking_list):
         for pid, rating, bonus in ranking_list:
-            self.add_entry(RankingEntry(pid, rating, bonus))
+            self.add_entry(RankingEntry(int(pid), int(rating), int(bonus)))
 
     def to_list(self):
         ranking_list = [[p.pid, p.rating, p.bonus] for p in self]

@@ -31,8 +31,8 @@ players.load_list(utils.load_sheet_workbook(tournaments_xlsx, cfg["sheetname"]["
 initial_ranking = utils.load_ranking_sheet(tournaments_xlsx, cfg["sheetname"]["initial_ranking"])
 
 for tid, tournament_sheetname in enumerate(tournament_sheetnames):
-
-    tournament = utils.load_tournament_xlsx(tournaments_xlsx, tournament_sheetname)
+    # Loading tournament info
+    tournament = utils.load_tournament_gs(spreadsheet_id, tournament_sheetname)
 
     old_ranking = models.Ranking("pre_" + tournament.name, tournament.date, tournament.location, tid - 1)
 
