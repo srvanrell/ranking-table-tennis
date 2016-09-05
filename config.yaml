@@ -8,8 +8,8 @@ sheetname:
     players: Jugadores
     initial_ranking: Ranking inicial
     tournaments_key: Partidos
-    bonus_details_key: Detalles Bonus
-    rating_details_key: Detalles Rating
+    bonus_details_key: Bonus
+    rating_details_key: Rating
     rankings_key: Ranking
 
 labels:
@@ -32,3 +32,11 @@ labels:
     Date: Fecha
     Location: Lugar
     Tournament name: Nombre del torneo
+
+roundnames:
+    final: final
+    champion: primero
+    second: segundo
+    third: tercero
+    fourth: cuarto
+    third place playoff: tercer puesto

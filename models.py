@@ -1,5 +1,13 @@
 import os
 import csv
+import yaml
+
+# Loads some names from config.yaml
+with open("config.yaml", 'r') as cfgyaml:
+    try:
+        cfg = yaml.load(cfgyaml)
+    except yaml.YAMLError as exc:
+        print(exc)
 
 
 def save_csv(filename, headers, list_to_save):
@@ -221,12 +229,12 @@ class Ranking:
 
         for winner, loser, round_match, category in matches:
             # changing labels of finals round match
-            if round_match == "final":
-                winner_round_match = "primero"
-                loser_round_match = "segundo"
-            elif round_match == "tercer puesto":
-                winner_round_match = "tercero"
-                loser_round_match = "cuarto"
+            if round_match == cfg["roundnames"]["final"]:
+                winner_round_match = cfg["roundnames"]["champion"]
+                loser_round_match = cfg["roundnames"]["second"]
+            elif round_match == cfg["roundnames"]["third place playoff"]:
+                winner_round_match = cfg["roundnames"]["third"]
+                loser_round_match = cfg["roundnames"]["fourth"]
             else:
                 winner_round_match = round_match
                 loser_round_match = round_match
