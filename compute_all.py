@@ -32,7 +32,7 @@ initial_ranking = utils.load_ranking_sheet(tournaments_xlsx, cfg["sheetname"]["i
 
 for tid, tournament_sheetname in enumerate(tournament_sheetnames):
     # Loading tournament info
-    tournament = utils.load_tournament_gs(spreadsheet_id, tournament_sheetname)
+    tournament = utils.load_tournament_xlsx(tournaments_xlsx, tournament_sheetname)
 
     old_ranking = models.Ranking("pre_" + tournament.name, tournament.date, tournament.location, tid - 1)
 
