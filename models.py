@@ -210,10 +210,6 @@ class Ranking:
         assigned_points = []
 
         for winner_pid, loser_pid, unused, unused2 in matches:
-            # workaround to add extra bonus points from match list
-            if winner_pid < 0:
-                continue
-
             [to_winner, to_loser] = self._points_to_assign(old_ranking[winner_pid].rating,
                                                            old_ranking[loser_pid].rating)
             self[winner_pid].rating += to_winner
@@ -281,7 +277,7 @@ class Tournament:
         players_set = set()
         for match in self.matches:
             # workaround to add extra bonus points from match list
-            if not match.winner_name == "to_add_bonus_points":
+            if not match.winner_name == cfg["aux"]["flag add bonus"]:
                 players_set.add(match.winner_name)
             players_set.add(match.loser_name)
         return sorted(list(players_set))
@@ -312,7 +308,7 @@ class Tournament:
             for name, played_round in [(match.winner_name, winner_round_match),
                                        (match.loser_name, loser_round_match)]:
                 # workaround to add extra bonus points from match list
-                if name == "to_add_bonus_points":
+                if name == cfg["aux"]["flag add bonus"]:
                     continue
 
                 catname = (match.category, name)

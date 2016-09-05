@@ -40,3 +40,6 @@ roundnames:
     third: tercero
     fourth: cuarto
     third place playoff: tercer puesto
+
+aux:
+    flag add bonus: to_add_bonus_points

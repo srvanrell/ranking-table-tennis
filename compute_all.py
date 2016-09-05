@@ -63,10 +63,7 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames):
     # Creating matches list with pid
     matches = []
     for match in tournament.matches:
-        if match.winner_name == "to_add_bonus_points":
-            matches.append([-1, players.get_pid(match.loser_name),
-                            match.round, match.category])
-        else:
+        if match.winner_name != cfg["aux"]["flag add bonus"]:
             matches.append([players.get_pid(match.winner_name), players.get_pid(match.loser_name),
                             match.round, match.category])
 
