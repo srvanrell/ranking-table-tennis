@@ -50,6 +50,12 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames):
     # Create list of players that partipate in the tournament
     pid_participation_list = [players.get_pid(name) for name in tournament.get_players_names()]
 
+    # Get the best round for each player in each category
+    # Formatted like: best_rounds[(category, pid)] = best_round_value
+    aux_best_rounds = tournament.compute_best_rounds()
+    best_rounds = {(categ, players.get_pid(name)): aux_best_rounds[categ, pid]
+                   for categ, name in aux_best_rounds().keys()}
+
     # Log current tournament as the last played tournament
     for pid in pid_participation_list:
         players[pid].last_tournament = tid
