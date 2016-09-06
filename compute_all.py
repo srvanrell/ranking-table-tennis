@@ -57,8 +57,9 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames):
                    for categ, name in aux_best_rounds.keys()}
 
     # Log current tournament as the last played tournament
-    for pid in pid_participation_list:
-        players[pid].last_tournament = tid
+    # Also, best rounds reached in each category are saved into corresponding history
+    players.update_histories(tid, best_rounds)
+    print(players)
 
     # Creating matches list with pid
     matches = []

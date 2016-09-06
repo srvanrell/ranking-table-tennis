@@ -71,8 +71,19 @@ class Player:
         self.history = {}
 
     def __str__(self):
+        formated_history = ["\tCategory %s - Tournament %s: %s" % (cat, tid, best_round)
+                            for cat, tid, best_round in self.sorted_history]
         return ";".join([str(self.pid), self.name, self.association, self.city, str(self.last_tournament),
-                         str(self.history)])
+                         "\n".join([""] + formated_history)])
+
+    @property
+    def sorted_history(self):
+        """ History sorted first by category and then by tournament_id.
+
+        Returns a list which elements are [cat, tid, best_round]
+        """
+        return [[cat, tid, self.history[(cat, tid)]] for cat, tid in
+                sorted(self.history.keys())]
 
 
 class PlayersList:
@@ -121,10 +132,15 @@ class PlayersList:
         for pid, name, association, city, last_tournament in players_list:
             self.add_player(Player(int(pid), name, association, city, int(last_tournament)))
 
-    def update_history(self, ranking):
-        # FIXME avoid empty history entries
-        for pid in ranking.participation_pid_list:
-            self[pid].history[ranking.tid] = ranking[pid].best_rounds
+    def update_histories(self, tid, best_rounds):
+        """ Save player's best rounds into their histories and update
+        last_tournament.
+
+        Each history is a dict with (tournament_id, category) as key.
+        """
+        for category, pid in best_rounds.keys():
+            self[pid].history[(category, tid)] = best_rounds[(category, pid)]
+            self[pid].last_tournament = tid
 
 
 class RankingEntry:
@@ -132,14 +148,13 @@ class RankingEntry:
         self.pid = pid
         self.rating = rating
         self.bonus = bonus
-        self.best_rounds = {}
 
     def get_total(self):
         return self.bonus + self.rating
 
     def __str__(self):
-        return ";".join([str(self.pid), str(self.get_total()), str(self.rating), str(self.bonus),
-                         str(self.best_rounds)])
+        return ";".join([str(self.pid), str(self.get_total()),
+                         str(self.rating), str(self.bonus)])
 
 
 class Ranking:
@@ -227,7 +242,6 @@ class Ranking:
             categpid = (category, pid)
             round_points = bonus_rounds_points[category]
             self[pid].bonus += round_points[best_rounds[categpid]]
-            self[pid].best_rounds[category] = best_rounds[categpid]
             assigned_points.append([pid, round_points[best_rounds[categpid]], best_rounds[categpid], category])
         return sorted(assigned_points, key=lambda l: (l[-1], l[1], l[0]), reverse=True)
 
@@ -244,12 +258,6 @@ class Ranking:
         for entry in self:
             entry.rating += entry.bonus
             entry.bonus = 0
-
-    def save_players_history(self, players):
-        """ Save player's best rounds into his history (dict with tournament id as key) """
-        # FIXME avoid empty history entries
-        for entry in self:
-            players[entry.pid].history[self.tid] = entry.best_rounds
 
 
 class Match:
