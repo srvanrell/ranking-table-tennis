@@ -1,4 +1,5 @@
 key-for-gspread.json
+config/gspreadids.yaml
 
 # Data folder
 data/

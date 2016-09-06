@@ -127,7 +127,7 @@ def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=False):
         cell.alignment = Alignment(horizontal='center')
 
     list_to_save = [[e.pid, e.get_total(), e.rating, e.bonus, players[e.pid].name, players[e.pid].association,
-                     players[e.pid].city, str(ranking.tid - players[e.pid].last_tournament < 2)] for e in ranking]
+                     players[e.pid].city, str(ranking.tid - players[e.pid].last_tournament < 6)] for e in ranking]
 
     # for row in sorted(list_to_save, key=lambda l: (l[-1], l[1]), reverse=True):  # to use Jugador activo
     for row in sorted(list_to_save, key=lambda l: l[1], reverse=True):
