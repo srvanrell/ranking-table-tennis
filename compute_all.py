@@ -19,6 +19,7 @@ __author__ = 'sebastian'
 tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
 rankings_xlsx = cfg["io"]["data_folder"] + cfg["io"]["rankings_filename"]
 log_xlsx = cfg["io"]["data_folder"] + cfg["io"]["log_filename"]
+histories_xlsx = cfg["io"]["data_folder"] + "histories.xlsx"
 
 # Listing tournament sheetnames by increasing date
 tournament_sheetnames = utils.get_sheetnames_by_date(tournaments_xlsx, cfg["sheetname"]["tournaments_key"])
@@ -100,3 +101,21 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames):
                                                            cfg["sheetname"]["bonus_details_key"]),
                               [cfg["labels"][key] for key in ["Player", "Bonus Points", "Best Round", "Category"]],
                               points_log_to_save + participation_points_log_to_save, True)
+
+# Saving complete histories of players
+histories = []
+for player in sorted(players, key=lambda l: l.name):
+    histories.append([player.name, "", "", ""])
+    old_cat = ""
+    for cat, tid, best_round in player.sorted_history:
+        if cat == old_cat:
+            cat = ""
+        else:
+            old_cat = cat
+        histories.append(["", cat, best_round, " ".join(tournament_sheetnames[tid].split()[1:])])
+
+
+utils.save_sheet_workbook(histories_xlsx, "Historiales",
+                          [cfg["labels"][key] for key in ["Player", "Category", "Best Round", "Tournament"]],
+                          histories,
+                          True)

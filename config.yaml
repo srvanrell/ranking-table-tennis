@@ -32,6 +32,7 @@ labels:
     Date: Fecha
     Location: Lugar
     Tournament name: Nombre del torneo
+    Tournament: Torneo
 
 roundnames:
     final: final
