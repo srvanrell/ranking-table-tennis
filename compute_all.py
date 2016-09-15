@@ -43,10 +43,12 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames):
             cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["rankings_key"]))
 
     # Load initial rankings for new players
+    pid_new_players = []
     for name in tournament.get_players_names():
         pid = players.get_pid(name)
         if old_ranking.get_entry(pid) is None:
             old_ranking.add_entry(initial_ranking[pid])
+            pid_new_players.append(pid)
 
     # Create list of players that partipate in the tournament
     pid_participation_list = [players.get_pid(name) for name in tournament.get_players_names()]
@@ -60,7 +62,6 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames):
     # Log current tournament as the last played tournament
     # Also, best rounds reached in each category are saved into corresponding history
     players.update_histories(tid, best_rounds)
-    print(players)
 
     # Creating matches list with pid
     matches = []
@@ -69,11 +70,23 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames):
             matches.append([players.get_pid(match.winner_name), players.get_pid(match.loser_name),
                             match.round, match.category])
 
+#    print("="*20)
+#    update_dic = {}
+#    for i in range(20):
+#        for pid in update_dic:
+#            old_ranking[pid].rating += update_dic[pid]
     # TODO make a better way to copy models
     new_ranking = models.Ranking(tournament.name, tournament.date, tournament.location, tid)
     assigned_points_per_match = new_ranking.compute_new_ratings(old_ranking, matches)
     assigned_points_per_best_round = new_ranking.compute_bonus_points(best_rounds)
     assigned_participation_points = new_ranking.add_participation_points(pid_participation_list)
+
+#        print(pid_new_players)
+#        for pid in pid_new_players:
+#            new_rating = new_ranking[pid].rating
+#            old_rating = old_ranking[pid].rating
+#            update_dic[pid] = new_rating - old_rating
+#            print(pid, old_rating, new_rating, new_rating - old_rating, update_dic[pid])
 
     # Saving new ranking
     utils.save_ranking_sheet(rankings_xlsx, tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
