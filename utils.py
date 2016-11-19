@@ -25,6 +25,7 @@ def get_sheetnames_by_date(filename, filter_key=""):
 
 
 def load_sheet_workbook(filename, sheetname, first_row=1):
+    print(">Reading\t", sheetname, "\tfrom\t", filename)
     wb = load_workbook(filename, read_only=True)
     ws = wb.get_sheet_by_name(sheetname)
 
@@ -52,6 +53,7 @@ def load_sheet_workbook(filename, sheetname, first_row=1):
 
 
 def save_sheet_workbook(filename, sheetname, headers, list_to_save, overwrite=False):
+    print("<<<Saving\t", sheetname, "\tin\t", filename)
     if os.path.isfile(filename):
         wb = load_workbook(filename)
         if overwrite and sheetname in wb:
@@ -88,6 +90,7 @@ def save_sheet_workbook(filename, sheetname, headers, list_to_save, overwrite=Fa
 
 
 def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=False):
+    print("<<<Saving\t", sheetname, "\tin\t", filename)
     if os.path.isfile(filename):
         wb = load_workbook(filename)
         if overwrite and sheetname in wb:
