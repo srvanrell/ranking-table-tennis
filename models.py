@@ -223,13 +223,15 @@ class Ranking:
 
         # List of points assigned in each match
         assigned_points = []
+        factor = cfg["aux"]["rating factor"]
 
         for winner_pid, loser_pid, unused, unused2 in matches:
             [to_winner, to_loser] = self._points_to_assign(old_ranking[winner_pid].rating,
                                                            old_ranking[loser_pid].rating)
+            to_winner = factor*to_winner
+            to_loser = min(self[loser_pid].rating, factor*to_loser)
             self[winner_pid].rating += to_winner
             self[loser_pid].rating -= to_loser
-            self[loser_pid].rating = max(0, self[loser_pid].rating)
 
             assigned_points.append([winner_pid, loser_pid, to_winner, -to_loser])
 

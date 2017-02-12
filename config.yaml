@@ -44,3 +44,4 @@ roundnames:
 
 aux:
     flag add bonus: to_add_bonus_points
+    rating factor: 3.0
