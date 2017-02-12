@@ -30,25 +30,19 @@ def load_sheet_workbook(filename, sheetname, first_row=1):
     ws = wb.get_sheet_by_name(sheetname)
 
     ws.calculate_dimension(force=True)
-    # print(ws.dimensions)
 
     list_to_return = []
-    max_column = 0
     for row in ws.rows:
         aux_row = []
         empty_row = True
         for cell in row:
-            if cell.column:
-                if cell.column > max_column:
-                    max_column = cell.column
             if cell.value is None:
                 aux_row.append("")
-                # print(cell.column)
             else:
                 empty_row = False
                 aux_row.append(cell.value)
         if not empty_row:
-            list_to_return.append(aux_row[:max_column])
+            list_to_return.append(aux_row[:ws.max_column])
     return list_to_return[first_row:]
 
 
@@ -123,10 +117,10 @@ def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=False):
     to_center = to_bold + ["B1", "B2", "B3"]
 
     for colrow in to_bold:
-        cell = ws.cell(colrow)
+        cell = ws[colrow]
         cell.font = Font(bold=True)
     for colrow in to_center:
-        cell = ws.cell(colrow)
+        cell = ws[colrow]
         cell.alignment = Alignment(horizontal='center')
 
     list_to_save = [[e.pid, e.get_total(), e.rating, e.bonus, players[e.pid].name, players[e.pid].association,
