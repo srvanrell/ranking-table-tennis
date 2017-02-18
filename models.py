@@ -43,11 +43,14 @@ expected_result_table = load_csv(config_folder + "expected_result.csv")
 # negative difference, points to winner, points to loser
 unexpected_result_table = load_csv(config_folder + "unexpected_result.csv")
 
-# points to be assigned by round
+# points to be assigned by round and by participation
 raw_bonus_table = load_csv(config_folder + "puntos_por_ronda.csv", first_row=0)
+raw_participation_points = load_csv(config_folder + "puntos_por_participar.csv")
+
 categories = raw_bonus_table[0][2:]
 bonus_rounds_points = {}
 bonus_rounds_priority = {}
+participation_points = {}
 for i, categ in enumerate(categories):
     bonus_rounds_points[categ] = {}
     for bonus_row in raw_bonus_table[1:]:
@@ -57,8 +60,8 @@ for i, categ in enumerate(categories):
         bonus_rounds_points[categ][reached_round] = points
         bonus_rounds_priority[reached_round] = priority
 
-# Points for being part of a tournament
-participation_points = int(load_csv(config_folder + "puntos_por_participar.csv").pop().pop())
+    # Points for being part of a tournament
+    participation_points[categ] = raw_participation_points[0][i]
 
 
 class Player:
@@ -69,6 +72,7 @@ class Player:
         self.city = city
         self.last_tournament = last_tournament
         self.history = {}
+        self.n_tournaments = 0
 
     def __str__(self):
         formated_history = ["\tCategory %s - Tournament %s: %s" % (cat, tid, best_round)
@@ -125,11 +129,11 @@ class PlayersList:
         return None
 
     def to_list(self):
-        players_list = [[p.pid, p.name, p.association, p.city, p.last_tournament] for p in self]
+        players_list = [[p.pid, p.name, p.association, p.city, p.last_tournament, p.n_tournaments] for p in self]
         return players_list
 
     def load_list(self, players_list):
-        for pid, name, association, city, last_tournament in players_list:
+        for pid, name, association, city, last_tournament, n_t in players_list:
             self.add_player(Player(int(pid), name, association, city, int(last_tournament)))
 
     def update_histories(self, tid, best_rounds):
@@ -247,6 +251,7 @@ class Ranking:
             assigned_points.append([pid, round_points[best_rounds[categpid]], best_rounds[categpid], category])
         return sorted(assigned_points, key=lambda l: (l[-1], l[1], l[0]), reverse=True)
 
+    # FIXME consider category
     def add_participation_points(self, pid_list):
         """Add bonus points for each participant given """
         assigned_points = []

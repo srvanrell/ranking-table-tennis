@@ -48,10 +48,12 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames):
 
         # Log current tournament as the last played tournament
         players[pid].last_tournament = tid
+        players[pid].n_tournaments += 1
 
 # Saving complete list of players, including new ones
 utils.save_sheet_workbook(xlsx_file, cfg["sheetname"]["players"],
-                          [cfg["labels"][key] for key in ["PID", "Player", "Association", "City", "Last Tournament"]],
+                          [cfg["labels"][key] for key in ["PID", "Player", "Association", "City",
+                                                          "Last Tournament", "Participations"]],
                           sorted(players.to_list(), key=lambda l: l[1]),
                           True)
 

@@ -18,7 +18,7 @@ labels:
     Association: Asociación
     City: Ciudad
     Last Tournament: Último Torneo
-    Bonus Points: Puntos Bonus
+    Bonus Points: Puntos de Campeonato
     Rating Points: Nivel de Juego
     Best Round: Mejor Ronda
     Winner: Ganador
@@ -33,6 +33,7 @@ labels:
     Location: Lugar
     Tournament name: Nombre del torneo
     Tournament: Torneo
+    Participations: Torneos Jugados
 
 roundnames:
     final: final
