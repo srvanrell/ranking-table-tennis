@@ -1,11 +1,11 @@
-priority,round_reached,primera,segunda,tercera
-0,zona,3,2,1
-1,octavos,6,4,2
-2,cuartos,12,8,4
-3,semifinal,15,10,5
-4,tercer puesto,0,0,0
-5,cuarto,15,10,5
-6,tercero,18,12,6
-7,final,0,0,0
-8,segundo,24,16,8
-9,primero,30,20,10
+priority,round_reached,primera,segunda,tercera,aficionados
+0,zona,100,50,25,10
+1,octavos,150,75,40,15
+2,cuartos,250,125,65,25
+3,semifinal,350,175,90,35
+4,tercer puesto,0,0,0,0
+5,cuarto,350,175,90,35
+6,tercero,500,250,125,50
+7,final,0,0,0,0
+8,segundo,750,375,190,75
+9,primero,1000,500,250,100
