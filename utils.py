@@ -123,12 +123,17 @@ def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=False):
         cell = ws[colrow]
         cell.alignment = Alignment(horizontal='center')
 
-    # FIXME active player should be an independent function
-    list_to_save = [[e.pid, e.rating, e.bonus, players[e.pid].name, players[e.pid].association,
-                     players[e.pid].city, str(ranking.tid - players[e.pid].last_tournament < 6)] for e in ranking]
+    # TODO double check active player function
+    if 0 < ranking.tid < 2:
+        ranking.update_active_players(players, inactivate=False)
+    if 2 <= ranking.tid:
+        ranking.update_active_players(players)
 
-    # for row in sorted(list_to_save, key=lambda l: (l[-1], l[1]), reverse=True):  # to use Jugador activo
-    for row in sorted(list_to_save, key=lambda l: l[1], reverse=True):
+    list_to_save = [[e.pid, e.rating, e.bonus, players[e.pid].name, players[e.pid].association,
+                     players[e.pid].city, str(e.active)] for e in ranking]
+
+    for row in sorted(list_to_save, key=lambda l: (l[-1], l[1]), reverse=True):  # to use Jugador activo
+    # for row in sorted(list_to_save, key=lambda l: l[1], reverse=True):
         ws.append(row)
 
     wb.save(filename)
@@ -139,7 +144,7 @@ def load_ranking_sheet(filename, sheetname):
     # TODO check if date is being read properly
     raw_ranking = load_sheet_workbook(filename, sheetname, first_row=0)
     ranking = models.Ranking(raw_ranking[0][1], raw_ranking[1][1], raw_ranking[2][1])
-    ranking.load_list([[rr[0], rr[1], rr[2]] for rr in raw_ranking[4:]])
+    ranking.load_list([[rr[0], rr[1], rr[2], rr[6]] for rr in raw_ranking[4:]])
     return ranking
 
 

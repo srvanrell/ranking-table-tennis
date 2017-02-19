@@ -86,13 +86,19 @@ class Player:
         :return: last_tournament, zero-indexed
         """
         if self.history:
-            self.last_tournament = max([tid for cat, tid in self.history.keys()])
+            self.last_tournament = max(self.played_tournaments())
         return self.last_tournament
 
     @property
     def n_tournaments(self):
         """ Number of played tournaments, regardless of categories. """
-        return len(set([tid for cat, tid in self.history.keys()]))
+        return len(self.played_tournaments())
+
+    def played_tournaments(self):
+        """ Return sorted list of played tournaments. Empty history will result in an empty list. """
+        if self.history:
+            return sorted(set([tid for cat, tid in self.history.keys()]))
+        return []
 
     @property
     def sorted_history(self):
@@ -162,12 +168,12 @@ class PlayersList:
 
 
 class RankingEntry:
-    def __init__(self, pid, rating, bonus):
+    def __init__(self, pid, rating, bonus, active=False):
         self.pid = pid
         self.rating = rating
         self.bonus = bonus
         self.category = ""
-        self.active = True
+        self.active = active
 
     def get_total(self):
         return self.bonus + self.rating
@@ -190,7 +196,7 @@ class Ranking:
 
     def add_entry(self, entry):
         if entry.pid not in self.ranking:
-            self.ranking[entry.pid] = RankingEntry(entry.pid, entry.rating, entry.bonus)
+            self.ranking[entry.pid] = RankingEntry(entry.pid, entry.rating, entry.bonus, entry.active)
         else:
             print("WARNING: Already exists an entry for pid:", entry.pid)
 
@@ -208,8 +214,8 @@ class Ranking:
         return aux + "\n".join(str(re) for re in self)
 
     def load_list(self, ranking_list):
-        for pid, rating, bonus in ranking_list:
-            self.add_entry(RankingEntry(int(pid), int(rating), int(bonus)))
+        for pid, rating, bonus, active in ranking_list:
+            self.add_entry(RankingEntry(int(pid), int(rating), int(bonus), bool(active)))
 
     def to_list(self):
         ranking_list = [[p.pid, p.rating, p.bonus] for p in self]
@@ -281,6 +287,13 @@ class Ranking:
         for entry in self:
             entry.rating += entry.bonus
             entry.bonus = 0
+
+    def update_active_players(self, players, inactivate=True):
+        for re in self:
+            # TODO verify the rules of activation
+            last_three = [t for t in players[re.pid].played_tournaments() if t > self.tid - 4]
+            if not len(last_three) > 1:
+                self[re.pid].active = len(last_three) > 1
 
 
 class Match:

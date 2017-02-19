@@ -57,10 +57,6 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames):
     # Also, best rounds reached in each category are saved into corresponding history
     players.update_histories(tid, best_rounds)
 
-    # # Log current tournament as the last played tournament
-    # players[pid].last_tournament = tid
-    # players[pid].n_tournaments += 1
-
 # Saving complete list of players, including new ones
 utils.save_sheet_workbook(xlsx_file, cfg["sheetname"]["players"],
                           [cfg["labels"][key] for key in ["PID", "Player", "Association", "City",
