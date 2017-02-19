@@ -16,6 +16,7 @@ __author__ = 'sebastian'
 ##########################################
 
 xlsx_file = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
+histories_xlsx = xlsx_file  # cfg["io"]["data_folder"] + "histories.xlsx"
 
 # Listing tournament sheetnames by increasing date
 tournament_sheetnames = utils.get_sheetnames_by_date(xlsx_file, cfg["sheetname"]["tournaments_key"])
@@ -46,9 +47,19 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames):
             ranking.add_new_entry(pid, initial_rating)
             print(ranking[pid])
 
-        # Log current tournament as the last played tournament
-        players[pid].last_tournament = tid
-        players[pid].n_tournaments += 1
+    # Get the best round for each player in each category
+    # Formatted like: best_rounds[(category, pid)] = best_round_value
+    aux_best_rounds = tournament.compute_best_rounds()
+    best_rounds = {(categ, players.get_pid(name)): aux_best_rounds[categ, name]
+                   for categ, name in aux_best_rounds.keys()}
+
+    # Log current tournament as the last played tournament
+    # Also, best rounds reached in each category are saved into corresponding history
+    players.update_histories(tid, best_rounds)
+
+    # # Log current tournament as the last played tournament
+    # players[pid].last_tournament = tid
+    # players[pid].n_tournaments += 1
 
 # Saving complete list of players, including new ones
 utils.save_sheet_workbook(xlsx_file, cfg["sheetname"]["players"],
@@ -59,3 +70,22 @@ utils.save_sheet_workbook(xlsx_file, cfg["sheetname"]["players"],
 
 # Saving initial rankings for all known players
 utils.save_ranking_sheet(xlsx_file, cfg["sheetname"]["initial_ranking"], ranking, players, True)
+
+# Saving complete histories of players
+histories = []
+for player in sorted(players, key=lambda l: l.name):
+    histories.append([player.name, "", "", ""])
+    old_cat = ""
+    for cat, tid, best_round in player.sorted_history:
+        if cat == old_cat:
+            cat = ""
+        else:
+            old_cat = cat
+        histories.append(["", cat, best_round, " ".join(tournament_sheetnames[tid].split()[1:])])
+
+
+utils.save_sheet_workbook(histories_xlsx, "Historiales",
+                          [cfg["labels"][key] for key in ["Player", "Category", "Best Round", "Tournament"]],
+                          histories,
+                          True)
+
