@@ -166,13 +166,15 @@ class RankingEntry:
         self.pid = pid
         self.rating = rating
         self.bonus = bonus
+        self.category = ""
+        self.active = True
 
     def get_total(self):
         return self.bonus + self.rating
 
     def __str__(self):
-        return ";".join([str(self.pid), str(self.get_total()),
-                         str(self.rating), str(self.bonus)])
+        return ";".join([str(self.pid), str(self.rating), str(self.bonus),
+                         self.category, str(self.active)])
 
 
 class Ranking:
