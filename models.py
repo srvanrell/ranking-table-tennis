@@ -72,13 +72,27 @@ class Player:
         self.city = city
         self.last_tournament = last_tournament
         self.history = {}
-        self.n_tournaments = 0
 
     def __str__(self):
         formated_history = ["\tCategory %s - Tournament %s: %s" % (cat, tid, best_round)
                             for cat, tid, best_round in self.sorted_history]
         return ";".join([str(self.pid), self.name, self.association, self.city, str(self.last_tournament),
                          "\n".join([""] + formated_history)])
+
+    def find_last_tournament(self):
+        """ Update and return last tournament index based on player history.
+        If history is not available will not update it.
+
+        :return: last_tournament, zero-indexed
+        """
+        if self.history:
+            self.last_tournament = max([tid for cat, tid in self.history.keys()])
+        return self.last_tournament
+
+    @property
+    def n_tournaments(self):
+        """ Number of played tournaments, regardless of categories. """
+        return len(set([tid for cat, tid in self.history.keys()]))
 
     @property
     def sorted_history(self):
