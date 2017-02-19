@@ -77,7 +77,7 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames):
     # TODO make a better way to copy models
     new_ranking = models.Ranking(tournament.name, tournament.date, tournament.location, tid)
     assigned_points_per_match = new_ranking.compute_new_ratings(old_ranking, matches)
-#    assigned_points_per_best_round = new_ranking.compute_bonus_points(best_rounds)
+    assigned_points_per_best_round = new_ranking.compute_bonus_points(best_rounds)
 #    assigned_participation_points = new_ranking.add_participation_points(pid_participation_list)
 
 #        print(pid_new_players)
@@ -103,13 +103,14 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames):
                               points_log_to_save, True)
 
     # Saving points assigned per best round reached and for participation
-#    points_log_to_save = [[players[pid].name, points, best_round, category] for pid, points, best_round, category
-#                          in assigned_points_per_best_round]
+    points_log_to_save = [[players[pid].name, points, best_round, category] for pid, points, best_round, category
+                          in assigned_points_per_best_round]
 #    participation_points_log_to_save = [[players[pid].name, points, cfg["labels"]["Participation Points"], ""]
 #                                        for pid, points in assigned_participation_points]
 
-#    utils.save_sheet_workbook(log_xlsx,
-#                              tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
-#                                                           cfg["sheetname"]["bonus_details_key"]),
-#                              [cfg["labels"][key] for key in ["Player", "Bonus Points", "Best Round", "Category"]],
-#                              points_log_to_save + participation_points_log_to_save, True)
+    utils.save_sheet_workbook(log_xlsx,
+                              tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
+                                                           cfg["sheetname"]["bonus_details_key"]),
+                              [cfg["labels"][key] for key in ["Player", "Bonus Points", "Best Round", "Category"]],
+                              points_log_to_save, True)
+                              # points_log_to_save + participation_points_log_to_save, True)
