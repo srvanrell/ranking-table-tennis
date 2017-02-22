@@ -1,7 +1,7 @@
 io:
     data_folder: data/
-    tournaments_filename: Liga Dos Orillas 2016 - Categorías Mayores - Partidos.xlsx
-    rankings_filename: Liga Dos Orillas 2016 - Categorías Mayores - Rankings Crudos.xlsx
+    tournaments_filename: Liga Dos Orillas 2017 - Categorías Mayores - Partidos.xlsx
+    rankings_filename: Liga Dos Orillas 2017 - Categorías Mayores - Rankings Crudos.xlsx
     log_filename: log.xlsx
 
 sheetname:

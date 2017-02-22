@@ -65,7 +65,7 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames):
     # Creating matches list with pid
     matches = []
     for match in tournament.matches:
-        if match.winner_name != cfg["aux"]["flag add bonus"]:
+        if match.winner_name != cfg["aux"]["flag add bonus"] and match.category != "aficionados":
             matches.append([players.get_pid(match.winner_name), players.get_pid(match.loser_name),
                             match.round, match.category])
 
@@ -78,7 +78,7 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames):
     new_ranking = models.Ranking(tournament.name, tournament.date, tournament.location, tid)
     assigned_points_per_match = new_ranking.compute_new_ratings(old_ranking, matches)
     assigned_points_per_best_round = new_ranking.compute_bonus_points(best_rounds)
-#    assigned_participation_points = new_ranking.add_participation_points(pid_participation_list)
+    assigned_participation_points = new_ranking.add_participation_points(pid_participation_list)
 
 #        print(pid_new_players)
 #        for pid in pid_new_players:
@@ -86,6 +86,12 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames):
 #            old_rating = old_ranking[pid].rating
 #            update_dic[pid] = new_rating - old_rating
 #            print(pid, old_rating, new_rating, new_rating - old_rating, update_dic[pid])
+
+    # Include all known players even if they din't play in the tournament
+    # TODO only include the previous ones, not the future additions
+    for entry in initial_ranking:
+        if new_ranking.get_entry(entry.pid) is None:
+            new_ranking.add_entry(entry)
 
     # Saving new ranking
     utils.save_ranking_sheet(rankings_xlsx, tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
@@ -105,12 +111,12 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames):
     # Saving points assigned per best round reached and for participation
     points_log_to_save = [[players[pid].name, points, best_round, category] for pid, points, best_round, category
                           in assigned_points_per_best_round]
-#    participation_points_log_to_save = [[players[pid].name, points, cfg["labels"]["Participation Points"], ""]
-#                                        for pid, points in assigned_participation_points]
+    participation_points_log_to_save = [[players[pid].name, points, cfg["labels"]["Participation Points"], ""]
+                                        for pid, points in assigned_participation_points]
 
     utils.save_sheet_workbook(log_xlsx,
                               tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
                                                            cfg["sheetname"]["bonus_details_key"]),
                               [cfg["labels"][key] for key in ["Player", "Bonus Points", "Best Round", "Category"]],
-                              points_log_to_save, True)
-                              # points_log_to_save + participation_points_log_to_save, True)
+                              # points_log_to_save, True)
+                              points_log_to_save + participation_points_log_to_save, True)

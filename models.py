@@ -168,11 +168,11 @@ class PlayersList:
 
 
 class RankingEntry:
-    def __init__(self, pid, rating, bonus, active=False):
+    def __init__(self, pid, rating, bonus, active=False, category=""):
         self.pid = pid
         self.rating = rating
         self.bonus = bonus
-        self.category = ""
+        self.category = category
         self.active = active
 
     def get_total(self):
@@ -196,7 +196,7 @@ class Ranking:
 
     def add_entry(self, entry):
         if entry.pid not in self.ranking:
-            self.ranking[entry.pid] = RankingEntry(entry.pid, entry.rating, entry.bonus, entry.active)
+            self.ranking[entry.pid] = RankingEntry(entry.pid, entry.rating, entry.bonus, entry.active, entry.category)
         else:
             print("WARNING: Already exists an entry for pid:", entry.pid)
 
@@ -214,8 +214,8 @@ class Ranking:
         return aux + "\n".join(str(re) for re in self)
 
     def load_list(self, ranking_list):
-        for pid, rating, bonus, active in ranking_list:
-            self.add_entry(RankingEntry(int(pid), int(rating), int(bonus), bool(active)))
+        for pid, rating, bonus, active, category in ranking_list:
+            self.add_entry(RankingEntry(int(pid), int(rating), int(bonus), bool(active), str(category)))
 
     def to_list(self):
         ranking_list = [[p.pid, p.rating, p.bonus] for p in self]
@@ -273,13 +273,12 @@ class Ranking:
             assigned_points.append([pid, round_points[best_rounds[categpid]], best_rounds[categpid], category])
         return sorted(assigned_points, key=lambda l: (l[-1], l[1], l[0]), reverse=True)
 
-    # FIXME consider category
     def add_participation_points(self, pid_list):
         """Add bonus points for each participant given """
         assigned_points = []
         for pid in pid_list:
-            self[pid].bonus += participation_points
-            assigned_points.append([pid, participation_points])
+            self[pid].bonus += participation_points[self[pid].category]
+            assigned_points.append([pid, participation_points[self[pid].category]])
         return assigned_points
 
     def bonus2rating(self):
