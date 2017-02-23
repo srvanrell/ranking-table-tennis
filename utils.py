@@ -63,12 +63,13 @@ def save_sheet_workbook(filename, sheetname, headers, list_to_save, overwrite=Fa
     ws.title = sheetname
 
     ws.append(headers)
+    
+    for row in list_to_save:
+        ws.append(row)
+
     for col in range(1, ws.max_column+1):
         cell = ws.cell(column=col, row=1)
         cell.font = Font(bold=True)
-
-    for row in list_to_save:
-        ws.append(row)
 
     # # Automatically adjust width of columns to its content
     # # TODO add width adaptation, now it breaks on datetime
@@ -112,6 +113,19 @@ def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=False):
     ws.append(cfg["labels"][key] for key in ["PID", "Rating Points", "Bonus Points",
                                              "Player", "Association", "City", "Active Player", "Category"])
 
+    # TODO double check active player function
+    if 0 < ranking.tid < 2:
+        ranking.update_active_players(players, inactivate=False)
+    if 2 <= ranking.tid:
+        ranking.update_active_players(players)
+
+    list_to_save = [[e.pid, e.rating, e.bonus, players[e.pid].name, players[e.pid].association,
+                     players[e.pid].city, cfg["activeplayer"][e.active], e.category] for e in ranking]
+
+    for row in sorted(list_to_save, key=lambda l: (l[6], -l[1]), reverse=False):  # to use Jugador activo
+    # for row in sorted(list_to_save, key=lambda l: l[1], reverse=True):
+        ws.append(row)
+
     to_bold = ["A1", "A2", "A3",
                "A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"]
     to_center = to_bold + ["B1", "B2", "B3"]
@@ -123,19 +137,6 @@ def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=False):
         cell = ws[colrow]
         cell.alignment = Alignment(horizontal='center')
 
-    # TODO double check active player function
-    if 0 < ranking.tid < 2:
-        ranking.update_active_players(players, inactivate=False)
-    if 2 <= ranking.tid:
-        ranking.update_active_players(players)
-
-    list_to_save = [[e.pid, e.rating, e.bonus, players[e.pid].name, players[e.pid].association,
-                     players[e.pid].city, str(e.active), e.category] for e in ranking]
-
-    for row in sorted(list_to_save, key=lambda l: (l[6], l[1]), reverse=True):  # to use Jugador activo
-    # for row in sorted(list_to_save, key=lambda l: l[1], reverse=True):
-        ws.append(row)
-
     wb.save(filename)
 
 
@@ -144,7 +145,7 @@ def load_ranking_sheet(filename, sheetname):
     # TODO check if date is being read properly
     raw_ranking = load_sheet_workbook(filename, sheetname, first_row=0)
     ranking = models.Ranking(raw_ranking[0][1], raw_ranking[1][1], raw_ranking[2][1])
-    ranking.load_list([[rr[0], rr[1], rr[2], rr[6] == "True", rr[7]] for rr in raw_ranking[4:]])
+    ranking.load_list([[rr[0], rr[1], rr[2], rr[6] == cfg["activeplayer"][True], rr[7]] for rr in raw_ranking[4:]])
 
     return ranking
 
