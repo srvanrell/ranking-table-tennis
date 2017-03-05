@@ -10,10 +10,6 @@ __author__ = 'sebastian'
 #        config.yaml
 # Output: xlsx rankings database
 #         xlsx log file
-#
-# It looks for unknown or unrated players.
-# It will ask for information not given 
-# and saves the result into the same xlsx
 ##########################################
 
 tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]

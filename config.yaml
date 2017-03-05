@@ -34,6 +34,7 @@ labels:
     Tournament name: Nombre del torneo
     Tournament: Torneo
     Participations: Torneos Jugados
+    Position: Posición
     
 activeplayer:
     True: activo

@@ -71,16 +71,6 @@ def save_sheet_workbook(filename, sheetname, headers, list_to_save, overwrite=Fa
         cell = ws.cell(column=col, row=1)
         cell.font = Font(bold=True)
 
-    # # Automatically adjust width of columns to its content
-    # # TODO add width adaptation, now it breaks on datetime
-    # dims = {}
-    # for row in ws.rows:
-    #     for cell in row:
-    #         if cell.value:
-    #             dims[cell.column] = max((dims.get(cell.column, 0), len(str(cell.value))))
-    # for col, value in dims.items():
-    #     ws.column_dimensions[col].width = value
-
     wb.save(filename)
 
 
@@ -113,21 +103,115 @@ def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=False):
     ws.append(cfg["labels"][key] for key in ["PID", "Rating Points", "Bonus Points",
                                              "Player", "Association", "City", "Active Player", "Category"])
 
-    # # TODO double check active player function
-    # if 0 < ranking.tid < 2:
-    #     ranking.update_active_players(players, inactivate=False)
-    # if 2 <= ranking.tid:
-    #     ranking.update_active_players(players)
-
     list_to_save = [[e.pid, e.rating, e.bonus, players[e.pid].name, players[e.pid].association,
                      players[e.pid].city, cfg["activeplayer"][e.active], e.category] for e in ranking]
 
     for row in sorted(list_to_save, key=lambda l: (l[6], -l[1]), reverse=False):  # to use Jugador activo
-    # for row in sorted(list_to_save, key=lambda l: l[1], reverse=True):
         ws.append(row)
 
     to_bold = ["A1", "A2", "A3",
                "A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"]
+    to_center = to_bold + ["B1", "B2", "B3"]
+
+    for colrow in to_bold:
+        cell = ws[colrow]
+        cell.font = Font(bold=True)
+    for colrow in to_center:
+        cell = ws[colrow]
+        cell.alignment = Alignment(horizontal='center')
+
+    wb.save(filename)
+
+
+def publish_rating_sheet(filename, sheetname, ranking, players, overwrite=False):
+    """ Format a ranking to be published into a rating sheet"""
+    print("<<<Saving\t", sheetname, "\tin\t", filename)
+    if os.path.isfile(filename):
+        wb = load_workbook(filename)
+        if overwrite and sheetname in wb:
+            wb.remove_sheet(wb.get_sheet_by_name(sheetname))
+        if sheetname in wb:
+            ws = wb.get_sheet_by_name(sheetname)
+        else:
+            ws = wb.create_sheet()
+    else:
+        wb = Workbook()
+        ws = wb.active
+
+    ws.title = sheetname
+
+    ws["A1"] = cfg["labels"]["Tournament name"]
+    ws["B1"] = ranking.tournament_name
+    ws.merge_cells('B1:F1')
+    ws["A2"] = cfg["labels"]["Date"]
+    ws["B2"] = ranking.date
+    ws.merge_cells('B2:F2')
+    ws["A3"] = cfg["labels"]["Location"]
+    ws["B3"] = ranking.location
+    ws.merge_cells('B3:F3')
+
+    ws.append(cfg["labels"][key] for key in ["Rating Points", "Player", "Association",
+                                             "City", "Active Player", "Category"])
+
+    list_to_save = [[e.rating, players[e.pid].name, players[e.pid].association,
+                     players[e.pid].city, cfg["activeplayer"][e.active], e.category] for e in ranking]
+
+    for row in sorted(list_to_save, key=lambda l: (l[4], -l[0]), reverse=False):   # to use Jugador activo
+        ws.append(row)
+
+    to_bold = ["A1", "A2", "A3",
+               "A4", "B4", "C4", "D4", "E4", "F4"]
+    to_center = to_bold + ["B1", "B2", "B3"]
+
+    for colrow in to_bold:
+        cell = ws[colrow]
+        cell.font = Font(bold=True)
+    for colrow in to_center:
+        cell = ws[colrow]
+        cell.alignment = Alignment(horizontal='center')
+
+    wb.save(filename)
+
+
+def publish_championship_sheet(filename, sheetname, ranking, players, overwrite=False):
+    """ Format a ranking to be published into a rating sheet"""
+    print("<<<Saving\t", sheetname, "\tin\t", filename)
+    if os.path.isfile(filename):
+        wb = load_workbook(filename)
+        if overwrite and sheetname in wb:
+            wb.remove_sheet(wb.get_sheet_by_name(sheetname))
+        if sheetname in wb:
+            ws = wb.get_sheet_by_name(sheetname)
+        else:
+            ws = wb.create_sheet()
+    else:
+        wb = Workbook()
+        ws = wb.active
+
+    ws.title = sheetname
+
+    ws["A1"] = cfg["labels"]["Tournament name"]
+    ws["B1"] = ranking.tournament_name
+    ws.merge_cells('B1:G1')
+    ws["A2"] = cfg["labels"]["Date"]
+    ws["B2"] = ranking.date
+    ws.merge_cells('B2:G2')
+    ws["A3"] = cfg["labels"]["Location"]
+    ws["B3"] = ranking.location
+    ws.merge_cells('B3:G3')
+
+    ws.append(cfg["labels"][key] for key in ["Position", "Bonus Points", "Player", "Association",
+                                             "City", "Active Player", "Category"])
+
+    list_to_save = [[e.bonus, players[e.pid].name, players[e.pid].association,
+                     players[e.pid].city, cfg["activeplayer"][e.active], e.category] for e in ranking]
+    sorted_list = sorted(list_to_save, key=lambda l: l[0], reverse=True)
+
+    for i, row in enumerate(sorted_list):
+        ws.append([i + 1] + row)
+
+    to_bold = ["A1", "A2", "A3",
+               "A4", "B4", "C4", "D4", "E4", "F4", "G4"]
     to_center = to_bold + ["B1", "B2", "B3"]
 
     for colrow in to_bold:
