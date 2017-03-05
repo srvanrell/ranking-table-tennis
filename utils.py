@@ -113,11 +113,11 @@ def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=False):
     ws.append(cfg["labels"][key] for key in ["PID", "Rating Points", "Bonus Points",
                                              "Player", "Association", "City", "Active Player", "Category"])
 
-    # TODO double check active player function
-    if 0 < ranking.tid < 2:
-        ranking.update_active_players(players, inactivate=False)
-    if 2 <= ranking.tid:
-        ranking.update_active_players(players)
+    # # TODO double check active player function
+    # if 0 < ranking.tid < 2:
+    #     ranking.update_active_players(players, inactivate=False)
+    # if 2 <= ranking.tid:
+    #     ranking.update_active_players(players)
 
     list_to_save = [[e.pid, e.rating, e.bonus, players[e.pid].name, players[e.pid].association,
                      players[e.pid].city, cfg["activeplayer"][e.active], e.category] for e in ranking]

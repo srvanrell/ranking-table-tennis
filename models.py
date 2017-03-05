@@ -294,6 +294,37 @@ class Ranking:
             if not len(last_three) > 1:
                 self[re.pid].active = len(last_three) > 1
 
+    def update_categories(self):
+        """ Players are ranked based on rating and their active state.
+
+        Players are ordered by rating. Active players are sorted first.
+
+        Active players are ranked like this:
+        - 1:12    -> first category
+        - 13:28   -> second category
+        - 29:last -> third category
+
+        Inactive players are ranked based on active players categories
+        """
+        actives_to_order = [[e.pid, e.rating, e.active, e.category] for e in self if e.active]
+        inactives_to_order = [[e.pid, e.rating, e.active, e.category] for e in self if not e.active]
+
+        ordered_actives = sorted(actives_to_order, key=lambda l: (l[2], l[1]), reverse=True)  # to use Jugador activo
+        ordered_inactives = sorted(inactives_to_order, key=lambda l: (l[2], l[1]), reverse=True)  # to use Jugador activo
+
+        # First and last player indexes by category
+        first = [0, 12, 12+16]
+        last = [12-1, 12+16-1, len(ordered_actives)-1]
+
+        for cat, f, l in zip(categories[:3], first, last):
+            for pid, rating, active, category in ordered_actives[f:l+1]:
+                self[pid].category = cat
+
+        for pid, rating, active, category in ordered_inactives:
+            for cat, f, l in zip(reversed(categories[:3]), reversed(first), reversed(last)):
+                if rating >= self[ordered_actives[l][0]].rating:
+                    self[pid].category = cat
+
 
 class Match:
     def __init__(self, winner_name, loser_name, match_round, category):

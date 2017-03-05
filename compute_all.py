@@ -93,6 +93,9 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames):
         if new_ranking.get_entry(entry.pid) is None:
             new_ranking.add_entry(entry)
 
+    # Update categories before saving the new ranking
+    new_ranking.update_categories()
+
     # Saving new ranking
     utils.save_ranking_sheet(rankings_xlsx, tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
                                                                          cfg["sheetname"]["rankings_key"]),
