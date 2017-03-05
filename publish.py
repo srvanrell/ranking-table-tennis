@@ -13,7 +13,7 @@ __author__ = 'sebastian'
 
 tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
 rankings_xlsx = cfg["io"]["data_folder"] + cfg["io"]["rankings_filename"]
-log_xlsx = cfg["io"]["data_folder"] + cfg["io"]["log_filename"]
+temp_xlsx = cfg["io"]["data_folder"] + "temp.xlsx"
 
 # Listing tournament sheetnames by increasing date
 tournament_sheetnames = utils.get_sheetnames_by_date(tournaments_xlsx, cfg["sheetname"]["tournaments_key"])
@@ -35,66 +35,17 @@ ranking = utils.load_ranking_sheet(rankings_xlsx, tournament_sheetnames[tid].rep
     cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["rankings_key"]))
 
 # Saving new ranking
-utils.publish_rating_sheet("temp.xlsx", tournament_sheetnames[tid].replace(cfg["sheetname"]["tournaments_key"],
-                                                                           cfg["labels"]["Rating Points"]),
+utils.publish_rating_sheet(temp_xlsx, tournament_sheetnames[tid].replace(cfg["sheetname"]["tournaments_key"],
+                                                                         cfg["labels"]["Rating Points"]),
                            ranking, players, True)
 
 # Saving new ranking
-utils.publish_championship_sheet("temp.xlsx", tournament_sheetnames[tid].replace(cfg["sheetname"]["tournaments_key"],
-                                                                                 "Campeonato"),
+utils.publish_championship_sheet(temp_xlsx, tournament_sheetnames[tid].replace(cfg["sheetname"]["tournaments_key"],
+                                                                               "Campeonato"),
                                  ranking, players, True)
 
-#
-#     old_ranking = models.Ranking("pre_" + tournament.name, tournament.date, tournament.location, tid - 1)
-#
-#     # Load previous ranking if exists
-#     if tid-1 >= 0:
-#         old_ranking = utils.load_ranking_sheet(rankings_xlsx, tournament_sheetnames[tid - 1].replace(
-#             cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["rankings_key"]))
-#
-#     # Load initial rankings for new players
-#     pid_new_players = []
-#     for name in tournament.get_players_names():
-#         pid = players.get_pid(name)
-#         if old_ranking.get_entry(pid) is None:
-#             old_ranking.add_entry(initial_ranking[pid])
-#             pid_new_players.append(pid)
-#
-#     # Create list of players that partipate in the tournament
-#     pid_participation_list = [players.get_pid(name) for name in tournament.get_players_names()]
-#
-#     # Get the best round for each player in each category
-#     # Formatted like: best_rounds[(category, pid)] = best_round_value
-#     aux_best_rounds = tournament.compute_best_rounds()
-#     best_rounds = {(categ, players.get_pid(name)): aux_best_rounds[categ, name]
-#                    for categ, name in aux_best_rounds.keys()}
-#
-#     # Log current tournament as the last played tournament
-#     # Also, best rounds reached in each category are saved into corresponding history
-#     players.update_histories(tid, best_rounds)
-#
-#     # Creating matches list with pid
-#     matches = []
-#     for match in tournament.matches:
-#         if match.winner_name != cfg["aux"]["flag add bonus"] and match.category != "aficionados":
-#             matches.append([players.get_pid(match.winner_name), players.get_pid(match.loser_name),
-#                             match.round, match.category])
-#
-#     # TODO make a better way to copy models
-#     new_ranking = models.Ranking(tournament.name, tournament.date, tournament.location, tid)
-#     assigned_points_per_match = new_ranking.compute_new_ratings(old_ranking, matches)
-#     assigned_points_per_best_round = new_ranking.compute_bonus_points(best_rounds)
-#     assigned_participation_points = new_ranking.add_participation_points(pid_participation_list)
-#
-#     # Include all known players even if they din't play in the tournament
-#     # TODO only include the previous ones, not the future additions
-#     for entry in initial_ranking:
-#         if new_ranking.get_entry(entry.pid) is None:
-#             new_ranking.add_entry(entry)
-#
-#     # Update categories before saving the new ranking
-#     new_ranking.update_categories()
-#
+
+# TODO make a copy of point log sheets
 
     # # Saving points assigned in each match
     # points_log_to_save = [[players[winner_pid].name, players[loser_pid].name, winner_points, loser_points]
