@@ -106,7 +106,7 @@ def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=False):
     list_to_save = [[e.pid, e.rating, e.bonus, players[e.pid].name, players[e.pid].association,
                      players[e.pid].city, cfg["activeplayer"][e.active], e.category] for e in ranking]
 
-    for row in sorted(list_to_save, key=lambda l: (l[6], -l[1]), reverse=False):  # to use Jugador activo
+    for row in sorted(list_to_save, key=lambda l: l[1], reverse=True):
         ws.append(row)
 
     to_bold = ["A1", "A2", "A3",
