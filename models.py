@@ -306,15 +306,17 @@ class Ranking:
 
         Inactive players are ranked based on active players categories
         """
-        actives_to_order = [[e.pid, e.rating, e.active, e.category] for e in self if e.active]
-        inactives_to_order = [[e.pid, e.rating, e.active, e.category] for e in self if not e.active]
+        actives_to_order = [[e.pid, e.rating, e.active, e.category] for e in self if e.active and
+                            not e.category == categories[3]]
+        inactives_to_order = [[e.pid, e.rating, e.active, e.category] for e in self if not e.active and
+                            not e.category == categories[3]]
 
         ordered_actives = sorted(actives_to_order, key=lambda l: (l[2], l[1]), reverse=True)  # to use Jugador activo
         ordered_inactives = sorted(inactives_to_order, key=lambda l: (l[2], l[1]), reverse=True)  # to use Jugador activo
 
         # First and last player indexes by category
-        first = [0, 12, 12+16]
-        last = [12-1, 12+16-1, len(ordered_actives)-1]
+        first = [0, 10, 10+10]
+        last = [10-1, 10+10-1, len(ordered_actives)-1]
 
         for cat, f, l in zip(categories[:3], first, last):
             for pid, rating, active, category in ordered_actives[f:l+1]:

@@ -34,6 +34,9 @@ tournament = utils.load_tournament_xlsx(tournaments_xlsx, tournament_sheetnames[
 ranking = utils.load_ranking_sheet(rankings_xlsx, tournament_sheetnames[tid].replace(
     cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["rankings_key"]))
 
+#FIXME should not update here
+ranking.update_categories()
+
 # Saving new ranking
 utils.publish_rating_sheet(temp_xlsx, tournament_sheetnames[tid].replace(cfg["sheetname"]["tournaments_key"],
                                                                          cfg["labels"]["Rating Points"]),
