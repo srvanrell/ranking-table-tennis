@@ -26,7 +26,7 @@ players.load_list(utils.load_sheet_workbook(tournaments_xlsx, cfg["sheetname"]["
 initial_ranking = utils.load_ranking_sheet(tournaments_xlsx, cfg["sheetname"]["initial_ranking"])
 
 for tid, tournament_sheetname in enumerate(tournament_sheetnames):
-    print("\n%d\t->\t%s" % (tid, tournament_sheetnames))
+    print("\n%d\t->\t%s" % (tid, tournament_sheetname))
 tid = int(input("Enter the tournament id to publish (look above):\n"))
 
 # Loading tournament info
