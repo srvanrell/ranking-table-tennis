@@ -6,6 +6,8 @@ __author__ = 'sebastian'
 
 ##########################################
 # Script to run after preprocess.py
+# It computes rating and points of
+# the selected tournament
 # Input: xlsx tournaments database
 #        config.yaml
 # Output: xlsx rankings database
@@ -26,12 +28,11 @@ players.load_list(utils.load_sheet_workbook(tournaments_xlsx, cfg["sheetname"]["
 # Loading initial ranking
 initial_ranking = utils.load_ranking_sheet(tournaments_xlsx, cfg["sheetname"]["initial_ranking"])
 
-
+# Ask for the tournament data to be processed
 for tid, tournament_sheetname in enumerate(tournament_sheetnames):
     print("\n%d\t->\t%s" % (tid, tournament_sheetname))
 tid = int(input("Enter the tournament to compute (look above):\n"))
   
-#for tid, tournament_sheetname in enumerate(tournament_sheetnames):
 # Loading tournament info
 tournament_sheetname = tournament_sheetnames[tid]
 tournament = utils.load_tournament_xlsx(tournaments_xlsx, tournament_sheetname)
@@ -71,30 +72,17 @@ for match in tournament.matches:
         matches.append([players.get_pid(match.winner_name), players.get_pid(match.loser_name),
                         match.round, match.category])
 
-#    print("="*20)
-#    update_dic = {}
-#    for i in range(20):
-#        for pid in update_dic:
-#            old_ranking[pid].rating += update_dic[pid]
 # TODO make a better way to copy models
 new_ranking = models.Ranking(tournament.name, tournament.date, tournament.location, tid)
 assigned_points_per_match = new_ranking.compute_new_ratings(old_ranking, matches)
 assigned_points_per_best_round = new_ranking.compute_bonus_points(best_rounds)
 assigned_participation_points = new_ranking.add_participation_points(pid_participation_list)
 
-#        print(pid_new_players)
-#        for pid in pid_new_players:
-#            new_rating = new_ranking[pid].rating
-#            old_rating = old_ranking[pid].rating
-#            update_dic[pid] = new_rating - old_rating
-#            print(pid, old_rating, new_rating, new_rating - old_rating, update_dic[pid])
-
-# Include all known players even if they din't play in the tournament
-# TODO only include the previous ones, not the future additions
+# Include all known players even if they didn't play in the tournament
 for entry in initial_ranking:
     if new_ranking.get_entry(entry.pid) is None:
+        # Only include previously known players, not from future tournaments
         if entry.bonus > 0 or entry.active:
-            print(players[entry.pid])
             new_ranking.add_entry(entry)
         
 # Update categories before saving the new ranking
@@ -126,5 +114,4 @@ utils.save_sheet_workbook(log_xlsx,
                           tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
                                                        cfg["sheetname"]["bonus_details_key"]),
                           [cfg["labels"][key] for key in ["Player", "Bonus Points", "Best Round", "Category"]],
-                          # points_log_to_save, True)
                           points_log_to_save + participation_points_log_to_save, True)

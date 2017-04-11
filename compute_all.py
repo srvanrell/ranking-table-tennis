@@ -5,6 +5,7 @@ from utils import cfg
 __author__ = 'sebastian'
 
 ##########################################
+# WARNING, THIS IS NOT WORKING NOW!!!!
 # Script to run after preprocess.py
 # Input: xlsx tournaments database
 #        config.yaml
@@ -65,29 +66,18 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames):
             matches.append([players.get_pid(match.winner_name), players.get_pid(match.loser_name),
                             match.round, match.category])
 
-#    print("="*20)
-#    update_dic = {}
-#    for i in range(20):
-#        for pid in update_dic:
-#            old_ranking[pid].rating += update_dic[pid]
     # TODO make a better way to copy models
     new_ranking = models.Ranking(tournament.name, tournament.date, tournament.location, tid)
     assigned_points_per_match = new_ranking.compute_new_ratings(old_ranking, matches)
     assigned_points_per_best_round = new_ranking.compute_bonus_points(best_rounds)
     assigned_participation_points = new_ranking.add_participation_points(pid_participation_list)
 
-#        print(pid_new_players)
-#        for pid in pid_new_players:
-#            new_rating = new_ranking[pid].rating
-#            old_rating = old_ranking[pid].rating
-#            update_dic[pid] = new_rating - old_rating
-#            print(pid, old_rating, new_rating, new_rating - old_rating, update_dic[pid])
-
-    # Include all known players even if they din't play in the tournament
-    # TODO only include the previous ones, not the future additions
+    # Include all known players even if they didn't play in the tournament
     for entry in initial_ranking:
         if new_ranking.get_entry(entry.pid) is None:
-            new_ranking.add_entry(entry)
+            # Only include previously known players, not from future tournaments
+            if entry.bonus > 0 or entry.active:
+                new_ranking.add_entry(entry)
 
     # Update categories before saving the new ranking
     # FIXME see if it should be here or in publish
