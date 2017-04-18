@@ -1,6 +1,7 @@
 import os
 import csv
 import yaml
+import ast
 
 # Loads some names from config.yaml
 with open("config.yaml", 'r') as cfgyaml:
@@ -65,13 +66,14 @@ for i, categ in enumerate(categories):
 
 
 class Player:
-    def __init__(self, pid=-1, name="Apellido, Nombre", association="Asociación", city="Ciudad", last_tournament=-1):
+    def __init__(self, pid=-1, name="Apellido, Nombre", association="Asociación", city="Ciudad", last_tournament=-1,
+                 history={}):
         self.pid = pid
         self.name = name
         self.association = association
         self.city = city
         self.last_tournament = last_tournament
-        self.history = {}
+        self.history = history
 
     def __str__(self):
         formated_history = ["\tCategory %s - Tournament %s: %s" % (cat, tid, best_round)
@@ -149,12 +151,14 @@ class PlayersList:
         return None
 
     def to_list(self):
-        players_list = [[p.pid, p.name, p.association, p.city, p.last_tournament, p.n_tournaments] for p in self]
+        players_list = [[p.pid, p.name, p.association, p.city, p.last_tournament, str(p.history)]
+                        for p in self]
         return players_list
 
     def load_list(self, players_list):
-        for pid, name, association, city, last_tournament, n_t in players_list:
-            self.add_player(Player(int(pid), name, association, city, int(last_tournament)))
+        for pid, name, association, city, last_tournament, history_str in players_list:
+            history = ast.literal_eval(history_str)
+            self.add_player(Player(int(pid), name, association, city, int(last_tournament), history))
 
     def update_histories(self, tid, best_rounds):
         """ Save player's best rounds into their histories and update
@@ -294,7 +298,7 @@ class Ranking:
             if not len(last_three) > 1:
                 self[re.pid].active = len(last_three) > 1
 
-    def update_categories(self):
+    def update_categories(self, n_first=10, n_second=10):
         """ Players are ranked based on rating and their active state.
 
         Players are ordered by rating. Active players are sorted first.
@@ -315,8 +319,8 @@ class Ranking:
         ordered_inactives = sorted(inactives_to_order, key=lambda l: (l[2], l[1]), reverse=True)  # to use Jugador activo
 
         # First and last player indexes by category
-        first = [0, 10, 10+10]
-        last = [10-1, 10+10-1, len(ordered_actives)-1]
+        first = [0, n_first, n_first+n_second]
+        last = [n_first-1, n_first+n_second-1, len(ordered_actives)-1]
 
         for cat, f, l in zip(categories[:3], first, last):
             for pid, rating, active, category in ordered_actives[f:l+1]:
