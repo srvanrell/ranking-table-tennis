@@ -112,6 +112,63 @@ def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=False):
     wb.save(filename)
 
 
+def load_ranking_sheet(filename, sheetname):
+    """Load a ranking in a xlxs sheet and return a Ranking object"""
+    # TODO check if date is being read properly
+    raw_ranking = load_sheet_workbook(filename, sheetname, first_row=0)
+    ranking = models.Ranking(raw_ranking[0][1], raw_ranking[1][1], raw_ranking[2][1])
+    ranking.load_list([[rr[0], rr[1], rr[2], rr[3] == cfg["activeplayer"][True], rr[4]] for rr in raw_ranking[4:]])
+
+    return ranking
+
+
+def load_tournament_csv(filename):
+    """Load a tournament csv and return a Tournament object"""
+    with open(filename, 'r') as incsv:
+        reader = csv.reader(incsv)
+        tournament_list = [row for row in reader]
+        return load_tournament_list(tournament_list)
+
+
+def load_tournament_xlsx(filename, sheet_name):
+    """Load a tournament xlsx sheet and return a Tournament object"""
+    return load_tournament_list(load_sheet_workbook(filename, sheet_name, 0))
+
+
+def load_tournament_list(tournament_list):
+    """Load a tournament list sheet and return a Tournament object
+    name = cell(B1)
+    date = cell(B2)
+    location = cell(B3)
+    matches should be from sixth row containing:
+    player1, player2, sets1, sets2, match_round, category
+    """
+    name = tournament_list[0][1]
+    date = tournament_list[1][1]
+    location = tournament_list[2][1]
+
+    tournament = models.Tournament(name, date, location)
+
+    # Reformated list of matches
+    for player1, player2, sets1, sets2, round_match, category in tournament_list[5:]:
+        # workaround to add extra bonus points from match list
+        if int(sets1) < 0 and int(sets2) < 0:
+            winner_name = cfg["aux"]["flag add bonus"]
+            loser_name = player2
+        elif int(sets1) > int(sets2):
+            winner_name = player1
+            loser_name = player2
+        elif int(sets1) < int(sets2):
+            winner_name = player2
+            loser_name = player1
+        else:
+            print("Failed to process matches, a tie was found between %s and %s" % (player1, player2))
+            break
+        tournament.add_match(winner_name, loser_name, round_match, category)
+
+    return tournament
+
+
 def publish_rating_sheet(filename, sheetname, ranking, players, overwrite=False):
     """ Format a ranking to be published into a rating sheet"""
     print("<<<Saving\t", sheetname, "\tin\t", filename)
@@ -213,58 +270,46 @@ def publish_championship_sheet(filename, sheetname, ranking, players, overwrite=
     wb.save(filename)
 
 
-def load_ranking_sheet(filename, sheetname):
-    """Load a ranking in a xlxs sheet and return a Ranking object"""
-    # TODO check if date is being read properly
-    raw_ranking = load_sheet_workbook(filename, sheetname, first_row=0)
-    ranking = models.Ranking(raw_ranking[0][1], raw_ranking[1][1], raw_ranking[2][1])
-    ranking.load_list([[rr[0], rr[1], rr[2], rr[3] == cfg["activeplayer"][True], rr[4]] for rr in raw_ranking[4:]])
-
-    return ranking
-
-
-def load_tournament_csv(filename):
-    """Load a tournament csv and return a Tournament object"""
-    with open(filename, 'r') as incsv:
-        reader = csv.reader(incsv)
-        tournament_list = [row for row in reader]
-        return load_tournament_list(tournament_list)
-
-
-def load_tournament_xlsx(filename, sheet_name):
-    """Load a tournament xlsx sheet and return a Tournament object"""
-    return load_tournament_list(load_sheet_workbook(filename, sheet_name, 0))
-
-
-def load_tournament_list(tournament_list):
-    """Load a tournament list sheet and return a Tournament object
-    name = cell(B1)
-    date = cell(B2)
-    location = cell(B3)
-    matches should be from sixth row containing:
-    player1, player2, sets1, sets2, match_round, category
-    """
-    name = tournament_list[0][1]
-    date = tournament_list[1][1]
-    location = tournament_list[2][1]
-
-    tournament = models.Tournament(name, date, location)
-
-    # Reformated list of matches
-    for player1, player2, sets1, sets2, round_match, category in tournament_list[5:]:
-        # workaround to add extra bonus points from match list
-        if int(sets1) < 0 and int(sets2) < 0:
-            winner_name = cfg["aux"]["flag add bonus"]
-            loser_name = player2
-        elif int(sets1) > int(sets2):
-            winner_name = player1
-            loser_name = player2
-        elif int(sets1) < int(sets2):
-            winner_name = player2
-            loser_name = player1
+def publish_histories_sheet(filename, sheetname, players, tournament_sheetnames, overwrite=False):
+        """ Format histories to be published into a sheet"""
+        print("<<<Saving\t", sheetname, "\tin\t", filename)
+        if os.path.isfile(filename):
+            wb = load_workbook(filename)
+            if overwrite and sheetname in wb:
+                wb.remove_sheet(wb.get_sheet_by_name(sheetname))
+            if sheetname in wb:
+                ws = wb.get_sheet_by_name(sheetname)
+            else:
+                ws = wb.create_sheet()
         else:
-            print("Failed to process matches, a tie was found between %s and %s" % (player1, player2))
-            break
-        tournament.add_match(winner_name, loser_name, round_match, category)
+            wb = Workbook()
+            ws = wb.active
 
-    return tournament
+        ws.title = sheetname
+
+        histories = []
+        for player in sorted(players, key=lambda l: l.name):
+            histories.append([player.name, "", "", ""])
+            old_cat = ""
+            for cat, tid, best_round in player.sorted_history:
+                if cat == old_cat:
+                    cat = ""
+                else:
+                    old_cat = cat
+                histories.append(["", cat, best_round, " ".join(tournament_sheetnames[tid - 1].split()[1:])])
+
+        to_bold = ["A1", "A2", "A3", "A4"]
+        to_center = to_bold
+
+        for colrow in to_bold:
+            cell = ws[colrow]
+            cell.font = Font(bold=True)
+        for colrow in to_center:
+            cell = ws[colrow]
+            cell.alignment = Alignment(horizontal='center')
+
+        save_sheet_workbook(filename, sheetname,
+                            [cfg["labels"][key] for key in ["Player", "Category", "Best Round", "Tournament"]],
+                            histories,
+                            overwrite)
+

@@ -75,19 +75,4 @@ utils.publish_championship_sheet(temp_xlsx, tournament_sheetname.replace(cfg["sh
 #                           points_log_to_save + participation_points_log_to_save, True)
 
 # Saving complete histories of players
-histories = []
-for player in sorted(players, key=lambda l: l.name):
-    histories.append([player.name, "", "", ""])
-    old_cat = ""
-    for cat, tid, best_round in player.sorted_history:
-        if cat == old_cat:
-            cat = ""
-        else:
-            old_cat = cat
-        histories.append(["", cat, best_round, " ".join(tournament_sheetnames[tid-1].split()[1:])])
-
-
-utils.save_sheet_workbook(histories_xlsx, "Historiales",
-                          [cfg["labels"][key] for key in ["Player", "Category", "Best Round", "Tournament"]],
-                          histories,
-                          True)
+utils.publish_histories_sheet(histories_xlsx, "Historiales", players, tournament_sheetnames, True)
