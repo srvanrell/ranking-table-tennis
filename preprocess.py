@@ -28,7 +28,7 @@ players.load_list(utils.load_sheet_workbook(xlsx_file, cfg["sheetname"]["players
 # Loading initial ranking and adding new players with 0
 ranking = utils.load_ranking_sheet(xlsx_file, cfg["sheetname"]["initial_ranking"])
 
-for tid, tournament_sheetname in enumerate(tournament_sheetnames):
+for tid, tournament_sheetname in enumerate(tournament_sheetnames, start=1):
     # Loading tournament info
     tournament = utils.load_tournament_xlsx(xlsx_file, tournament_sheetname)
 
@@ -78,7 +78,7 @@ for player in sorted(players, key=lambda l: l.name):
             cat = ""
         else:
             old_cat = cat
-        histories.append(["", cat, best_round, " ".join(tournament_sheetnames[tid].split()[1:])])
+        histories.append(["", cat, best_round, " ".join(tournament_sheetnames[tid-1].split()[1:])])
 
 
 utils.save_sheet_workbook(histories_xlsx, "Historiales",
