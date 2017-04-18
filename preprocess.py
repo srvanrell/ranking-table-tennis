@@ -16,12 +16,11 @@ __author__ = 'sebastian'
 ##########################################
 
 xlsx_file = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
-histories_xlsx = xlsx_file  # cfg["io"]["data_folder"] + "histories.xlsx"
 
 # Listing tournament sheetnames by increasing date
 tournament_sheetnames = utils.get_sheetnames_by_date(xlsx_file, cfg["sheetname"]["tournaments_key"])
 
-# Loading and completing the players list
+# Loading players list
 players = models.PlayersList()
 players.load_list(utils.load_sheet_workbook(xlsx_file, cfg["sheetname"]["players"]))
 
@@ -67,22 +66,3 @@ utils.save_sheet_workbook(xlsx_file, cfg["sheetname"]["players"],
 
 # Saving initial rankings for all known players
 utils.save_ranking_sheet(xlsx_file, cfg["sheetname"]["initial_ranking"], ranking, players, True)
-
-# Saving complete histories of players
-histories = []
-for player in sorted(players, key=lambda l: l.name):
-    histories.append([player.name, "", "", ""])
-    old_cat = ""
-    for cat, tid, best_round in player.sorted_history:
-        if cat == old_cat:
-            cat = ""
-        else:
-            old_cat = cat
-        histories.append(["", cat, best_round, " ".join(tournament_sheetnames[tid-1].split()[1:])])
-
-
-utils.save_sheet_workbook(histories_xlsx, "Historiales",
-                          [cfg["labels"][key] for key in ["Player", "Category", "Best Round", "Tournament"]],
-                          histories,
-                          True)
-
