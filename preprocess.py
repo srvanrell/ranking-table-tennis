@@ -42,9 +42,15 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames, start=1):
         pid = players.get_pid(name)
 
         if ranking.get_entry(pid) is None:
-            # TODO ask for initial category
             initial_rating = int(input("Enter the initial rating points for %s:\n" % name))
             ranking.add_new_entry(pid, initial_rating)
+            print(ranking[pid])
+
+        if ranking[pid].category is "":
+            for option, category in enumerate(models.categories, start=1):
+                print("\n%d\t->\t%s" % (option, category))
+            selected_category = int(input("Enter the initial category (look above) for %s:\n" % name))
+            ranking[pid].category = models.categories[selected_category-1]
             print(ranking[pid])
 
     # Get the best round for each player in each category

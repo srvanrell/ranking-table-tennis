@@ -157,7 +157,10 @@ class PlayersList:
 
     def load_list(self, players_list):
         for pid, name, association, city, last_tournament, history_str in players_list:
-            history = ast.literal_eval(history_str)
+            if history_str:
+                history = ast.literal_eval(history_str)
+            else:
+                history = {}
             self.add_player(Player(int(pid), name, association, city, int(last_tournament), history))
 
     def update_histories(self, tid, best_rounds):
@@ -204,8 +207,8 @@ class Ranking:
         else:
             print("WARNING: Already exists an entry for pid:", entry.pid)
 
-    def add_new_entry(self, pid, initial_rating=0, initial_bonus=0):
-        self.add_entry(RankingEntry(pid, initial_rating, initial_bonus))
+    def add_new_entry(self, pid, initial_rating=0, initial_bonus=0, active=False, initial_category=""):
+        self.add_entry(RankingEntry(pid, initial_rating, initial_bonus, active, initial_category))
 
     def get_entry(self, pid):
         return self.ranking.get(pid)
