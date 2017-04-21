@@ -29,19 +29,19 @@ players.load_list(utils.load_sheet_workbook(tournaments_xlsx, cfg["sheetname"]["
 initial_ranking = utils.load_ranking_sheet(tournaments_xlsx, cfg["sheetname"]["initial_ranking"])
 
 # Ask for the tournament data to be processed
-for tid, tournament_sheetname in enumerate(tournament_sheetnames):
+for tid, tournament_sheetname in enumerate(tournament_sheetnames, start=1):
     print("\n%d\t->\t%s" % (tid, tournament_sheetname))
 tid = int(input("Enter the tournament to compute (look above):\n"))
   
 # Loading tournament info
-tournament_sheetname = tournament_sheetnames[tid]
+tournament_sheetname = tournament_sheetnames[tid-1]  # Start on 1 but list is zero based
 tournament = utils.load_tournament_xlsx(tournaments_xlsx, tournament_sheetname)
 
-old_ranking = models.Ranking("pre_" + tournament.name, tournament.date, tournament.location, tid - 1)
+old_ranking = models.Ranking("pre_" + tournament.name, tournament.date, tournament.location, tid - 2)
 
 # Load previous ranking if exists
-if tid-1 >= 0:
-    old_ranking = utils.load_ranking_sheet(rankings_xlsx, tournament_sheetnames[tid - 1].replace(
+if tid-1 > 0:
+    old_ranking = utils.load_ranking_sheet(rankings_xlsx, tournament_sheetnames[tid - 2].replace(
         cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["rankings_key"]))
 
 # Load initial rankings for new players
@@ -61,14 +61,10 @@ aux_best_rounds = tournament.compute_best_rounds()
 best_rounds = {(categ, players.get_pid(name)): aux_best_rounds[categ, name]
                for categ, name in aux_best_rounds.keys()}
 
-# Log current tournament as the last played tournament
-# Also, best rounds reached in each category are saved into corresponding history
-players.update_histories(tid, best_rounds)
-
 # Creating matches list with pid
 matches = []
 for match in tournament.matches:
-    if match.winner_name != cfg["aux"]["flag add bonus"] and match.category != "aficionados":
+    if match.winner_name != cfg["aux"]["flag add bonus"] and match.category != models.categories[-1]:
         matches.append([players.get_pid(match.winner_name), players.get_pid(match.loser_name),
                         match.round, match.category])
 
@@ -87,6 +83,7 @@ for entry in initial_ranking:
         
 # Update categories before saving the new ranking
 # FIXME see if it should be here or in publish
+# new_ranking.update_active()
 # new_ranking.update_categories()
 
 # Saving new ranking
