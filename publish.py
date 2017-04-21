@@ -36,8 +36,15 @@ tournament = utils.load_tournament_xlsx(tournaments_xlsx, tournament_sheetname)
 ranking = utils.load_ranking_sheet(rankings_xlsx, tournament_sheetname.replace(
     cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["rankings_key"]))
 
-#FIXME should not update here
-ranking.update_categories()
+# #FIXME should not update here
+# ranking.update_categories()
+# # # Update categories before saving the new ranking
+# # # FIXME see if it should be here or in publish
+if tid == 1:
+    new_ranking.update_categories(n_first=12, n_second=16)
+else:
+    # new_ranking.update_active()
+    new_ranking.update_categories()
 
 # Saving new ranking
 utils.publish_rating_sheet(temp_xlsx, tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],

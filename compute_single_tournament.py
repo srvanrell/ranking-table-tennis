@@ -81,10 +81,13 @@ for entry in initial_ranking:
         if entry.bonus > 0 or entry.active:
             new_ranking.add_entry(entry)
         
-# Update categories before saving the new ranking
-# FIXME see if it should be here or in publish
-# new_ranking.update_active()
-# new_ranking.update_categories()
+# # Update categories before saving the new ranking
+# # FIXME see if it should be here or in publish
+# if tid == 1:
+#     new_ranking.update_categories(n_first=12, n_second=16)
+# else:
+#     new_ranking.update_active()
+#     new_ranking.update_categories()
 
 # Saving new ranking
 utils.save_ranking_sheet(rankings_xlsx, tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
