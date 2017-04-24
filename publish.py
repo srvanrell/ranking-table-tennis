@@ -38,8 +38,8 @@ ranking = utils.load_ranking_sheet(rankings_xlsx, tournament_sheetname.replace(
 # FIXME ranking tid should be read from file
 ranking.tid = tid
 
-# # # Update categories before saving the new ranking
-# # # FIXME see if it should be here or in publish
+# Update categories before saving the new ranking
+# FIXME see if it should be here or in publish
 initial_active_players = [re.pid for re in initial_ranking if re.active]
 ranking.update_active_players(players, initial_active_players)
 

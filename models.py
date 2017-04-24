@@ -340,6 +340,7 @@ class Ranking:
             for pid, rating, active, category in ordered_actives[f:l+1]:
                 self[pid].category = cat
 
+        # TODO check with inactives between last active above, and first active below
         for pid, rating, active, category in ordered_inactives:
             for cat, f, l in zip(reversed(categories[:3]), reversed(first), reversed(last)):
                 if rating >= self[ordered_actives[l][0]].rating:
