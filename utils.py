@@ -101,10 +101,10 @@ def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=False):
     ws.merge_cells('B3:E3')
 
     ws.append(cfg["labels"][key] for key in ["PID", "Rating Points", "Bonus Points",
-                                             "Active Player", "Category"])
-    #TODO add name but don't read it on loading
+                                             "Active Player", "Category", "Player"])
+
     list_to_save = [[e.pid, e.rating, e.bonus, cfg["activeplayer"][e.active],
-                     e.category] for e in ranking]
+                     e.category, players[e.pid].name] for e in ranking]
 
     for row in sorted(list_to_save, key=lambda l: l[1], reverse=True):
         ws.append(row)

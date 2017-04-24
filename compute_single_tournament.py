@@ -85,11 +85,10 @@ for entry in initial_ranking:
 initial_active_players = [re.pid for re in initial_ranking if re.active]
 new_ranking.update_active_players(players, initial_active_players)
 # # FIXME see if it should be here or in publish
-# if tid == 1:
-#     new_ranking.update_categories(n_first=12, n_second=16)
-# else:
-#     new_ranking.update_active()
-#     new_ranking.update_categories()
+if tid == 1:
+    new_ranking.update_categories(n_first=12, n_second=16)
+else:
+    new_ranking.update_categories(n_first=10, n_second=10)
 
 # Saving new ranking
 utils.save_ranking_sheet(rankings_xlsx, tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
