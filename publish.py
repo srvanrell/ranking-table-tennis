@@ -35,16 +35,18 @@ tournament_sheetname = tournament_sheetnames[tid-1]
 tournament = utils.load_tournament_xlsx(tournaments_xlsx, tournament_sheetname)
 ranking = utils.load_ranking_sheet(rankings_xlsx, tournament_sheetname.replace(
     cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["rankings_key"]))
+# FIXME ranking tid should be read from file
+ranking.tid = tid
 
-# #FIXME should not update here
-# ranking.update_categories()
 # # # Update categories before saving the new ranking
 # # # FIXME see if it should be here or in publish
+initial_active_players = [re.pid for re in initial_ranking if re.active]
+ranking.update_active_players(players, initial_active_players)
+
 if tid == 1:
     ranking.update_categories(n_first=12, n_second=16)
 else:
-    # new_ranking.update_active()
-    ranking.update_categories()
+    ranking.update_categories(n_first=10, n_second=10)
 
 # Saving new ranking
 utils.publish_rating_sheet(temp_xlsx, tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
@@ -56,6 +58,8 @@ utils.publish_championship_sheet(temp_xlsx, tournament_sheetname.replace(cfg["sh
                                                                          "Campeonato"),
                                  ranking, players, True)
 
+# Saving complete histories of players
+utils.publish_histories_sheet(histories_xlsx, "Historiales", players, tournament_sheetnames, True)
 
 # TODO make a copy of point log sheets
 # # Saving points assigned in each match
@@ -81,5 +85,3 @@ utils.publish_championship_sheet(temp_xlsx, tournament_sheetname.replace(cfg["sh
 #                           # points_log_to_save, True)
 #                           points_log_to_save + participation_points_log_to_save, True)
 
-# Saving complete histories of players
-utils.publish_histories_sheet(histories_xlsx, "Historiales", players, tournament_sheetnames, True)

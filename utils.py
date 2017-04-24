@@ -102,7 +102,7 @@ def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=False):
 
     ws.append(cfg["labels"][key] for key in ["PID", "Rating Points", "Bonus Points",
                                              "Active Player", "Category"])
-
+    #TODO add name but don't read it on loading
     list_to_save = [[e.pid, e.rating, e.bonus, cfg["activeplayer"][e.active],
                      e.category] for e in ranking]
 

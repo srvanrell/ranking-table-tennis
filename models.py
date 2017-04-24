@@ -294,12 +294,23 @@ class Ranking:
             entry.rating += entry.bonus
             entry.bonus = 0
 
-    def update_active_players(self, players, inactivate=True):
-        for re in self:
-            # TODO verify the rules of activation
-            last_three = [t for t in players[re.pid].played_tournaments() if t > self.tid - 4]
-            if not len(last_three) > 1:
-                self[re.pid].active = len(last_three) > 1
+    def update_active_players(self, players, initial_active_players, inactivate=True):
+        # Avoid activate or inactivate players after the first tournament.
+        if self.tid > 1:
+            for re in self:
+                last_three = [tid for tid in players[re.pid].played_tournaments() if self.tid >= tid > self.tid - 3]
+                # Add initial active players if it is the second tournament
+                if self.tid == 2 and re.pid in initial_active_players:
+                    last_three = [0] + last_three
+
+                if not re.active:
+                    # activate if he has played two of three tournaments
+                    active = len(last_three) >= 2
+                else:
+                    # inactivate if two or more tournaments has passed since his last participation
+                    active = last_three[-1] >= self.tid - 1
+
+                self[re.pid].active = active
 
     def update_categories(self, n_first=10, n_second=10):
         """ Players are ranked based on rating and their active state.
@@ -316,7 +327,7 @@ class Ranking:
         actives_to_order = [[e.pid, e.rating, e.active, e.category] for e in self if e.active and
                             not e.category == categories[3]]
         inactives_to_order = [[e.pid, e.rating, e.active, e.category] for e in self if not e.active and
-                            not e.category == categories[3]]
+                              not e.category == categories[3]]
 
         ordered_actives = sorted(actives_to_order, key=lambda l: (l[2], l[1]), reverse=True)  # to use Jugador activo
         ordered_inactives = sorted(inactives_to_order, key=lambda l: (l[2], l[1]), reverse=True)  # to use Jugador activo

@@ -81,7 +81,9 @@ for entry in initial_ranking:
         if entry.bonus > 0 or entry.active:
             new_ranking.add_entry(entry)
         
-# # Update categories before saving the new ranking
+# Update categories before saving the new ranking
+initial_active_players = [re.pid for re in initial_ranking if re.active]
+new_ranking.update_active_players(players, initial_active_players)
 # # FIXME see if it should be here or in publish
 # if tid == 1:
 #     new_ranking.update_categories(n_first=12, n_second=16)
