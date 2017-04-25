@@ -96,13 +96,16 @@ utils.save_ranking_sheet(rankings_xlsx, tournament_sheetname.replace(cfg["sheetn
                          new_ranking, players, True)
 
 # Saving points assigned in each match
-points_log_to_save = [[players[winner_pid].name, players[loser_pid].name, winner_points, loser_points]
+points_log_to_save = [[players[winner_pid].name + " (%d)" % old_ranking[winner_pid].rating,
+                       players[loser_pid].name + " (%d)" % old_ranking[loser_pid].rating,
+                       old_ranking[winner_pid].rating - old_ranking[loser_pid].rating, winner_points, loser_points]
                       for winner_pid, loser_pid, winner_points, loser_points in assigned_points_per_match]
 
 utils.save_sheet_workbook(log_xlsx,
                           tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
                                                        cfg["sheetname"]["rating_details_key"]),
-                          [cfg["labels"][key] for key in ["Winner", "Loser", "Winner Points", "Loser Points"]],
+                          [cfg["labels"][key] for key in ["Winner", "Loser", "Difference",
+                                                          "Winner Points", "Loser Points"]],
                           points_log_to_save, True)
 
 # Saving points assigned per best round reached and for participation
