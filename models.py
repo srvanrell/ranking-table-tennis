@@ -317,7 +317,7 @@ class Ranking:
 
         Players are ordered by rating. Active players are sorted first.
 
-        Active players are ranked like this:
+        Active players are ranked like this (n_first=12, n_second=16):
         - 1:12    -> first category
         - 13:28   -> second category
         - 29:last -> third category
@@ -340,10 +340,12 @@ class Ranking:
             for pid, rating, active, category in ordered_actives[f:l+1]:
                 self[pid].category = cat
 
-        # TODO check with inactives between last active above, and first active below
         for pid, rating, active, category in ordered_inactives:
-            for cat, f, l in zip(reversed(categories[:3]), reversed(first), reversed(last)):
-                if rating >= self[ordered_actives[l][0]].rating:
+            # By defaut it is assigned to first category. It will be downgraded if necessary
+            self[pid].category = categories[0]
+
+            for cat, f, l in zip(categories[:3], first, last):
+                if rating <= self[ordered_actives[f][0]].rating:
                     self[pid].category = cat
 
 
