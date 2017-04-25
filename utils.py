@@ -289,14 +289,15 @@ def publish_histories_sheet(filename, sheetname, players, tournament_sheetnames,
 
         histories = []
         for player in sorted(players, key=lambda l: l.name):
-            histories.append([player.name, "", "", ""])
-            old_cat = ""
-            for cat, tid, best_round in player.sorted_history:
-                if cat == old_cat:
-                    cat = ""
-                else:
-                    old_cat = cat
-                histories.append(["", cat, best_round, " ".join(tournament_sheetnames[tid - 1].split()[1:])])
+            if len(player.sorted_history) > 0:
+                histories.append([player.name, "", "", ""])
+                old_cat = ""
+                for cat, tid, best_round in player.sorted_history:
+                    if cat == old_cat:
+                        cat = ""
+                    else:
+                        old_cat = cat
+                    histories.append(["", cat, best_round, " ".join(tournament_sheetnames[tid - 1].split()[1:])])
 
         to_bold = ["A1", "A2", "A3", "A4"]
         to_center = to_bold
