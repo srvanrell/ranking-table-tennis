@@ -36,6 +36,7 @@ labels:
     Participations: Torneos Jugados
     Position: Posición
     Difference: Diferencia
+    Championship: Campeonato
     
 activeplayer:
     True: activo
