@@ -221,7 +221,7 @@ def publish_rating_sheet(filename, sheetname, ranking, players, old_ranking, ove
     wb.save(filename)
 
 
-def publish_championship_sheet(filename, sheetname, ranking, players, overwrite=False):
+def publish_championship_sheet(filename, sheetname, ranking, players, overwrite=True):
     """ Format a ranking to be published into a rating sheet"""
     print("<<<Saving\t", sheetname, "\tin\t", filename)
     if os.path.isfile(filename):
