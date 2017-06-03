@@ -212,10 +212,18 @@ def publish_rating_sheet(filename, sheetname, ranking, players, old_ranking, ove
     list_to_save = [[e.category, (e.rating, old_ranking[e.pid].rating), players[e.pid].name, players[e.pid].city,
                      players[e.pid].association, cfg["activeplayer"][e.active]] for e in ranking]
 
+    for row in list_to_save:
+        # Do not publish ratings of fans category
+        if row[0] == models.categories[-1]:
+            row[1] = (row[1][0]-100000, -1)  # negative value to keep fans category at the end
+
     for row in sorted(list_to_save, key=lambda l: l[1][0], reverse=True):
-        # Save difference with previous rating
-        diff = row[1][0] - row[1][1]
-        row[1] = "%d (%s)" % (row[1][0], _format_diff(diff))
+        if row[1][0] < 0:
+            row[1] = "NA"  # FIXME should read the value from config
+        else:
+            # Save difference with previous rating
+            diff = row[1][0] - row[1][1]
+            row[1] = "%d (%s)" % (row[1][0], _format_diff(diff))
         ws.append(row)
 
     to_bold = ["A1", "A2", "A3",

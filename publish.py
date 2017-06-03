@@ -41,16 +41,16 @@ ranking = utils.load_ranking_sheet(rankings_xlsx, tournament_sheetname.replace(
 # FIXME ranking tid should be read from file
 ranking.tid = tid
 
+old_ranking = models.Ranking("pre_" + tournament.name, tournament.date, tournament.location, tid - 2)
 # Load previous ranking if exists
 if tid-1 > 0:
     old_ranking = utils.load_ranking_sheet(rankings_xlsx, tournament_sheetnames[tid - 2].replace(
         cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["rankings_key"]))
 
 # Load initial rankings for new players
-for name in tournament.get_players_names():
-    pid = players.get_pid(name)
-    if old_ranking.get_entry(pid) is None:
-        old_ranking.add_entry(initial_ranking[pid])
+for entry in ranking:
+    if old_ranking.get_entry(entry.pid) is None:
+        old_ranking.add_entry(initial_ranking[entry.pid])
 
 # Saving new ranking
 utils.publish_rating_sheet(output_xlsx, tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
