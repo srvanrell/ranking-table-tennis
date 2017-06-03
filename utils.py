@@ -169,7 +169,7 @@ def load_tournament_list(tournament_list):
     return tournament
 
 
-def publish_rating_sheet(filename, sheetname, ranking, players, overwrite=False):
+def publish_rating_sheet(filename, sheetname, ranking, players, old_ranking, overwrite=True):
     """ Format a ranking to be published into a rating sheet"""
     print("<<<Saving\t", sheetname, "\tin\t", filename)
     if os.path.isfile(filename):
@@ -196,13 +196,15 @@ def publish_rating_sheet(filename, sheetname, ranking, players, overwrite=False)
     ws["B3"] = ranking.location
     ws.merge_cells('B3:F3')
 
-    ws.append(cfg["labels"][key] for key in ["Rating Points", "Player", "Association",
-                                             "City", "Active Player", "Category"])
+    ws.append(cfg["labels"][key] for key in ["Category", "Rating Points", "Player", "City",
+                                             "Association", "Active Player"])
 
-    list_to_save = [[e.rating, players[e.pid].name, players[e.pid].association,
-                     players[e.pid].city, cfg["activeplayer"][e.active], e.category] for e in ranking]
+    list_to_save = [[e.category, (e.rating, old_ranking[e.pid].rating), players[e.pid].name, players[e.pid].city,
+                     players[e.pid].association, cfg["activeplayer"][e.active]] for e in ranking]
 
-    for row in sorted(list_to_save, key=lambda l: (-l[0]), reverse=False):
+    for row in sorted(list_to_save, key=lambda l: (l[1]), reverse=True):
+        # Save difference with previous rating
+        row[1] = "%d (%d)" % (row[1][0], row[1][0] - row[1][1])
         ws.append(row)
 
     to_bold = ["A1", "A2", "A3",
