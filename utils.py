@@ -169,6 +169,16 @@ def load_tournament_list(tournament_list):
     return tournament
 
 
+def _format_diff(diff):
+    """Return a formated str that indicates +##, -## or ="""
+    diff_str = str(diff)
+    if diff > 0:
+        diff_str = "+" + diff_str
+    elif diff == 0:
+        diff_str = "="
+    return diff_str
+
+
 def publish_rating_sheet(filename, sheetname, ranking, players, old_ranking, overwrite=True):
     """ Format a ranking to be published into a rating sheet"""
     print("<<<Saving\t", sheetname, "\tin\t", filename)
@@ -202,9 +212,10 @@ def publish_rating_sheet(filename, sheetname, ranking, players, old_ranking, ove
     list_to_save = [[e.category, (e.rating, old_ranking[e.pid].rating), players[e.pid].name, players[e.pid].city,
                      players[e.pid].association, cfg["activeplayer"][e.active]] for e in ranking]
 
-    for row in sorted(list_to_save, key=lambda l: (l[1]), reverse=True):
+    for row in sorted(list_to_save, key=lambda l: l[1][0], reverse=True):
         # Save difference with previous rating
-        row[1] = "%d (%d)" % (row[1][0], row[1][0] - row[1][1])
+        diff = row[1][0] - row[1][1]
+        row[1] = "%d (%s)" % (row[1][0], _format_diff(diff))
         ws.append(row)
 
     to_bold = ["A1", "A2", "A3",
@@ -221,7 +232,7 @@ def publish_rating_sheet(filename, sheetname, ranking, players, old_ranking, ove
     wb.save(filename)
 
 
-def publish_championship_sheet(filename, sheetname, ranking, players, overwrite=True):
+def publish_championship_sheet(filename, sheetname, ranking, players, old_ranking, overwrite=True):
     """ Format a ranking to be published into a rating sheet"""
     print("<<<Saving\t", sheetname, "\tin\t", filename)
     if os.path.isfile(filename):
@@ -248,14 +259,17 @@ def publish_championship_sheet(filename, sheetname, ranking, players, overwrite=
     ws["B3"] = ranking.location
     ws.merge_cells('B3:G3')
 
-    ws.append(cfg["labels"][key] for key in ["Position", "Bonus Points", "Player", "Association",
-                                             "City", "Active Player", "Category"])
+    ws.append(cfg["labels"][key] for key in ["Position", "Bonus Points", "Player", "City",
+                                             "Association", "Active Player", "Category"])
 
-    list_to_save = [[e.bonus, players[e.pid].name, players[e.pid].association,
-                     players[e.pid].city, cfg["activeplayer"][e.active], e.category] for e in ranking]
-    sorted_list = sorted(list_to_save, key=lambda l: l[0], reverse=True)
+    list_to_save = [[(e.bonus, old_ranking[e.pid].bonus), players[e.pid].name, players[e.pid].city,
+                     players[e.pid].association, cfg["activeplayer"][e.active], e.category] for e in ranking]
+    sorted_list = sorted(list_to_save, key=lambda l: l[0][0], reverse=True)
 
     for i, row in enumerate(sorted_list):
+        # Save difference with previous bonus
+        diff = row[0][0] - row[0][1]
+        row[0] = "%d (%s)" % (row[0][0], _format_diff(diff))
         ws.append([i + 1] + row)
 
     to_bold = ["A1", "A2", "A3",

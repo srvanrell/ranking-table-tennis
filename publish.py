@@ -60,7 +60,7 @@ utils.publish_rating_sheet(output_xlsx, tournament_sheetname.replace(cfg["sheetn
 # Saving new ranking
 utils.publish_championship_sheet(output_xlsx, tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
                                                                            cfg["labels"]["Championship"]),
-                                 ranking, players)
+                                 ranking, players, old_ranking)
 
 # Saving points assigned in each match
 rating_details_sheetname = tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
