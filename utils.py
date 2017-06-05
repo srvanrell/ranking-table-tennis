@@ -112,8 +112,19 @@ def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=False):
     wb.save(filename)
 
 
-def load_ranking_sheet(filename, sheetname):
-    """Load a ranking in a xlxs sheet and return a Ranking object"""
+def load_ranking_sheet(filename, sheetname, replace_key=True):
+    """Load a ranking from a xlsx sheet and return a Ranking object
+
+    :param filename: ranking workbook
+    :param sheetname: tournament sheetname (will be replaced with ranking sheetname by default)
+    :param replace_key: Default True. It will replace tournament key with ranking key.
+    If False, sheetname will be used as it is given.
+
+    :return: Ranking object
+    """
+    if replace_key:
+        sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["rankings_key"])
+
     # TODO check if date is being read properly
     raw_ranking = load_sheet_workbook(filename, sheetname, first_row=0)
     ranking = models.Ranking(raw_ranking[0][1], raw_ranking[1][1], raw_ranking[2][1])

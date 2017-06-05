@@ -25,7 +25,7 @@ players = models.PlayersList()
 players.load_list(utils.load_sheet_workbook(xlsx_file, cfg["sheetname"]["players"]))
 
 # Loading initial ranking and adding new players with 0
-ranking = utils.load_ranking_sheet(xlsx_file, cfg["sheetname"]["initial_ranking"])
+ranking = utils.load_ranking_sheet(xlsx_file, cfg["sheetname"]["initial_ranking"], replace_key=False)
 
 for tid, tournament_sheetname in enumerate(tournament_sheetnames, start=1):
     # Loading tournament info
