@@ -19,7 +19,7 @@ log_xlsx = cfg["io"]["data_folder"] + cfg["io"]["log_filename"]
 output_xlsx = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
 
 # Listing tournament sheetnames by increasing date
-tournament_sheetnames = utils.get_sheetnames_by_date(tournaments_xlsx, cfg["sheetname"]["tournaments_key"])
+tournament_sheetnames = utils.get_sheetnames_by_date(cfg["sheetname"]["tournaments_key"])
 
 # Loading players info list
 players = models.PlayersList()
@@ -35,7 +35,7 @@ tournament_sheetname = tournament_sheetnames[tid-1]
 output_xlsx = output_xlsx.replace("NN", "%d" % tid)
 
 # Loading tournament info
-tournament = utils.load_tournament_xlsx(tournaments_xlsx, tournament_sheetname)
+tournament = utils.load_tournament_xlsx(tournament_sheetname)
 ranking = utils.load_ranking_sheet(rankings_xlsx, tournament_sheetname)
 
 old_ranking = models.Ranking("pre_" + tournament.name, tournament.date, tournament.location, tid - 2)

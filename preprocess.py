@@ -18,7 +18,7 @@ __author__ = 'sebastian'
 xlsx_file = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
 
 # Listing tournament sheetnames by increasing date
-tournament_sheetnames = utils.get_sheetnames_by_date(xlsx_file, cfg["sheetname"]["tournaments_key"])
+tournament_sheetnames = utils.get_sheetnames_by_date(cfg["sheetname"]["tournaments_key"])
 
 # Loading players list
 players = models.PlayersList()
@@ -29,7 +29,7 @@ ranking = utils.load_ranking_sheet(xlsx_file, cfg["sheetname"]["initial_ranking"
 
 for tid, tournament_sheetname in enumerate(tournament_sheetnames, start=1):
     # Loading tournament info
-    tournament = utils.load_tournament_xlsx(xlsx_file, tournament_sheetname)
+    tournament = utils.load_tournament_xlsx(tournament_sheetname)
 
     for name in tournament.get_players_names():
         if players.get_pid(name) is None:

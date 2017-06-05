@@ -19,7 +19,7 @@ rankings_xlsx = cfg["io"]["data_folder"] + cfg["io"]["rankings_filename"]
 log_xlsx = cfg["io"]["data_folder"] + cfg["io"]["log_filename"]
 
 # Listing tournament sheetnames by increasing date
-tournament_sheetnames = utils.get_sheetnames_by_date(tournaments_xlsx, cfg["sheetname"]["tournaments_key"])
+tournament_sheetnames = utils.get_sheetnames_by_date(cfg["sheetname"]["tournaments_key"])
 
 # Loading players info list
 players = models.PlayersList()
@@ -35,7 +35,7 @@ tid = int(input("Enter the tournament to compute (look above):\n"))
   
 # Loading tournament info
 tournament_sheetname = tournament_sheetnames[tid-1]  # Start on 1 but list is zero based
-tournament = utils.load_tournament_xlsx(tournaments_xlsx, tournament_sheetname)
+tournament = utils.load_tournament_xlsx(tournament_sheetname)
 
 old_ranking = models.Ranking("pre_" + tournament.name, tournament.date, tournament.location, tid - 2)
 

@@ -15,10 +15,11 @@ with open("config.yaml", 'r') as cfgyaml:
         print(exc)
 
 
-def get_sheetnames_by_date(filename, filter_key=""):
-    wb = load_workbook(filename, read_only=True)
+def get_sheetnames_by_date(filter_key=""):
+    tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
+    wb = load_workbook(tournaments_xlsx, read_only=True)
     sheetnames = [s for s in wb.sheetnames if filter_key in s]
-    namesdates = [(name, load_tournament_xlsx(filename, name).date) for name in sheetnames]
+    namesdates = [(name, load_tournament_xlsx(name).date) for name in sheetnames]
     namesdates.sort(key=lambda p: p[1])
 
     return [name for name, date in namesdates]
@@ -146,9 +147,14 @@ def load_tournament_csv(filename):
         return load_tournament_list(tournament_list)
 
 
-def load_tournament_xlsx(filename, sheet_name):
-    """Load a tournament xlsx sheet and return a Tournament object"""
-    return load_tournament_list(load_sheet_workbook(filename, sheet_name, 0))
+def load_tournament_xlsx(sheet_name):
+    """Load a tournament xlsx sheet and return a Tournament object
+
+    tournaments xlsx database is defined in config.yaml
+    """
+    tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
+
+    return load_tournament_list(load_sheet_workbook(tournaments_xlsx, sheet_name, 0))
 
 
 def load_tournament_list(tournament_list):
