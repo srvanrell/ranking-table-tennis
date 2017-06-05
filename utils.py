@@ -311,45 +311,45 @@ def publish_championship_sheet(filename, sheetname, ranking, players, old_rankin
 
 
 def publish_histories_sheet(filename, sheetname, players, tournament_sheetnames, overwrite=True):
-        """ Format histories to be published into a sheet"""
-        print("<<<Saving\t", sheetname, "\tin\t", filename)
-        if os.path.isfile(filename):
-            wb = load_workbook(filename)
-            if overwrite and sheetname in wb:
-                wb.remove_sheet(wb.get_sheet_by_name(sheetname))
-            if sheetname in wb:
-                ws = wb.get_sheet_by_name(sheetname)
-            else:
-                ws = wb.create_sheet()
+    """ Format histories to be published into a sheet"""
+    print("<<<Saving\t", sheetname, "\tin\t", filename)
+    if os.path.isfile(filename):
+        wb = load_workbook(filename)
+        if overwrite and sheetname in wb:
+            wb.remove_sheet(wb.get_sheet_by_name(sheetname))
+        if sheetname in wb:
+            ws = wb.get_sheet_by_name(sheetname)
         else:
-            wb = Workbook()
-            ws = wb.active
+            ws = wb.create_sheet()
+    else:
+        wb = Workbook()
+        ws = wb.active
 
-        ws.title = sheetname
+    ws.title = sheetname
 
-        histories = []
-        for player in sorted(players, key=lambda l: l.name):
-            if len(player.sorted_history) > 0:
-                histories.append([player.name, "", "", ""])
-                old_cat = ""
-                for cat, tid, best_round in player.sorted_history:
-                    if cat == old_cat:
-                        cat = ""
-                    else:
-                        old_cat = cat
-                    histories.append(["", cat, best_round, " ".join(tournament_sheetnames[tid - 1].split()[1:])])
+    histories = []
+    for player in sorted(players, key=lambda l: l.name):
+        if len(player.sorted_history) > 0:
+            histories.append([player.name, "", "", ""])
+            old_cat = ""
+            for cat, tid, best_round in player.sorted_history:
+                if cat == old_cat:
+                    cat = ""
+                else:
+                    old_cat = cat
+                histories.append(["", cat, best_round, " ".join(tournament_sheetnames[tid - 1].split()[1:])])
 
-        to_bold = ["A1", "A2", "A3", "A4"]
-        to_center = to_bold
+    to_bold = ["A1", "A2", "A3", "A4"]
+    to_center = to_bold
 
-        for colrow in to_bold:
-            cell = ws[colrow]
-            cell.font = Font(bold=True)
-        for colrow in to_center:
-            cell = ws[colrow]
-            cell.alignment = Alignment(horizontal='center')
+    for colrow in to_bold:
+        cell = ws[colrow]
+        cell.font = Font(bold=True)
+    for colrow in to_center:
+        cell = ws[colrow]
+        cell.alignment = Alignment(horizontal='center')
 
-        save_sheet_workbook(filename, sheetname,
-                            [cfg["labels"][key] for key in ["Player", "Category", "Best Round", "Tournament"]],
-                            histories,
-                            overwrite)
+    save_sheet_workbook(filename, sheetname,
+                        [cfg["labels"][key] for key in ["Player", "Category", "Best Round", "Tournament"]],
+                        histories,
+                        overwrite)
