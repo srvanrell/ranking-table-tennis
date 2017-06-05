@@ -90,9 +90,7 @@ else:
     new_ranking.update_categories(n_first=10, n_second=10)
 
 # Saving new ranking
-utils.save_ranking_sheet(rankings_xlsx, tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
-                                                                     cfg["sheetname"]["rankings_key"]),
-                         new_ranking, players)
+utils.save_ranking_sheet(rankings_xlsx, tournament_sheetname, new_ranking, players)
 
 # Saving points assigned in each match
 points_log_to_save = [[players[winner_pid].name + " (%d)" % old_ranking[winner_pid].rating,

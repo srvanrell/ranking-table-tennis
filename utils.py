@@ -90,7 +90,10 @@ def save_sheet_workbook(filename, sheetname, headers, list_to_save, overwrite=Tr
     wb.save(filename)
 
 
-def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=True):
+def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=True, replace_key=True):
+    if replace_key:
+        sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["rankings_key"])
+
     wb, ws = _wb_ws_to_save(filename, sheetname, overwrite)
 
     ws["A1"] = cfg["labels"]["Tournament name"]

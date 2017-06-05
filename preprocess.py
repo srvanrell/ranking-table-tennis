@@ -70,4 +70,4 @@ utils.save_sheet_workbook(xlsx_file, cfg["sheetname"]["players"],
                           sorted(players.to_list(), key=lambda l: l[1]))
 
 # Saving initial rankings for all known players
-utils.save_ranking_sheet(xlsx_file, cfg["sheetname"]["initial_ranking"], ranking, players)
+utils.save_ranking_sheet(xlsx_file, cfg["sheetname"]["initial_ranking"], ranking, players, replace_key=False)
