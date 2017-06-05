@@ -37,8 +37,6 @@ output_xlsx = output_xlsx.replace("NN", "%d" % tid)
 # Loading tournament info
 tournament = utils.load_tournament_xlsx(tournaments_xlsx, tournament_sheetname)
 ranking = utils.load_ranking_sheet(rankings_xlsx, tournament_sheetname)
-# FIXME ranking tid should be read from file
-ranking.tid = tid
 
 old_ranking = models.Ranking("pre_" + tournament.name, tournament.date, tournament.location, tid - 2)
 # Load previous ranking if exists

@@ -95,13 +95,12 @@ def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=True):
 
     ws["A1"] = cfg["labels"]["Tournament name"]
     ws["B1"] = ranking.tournament_name
-    ws.merge_cells('B1:E1')
     ws["A2"] = cfg["labels"]["Date"]
     ws["B2"] = ranking.date
-    ws.merge_cells('B2:E2')
     ws["A3"] = cfg["labels"]["Location"]
     ws["B3"] = ranking.location
-    ws.merge_cells('B3:E3')
+    ws["A4"] = cfg["labels"]["tid"]
+    ws["B4"] = ranking.tid
 
     ws.append(cfg["labels"][key] for key in ["PID", "Rating Points", "Bonus Points",
                                              "Active Player", "Category", "Player"])
@@ -130,8 +129,8 @@ def load_ranking_sheet(filename, sheetname, replace_key=True):
 
     # TODO check if date is being read properly
     raw_ranking = load_sheet_workbook(filename, sheetname, first_row=0)
-    ranking = models.Ranking(raw_ranking[0][1], raw_ranking[1][1], raw_ranking[2][1])
-    ranking.load_list([[rr[0], rr[1], rr[2], rr[3] == cfg["activeplayer"][True], rr[4]] for rr in raw_ranking[4:]])
+    ranking = models.Ranking(raw_ranking[0][1], raw_ranking[1][1], raw_ranking[2][1], raw_ranking[3][1])
+    ranking.load_list([[rr[0], rr[1], rr[2], rr[3] == cfg["activeplayer"][True], rr[4]] for rr in raw_ranking[5:]])
 
     return ranking
 
