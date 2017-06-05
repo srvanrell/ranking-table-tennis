@@ -105,7 +105,7 @@ utils.save_sheet_workbook(log_xlsx,
                                                        cfg["sheetname"]["rating_details_key"]),
                           [cfg["labels"][key] for key in ["Winner", "Loser", "Difference",
                                                           "Winner Points", "Loser Points"]],
-                          points_log_to_save, True)
+                          points_log_to_save)
 
 # Saving points assigned per best round reached and for participation
 points_log_to_save = [[players[pid].name, points, best_round, category] for pid, points, best_round, category
@@ -117,4 +117,4 @@ utils.save_sheet_workbook(log_xlsx,
                           tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
                                                        cfg["sheetname"]["bonus_details_key"]),
                           [cfg["labels"][key] for key in ["Player", "Bonus Points", "Best Round", "Category"]],
-                          points_log_to_save + participation_points_log_to_save, True)
+                          points_log_to_save + participation_points_log_to_save)

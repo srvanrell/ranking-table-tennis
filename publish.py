@@ -58,13 +58,13 @@ utils.publish_championship_sheet(output_xlsx, tournament_sheetname, ranking, pla
 rating_details_sheetname = tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
                                                         cfg["sheetname"]["rating_details_key"])
 rating_log_saved = utils.load_sheet_workbook(log_xlsx, rating_details_sheetname, first_row=0)
-utils.save_sheet_workbook(output_xlsx, rating_details_sheetname, rating_log_saved[0], rating_log_saved[1:], True)
+utils.save_sheet_workbook(output_xlsx, rating_details_sheetname, rating_log_saved[0], rating_log_saved[1:])
 
 # Saving points assigned per best round reached and for participation
 bonus_details_sheetname = tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
                                                        cfg["sheetname"]["bonus_details_key"])
 bonus_log_saved = utils.load_sheet_workbook(log_xlsx, bonus_details_sheetname, first_row=0)
-utils.save_sheet_workbook(output_xlsx, bonus_details_sheetname, bonus_log_saved[0], bonus_log_saved[1:], True)
+utils.save_sheet_workbook(output_xlsx, bonus_details_sheetname, bonus_log_saved[0], bonus_log_saved[1:])
 
 # Saving complete histories of players
 utils.publish_histories_sheet(output_xlsx, cfg["sheetname"]["histories"], players, tournament_sheetnames)

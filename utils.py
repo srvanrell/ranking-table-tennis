@@ -75,7 +75,7 @@ def _bold_and_center(ws, to_bold, to_center):
         cell.alignment = Alignment(horizontal='center')
 
 
-def save_sheet_workbook(filename, sheetname, headers, list_to_save, overwrite=False):
+def save_sheet_workbook(filename, sheetname, headers, list_to_save, overwrite=True):
     wb, ws = _wb_ws_to_save(filename, sheetname, overwrite)
 
     ws.append(headers)

@@ -67,8 +67,7 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames, start=1):
 utils.save_sheet_workbook(xlsx_file, cfg["sheetname"]["players"],
                           [cfg["labels"][key] for key in ["PID", "Player", "Association", "City",
                                                           "Last Tournament", "Participations"]],
-                          sorted(players.to_list(), key=lambda l: l[1]),
-                          True)
+                          sorted(players.to_list(), key=lambda l: l[1]))
 
 # Saving initial rankings for all known players
 utils.save_ranking_sheet(xlsx_file, cfg["sheetname"]["initial_ranking"], ranking, players)
