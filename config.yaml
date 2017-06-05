@@ -12,6 +12,7 @@ sheetname:
     bonus_details_key: Bonus
     rating_details_key: Rating
     rankings_key: Ranking
+    histories: Historiales
 
 labels:
     PID: PID

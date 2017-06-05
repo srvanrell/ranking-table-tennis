@@ -75,4 +75,4 @@ bonus_log_saved = utils.load_sheet_workbook(log_xlsx, bonus_details_sheetname, f
 utils.save_sheet_workbook(output_xlsx, bonus_details_sheetname, bonus_log_saved[0], bonus_log_saved[1:], True)
 
 # Saving complete histories of players
-utils.publish_histories_sheet(output_xlsx, "Historiales", players, tournament_sheetnames, True)
+utils.publish_histories_sheet(output_xlsx, cfg["sheetname"]["histories"], players, tournament_sheetnames)

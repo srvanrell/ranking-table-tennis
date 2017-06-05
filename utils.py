@@ -294,7 +294,7 @@ def publish_championship_sheet(filename, sheetname, ranking, players, old_rankin
     wb.save(filename)
 
 
-def publish_histories_sheet(filename, sheetname, players, tournament_sheetnames, overwrite=False):
+def publish_histories_sheet(filename, sheetname, players, tournament_sheetnames, overwrite=True):
         """ Format histories to be published into a sheet"""
         print("<<<Saving\t", sheetname, "\tin\t", filename)
         if os.path.isfile(filename):
