@@ -46,7 +46,7 @@ def load_sheet_workbook(filename, sheetname, first_row=1):
     return list_to_return[first_row:]
 
 
-def save_sheet_workbook(filename, sheetname, headers, list_to_save, overwrite=False):
+def _wb_ws_to_save(filename, sheetname, overwrite):
     print("<<<Saving\t", sheetname, "\tin\t", filename)
     if os.path.isfile(filename):
         wb = load_workbook(filename)
@@ -61,6 +61,12 @@ def save_sheet_workbook(filename, sheetname, headers, list_to_save, overwrite=Fa
         ws = wb.active
 
     ws.title = sheetname
+
+    return wb, ws
+
+
+def save_sheet_workbook(filename, sheetname, headers, list_to_save, overwrite=False):
+    wb, ws = _wb_ws_to_save(filename, sheetname, overwrite)
 
     ws.append(headers)
     
@@ -75,20 +81,7 @@ def save_sheet_workbook(filename, sheetname, headers, list_to_save, overwrite=Fa
 
 
 def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=True):
-    print("<<<Saving\t", sheetname, "\tin\t", filename)
-    if os.path.isfile(filename):
-        wb = load_workbook(filename)
-        if overwrite and sheetname in wb:
-            wb.remove_sheet(wb.get_sheet_by_name(sheetname))
-        if sheetname in wb:
-            ws = wb.get_sheet_by_name(sheetname)
-        else:
-            ws = wb.create_sheet()
-    else:
-        wb = Workbook()
-        ws = wb.active
-
-    ws.title = sheetname
+    wb, ws = _wb_ws_to_save(filename, sheetname, overwrite)
 
     ws["A1"] = cfg["labels"]["Tournament name"]
     ws["B1"] = ranking.tournament_name
@@ -195,20 +188,7 @@ def publish_rating_sheet(filename, sheetname, ranking, players, old_ranking, ove
     """
     sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cfg["labels"]["Rating Points"])
 
-    print("<<<Saving\t", sheetname, "\tin\t", filename)
-    if os.path.isfile(filename):
-        wb = load_workbook(filename)
-        if overwrite and sheetname in wb:
-            wb.remove_sheet(wb.get_sheet_by_name(sheetname))
-        if sheetname in wb:
-            ws = wb.get_sheet_by_name(sheetname)
-        else:
-            ws = wb.create_sheet()
-    else:
-        wb = Workbook()
-        ws = wb.active
-
-    ws.title = sheetname
+    wb, ws = _wb_ws_to_save(filename, sheetname, overwrite)
 
     ws["A1"] = cfg["labels"]["Tournament name"]
     ws["B1"] = ranking.tournament_name
@@ -258,20 +238,7 @@ def publish_championship_sheet(filename, sheetname, ranking, players, old_rankin
     """ Format a ranking to be published into a rating sheet"""
     sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["championship_key"])
 
-    print("<<<Saving\t", sheetname, "\tin\t", filename)
-    if os.path.isfile(filename):
-        wb = load_workbook(filename)
-        if overwrite and sheetname in wb:
-            wb.remove_sheet(wb.get_sheet_by_name(sheetname))
-        if sheetname in wb:
-            ws = wb.get_sheet_by_name(sheetname)
-        else:
-            ws = wb.create_sheet()
-    else:
-        wb = Workbook()
-        ws = wb.active
-
-    ws.title = sheetname
+    wb, ws = _wb_ws_to_save(filename, sheetname, overwrite)
 
     ws["A1"] = cfg["labels"]["Tournament name"]
     ws["B1"] = ranking.tournament_name
@@ -312,20 +279,7 @@ def publish_championship_sheet(filename, sheetname, ranking, players, old_rankin
 
 def publish_histories_sheet(filename, sheetname, players, tournament_sheetnames, overwrite=True):
     """ Format histories to be published into a sheet"""
-    print("<<<Saving\t", sheetname, "\tin\t", filename)
-    if os.path.isfile(filename):
-        wb = load_workbook(filename)
-        if overwrite and sheetname in wb:
-            wb.remove_sheet(wb.get_sheet_by_name(sheetname))
-        if sheetname in wb:
-            ws = wb.get_sheet_by_name(sheetname)
-        else:
-            ws = wb.create_sheet()
-    else:
-        wb = Workbook()
-        ws = wb.active
-
-    ws.title = sheetname
+    wb, ws = _wb_ws_to_save(filename, sheetname, overwrite)
 
     histories = []
     for player in sorted(players, key=lambda l: l.name):
