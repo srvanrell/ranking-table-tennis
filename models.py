@@ -294,7 +294,7 @@ class Ranking:
             entry.rating += entry.bonus
             entry.bonus = 0
 
-    def update_active_players(self, players, initial_active_players, inactivate=True):
+    def update_active_players(self, players, initial_active_players):
         # Avoid activate or inactivate players after the first tournament.
         if self.tid > 1:
             for re in self:
@@ -329,8 +329,8 @@ class Ranking:
         inactives_to_order = [[e.pid, e.rating, e.active, e.category] for e in self if not e.active and
                               not e.category == categories[3]]
 
-        ordered_actives = sorted(actives_to_order, key=lambda l: (l[2], l[1]), reverse=True)  # to use Jugador activo
-        ordered_inactives = sorted(inactives_to_order, key=lambda l: (l[2], l[1]), reverse=True)  # to use Jugador activo
+        ordered_actives = sorted(actives_to_order, key=lambda l: (l[2], l[1]), reverse=True)  # to use active player
+        ordered_inactives = sorted(inactives_to_order, key=lambda l: (l[2], l[1]), reverse=True)  # to use active player
 
         # First and last player indexes by category
         first = [0, n_first, n_first+n_second]
