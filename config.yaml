@@ -13,6 +13,7 @@ sheetname:
     rating_details_key: Rating
     rankings_key: Ranking
     histories: Historiales
+    championship_key: Campeonato
 
 labels:
     PID: PID
@@ -38,7 +39,7 @@ labels:
     Participations: Torneos Jugados
     Position: Posición
     Difference: Diferencia
-    Championship: Campeonato
+
     
 activeplayer:
     True: activo

@@ -191,7 +191,10 @@ def _format_diff(diff):
 
 
 def publish_rating_sheet(filename, sheetname, ranking, players, old_ranking, overwrite=True):
-    """ Format a ranking to be published into a rating sheet"""
+    """ Format a ranking to be published into a rating sheet
+    """
+    sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cfg["labels"]["Rating Points"])
+
     print("<<<Saving\t", sheetname, "\tin\t", filename)
     if os.path.isfile(filename):
         wb = load_workbook(filename)
@@ -253,6 +256,8 @@ def publish_rating_sheet(filename, sheetname, ranking, players, old_ranking, ove
 
 def publish_championship_sheet(filename, sheetname, ranking, players, old_ranking, overwrite=True):
     """ Format a ranking to be published into a rating sheet"""
+    sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["championship_key"])
+
     print("<<<Saving\t", sheetname, "\tin\t", filename)
     if os.path.isfile(filename):
         wb = load_workbook(filename)

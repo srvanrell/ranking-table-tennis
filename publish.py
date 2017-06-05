@@ -50,15 +50,11 @@ for entry in ranking:
     if old_ranking.get_entry(entry.pid) is None:
         old_ranking.add_entry(initial_ranking[entry.pid])
 
-# Saving new ranking
-utils.publish_rating_sheet(output_xlsx, tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
-                                                                     cfg["labels"]["Rating Points"]),
-                           ranking, players, old_ranking)
+# Publish formated rating of selected tournament
+utils.publish_rating_sheet(output_xlsx, tournament_sheetname, ranking, players, old_ranking)
 
-# Saving new ranking
-utils.publish_championship_sheet(output_xlsx, tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
-                                                                           cfg["labels"]["Championship"]),
-                                 ranking, players, old_ranking)
+# Publish formated championship of selected tournament
+utils.publish_championship_sheet(output_xlsx, tournament_sheetname, ranking, players, old_ranking)
 
 # Saving points assigned in each match
 rating_details_sheetname = tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
