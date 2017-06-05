@@ -65,6 +65,16 @@ def _wb_ws_to_save(filename, sheetname, overwrite):
     return wb, ws
 
 
+def _bold_and_center(ws, to_bold, to_center):
+    """Bold and center cells in given worksheet (ws)"""
+    for colrow in to_bold:
+        cell = ws[colrow]
+        cell.font = Font(bold=True)
+    for colrow in to_center:
+        cell = ws[colrow]
+        cell.alignment = Alignment(horizontal='center')
+
+
 def save_sheet_workbook(filename, sheetname, headers, list_to_save, overwrite=False):
     wb, ws = _wb_ws_to_save(filename, sheetname, overwrite)
 
@@ -224,12 +234,7 @@ def publish_rating_sheet(filename, sheetname, ranking, players, old_ranking, ove
                "A4", "B4", "C4", "D4", "E4", "F4"]
     to_center = to_bold + ["B1", "B2", "B3"]
 
-    for colrow in to_bold:
-        cell = ws[colrow]
-        cell.font = Font(bold=True)
-    for colrow in to_center:
-        cell = ws[colrow]
-        cell.alignment = Alignment(horizontal='center')
+    _bold_and_center(ws, to_bold, to_center)
 
     wb.save(filename)
 
@@ -267,12 +272,7 @@ def publish_championship_sheet(filename, sheetname, ranking, players, old_rankin
                "A4", "B4", "C4", "D4", "E4", "F4", "G4"]
     to_center = to_bold + ["B1", "B2", "B3"]
 
-    for colrow in to_bold:
-        cell = ws[colrow]
-        cell.font = Font(bold=True)
-    for colrow in to_center:
-        cell = ws[colrow]
-        cell.alignment = Alignment(horizontal='center')
+    _bold_and_center(ws, to_bold, to_center)
 
     wb.save(filename)
 
@@ -296,12 +296,7 @@ def publish_histories_sheet(filename, sheetname, players, tournament_sheetnames,
     to_bold = ["A1", "A2", "A3", "A4"]
     to_center = to_bold
 
-    for colrow in to_bold:
-        cell = ws[colrow]
-        cell.font = Font(bold=True)
-    for colrow in to_center:
-        cell = ws[colrow]
-        cell.alignment = Alignment(horizontal='center')
+    _bold_and_center(ws, to_bold, to_center)
 
     save_sheet_workbook(filename, sheetname,
                         [cfg["labels"][key] for key in ["Player", "Category", "Best Round", "Tournament"]],
