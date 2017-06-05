@@ -74,7 +74,7 @@ def save_sheet_workbook(filename, sheetname, headers, list_to_save, overwrite=Fa
     wb.save(filename)
 
 
-def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=False):
+def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=True):
     print("<<<Saving\t", sheetname, "\tin\t", filename)
     if os.path.isfile(filename):
         wb = load_workbook(filename)

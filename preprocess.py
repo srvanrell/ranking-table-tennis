@@ -71,4 +71,4 @@ utils.save_sheet_workbook(xlsx_file, cfg["sheetname"]["players"],
                           True)
 
 # Saving initial rankings for all known players
-utils.save_ranking_sheet(xlsx_file, cfg["sheetname"]["initial_ranking"], ranking, players, True)
+utils.save_ranking_sheet(xlsx_file, cfg["sheetname"]["initial_ranking"], ranking, players)
