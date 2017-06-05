@@ -16,7 +16,7 @@ __author__ = 'sebastian'
 tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
 rankings_xlsx = cfg["io"]["data_folder"] + cfg["io"]["rankings_filename"]
 log_xlsx = cfg["io"]["data_folder"] + cfg["io"]["log_filename"]
-output_xlsx = cfg["io"]["data_folder"] + "Torneo NN para publicar.xlsx"
+output_xlsx = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
 
 # Listing tournament sheetnames by increasing date
 tournament_sheetnames = utils.get_sheetnames_by_date(tournaments_xlsx, cfg["sheetname"]["tournaments_key"])

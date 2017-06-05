@@ -337,4 +337,3 @@ def publish_histories_sheet(filename, sheetname, players, tournament_sheetnames,
                             [cfg["labels"][key] for key in ["Player", "Category", "Best Round", "Tournament"]],
                             histories,
                             overwrite)
-
