@@ -85,6 +85,11 @@ for entry in initial_ranking:
 initial_active_players = [re.pid for re in initial_ranking if re.active]
 new_ranking.update_active_players(players, initial_active_players)
 
+# Promote those players indicated in the matches list of the tournament
+for match in tournament.matches:
+    if match.winner_name == cfg["aux"]["flag promotion"]:
+        new_ranking[players.get_pid(match.loser_name)].category = match.category
+
 if tid == 1:
     new_ranking.update_categories(n_first=12, n_second=16)
 else:
