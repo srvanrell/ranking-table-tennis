@@ -225,7 +225,8 @@ def publish_rating_sheet(filename, sheetname, ranking, players, old_ranking, ove
                                              "Association", "Active Player"])
 
     list_to_save = [[e.category, (e.rating, old_ranking[e.pid].rating), players[e.pid].name, players[e.pid].city,
-                     players[e.pid].association, cfg["activeplayer"][e.active]] for e in ranking]
+                     players[e.pid].association, cfg["activeplayer"][e.active]] for e in ranking
+                    if e.bonus > 0 or ranking.tid < 6]  # Exclude players that didn't played for a long time
 
     for row in list_to_save:
         # Do not publish ratings of fans category
@@ -270,7 +271,8 @@ def publish_championship_sheet(filename, sheetname, ranking, players, old_rankin
                                              "Association", "Active Player", "Category"])
 
     list_to_save = [[(e.bonus, old_ranking[e.pid].bonus), players[e.pid].name, players[e.pid].city,
-                     players[e.pid].association, cfg["activeplayer"][e.active], e.category] for e in ranking]
+                     players[e.pid].association, cfg["activeplayer"][e.active], e.category] for e in ranking
+                    if e.bonus > 0 or ranking.tid < 6]  # Exclude players that didn't played for a long time
     sorted_list = sorted(list_to_save, key=lambda l: l[0][0], reverse=True)
 
     for i, row in enumerate(sorted_list):
