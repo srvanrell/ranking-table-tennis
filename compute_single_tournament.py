@@ -63,7 +63,8 @@ best_rounds = {(categ, players.get_pid(name)): aux_best_rounds[categ, name]
 # Creating matches list with pid
 matches = []
 for match in tournament.matches:
-    if match.winner_name != cfg["aux"]["flag add bonus"] and match.category != models.categories[-1]:
+    if match.winner_name not in [cfg["aux"]["flag add bonus"], cfg["aux"]["flag promotion"]] \
+            and match.category != models.categories[-1]:
         matches.append([players.get_pid(match.winner_name), players.get_pid(match.loser_name),
                         match.round, match.category])
 

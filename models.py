@@ -374,7 +374,7 @@ class Tournament:
         players_set = set()
         for match in self.matches:
             # workaround to add extra bonus points from match list
-            if not match.winner_name == cfg["aux"]["flag add bonus"]:
+            if match.winner_name not in [cfg["aux"]["flag add bonus"], cfg["aux"]["flag promotion"]]:
                 players_set.add(match.winner_name)
             players_set.add(match.loser_name)
         return sorted(list(players_set))
@@ -400,6 +400,10 @@ class Tournament:
             else:
                 winner_round_match = match.round
                 loser_round_match = match.round
+
+            # workaround to avoid promotion entries being considered as matches
+            if match.winner_name == cfg["aux"]["flag promotion"]:
+                continue
 
             # finding best round per category of each player
             for name, played_round in [(match.winner_name, winner_round_match),
