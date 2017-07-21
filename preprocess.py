@@ -1,5 +1,6 @@
 import utils
 import models
+from urllib import request
 from utils import cfg
 
 __author__ = 'sebastian'
@@ -16,6 +17,11 @@ __author__ = 'sebastian'
 ##########################################
 
 xlsx_file = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
+
+retrieve = input("Do you want to retrieve online sheet? [YES/no] (Enter to download)\n")
+if retrieve.lower() != "no":
+    print("Downloading and saving %s\n" % xlsx_file)
+    request.urlretrieve(cfg["io"]["tournaments_gdrive"], xlsx_file)
 
 # Listing tournament sheetnames by increasing date
 tournament_sheetnames = utils.get_sheetnames_by_date(cfg["sheetname"]["tournaments_key"])
