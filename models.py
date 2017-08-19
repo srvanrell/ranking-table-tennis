@@ -67,7 +67,9 @@ for i, categ in enumerate(categories):
 
 class Player:
     def __init__(self, pid=-1, name="Apellido, Nombre", association="Asociación", city="Ciudad", last_tournament=-1,
-                 history={}):
+                 history=None):
+        if history is None:
+            history = {}
         self.pid = pid
         self.name = name
         self.association = association
@@ -329,8 +331,8 @@ class Ranking:
         inactives_to_order = [[e.pid, e.rating, e.active, e.category] for e in self if not e.active and
                               not e.category == categories[3]]
 
-        ordered_actives = sorted(actives_to_order, key=lambda l: (l[2], l[1]), reverse=True)  # to use active player
-        ordered_inactives = sorted(inactives_to_order, key=lambda l: (l[2], l[1]), reverse=True)  # to use active player
+        ordered_actives = sorted(actives_to_order, key=lambda k: (k[2], k[1]), reverse=True)  # to use active player
+        ordered_inactives = sorted(inactives_to_order, key=lambda k: (k[2], k[1]), reverse=True)  # to use active player
 
         # First and last player indexes by category
         first = [0, n_first, n_first+n_second]
