@@ -5,6 +5,9 @@ import yaml
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font, Alignment
 
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+
 __author__ = 'sebastian'
 
 # Loads some names from config.yaml
@@ -13,6 +16,12 @@ with open("config.yaml", 'r') as cfgyaml:
         cfg = yaml.load(cfgyaml)
     except yaml.YAMLError as exc:
         print(exc)
+
+# Drive authorization
+scope = ['https://spreadsheets.google.com/feeds']
+key_filename = "key-for-gspread.json"
+credentials = ServiceAccountCredentials.from_json_keyfile_name(key_filename, scope)
+gc = gspread.authorize(credentials)
 
 
 def get_sheetnames_by_date(filter_key=""):
@@ -316,3 +325,31 @@ def publish_histories_sheet(filename, sheetname, players, tournament_sheetnames,
                         [cfg["labels"][key] for key in ["Player", "Category", "Best Round", "Tournament"]],
                         histories,
                         overwrite)
+
+
+def save_sheet_gs(spreadsheet_id, sheet_name, headers, rows_to_save):
+    """ Saves headers and rows_to_save into given sheet_name.
+        If sheet_name does not exist, it will be created. """
+    print("<<<Saving\t", sheet_name, "\tin\t", spreadsheet_id)
+    wb = gc.open_by_key(spreadsheet_id)
+    num_cols = len(headers)
+    num_rows = len(rows_to_save) + 1  # +1 because of header
+
+    # Overwrites an existing sheet or creates a new one
+    if sheet_name in [ws.title for ws in wb.worksheets()]:
+        ws = wb.worksheet(sheet_name)
+        ws.resize(rows=num_rows, cols=num_cols)
+    else:
+        ws = wb.add_worksheet(title=sheet_name, rows=num_rows, cols=num_cols)
+
+    # Concatenation of all cells values to be updated in batch mode
+    cell_list = ws.range("A1:" + ws.get_addr_int(row=num_rows, col=num_cols))
+    for i, value in enumerate(headers + [v for row in rows_to_save for v in row]):
+        cell_list[i].value = value
+
+    ws.update_cells(cell_list)
+
+    # FIXME add bold to header
+    # for col in range(1, len(ws.row_values())+1):
+    #     cell = ws.cell(column=col, row=1)
+    #     cell.font = Font(bold=True)

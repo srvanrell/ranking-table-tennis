@@ -17,8 +17,9 @@ __author__ = 'sebastian'
 ##########################################
 
 xlsx_file = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
+spreadsheet_id = cfg["io"]["tournaments_spreadsheet_id"]
 
-retrieve = input("Do you want to retrieve online sheet? [YES/no] (Enter to download)\n")
+retrieve = input("Do you want to retrieve online sheet? [YES/no] (press Enter to continue)\n")
 if retrieve.lower() != "no":
     print("Downloading and saving %s\n" % xlsx_file)
     request.urlretrieve(cfg["io"]["tournaments_gdrive"], xlsx_file)
@@ -77,3 +78,17 @@ utils.save_sheet_workbook(xlsx_file, cfg["sheetname"]["players"],
 
 # Saving initial rankings for all known players
 utils.save_ranking_sheet(xlsx_file, cfg["sheetname"]["initial_ranking"], ranking, players, replace_key=False)
+
+# Update the online version
+retrieve = input("\nDo you want to update online sheets? [YES/no] (press Enter to continue)\n")
+if retrieve.lower() != "no":
+    print("Uploading changes to online sheets in %s\n" % spreadsheet_id)
+
+# Saving complete list of players, including new ones
+utils.save_sheet_gs(spreadsheet_id, cfg["sheetname"]["players"],
+                    [cfg["labels"][key] for key in ["PID", "Player", "Association", "City",
+                                                    "Last Tournament", "Participations"]],
+                    sorted(players.to_list(), key=lambda l: l[1]))
+
+# # Saving initial rankings for all known players
+# utils.save_ranking_sheet_gs(spreadsheet_id, cfg["sheetname"]["initial_ranking"], ranking, players)

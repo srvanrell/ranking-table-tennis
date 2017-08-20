@@ -5,6 +5,7 @@ io:
     log_filename: log.xlsx
     publish_filename: Torneo NN para publicar.xlsx
     tournaments_gdrive: https://docs.google.com/spreadsheets/d/e/2PACX-1vTWBSRRCCBqtGTcETManYdsM9DMX3Jz6VQTVt5mAMmON8M7cfzZwK0a0CUvvFrFsjW-usKxHw7m_aiV/pub?output=xlsx
+    tournaments_spreadsheet_id: 1vvrkNyxkUz1sjdCkrdeTButie7qNow_ytTjWIzlihjE
 
 sheetname:
     players: Jugadores
