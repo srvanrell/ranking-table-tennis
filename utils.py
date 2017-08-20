@@ -100,11 +100,22 @@ def save_sheet_workbook(filename, sheetname, headers, list_to_save, overwrite=Tr
     wb.save(filename)
 
 
+def _format_ranking_header_and_list(ranking, players):
+    headers = [cfg["labels"][key] for key in ["PID", "Rating Points", "Bonus Points",
+                                              "Active Player", "Category", "Player"]]
+    list_to_save = [[e.pid, e.rating, e.bonus, cfg["activeplayer"][e.active],
+                     e.category, players[e.pid].name] for e in ranking]
+    list_to_save.sort(key=lambda l: l[1], reverse=True)
+
+    return headers, list_to_save
+
+
 def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=True, replace_key=True):
     if replace_key:
         sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["rankings_key"])
 
     wb, ws = _wb_ws_to_save(filename, sheetname, overwrite)
+    headers, list_to_save = _format_ranking_header_and_list(ranking, players)
 
     ws["A1"] = cfg["labels"]["Tournament name"]
     ws["B1"] = ranking.tournament_name
@@ -115,13 +126,9 @@ def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=True, re
     ws["A4"] = cfg["labels"]["tid"]
     ws["B4"] = ranking.tid
 
-    ws.append(cfg["labels"][key] for key in ["PID", "Rating Points", "Bonus Points",
-                                             "Active Player", "Category", "Player"])
+    ws.append(headers)
 
-    list_to_save = [[e.pid, e.rating, e.bonus, cfg["activeplayer"][e.active],
-                     e.category, players[e.pid].name] for e in ranking]
-
-    for row in sorted(list_to_save, key=lambda l: l[1], reverse=True):
+    for row in list_to_save:
         ws.append(row)
 
     wb.save(filename)
@@ -327,20 +334,27 @@ def publish_histories_sheet(filename, sheetname, players, tournament_sheetnames,
                         overwrite)
 
 
-def save_sheet_gs(spreadsheet_id, sheet_name, headers, rows_to_save):
-    """ Saves headers and rows_to_save into given sheet_name.
-        If sheet_name does not exist, it will be created. """
-    print("<<<Saving\t", sheet_name, "\tin\t", spreadsheet_id)
+def _wb_ws_to_save_gs(spreadsheet_id, sheetname, num_rows, num_cols):
+    print("<<<Saving\t", sheetname, "\tin\t", spreadsheet_id)
     wb = gc.open_by_key(spreadsheet_id)
-    num_cols = len(headers)
-    num_rows = len(rows_to_save) + 1  # +1 because of header
 
     # Overwrites an existing sheet or creates a new one
-    if sheet_name in [ws.title for ws in wb.worksheets()]:
-        ws = wb.worksheet(sheet_name)
+    if sheetname in [ws.title for ws in wb.worksheets()]:
+        ws = wb.worksheet(sheetname)
         ws.resize(rows=num_rows, cols=num_cols)
     else:
-        ws = wb.add_worksheet(title=sheet_name, rows=num_rows, cols=num_cols)
+        ws = wb.add_worksheet(title=sheetname, rows=num_rows, cols=num_cols)
+
+    return wb, ws
+
+
+def save_sheet_gs(spreadsheet_id, sheetname, headers, rows_to_save):
+    """ Saves headers and rows_to_save into given sheet_name.
+        If sheet_name does not exist, it will be created. """
+    num_rows = len(rows_to_save) + 1  # +1 because of header
+    num_cols = len(headers)
+
+    wb, ws = _wb_ws_to_save_gs(spreadsheet_id, sheetname, num_rows, num_cols)
 
     # Concatenation of all cells values to be updated in batch mode
     cell_list = ws.range("A1:" + ws.get_addr_int(row=num_rows, col=num_cols))
@@ -349,7 +363,32 @@ def save_sheet_gs(spreadsheet_id, sheet_name, headers, rows_to_save):
 
     ws.update_cells(cell_list)
 
-    # FIXME add bold to header
-    # for col in range(1, len(ws.row_values())+1):
-    #     cell = ws.cell(column=col, row=1)
-    #     cell.font = Font(bold=True)
+
+def save_ranking_sheet_gs(spreadsheet_id, sheetname, ranking, players, replace_key=True):
+    """ Saves ranking into given sheet_name.
+        If sheet_name does not exist, it will be created. """
+    if replace_key:
+        sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["rankings_key"])
+
+    headers, list_to_save = _format_ranking_header_and_list(ranking, players)
+
+    num_cols = len(headers)
+    num_rows = len(list_to_save) + 1 + 4  # +1 because of header + 4 because of tournament metadata
+
+    wb, ws = _wb_ws_to_save_gs(spreadsheet_id, sheetname, num_rows, num_cols)
+
+    ws.update_acell("A1", cfg["labels"]["Tournament name"])
+    ws.update_acell("B1", ranking.tournament_name)
+    ws.update_acell("A2", cfg["labels"]["Date"])
+    ws.update_acell("B2", ranking.date)
+    ws.update_acell("A3", cfg["labels"]["Location"])
+    ws.update_acell("B3", ranking.location)
+    ws.update_acell("A4", cfg["labels"]["tid"])
+    ws.update_acell("B4", ranking.tid)
+
+    # Concatenation of all cells values to be updated in batch mode
+    cell_list = ws.range("A5:" + ws.get_addr_int(row=num_rows, col=num_cols))
+    for i, value in enumerate(headers + [v for row in list_to_save for v in row]):
+        cell_list[i].value = value
+
+    ws.update_cells(cell_list)

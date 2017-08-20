@@ -84,11 +84,12 @@ retrieve = input("\nDo you want to update online sheets? [YES/no] (press Enter t
 if retrieve.lower() != "no":
     print("Uploading changes to online sheets in %s\n" % spreadsheet_id)
 
-# Saving complete list of players, including new ones
-utils.save_sheet_gs(spreadsheet_id, cfg["sheetname"]["players"],
-                    [cfg["labels"][key] for key in ["PID", "Player", "Association", "City",
-                                                    "Last Tournament", "Participations"]],
-                    sorted(players.to_list(), key=lambda l: l[1]))
+    # Saving complete list of players, including new ones
+    utils.save_sheet_gs(spreadsheet_id, cfg["sheetname"]["players"],
+                        [cfg["labels"][key] for key in ["PID", "Player", "Association", "City",
+                                                        "Last Tournament", "Participations"]],
+                        sorted(players.to_list(), key=lambda l: l[1]))
 
-# # Saving initial rankings for all known players
-# utils.save_ranking_sheet_gs(spreadsheet_id, cfg["sheetname"]["initial_ranking"], ranking, players)
+    # # Saving initial rankings for all known players
+    utils.save_ranking_sheet_gs(spreadsheet_id, cfg["sheetname"]["initial_ranking"], ranking,
+                                players, replace_key=False)
