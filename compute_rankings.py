@@ -26,7 +26,7 @@ players = models.PlayersList()
 players.load_list(utils.load_sheet_workbook(tournaments_xlsx, cfg["sheetname"]["players"]))
 
 # Loading initial ranking
-initial_ranking = utils.load_ranking_sheet(tournaments_xlsx, cfg["sheetname"]["initial_ranking"], replace_key=False)
+initial_ranking = utils.load_ranking_sheet(cfg["sheetname"]["initial_ranking"])
 
 # Ask for the tournament data to be processed
 print("\n0\t->\tCompute all from the begining")
@@ -48,7 +48,7 @@ for tid in tids:
 
     # Load previous ranking if exists
     if tid-1 > 0:
-        old_ranking = utils.load_ranking_sheet(rankings_xlsx, tournament_sheetnames[tid - 2])
+        old_ranking = utils.load_ranking_sheet(tournament_sheetnames[tid - 2])
 
     # Load initial rankings for new players
     pid_new_players = []

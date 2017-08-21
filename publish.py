@@ -26,7 +26,7 @@ players = models.PlayersList()
 players.load_list(utils.load_sheet_workbook(tournaments_xlsx, cfg["sheetname"]["players"]))
 
 # Loading initial ranking
-initial_ranking = utils.load_ranking_sheet(tournaments_xlsx, cfg["sheetname"]["initial_ranking"], replace_key=False)
+initial_ranking = utils.load_ranking_sheet(cfg["sheetname"]["initial_ranking"])
 
 for tid, tournament_sheetname in enumerate(tournament_sheetnames, start=1):
     print("\n%d\t->\t%s" % (tid, tournament_sheetname))
@@ -36,12 +36,12 @@ output_xlsx = output_xlsx.replace("NN", "%d" % tid)
 
 # Loading tournament info
 tournament = utils.load_tournament_xlsx(tournament_sheetname)
-ranking = utils.load_ranking_sheet(rankings_xlsx, tournament_sheetname)
+ranking = utils.load_ranking_sheet(tournament_sheetname)
 
 old_ranking = models.Ranking("pre_" + tournament.name, tournament.date, tournament.location, tid - 2)
 # Load previous ranking if exists
 if tid-1 > 0:
-    old_ranking = utils.load_ranking_sheet(rankings_xlsx, tournament_sheetnames[tid - 2])
+    old_ranking = utils.load_ranking_sheet(tournament_sheetnames[tid - 2])
 
 # Load initial rankings for new players
 for entry in ranking:

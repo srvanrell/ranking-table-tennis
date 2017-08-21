@@ -151,17 +151,18 @@ def save_players_sheet(players, upload=False):
                      list_to_save)
 
 
-def load_ranking_sheet(filename, sheetname, replace_key=True):
+def load_ranking_sheet(sheetname):
     """Load a ranking from a xlsx sheet and return a Ranking object
 
-    :param filename: ranking workbook
     :param sheetname: tournament sheetname (will be replaced with ranking sheetname by default)
-    :param replace_key: Default True. It will replace tournament key with ranking key.
-    If False, sheetname will be used as it is given.
+    Except that sheetname match with initial ranking name.
 
     :return: Ranking object
     """
-    if replace_key:
+    if sheetname == cfg["sheetname"]["initial_ranking"]:
+        filename = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
+    else:
+        filename = cfg["io"]["data_folder"] + cfg["io"]["rankings_filename"]
         sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["rankings_key"])
 
     # TODO check if date is being read properly
