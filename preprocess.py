@@ -17,7 +17,6 @@ __author__ = 'sebastian'
 ##########################################
 
 xlsx_file = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
-spreadsheet_id = cfg["io"]["tournaments_spreadsheet_id"]
 
 retrieve = input("Do you want to retrieve online sheet [YES/no]? (press Enter to continue)\n")
 if retrieve.lower() != "no":
@@ -25,7 +24,7 @@ if retrieve.lower() != "no":
     request.urlretrieve(cfg["io"]["tournaments_gdrive"], xlsx_file)
 
 # Listing tournament sheetnames by increasing date
-tournament_sheetnames = utils.get_sheetnames_by_date(cfg["sheetname"]["tournaments_key"])
+tournament_sheetnames = utils.get_tournament_sheetnames_by_date()
 
 # Loading players list
 players = models.PlayersList()

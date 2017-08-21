@@ -18,9 +18,10 @@ with open("config/config.yaml", 'r') as cfgyaml:
         print(exc)
 
 
-def get_sheetnames_by_date(filter_key=""):
+def get_tournament_sheetnames_by_date():
     tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
     wb = load_workbook(tournaments_xlsx, read_only=True)
+    filter_key = cfg["sheetname"]["tournaments_key"]
     sheetnames = [s for s in wb.sheetnames if filter_key in s]
     namesdates = [(name, load_tournament_xlsx(name).date) for name in sheetnames]
     namesdates.sort(key=lambda p: p[1])

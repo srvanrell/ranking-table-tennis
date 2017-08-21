@@ -19,7 +19,7 @@ log_xlsx = cfg["io"]["data_folder"] + cfg["io"]["log_filename"]
 output_xlsx = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
 
 # Listing tournament sheetnames by increasing date
-tournament_sheetnames = utils.get_sheetnames_by_date(cfg["sheetname"]["tournaments_key"])
+tournament_sheetnames = utils.get_tournament_sheetnames_by_date()
 
 # Loading players info list
 players = models.PlayersList()
