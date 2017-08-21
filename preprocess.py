@@ -28,7 +28,7 @@ tournament_sheetnames = utils.get_tournament_sheetnames_by_date()
 
 # Loading players list
 players = models.PlayersList()
-players.load_list(utils.load_sheet_workbook(xlsx_file, cfg["sheetname"]["players"]))
+players.load_list(utils.load_players_sheet())
 
 # Loading initial ranking and adding new players with 0
 ranking = utils.load_ranking_sheet(cfg["sheetname"]["initial_ranking"])

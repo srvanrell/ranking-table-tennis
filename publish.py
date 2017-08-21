@@ -13,7 +13,6 @@ __author__ = 'sebastian'
 # Output: temp xlsx to publish a single ranking
 ###################################################
 
-tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
 log_xlsx = cfg["io"]["data_folder"] + cfg["io"]["log_filename"]
 output_xlsx = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
 
@@ -22,7 +21,7 @@ tournament_sheetnames = utils.get_tournament_sheetnames_by_date()
 
 # Loading players info list
 players = models.PlayersList()
-players.load_list(utils.load_sheet_workbook(tournaments_xlsx, cfg["sheetname"]["players"]))
+players.load_list(utils.load_players_sheet())
 
 # Loading initial ranking
 initial_ranking = utils.load_ranking_sheet(cfg["sheetname"]["initial_ranking"])

@@ -153,6 +153,11 @@ def save_players_sheet(players, upload=False):
                      list_to_save)
 
 
+def load_players_sheet():
+    return load_sheet_workbook(cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"],
+                               cfg["sheetname"]["players"])
+
+
 def load_ranking_sheet(sheetname):
     """Load a ranking from a xlsx sheet and return a Ranking object
 

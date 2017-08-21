@@ -14,8 +14,6 @@ __author__ = 'sebastian'
 #         xlsx log file
 ##########################################
 
-tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
-rankings_xlsx = cfg["io"]["data_folder"] + cfg["io"]["rankings_filename"]
 log_xlsx = cfg["io"]["data_folder"] + cfg["io"]["log_filename"]
 
 # Listing tournament sheetnames by increasing date
@@ -23,20 +21,20 @@ tournament_sheetnames = utils.get_tournament_sheetnames_by_date()
 
 # Loading players info list
 players = models.PlayersList()
-players.load_list(utils.load_sheet_workbook(tournaments_xlsx, cfg["sheetname"]["players"]))
+players.load_list(utils.load_players_sheet())
 
 # Loading initial ranking
 initial_ranking = utils.load_ranking_sheet(cfg["sheetname"]["initial_ranking"])
 
 # Ask for the tournament data to be processed
-print("\n0\t->\tCompute all from the begining")
+print("\n0\t->\tCompute all from the beginning")
 for tid, tournament_sheetname in enumerate(tournament_sheetnames, start=1):
     print("%d\t->\t%s" % (tid, tournament_sheetname))
 tid = int(input("Enter the tournament to compute (look above):\n"))
 
-if tid == 0:
-    tids = range(1, len(tournament_sheetnames)+1)
-else:
+# Will compute all rankings from the beginning by default
+tids = range(1, len(tournament_sheetnames)+1)
+if tid != 0:
     tids = [tid]
 
 for tid in tids:
