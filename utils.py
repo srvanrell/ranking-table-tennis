@@ -243,16 +243,7 @@ def _format_diff(diff):
     return diff_str
 
 
-def publish_rating_sheet(sheetname, ranking, players, old_ranking, upload=False):
-    """ Format a ranking to be published into a rating sheet
-    """
-    sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cfg["labels"]["Rating Points"])
-
-    filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
-    filename = filename.replace("NN", "%d" % ranking.tid)
-
-    wb, ws = _wb_ws_to_save(filename, sheetname)
-
+def _publish_tournament_metadata(ws, ranking):
     ws["A1"] = cfg["labels"]["Tournament name"]
     ws["B1"] = ranking.tournament_name
     ws.merge_cells('B1:F1')
@@ -263,6 +254,22 @@ def publish_rating_sheet(sheetname, ranking, players, old_ranking, upload=False)
     ws["B3"] = ranking.location
     ws.merge_cells('B3:F3')
 
+
+def publish_rating_sheet(sheetname, ranking, players, old_ranking, upload=False):
+    """ Format a ranking to be published into a rating sheet
+    """
+    sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cfg["labels"]["Rating Points"])
+
+    filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
+    filename = filename.replace("NN", "%d" % ranking.tid)
+
+    # initialize the worksheet
+    wb, ws = _wb_ws_to_save(filename, sheetname)
+
+    # publish and format tournament metadata
+    _publish_tournament_metadata(ws, ranking)
+
+    # headers
     ws.append(cfg["labels"][key] for key in ["Category", "Rating Points", "Player", "City",
                                              "Association", "Active Player"])
 
@@ -304,18 +311,13 @@ def publish_championship_sheet(sheetname, ranking, players, old_ranking, upload=
     filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
     filename = filename.replace("NN", "%d" % ranking.tid)
 
+    # initialize the worksheet
     wb, ws = _wb_ws_to_save(filename, sheetname)
 
-    ws["A1"] = cfg["labels"]["Tournament name"]
-    ws["B1"] = ranking.tournament_name
-    ws.merge_cells('B1:G1')
-    ws["A2"] = cfg["labels"]["Date"]
-    ws["B2"] = ranking.date
-    ws.merge_cells('B2:G2')
-    ws["A3"] = cfg["labels"]["Location"]
-    ws["B3"] = ranking.location
-    ws.merge_cells('B3:G3')
+    # publish and format tournament metadata
+    _publish_tournament_metadata(ws, ranking)
 
+    # headers
     ws.append(cfg["labels"][key] for key in ["Position", "Bonus Points", "Player", "City",
                                              "Association", "Active Player", "Category"])
 
