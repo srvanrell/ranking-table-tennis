@@ -70,26 +70,13 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames, start=1):
     # Also, best rounds reached in each category are saved into corresponding history
     players.update_histories(tid, best_rounds)
 
+# Update the online version
+answer = input("\nDo you want to update online sheets [YES/no]? (press Enter to continue)\n")
+upload = answer.lower() != "no"
+
 # Saving complete list of players, including new ones
-utils.save_sheet_workbook(xlsx_file, cfg["sheetname"]["players"],
-                          [cfg["labels"][key] for key in ["PID", "Player", "Association", "City",
-                                                          "Last Tournament", "Participations"]],
-                          sorted(players.to_list(), key=lambda l: l[1]))
+utils.save_players_sheet(players, upload=upload)
 
 # Saving initial rankings for all known players
-utils.save_ranking_sheet(xlsx_file, cfg["sheetname"]["initial_ranking"], ranking, players, replace_key=False)
-
-# Update the online version
-retrieve = input("\nDo you want to update online sheets [YES/no]? (press Enter to continue)\n")
-if retrieve.lower() != "no":
-    print("Uploading changes to online sheets in %s\n" % spreadsheet_id)
-
-    # Saving complete list of players, including new ones
-    utils.upload_sheet(spreadsheet_id, cfg["sheetname"]["players"],
-                       [cfg["labels"][key] for key in ["PID", "Player", "Association", "City",
-                                                       "Last Tournament", "Participations"]],
-                       sorted(players.to_list(), key=lambda l: l[1]))
-
-    # # Saving initial rankings for all known players
-    utils.upload_ranking_sheet(spreadsheet_id, cfg["sheetname"]["initial_ranking"], ranking,
-                               players, replace_key=False)
+utils.save_ranking_sheet(xlsx_file, cfg["sheetname"]["initial_ranking"], ranking, players,
+                         replace_key=False, upload=upload)

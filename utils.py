@@ -104,7 +104,8 @@ def _format_ranking_header_and_list(ranking, players):
     return headers, list_to_save
 
 
-def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=True, replace_key=True):
+def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=True, replace_key=True,
+                       upload=False):
     if replace_key:
         sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["rankings_key"])
 
@@ -126,6 +127,27 @@ def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=True, re
         ws.append(row)
 
     wb.save(filename)
+
+    if upload:
+        upload_ranking_sheet(cfg["io"]["tournaments_spreadsheet_id"],
+                             cfg["sheetname"]["initial_ranking"],
+                             ranking, players, replace_key=False)
+
+
+def save_players_sheet(players, upload=False):
+    headers = [cfg["labels"][key] for key in ["PID", "Player", "Association", "City",
+                                              "Last Tournament", "Participations"]]
+    list_to_save = sorted(players.to_list(), key=lambda l: l[1])
+
+    save_sheet_workbook(cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"],
+                        cfg["sheetname"]["players"],
+                        headers,
+                        list_to_save)
+    if upload:
+        upload_sheet(cfg["io"]["tournaments_spreadsheet_id"],
+                     cfg["sheetname"]["players"],
+                     headers,
+                     list_to_save)
 
 
 def load_ranking_sheet(filename, sheetname, replace_key=True):
