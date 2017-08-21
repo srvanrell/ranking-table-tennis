@@ -17,12 +17,6 @@ with open("config/config.yaml", 'r') as cfgyaml:
     except yaml.YAMLError as exc:
         print(exc)
 
-# Drive authorization
-scope = ['https://spreadsheets.google.com/feeds']
-key_filename = "config/key-for-gspread.json"
-credentials = ServiceAccountCredentials.from_json_keyfile_name(key_filename, scope)
-gc = gspread.authorize(credentials)
-
 
 def get_sheetnames_by_date(filter_key=""):
     tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
@@ -334,9 +328,17 @@ def publish_histories_sheet(filename, sheetname, players, tournament_sheetnames,
                         overwrite)
 
 
+def _get_gc():
+    # Drive authorization
+    scope = ['https://spreadsheets.google.com/feeds']
+    key_filename = "config/key-for-gspread.json"
+    credentials = ServiceAccountCredentials.from_json_keyfile_name(key_filename, scope)
+    return gspread.authorize(credentials)
+
+
 def _wb_ws_to_upload(spreadsheet_id, sheetname, num_rows, num_cols):
     print("<<<Saving\t", sheetname, "\tin\t", spreadsheet_id)
-    wb = gc.open_by_key(spreadsheet_id)
+    wb = _get_gc().open_by_key(spreadsheet_id)
 
     # Overwrites an existing sheet or creates a new one
     if sheetname in [ws.title for ws in wb.worksheets()]:
