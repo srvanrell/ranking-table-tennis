@@ -120,7 +120,7 @@ for tid in tids:
     points_log_to_save = [[players[pid].name, points, best_round, category] for pid, points, best_round, category
                           in assigned_points_per_best_round]
     participation_points_log_to_save = [[players[pid].name, points, cfg["labels"]["Participation Points"], ""]
-                                        for pid, points in assigned_participation_points]
+                                        for pid, points in assigned_participation_points if points > 0]
 
     utils.save_sheet_workbook(log_xlsx,
                               tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
