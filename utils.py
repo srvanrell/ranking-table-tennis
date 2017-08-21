@@ -303,8 +303,6 @@ def publish_championship_sheet(filename, sheetname, ranking, players, old_rankin
 
 def publish_histories_sheet(filename, sheetname, players, tournament_sheetnames, overwrite=True):
     """ Format histories to be published into a sheet"""
-    wb, ws = _wb_ws_to_save(filename, sheetname, overwrite)
-
     histories = []
     for player in sorted(players, key=lambda l: l.name):
         if len(player.sorted_history) > 0:
@@ -316,11 +314,6 @@ def publish_histories_sheet(filename, sheetname, players, tournament_sheetnames,
                 else:
                     old_cat = cat
                 histories.append(["", cat, best_round, " ".join(tournament_sheetnames[tid - 1].split()[1:])])
-
-    to_bold = ["A1", "A2", "A3", "A4"]
-    to_center = to_bold
-
-    _bold_and_center(ws, to_bold, to_center)
 
     save_sheet_workbook(filename, sheetname,
                         [cfg["labels"][key] for key in ["Player", "Category", "Best Round", "Tournament"]],
