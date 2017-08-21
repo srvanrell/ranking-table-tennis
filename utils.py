@@ -294,7 +294,7 @@ def publish_rating_sheet(sheetname, ranking, players, old_ranking, upload=False)
     wb.save(filename)
 
     if upload:
-        load_and_upload_sheet(filename, sheetname, cfg["io"]["test_spreadsheet_id"])
+        load_and_upload_sheet(filename, sheetname, cfg["io"]["temporal_spreadsheet_id"])
 
 
 def publish_championship_sheet(sheetname, ranking, players, old_ranking, upload=False):
@@ -339,7 +339,7 @@ def publish_championship_sheet(sheetname, ranking, players, old_ranking, upload=
     wb.save(filename)
 
     if upload:
-        load_and_upload_sheet(filename, sheetname, cfg["io"]["test_spreadsheet_id"])
+        load_and_upload_sheet(filename, sheetname, cfg["io"]["temporal_spreadsheet_id"])
 
 
 def publish_histories_sheet(ranking, players, tournament_sheetnames, upload=False):
@@ -365,7 +365,7 @@ def publish_histories_sheet(ranking, players, tournament_sheetnames, upload=Fals
                         histories)
 
     if upload:
-        load_and_upload_sheet(output_xlsx, cfg["sheetname"]["histories"], cfg["io"]["test_spreadsheet_id"])
+        load_and_upload_sheet(output_xlsx, cfg["sheetname"]["histories"], cfg["io"]["temporal_spreadsheet_id"])
 
 
 def publish_details_sheets(sheetname, ranking, upload=False):
@@ -388,8 +388,8 @@ def publish_details_sheets(sheetname, ranking, upload=False):
     save_sheet_workbook(output_xlsx, bonus_details_sheetname, bonus_log_saved[0], bonus_log_saved[1:])
 
     if upload:
-        load_and_upload_sheet(output_xlsx, rating_details_sheetname, cfg["io"]["test_spreadsheet_id"])
-        load_and_upload_sheet(output_xlsx, bonus_details_sheetname, cfg["io"]["test_spreadsheet_id"])
+        load_and_upload_sheet(output_xlsx, rating_details_sheetname, cfg["io"]["temporal_spreadsheet_id"])
+        load_and_upload_sheet(output_xlsx, bonus_details_sheetname, cfg["io"]["temporal_spreadsheet_id"])
 
 
 def _get_gc():
