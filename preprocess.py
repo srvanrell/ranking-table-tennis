@@ -85,11 +85,11 @@ if retrieve.lower() != "no":
     print("Uploading changes to online sheets in %s\n" % spreadsheet_id)
 
     # Saving complete list of players, including new ones
-    utils.save_sheet_gs(spreadsheet_id, cfg["sheetname"]["players"],
-                        [cfg["labels"][key] for key in ["PID", "Player", "Association", "City",
-                                                        "Last Tournament", "Participations"]],
-                        sorted(players.to_list(), key=lambda l: l[1]))
+    utils.upload_sheet(spreadsheet_id, cfg["sheetname"]["players"],
+                       [cfg["labels"][key] for key in ["PID", "Player", "Association", "City",
+                                                       "Last Tournament", "Participations"]],
+                       sorted(players.to_list(), key=lambda l: l[1]))
 
     # # Saving initial rankings for all known players
-    utils.save_ranking_sheet_gs(spreadsheet_id, cfg["sheetname"]["initial_ranking"], ranking,
-                                players, replace_key=False)
+    utils.upload_ranking_sheet(spreadsheet_id, cfg["sheetname"]["initial_ranking"], ranking,
+                               players, replace_key=False)

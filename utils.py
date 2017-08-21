@@ -334,7 +334,7 @@ def publish_histories_sheet(filename, sheetname, players, tournament_sheetnames,
                         overwrite)
 
 
-def _wb_ws_to_save_gs(spreadsheet_id, sheetname, num_rows, num_cols):
+def _wb_ws_to_upload(spreadsheet_id, sheetname, num_rows, num_cols):
     print("<<<Saving\t", sheetname, "\tin\t", spreadsheet_id)
     wb = gc.open_by_key(spreadsheet_id)
 
@@ -348,13 +348,13 @@ def _wb_ws_to_save_gs(spreadsheet_id, sheetname, num_rows, num_cols):
     return wb, ws
 
 
-def save_sheet_gs(spreadsheet_id, sheetname, headers, rows_to_save):
+def upload_sheet(spreadsheet_id, sheetname, headers, rows_to_save):
     """ Saves headers and rows_to_save into given sheet_name.
         If sheet_name does not exist, it will be created. """
     num_rows = len(rows_to_save) + 1  # +1 because of header
     num_cols = len(headers)
 
-    wb, ws = _wb_ws_to_save_gs(spreadsheet_id, sheetname, num_rows, num_cols)
+    wb, ws = _wb_ws_to_upload(spreadsheet_id, sheetname, num_rows, num_cols)
 
     # Concatenation of all cells values to be updated in batch mode
     cell_list = ws.range("A1:" + ws.get_addr_int(row=num_rows, col=num_cols))
@@ -364,7 +364,7 @@ def save_sheet_gs(spreadsheet_id, sheetname, headers, rows_to_save):
     ws.update_cells(cell_list)
 
 
-def save_ranking_sheet_gs(spreadsheet_id, sheetname, ranking, players, replace_key=True):
+def upload_ranking_sheet(spreadsheet_id, sheetname, ranking, players, replace_key=True):
     """ Saves ranking into given sheet_name.
         If sheet_name does not exist, it will be created. """
     if replace_key:
@@ -375,7 +375,7 @@ def save_ranking_sheet_gs(spreadsheet_id, sheetname, ranking, players, replace_k
     num_cols = len(headers)
     num_rows = len(list_to_save) + 1 + 4  # +1 because of header + 4 because of tournament metadata
 
-    wb, ws = _wb_ws_to_save_gs(spreadsheet_id, sheetname, num_rows, num_cols)
+    wb, ws = _wb_ws_to_upload(spreadsheet_id, sheetname, num_rows, num_cols)
 
     ws.update_acell("A1", cfg["labels"]["Tournament name"])
     ws.update_acell("B1", ranking.tournament_name)
