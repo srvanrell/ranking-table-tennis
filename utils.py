@@ -105,9 +105,11 @@ def _format_ranking_header_and_list(ranking, players):
     return headers, list_to_save
 
 
-def save_ranking_sheet(filename, sheetname, ranking, players, overwrite=True, replace_key=True,
-                       upload=False):
-    if replace_key:
+def save_ranking_sheet(sheetname, ranking, players, overwrite=True, upload=False):
+    if sheetname == cfg["sheetname"]["initial_ranking"]:
+        filename = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
+    else:
+        filename = cfg["io"]["data_folder"] + cfg["io"]["rankings_filename"]
         sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["rankings_key"])
 
     wb, ws = _wb_ws_to_save(filename, sheetname, overwrite)

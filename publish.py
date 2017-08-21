@@ -14,7 +14,6 @@ __author__ = 'sebastian'
 ###################################################
 
 tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
-rankings_xlsx = cfg["io"]["data_folder"] + cfg["io"]["rankings_filename"]
 log_xlsx = cfg["io"]["data_folder"] + cfg["io"]["log_filename"]
 output_xlsx = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
 

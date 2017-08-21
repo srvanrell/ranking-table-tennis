@@ -77,5 +77,4 @@ upload = answer.lower() != "no"
 utils.save_players_sheet(players, upload=upload)
 
 # Saving initial rankings for all known players
-utils.save_ranking_sheet(xlsx_file, cfg["sheetname"]["initial_ranking"], ranking, players,
-                         replace_key=False, upload=upload)
+utils.save_ranking_sheet(cfg["sheetname"]["initial_ranking"], ranking, players, upload=upload)
