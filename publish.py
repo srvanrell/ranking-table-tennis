@@ -5,7 +5,7 @@ from utils import cfg
 __author__ = 'sebastian'
 
 ###################################################
-# Script to run after compute_single_tournament.py
+# Script to run after compute_rankings.py
 # Input: xlsx tournaments database
 #        xlsx rankings database
 #        xlsx log file

@@ -19,7 +19,7 @@ with open("config.yaml", 'r') as cfgyaml:
 
 # Drive authorization
 scope = ['https://spreadsheets.google.com/feeds']
-key_filename = "key-for-gspread.json"
+key_filename = "config/key-for-gspread.json"
 credentials = ServiceAccountCredentials.from_json_keyfile_name(key_filename, scope)
 gc = gspread.authorize(credentials)
 
