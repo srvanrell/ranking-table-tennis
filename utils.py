@@ -51,7 +51,7 @@ def load_sheet_workbook(filename, sheetname, first_row=1):
     return list_to_return[first_row:]
 
 
-def _wb_ws_to_save(filename, sheetname, overwrite):
+def _wb_ws_to_save(filename, sheetname, overwrite=True):
     print("<<<Saving\t", sheetname, "\tin\t", filename)
     if os.path.isfile(filename):
         wb = load_workbook(filename)
@@ -132,9 +132,7 @@ def save_ranking_sheet(sheetname, ranking, players, overwrite=True, upload=False
     wb.save(filename)
 
     if upload:
-        upload_ranking_sheet(cfg["io"]["tournaments_spreadsheet_id"],
-                             cfg["sheetname"]["initial_ranking"],
-                             ranking, players, replace_key=False)
+        upload_ranking_sheet(cfg["sheetname"]["initial_ranking"], ranking, players)
 
 
 def save_players_sheet(players, upload=False):
@@ -245,12 +243,15 @@ def _format_diff(diff):
     return diff_str
 
 
-def publish_rating_sheet(filename, sheetname, ranking, players, old_ranking, overwrite=True):
+def publish_rating_sheet(sheetname, ranking, players, old_ranking):
     """ Format a ranking to be published into a rating sheet
     """
     sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cfg["labels"]["Rating Points"])
 
-    wb, ws = _wb_ws_to_save(filename, sheetname, overwrite)
+    filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
+    filename.replace("NN", "%d" % ranking.tid)
+
+    wb, ws = _wb_ws_to_save(filename, sheetname)
 
     ws["A1"] = cfg["labels"]["Tournament name"]
     ws["B1"] = ranking.tournament_name
@@ -293,11 +294,14 @@ def publish_rating_sheet(filename, sheetname, ranking, players, old_ranking, ove
     wb.save(filename)
 
 
-def publish_championship_sheet(filename, sheetname, ranking, players, old_ranking, overwrite=True):
+def publish_championship_sheet(sheetname, ranking, players, old_ranking):
     """ Format a ranking to be published into a rating sheet"""
     sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["championship_key"])
 
-    wb, ws = _wb_ws_to_save(filename, sheetname, overwrite)
+    filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
+    filename.replace("NN", "%d" % ranking.tid)
+
+    wb, ws = _wb_ws_to_save(filename, sheetname)
 
     ws["A1"] = cfg["labels"]["Tournament name"]
     ws["B1"] = ranking.tournament_name
@@ -332,8 +336,11 @@ def publish_championship_sheet(filename, sheetname, ranking, players, old_rankin
     wb.save(filename)
 
 
-def publish_histories_sheet(filename, sheetname, players, tournament_sheetnames, overwrite=True):
+def publish_histories_sheet(players, ranking, tournament_sheetnames):
     """ Format histories to be published into a sheet"""
+    output_xlsx = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
+    output_xlsx.replace("NN", "%d" % ranking.tid)
+
     histories = []
     for player in sorted(players, key=lambda l: l.name):
         if len(player.sorted_history) > 0:
@@ -346,10 +353,30 @@ def publish_histories_sheet(filename, sheetname, players, tournament_sheetnames,
                     old_cat = cat
                 histories.append(["", cat, best_round, " ".join(tournament_sheetnames[tid - 1].split()[1:])])
 
-    save_sheet_workbook(filename, sheetname,
+    save_sheet_workbook(output_xlsx,
+                        cfg["sheetname"]["histories"],
                         [cfg["labels"][key] for key in ["Player", "Category", "Best Round", "Tournament"]],
-                        histories,
-                        overwrite)
+                        histories)
+
+
+def publish_details_sheets(sheetname, ranking):
+    """ Copy details from log and output details of given tournament"""
+    output_xlsx = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
+    output_xlsx.replace("NN", "%d" % ranking.tid)
+
+    log_xlsx = cfg["io"]["data_folder"] + cfg["io"]["log_filename"]
+
+    # Saving points assigned in each match
+    rating_details_sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"],
+                                                 cfg["sheetname"]["rating_details_key"])
+    rating_log_saved = load_sheet_workbook(log_xlsx, rating_details_sheetname, first_row=0)
+    save_sheet_workbook(output_xlsx, rating_details_sheetname, rating_log_saved[0], rating_log_saved[1:])
+
+    # Saving points assigned per best round reached and for participation
+    bonus_details_sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"],
+                                                cfg["sheetname"]["bonus_details_key"])
+    bonus_log_saved = load_sheet_workbook(log_xlsx, bonus_details_sheetname, first_row=0)
+    save_sheet_workbook(output_xlsx, bonus_details_sheetname, bonus_log_saved[0], bonus_log_saved[1:])
 
 
 def _get_gc():
@@ -390,31 +417,35 @@ def upload_sheet(spreadsheet_id, sheetname, headers, rows_to_save):
     ws.update_cells(cell_list)
 
 
-def upload_ranking_sheet(spreadsheet_id, sheetname, ranking, players, replace_key=True):
+# FIXME It should allow uploading more than initial ranking
+def upload_ranking_sheet(sheetname, ranking, players):
     """ Saves ranking into given sheet_name.
         If sheet_name does not exist, it will be created. """
-    if replace_key:
-        sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["rankings_key"])
+    if sheetname == cfg["sheetname"]["initial_ranking"]:
+        spreadsheet_id = cfg["io"]["tournaments_spreadsheet_id"]
+        # else:
+        #     spreadsheet_id = cfg["io"]["not_existent_spreadsheet_id"]
+        #     sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["rankings_key"])
 
-    headers, list_to_save = _format_ranking_header_and_list(ranking, players)
+        headers, list_to_save = _format_ranking_header_and_list(ranking, players)
 
-    num_cols = len(headers)
-    num_rows = len(list_to_save) + 1 + 4  # +1 because of header + 4 because of tournament metadata
+        num_cols = len(headers)
+        num_rows = len(list_to_save) + 1 + 4  # +1 because of header + 4 because of tournament metadata
 
-    wb, ws = _wb_ws_to_upload(spreadsheet_id, sheetname, num_rows, num_cols)
+        wb, ws = _wb_ws_to_upload(spreadsheet_id, sheetname, num_rows, num_cols)
 
-    ws.update_acell("A1", cfg["labels"]["Tournament name"])
-    ws.update_acell("B1", ranking.tournament_name)
-    ws.update_acell("A2", cfg["labels"]["Date"])
-    ws.update_acell("B2", ranking.date)
-    ws.update_acell("A3", cfg["labels"]["Location"])
-    ws.update_acell("B3", ranking.location)
-    ws.update_acell("A4", cfg["labels"]["tid"])
-    ws.update_acell("B4", ranking.tid)
+        ws.update_acell("A1", cfg["labels"]["Tournament name"])
+        ws.update_acell("B1", ranking.tournament_name)
+        ws.update_acell("A2", cfg["labels"]["Date"])
+        ws.update_acell("B2", ranking.date)
+        ws.update_acell("A3", cfg["labels"]["Location"])
+        ws.update_acell("B3", ranking.location)
+        ws.update_acell("A4", cfg["labels"]["tid"])
+        ws.update_acell("B4", ranking.tid)
 
-    # Concatenation of all cells values to be updated in batch mode
-    cell_list = ws.range("A5:" + ws.get_addr_int(row=num_rows, col=num_cols))
-    for i, value in enumerate(headers + [v for row in list_to_save for v in row]):
-        cell_list[i].value = value
+        # Concatenation of all cells values to be updated in batch mode
+        cell_list = ws.range("A5:" + ws.get_addr_int(row=num_rows, col=num_cols))
+        for i, value in enumerate(headers + [v for row in list_to_save for v in row]):
+            cell_list[i].value = value
 
-    ws.update_cells(cell_list)
+        ws.update_cells(cell_list)
