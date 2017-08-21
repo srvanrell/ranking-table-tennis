@@ -243,13 +243,13 @@ def _format_diff(diff):
     return diff_str
 
 
-def publish_rating_sheet(sheetname, ranking, players, old_ranking):
+def publish_rating_sheet(sheetname, ranking, players, old_ranking, upload=False):
     """ Format a ranking to be published into a rating sheet
     """
     sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cfg["labels"]["Rating Points"])
 
     filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
-    filename.replace("NN", "%d" % ranking.tid)
+    filename = filename.replace("NN", "%d" % ranking.tid)
 
     wb, ws = _wb_ws_to_save(filename, sheetname)
 
@@ -293,13 +293,16 @@ def publish_rating_sheet(sheetname, ranking, players, old_ranking):
 
     wb.save(filename)
 
+    if upload:
+        load_and_upload_sheet(filename, sheetname, cfg["io"]["test_spreadsheet_id"])
 
-def publish_championship_sheet(sheetname, ranking, players, old_ranking):
+
+def publish_championship_sheet(sheetname, ranking, players, old_ranking, upload=False):
     """ Format a ranking to be published into a rating sheet"""
     sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["championship_key"])
 
     filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
-    filename.replace("NN", "%d" % ranking.tid)
+    filename = filename.replace("NN", "%d" % ranking.tid)
 
     wb, ws = _wb_ws_to_save(filename, sheetname)
 
@@ -335,11 +338,14 @@ def publish_championship_sheet(sheetname, ranking, players, old_ranking):
 
     wb.save(filename)
 
+    if upload:
+        load_and_upload_sheet(filename, sheetname, cfg["io"]["test_spreadsheet_id"])
 
-def publish_histories_sheet(players, ranking, tournament_sheetnames):
+
+def publish_histories_sheet(ranking, players, tournament_sheetnames, upload=False):
     """ Format histories to be published into a sheet"""
     output_xlsx = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
-    output_xlsx.replace("NN", "%d" % ranking.tid)
+    output_xlsx = output_xlsx.replace("NN", "%d" % ranking.tid)
 
     histories = []
     for player in sorted(players, key=lambda l: l.name):
@@ -358,11 +364,14 @@ def publish_histories_sheet(players, ranking, tournament_sheetnames):
                         [cfg["labels"][key] for key in ["Player", "Category", "Best Round", "Tournament"]],
                         histories)
 
+    if upload:
+        load_and_upload_sheet(output_xlsx, cfg["sheetname"]["histories"], cfg["io"]["test_spreadsheet_id"])
 
-def publish_details_sheets(sheetname, ranking):
+
+def publish_details_sheets(sheetname, ranking, upload=False):
     """ Copy details from log and output details of given tournament"""
     output_xlsx = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
-    output_xlsx.replace("NN", "%d" % ranking.tid)
+    output_xlsx = output_xlsx.replace("NN", "%d" % ranking.tid)
 
     log_xlsx = cfg["io"]["data_folder"] + cfg["io"]["log_filename"]
 
@@ -377,6 +386,10 @@ def publish_details_sheets(sheetname, ranking):
                                                 cfg["sheetname"]["bonus_details_key"])
     bonus_log_saved = load_sheet_workbook(log_xlsx, bonus_details_sheetname, first_row=0)
     save_sheet_workbook(output_xlsx, bonus_details_sheetname, bonus_log_saved[0], bonus_log_saved[1:])
+
+    if upload:
+        load_and_upload_sheet(output_xlsx, rating_details_sheetname, cfg["io"]["test_spreadsheet_id"])
+        load_and_upload_sheet(output_xlsx, bonus_details_sheetname, cfg["io"]["test_spreadsheet_id"])
 
 
 def _get_gc():
@@ -449,3 +462,11 @@ def upload_ranking_sheet(sheetname, ranking, players):
             cell_list[i].value = value
 
         ws.update_cells(cell_list)
+
+
+def load_and_upload_sheet(filename, sheetname, spreadsheet_id):
+    raw_sheet = load_sheet_workbook(filename, sheetname, first_row=0)
+    headers = raw_sheet[0]
+    list_to_save = raw_sheet[1:]
+
+    upload_sheet(spreadsheet_id, sheetname, headers, list_to_save)

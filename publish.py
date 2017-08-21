@@ -42,14 +42,17 @@ for entry in ranking:
     if old_ranking.get_entry(entry.pid) is None:
         old_ranking.add_entry(initial_ranking[entry.pid])
 
+answer = input("\nDo you want to publish to temporal online sheets [YES/no]? (press Enter to continue)\n")
+upload = answer.lower() != "no"
+
 # Publish formated rating of selected tournament
-utils.publish_rating_sheet(tournament_sheetname, ranking, players, old_ranking)
+utils.publish_rating_sheet(tournament_sheetname, ranking, players, old_ranking, upload=upload)
 
 # Publish formated championship of selected tournament
-utils.publish_championship_sheet(tournament_sheetname, ranking, players, old_ranking)
+utils.publish_championship_sheet(tournament_sheetname, ranking, players, old_ranking, upload=upload)
 
 # Publish points assigned in each match and points assigned per best round reached and for participation
-utils.publish_details_sheets(tournament_sheetname, ranking)
+utils.publish_details_sheets(tournament_sheetname, ranking, upload=upload)
 
 # Saving complete histories of players
-utils.publish_histories_sheet(ranking, players, tournament_sheetnames)
+utils.publish_histories_sheet(ranking, players, tournament_sheetnames, upload=upload)
