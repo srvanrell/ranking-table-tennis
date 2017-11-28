@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import utils
 import models
 from utils import cfg
