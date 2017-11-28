@@ -398,20 +398,29 @@ def _get_gc():
     # Drive authorization
     scope = ['https://spreadsheets.google.com/feeds']
     key_filename = "config/key-for-gspread.json"
-    credentials = ServiceAccountCredentials.from_json_keyfile_name(key_filename, scope)
-    return gspread.authorize(credentials)
+    gc = None
+    try:
+        credentials = ServiceAccountCredentials.from_json_keyfile_name(key_filename, scope)
+        gc = gspread.authorize(credentials)
+    except FileNotFoundError:
+        print("The .json key file has not been configured. Upload will fail.")
+    return gc
 
 
 def _wb_ws_to_upload(spreadsheet_id, sheetname, num_rows, num_cols):
     print("<<<Saving\t", sheetname, "\tin\t", spreadsheet_id)
-    wb = _get_gc().open_by_key(spreadsheet_id)
+    wb, ws = None, None
+    gc = _get_gc()
+    #FIXME it should raise an exception to abort uploading
+    if gc:
+        wb = gc.open_by_key(spreadsheet_id)   
 
-    # Overwrites an existing sheet or creates a new one
-    if sheetname in [ws.title for ws in wb.worksheets()]:
-        ws = wb.worksheet(sheetname)
-        ws.resize(rows=num_rows, cols=num_cols)
-    else:
-        ws = wb.add_worksheet(title=sheetname, rows=num_rows, cols=num_cols)
+        # Overwrites an existing sheet or creates a new one
+        if sheetname in [ws.title for ws in wb.worksheets()]:
+            ws = wb.worksheet(sheetname)
+            ws.resize(rows=num_rows, cols=num_cols)
+        else:
+            ws = wb.add_worksheet(title=sheetname, rows=num_rows, cols=num_cols)
 
     return wb, ws
 
@@ -423,6 +432,9 @@ def upload_sheet(spreadsheet_id, sheetname, headers, rows_to_save):
     num_cols = len(headers)
 
     wb, ws = _wb_ws_to_upload(spreadsheet_id, sheetname, num_rows, num_cols)
+    if wb is None and ws is None:
+        print("Updating has failed. Skipping...")
+        return
 
     # Concatenation of all cells values to be updated in batch mode
     cell_list = ws.range("A1:" + ws.get_addr_int(row=num_rows, col=num_cols))
@@ -448,6 +460,9 @@ def upload_ranking_sheet(sheetname, ranking, players):
         num_rows = len(list_to_save) + 1 + 4  # +1 because of header + 4 because of tournament metadata
 
         wb, ws = _wb_ws_to_upload(spreadsheet_id, sheetname, num_rows, num_cols)
+        if wb is None and ws is None:
+            print("Updating has failed. Skipping...")
+            return
 
         ws.update_acell("A1", cfg["labels"]["Tournament name"])
         ws.update_acell("B1", ranking.tournament_name)

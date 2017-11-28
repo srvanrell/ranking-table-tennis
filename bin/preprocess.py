@@ -2,8 +2,8 @@
 
 from ranking_table_tennis import utils
 from ranking_table_tennis import models
+from ranking_table_tennis.utils import cfg
 from urllib import request
-from utils import cfg
 
 __author__ = 'sebastian'
 
