@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-import utils
-import models
+from ranking_table_tennis import utils
+from ranking_table_tennis import models
 from urllib import request
 from utils import cfg
 

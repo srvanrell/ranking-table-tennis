@@ -8,5 +8,6 @@ setup(name='ranking_table_tennis',
       author_email='srvanrell@gmail.com',
       license='MIT',
       packages=['ranking_table_tennis'],
-      scripts=['bin/preprocess']
+      scripts=['bin/preprocess.py'],
+      include_package_data=True,
       zip_safe=False)

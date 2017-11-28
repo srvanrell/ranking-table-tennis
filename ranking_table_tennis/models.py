@@ -4,7 +4,7 @@ import yaml
 import ast
 
 # Loads some names from config.yaml
-with open("config/config.yaml", 'r') as cfgyaml:
+with open("ranking_table_tennis/config/config.yaml", 'r') as cfgyaml:
     try:
         cfg = yaml.load(cfgyaml)
     except yaml.YAMLError as exc:

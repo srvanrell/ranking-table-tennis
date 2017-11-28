@@ -1,7 +1,7 @@
 import csv
-import models
 import os
 import yaml
+from ranking_table_tennis import models
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font, Alignment
 
@@ -11,7 +11,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 __author__ = 'sebastian'
 
 # Loads some names from config.yaml
-with open("config/config.yaml", 'r') as cfgyaml:
+with open("ranking_table_tennis/config/config.yaml", 'r') as cfgyaml:
     try:
         cfg = yaml.load(cfgyaml)
     except yaml.YAMLError as exc:
