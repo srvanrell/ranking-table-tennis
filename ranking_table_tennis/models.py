@@ -48,8 +48,8 @@ expected_result_table = load_csv(config_folder + "expected_result.csv")
 unexpected_result_table = load_csv(config_folder + "unexpected_result.csv")
 
 # points to be assigned by round and by participation
-raw_bonus_table = load_csv(config_folder + "puntos_por_ronda.csv", first_row=0)
-raw_participation_points = load_csv(config_folder + "puntos_por_participar.csv")
+raw_bonus_table = load_csv(config_folder + "points_per_round.csv", first_row=0)
+raw_participation_points = load_csv(config_folder + "participation_points.csv")
 
 categories = raw_bonus_table[0][2:]
 bonus_rounds_points = {}
