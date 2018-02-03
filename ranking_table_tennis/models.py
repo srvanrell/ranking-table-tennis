@@ -252,6 +252,20 @@ class Ranking:
 
         return [points_to_winner, points_to_loser]
 
+    @staticmethod
+    def _get_factor(rating_winner, rating_loser, category_winner, category_loser):
+        """Returns factor for rating computation. It considers given winner and loser category."""
+        rating_diff = rating_winner - rating_loser
+        category_factor = 1.0
+        if category_winner != category_loser:
+            category_factor = cfg["aux"]["category expected factor"]
+            if rating_diff < 0:
+                category_factor = cfg["aux"]["category unexpected factor"]
+
+        factor = cfg["aux"]["rating factor"] * category_factor
+
+        return factor
+
     def compute_new_ratings(self, old_ranking, matches):
         """return assigned points per match
         (a list containing [winner_pid, loser_pid, points_to_winner, points_to_loser])"""
@@ -261,11 +275,12 @@ class Ranking:
 
         # List of points assigned in each match
         assigned_points = []
-        factor = cfg["aux"]["rating factor"]
 
         for winner_pid, loser_pid, unused, unused2 in matches:
             [to_winner, to_loser] = self._points_to_assign(old_ranking[winner_pid].rating,
                                                            old_ranking[loser_pid].rating)
+            factor = self._get_factor(old_ranking[winner_pid].rating, old_ranking[loser_pid].rating,
+                                      old_ranking[winner_pid].category, old_ranking[loser_pid].category)
             to_winner = factor*to_winner
             to_loser = min(self[loser_pid].rating, factor*to_loser)
             self[winner_pid].rating += to_winner
