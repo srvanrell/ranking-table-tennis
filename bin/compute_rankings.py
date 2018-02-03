@@ -97,10 +97,7 @@ for tid in tids:
         if match.winner_name == cfg["aux"]["flag promotion"]:
             new_ranking[players.get_pid(match.loser_name)].category = match.category
 
-    if tid == 1:
-        new_ranking.update_categories(n_first=12, n_second=16)
-    else:
-        new_ranking.update_categories(n_first=10, n_second=10)
+    new_ranking.update_categories(n_first=10, n_second=10)
 
     # Saving new ranking
     utils.save_ranking_sheet(tournament_sheetname, new_ranking, players)
