@@ -4,11 +4,14 @@ import yaml
 import ast
 
 # Loads some names from config.yaml
-with open("ranking_table_tennis/config/config.yaml", 'r') as cfgyaml:
+with open(os.path.dirname(__file__) + "/config/config.yaml", 'r') as cfgyaml:
     try:
         cfg = yaml.load(cfgyaml)
     except yaml.YAMLError as exc:
         print(exc)
+
+if not os.path.exists(cfg["io"]["data_folder"]):
+    os.mkdir(cfg["io"]["data_folder"])
 
 
 def save_csv(filename, headers, list_to_save):

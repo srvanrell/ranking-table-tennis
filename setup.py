@@ -1,10 +1,15 @@
 from setuptools import setup
 
+
+def readme():
+    with open('README.rst') as f:
+        return f.read()
+
 setup(name='ranking_table_tennis',
-      version='0.2',
+      version='2017.2',
       description='A ranking table tennis system',
       url='http://github.com/srvanrell/ranking-table-tennis',
-      author='Sebastián Vanrell',
+      author='Sebastian Vanrell',
       author_email='srvanrell@gmail.com',
       license='MIT',
       packages=['ranking_table_tennis'],
