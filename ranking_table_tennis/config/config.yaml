@@ -44,7 +44,6 @@ labels:
     Difference: Diferencia
     tid: ID torneo
 
-    
 activeplayer:
     True: activo
     False: inactivo
@@ -63,3 +62,6 @@ aux:
     rating factor: 2.0
     category expected factor: 0.5
     category unexpected factor: 2.0
+    tournament window to activate: 6
+    tournaments to activate: 2
+    tournament window to inactivate: 5

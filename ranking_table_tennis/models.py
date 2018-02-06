@@ -316,21 +316,26 @@ class Ranking:
 
     def update_active_players(self, players, initial_active_players):
         # Avoid activate or inactivate players after the first tournament.
-        if self.tid > 1:
-            for re in self:
-                last_three = [tid for tid in players[re.pid].played_tournaments() if self.tid >= tid > self.tid - 3]
-                # Add initial active players if it is the second tournament
-                if self.tid == 2 and re.pid in initial_active_players:
-                    last_three = [0] + last_three
+        activate_window = cfg["aux"]["tournament window to activate"]
+        tourns_to_activate = cfg["aux"]["tournaments to activate"]
+        inactivate_window = cfg["aux"]["tournament window to inactivate"]
 
-                if not re.active:
-                    # activate if he has played two of three tournaments
-                    active = len(last_three) >= 2
+        for re in self:
+            if not re.active:
+                last_tourns = [tid for tid in players[re.pid].played_tournaments()
+                               if self.tid >= tid > self.tid - activate_window]
+                # activate if he has played at least tourns_to_activate tournaments
+                active = len(last_tourns) >= tourns_to_activate
+            else:
+                last_tourns = [tid for tid in players[re.pid].played_tournaments()
+                               if self.tid >= tid > self.tid - inactivate_window]
+                # don't inactivate during tournaments window if it is an initial active player
+                if self.tid < inactivate_window and re.pid in initial_active_players:
+                    active = True
                 else:
-                    # inactivate if two or more tournaments has passed since his last participation
-                    active = last_three[-1] >= self.tid - 1
+                    active = len(last_tourns) > 0
 
-                self[re.pid].active = active
+            self[re.pid].active = active
 
     def update_categories(self, n_first=10, n_second=10):
         """ Players are ranked based on rating and their active state.

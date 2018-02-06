@@ -75,7 +75,6 @@ for tid in tids:
             matches.append([players.get_pid(match.winner_name), players.get_pid(match.loser_name),
                             match.round, match.category])
 
-    # TODO make a better way to copy models
     new_ranking = models.Ranking(tournament.name, tournament.date, tournament.location, tid)
     assigned_points_per_match = new_ranking.compute_new_ratings(old_ranking, matches)
     assigned_points_per_best_round = new_ranking.compute_bonus_points(best_rounds)
