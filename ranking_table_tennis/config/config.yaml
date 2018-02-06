@@ -61,7 +61,7 @@ aux:
     flag promotion: promotion
     rating factor: 2.0
     category expected factor: 0.5
-    category unexpected factor: 2.0
-    tournament window to activate: 6
+    category unexpected factor: 1.5
+    tournament window to activate: 4
     tournaments to activate: 2
-    tournament window to inactivate: 5
+    tournament window to inactivate: 4
