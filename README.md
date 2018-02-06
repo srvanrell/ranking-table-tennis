@@ -21,6 +21,10 @@ System-wide installation
 Single-user installation (recommended)
 
     pip3 install --user ranking-table-tennis
+    
+Uninstallation
+
+    [sudo] pip3 uninstall ranking-table-tennis
 
 ## Usage
 
@@ -47,9 +51,10 @@ The outcome will be saved in a new spreadsheet.
 
 ## Development
 
-Install locally from project folder   
+Install locally from source (source directory will immediately affect the installed package
+without needing to re-install): 
     
-    pip3 install --user --upgrade --no-deps --force-reinstall .
+    pip3 install --user --editable .
     
 Update version at `setup.py` and then create a source distribution
 
