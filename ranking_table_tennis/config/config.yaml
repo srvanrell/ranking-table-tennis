@@ -1,11 +1,11 @@
 io:
     data_folder: data/
-    tournaments_filename: Liga Dos Orillas 2018 prueba - Partidos.xlsx
-    rankings_filename: Liga Dos Orillas 2018 prueba - Rankings Crudos.xlsx
+    tournaments_filename: Liga Dos Orillas 2018 - Partidos.xlsx
+    rankings_filename: Liga Dos Orillas 2018 - Rankings Crudos.xlsx
     log_filename: log.xlsx
-    publish_filename: Torneo NN para publicar.xlsx
-    tournaments_gdrive: https://docs.google.com/spreadsheets/d/e/2PACX-1vTWBSRRCCBqtGTcETManYdsM9DMX3Jz6VQTVt5mAMmON8M7cfzZwK0a0CUvvFrFsjW-usKxHw7m_aiV/pub?output=xlsx
-    tournaments_spreadsheet_id: 1dnu-_xGlA-5N-01bZN554l6N-9SD6Ct1UOCJ9tUWXRs
+    publish_filename: Torneo NN 2018 para publicar.xlsx
+    tournaments_gdrive: https://docs.google.com/spreadsheets/d/e/2PACX-1vQmE0tA4iQl-_yY1C3Blq-WbU89gIR_svbwSBj6t2c8Z6w3oGzU3BvHyziY4YR9Ti3V71YDUY-c9qli/pub?output=xlsx
+    tournaments_spreadsheet_id: 1l9Iqr4o0oNUMqA9e1nSh2bZC1Pud43dQ64x6yAOwUd8
     temporal_spreadsheet_id: 1dnu-_xGlA-5N-01bZN554l6N-9SD6Ct1UOCJ9tUWXRs
 
 sheetname:
