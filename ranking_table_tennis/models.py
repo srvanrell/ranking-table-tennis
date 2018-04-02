@@ -2,6 +2,8 @@ import os
 import csv
 import yaml
 import ast
+import unidecode
+
 
 # Loads some names from config.yaml
 with open(os.path.dirname(__file__) + "/config/config.yaml", 'r') as cfgyaml:
@@ -74,7 +76,7 @@ class Player:
         if history is None:
             history = {}
         self.pid = pid
-        self.name = name
+        self.name = unidecode.unidecode(name)
         self.association = association
         self.city = city
         self.last_tournament = last_tournament
@@ -150,7 +152,8 @@ class PlayersList:
 
     def get_pid(self, name):
         for player in self:
-            if name == player.name:
+            uname = unidecode.unidecode(name)
+            if uname == player.name:
                 return player.pid
         print("WARNING: Unknown player:", name)
         return None
