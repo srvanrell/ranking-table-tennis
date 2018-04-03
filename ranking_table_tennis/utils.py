@@ -2,6 +2,7 @@ import csv
 import os
 import yaml
 from ranking_table_tennis import models
+from ranking_table_tennis.models import cfg
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font, Alignment
 
@@ -9,13 +10,6 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
 __author__ = 'sebastian'
-
-# Loads some names from config.yaml
-with open(os.path.dirname(__file__) + "/config/config.yaml", 'r') as cfgyaml:
-    try:
-        cfg = yaml.load(cfgyaml)
-    except yaml.YAMLError as exc:
-        print(exc)
 
 
 def get_tournament_sheetnames_by_date():
@@ -397,13 +391,15 @@ def publish_details_sheets(sheetname, ranking, upload=False):
 def _get_gc():
     # Drive authorization
     scope = ['https://spreadsheets.google.com/feeds']
-    key_filename = "config/key-for-gspread.json"
+    key_filename = models.user_config_path + "/key-for-gspread.json"
     gc = None
     try:
         credentials = ServiceAccountCredentials.from_json_keyfile_name(key_filename, scope)
         gc = gspread.authorize(credentials)
     except FileNotFoundError:
         print("The .json key file has not been configured. Upload will fail.")
+    except OSError:
+        print("Connection failure. Upload will fail.")
     return gc
 
 
