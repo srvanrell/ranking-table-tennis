@@ -3,10 +3,16 @@ import csv
 import yaml
 import ast
 import unidecode
+import shutil
 
 
 # Loads some names from config.yaml
-with open(os.path.dirname(__file__) + "/config/config.yaml", 'r') as cfgyaml:
+user_config_path = os.path.expanduser("~") + "/.config/ranking_table_tennis"
+
+if not os.path.exists(user_config_path):
+    shutil.copytree(os.path.dirname(__file__) + "/config", user_config_path)
+
+with open(user_config_path + "/config.yaml", 'r') as cfgyaml:
     try:
         cfg = yaml.load(cfgyaml)
     except yaml.YAMLError as exc:
@@ -41,7 +47,7 @@ def load_csv(filename, first_row=1):
 
 # Tables to assign points
 
-config_folder = os.path.dirname(__file__) + "/config/"
+config_folder = user_config_path + "/"
 
 # difference, points to winner, points to loser
 expected_result_table = load_csv(config_folder + "expected_result.csv")
