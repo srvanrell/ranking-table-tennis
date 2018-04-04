@@ -48,17 +48,15 @@ def load_csv(filename, first_row=1):
 
 # Tables to assign points
 
-config_folder = user_config_path + "/"
-
 # difference, points to winner, points to loser
-expected_result_table = load_csv(config_folder + "expected_result.csv")
+expected_result_table = load_csv(user_config_path + "/expected_result.csv")
 
 # negative difference, points to winner, points to loser
-unexpected_result_table = load_csv(config_folder + "unexpected_result.csv")
+unexpected_result_table = load_csv(user_config_path + "/unexpected_result.csv")
 
 # points to be assigned by round and by participation
-raw_bonus_table = load_csv(config_folder + "points_per_round.csv", first_row=0)
-raw_participation_points = load_csv(config_folder + "participation_points.csv")
+raw_bonus_table = load_csv(user_config_path + "/points_per_round.csv", first_row=0)
+raw_participation_points = load_csv(user_config_path + "/participation_points.csv")
 
 categories = raw_bonus_table[0][2:]
 bonus_rounds_points = {}
