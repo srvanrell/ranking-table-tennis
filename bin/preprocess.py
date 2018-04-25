@@ -20,8 +20,8 @@ __author__ = 'sebastian'
 
 xlsx_file = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
 
-retrieve = input("Do you want to retrieve online sheet [YES/no]? (press Enter to continue)\n")
-if retrieve.lower() != "no":
+retrieve = input("Do you want to retrieve online sheet [y/n]? (press Enter to continue)\n")
+if retrieve.lower() != "n":
     print("Downloading and saving %s\n" % xlsx_file)
     request.urlretrieve(cfg["io"]["tournaments_gdrive"], xlsx_file)
 
