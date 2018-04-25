@@ -385,6 +385,8 @@ class Ranking:
 
 class Match:
     def __init__(self, winner_name, loser_name, match_round, category):
+        winner_name = winner_name.strip()
+        loser_name = loser_name.strip()
         self.winner_name = unidecode.unidecode(winner_name)
         self.loser_name = unidecode.unidecode(loser_name)
         self.round = match_round
