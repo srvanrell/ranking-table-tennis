@@ -41,8 +41,8 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames, start=1):
 
     for name in tournament.get_players_names():
         if players.get_pid(name) is None:
-            association = input("Enter the association of %s:\n" % name)
-            city = input("Enter the city of %s:\n" % name)
+            association = input("Enter the association of %s: (optional field)\n" % name)
+            city = input("Enter the city of %s: (optional field)\n" % name)
             # Assign a pid for the new given player and add it to the list
             players.add_new_player(name, association, city)
             print(players[players.get_pid(name)])
