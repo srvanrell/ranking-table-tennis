@@ -21,18 +21,20 @@ System-wide installation
 Single-user installation (recommended)
 
     pip3 install --user ranking-table-tennis
+
+Uninstallation
+
+    [sudo] pip3 uninstall ranking-table-tennis
     
+## Update
+
 System-wide update
 
-    pip3 install -U ranking-table-tennis
+    sudo pip3 install -U ranking-table-tennis
     
 Single-user update (recommended)
 
     pip3 install --user -U ranking-table-tennis
-    
-Uninstallation
-
-    [sudo] pip3 uninstall ranking-table-tennis
 
 ## Usage
 
