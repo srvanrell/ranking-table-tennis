@@ -407,18 +407,29 @@ class Tournament:
     def add_match(self, winner_name, loser_name, match_round, category):
         self.matches.append(Match(winner_name, loser_name, match_round, category))
 
-    def get_players_names(self):
+    def get_players_names(self, category=''):
+        """
+        Return a sorted list of players that played the tournament
+
+        If category is given, the list of players is filtered by category
+        """
         players_set = set()
         for match in self.matches:
-            # workaround to add extra bonus points from match list
-            if match.winner_name not in [cfg["aux"]["flag add bonus"], cfg["aux"]["flag promotion"]]:
-                players_set.add(match.winner_name)
-            players_set.add(match.loser_name)
+            if not category or category == match.category:
+                # workaround to add extra bonus points from match list
+                if match.winner_name not in [cfg["aux"]["flag add bonus"], cfg["aux"]["flag promotion"]]:
+                    players_set.add(match.winner_name)
+                players_set.add(match.loser_name)
         return sorted(list(players_set))
+
+    def get_statistics(self):
+        statistics = {cat: len(self.get_players_names(cat)) for cat in categories}
+        statistics['total'] = len(self.get_players_names())
+        return statistics
 
     def compute_best_rounds(self):
         """
-        return a dictionary with the best round for each player and category
+        Return a dictionary with the best round for each player and category
 
         The keys of the dictionary are tuples like: (category, player_name)
 
