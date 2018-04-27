@@ -10,4 +10,4 @@ Their computation is based on the best rounds reached by players in each tournam
 Rating points aim at tracking the relative skill level of players.
 Their computation is based on the outcomes of one-versus-one matches.
 
-Check github repository for updated documentation
+Check github repository for updated documentation.

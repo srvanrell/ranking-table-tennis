@@ -1,6 +1,5 @@
 import csv
 import os
-import yaml
 from ranking_table_tennis import models
 from ranking_table_tennis.models import cfg
 from openpyxl import Workbook, load_workbook
@@ -407,7 +406,7 @@ def _wb_ws_to_upload(spreadsheet_id, sheetname, num_rows, num_cols):
     print("<<<Saving\t", sheetname, "\tin\t", spreadsheet_id)
     wb, ws = None, None
     gc = _get_gc()
-    #FIXME it should raise an exception to abort uploading
+    # FIXME it should raise an exception to abort uploading
     if gc:
         wb = gc.open_by_key(spreadsheet_id)   
 

@@ -5,6 +5,7 @@ def readme():
     with open('README.rst') as f:
         return f.read()
 
+
 setup(name='ranking_table_tennis',
       version='2018.2',
       description='A ranking table tennis system',

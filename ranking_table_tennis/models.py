@@ -45,6 +45,7 @@ def load_csv(filename, first_row=1):
             list_to_return.append(aux_row)
         return list_to_return[first_row:]
 
+
 # Tables to assign points
 
 config_folder = user_config_path + "/"
