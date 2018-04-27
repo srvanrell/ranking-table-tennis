@@ -383,6 +383,23 @@ class Ranking:
                 if rating <= self[ordered_actives[f][0]].rating:
                     self[pid].category = cat
 
+    def get_pids(self, category=''):
+        """
+        Return a list of pids that may be filtered by category
+
+        If no parameter is given, it won't filter the list
+        :param category: It should be a known category
+        :return:
+        """
+        #TODO it should consider active, inactive or both
+        pids = [p.pid for p in self if (not category or p.category == category)]
+        return pids
+
+    def get_statistics(self):
+        statistics = {cat: len(self.get_pids(cat)) for cat in categories}
+        statistics['total'] = len(self.get_pids())
+        return statistics
+
 
 class Match:
     def __init__(self, winner_name, loser_name, match_round, category):

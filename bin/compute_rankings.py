@@ -125,3 +125,7 @@ for tid in tids:
                                                            cfg["sheetname"]["bonus_details_key"]),
                               [cfg["labels"][key] for key in ["Player", "Bonus Points", "Best Round", "Category"]],
                               points_log_to_save + participation_points_log_to_save)
+
+    # Testing statistics of tournament and ranking
+    print("This tournament:", tournament.get_statistics())
+    print("Updated ranking:", new_ranking.get_statistics())

@@ -71,8 +71,6 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames, start=1):
     # Also, best rounds reached in each category are saved into corresponding history
     players.update_histories(tid, best_rounds)
 
-    print(tournament.get_statistics())
-
 # Update the online version
 answer = input("\nDo you want to update online sheets [y/n]? (press Enter to continue)\n")
 upload = answer.lower() != "n"
