@@ -163,9 +163,12 @@ def load_ranking_sheet(sheetname):
         filename = cfg["io"]["data_folder"] + cfg["io"]["rankings_filename"]
         sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["rankings_key"])
 
-    # TODO check if date is being read properly
     raw_ranking = load_sheet_workbook(filename, sheetname, first_row=0)
-    ranking = models.Ranking(raw_ranking[0][1], raw_ranking[1][1], raw_ranking[2][1], raw_ranking[3][1])
+    name = raw_ranking[0][1]
+    date = str(raw_ranking[1][1])
+    location = raw_ranking[2][1]
+    tid = raw_ranking[3][1]
+    ranking = models.Ranking(name, date, location, tid)
     ranking.load_list([[rr[0], rr[1], rr[2], rr[3] == cfg["activeplayer"][True], rr[4]] for rr in raw_ranking[5:]])
 
     return ranking
@@ -198,7 +201,7 @@ def load_tournament_list(tournament_list):
     player1, player2, sets1, sets2, match_round, category
     """
     name = tournament_list[0][1]
-    date = tournament_list[1][1]
+    date = str(tournament_list[1][1])
     location = tournament_list[2][1]
 
     tournament = models.Tournament(name, date, location)
@@ -432,7 +435,7 @@ def upload_sheet(spreadsheet_id, sheetname, headers, rows_to_save):
         return
 
     # Concatenation of all cells values to be updated in batch mode
-    cell_list = ws.range("A1:" + ws.get_addr_int(row=num_rows, col=num_cols))
+    cell_list = ws.range("A1:" + gspread.utils.rowcol_to_a1(row=num_rows, col=num_cols))
     for i, value in enumerate(headers + [v for row in rows_to_save for v in row]):
         cell_list[i].value = value
 
@@ -469,7 +472,7 @@ def upload_ranking_sheet(sheetname, ranking, players):
         ws.update_acell("B4", ranking.tid)
 
         # Concatenation of all cells values to be updated in batch mode
-        cell_list = ws.range("A5:" + ws.get_addr_int(row=num_rows, col=num_cols))
+        cell_list = ws.range("A5:" + gspread.utils.rowcol_to_a1(row=num_rows, col=num_cols))
         for i, value in enumerate(headers + [v for row in list_to_save for v in row]):
             cell_list[i].value = value
 
