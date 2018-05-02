@@ -390,6 +390,29 @@ def publish_details_sheets(sheetname, ranking, upload=False):
         load_and_upload_sheet(output_xlsx, bonus_details_sheetname, cfg["io"]["temporal_spreadsheet_id"])
 
 
+def save_statistics(sheetname, tournament, ranking):
+    # Testing statistics of tournament and ranking
+    log_xlsx = cfg["io"]["data_folder"] + cfg["io"]["log_filename"]
+
+    stats_sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"],
+                                        cfg["sheetname"]["statistics_key"])
+
+    t_stats = tournament.get_statistics()
+    r_stats = ranking.get_statistics()
+
+    labels = ['total'] + models.categories
+    headers = ["tid", "description"] + labels
+    data_to_save = [[ranking.tid, "tournament participation"] + [t_stats[k] for k in labels],
+                    [ranking.tid, "ranked players"] + [r_stats['all'][k] for k in labels],
+                    [ranking.tid, "ranked active"] + [r_stats['active'][k] for k in labels],
+                    [ranking.tid, "ranked inactive"] + [r_stats['inactive'][k] for k in labels]]
+
+    save_sheet_workbook(log_xlsx,
+                        stats_sheetname,
+                        headers,
+                        data_to_save)
+
+
 def _get_gc():
     # Drive authorization
     scope = ['https://spreadsheets.google.com/feeds']

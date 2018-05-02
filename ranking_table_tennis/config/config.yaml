@@ -17,6 +17,7 @@ sheetname:
     rankings_key: Ranking
     histories: Historiales
     championship_key: Campeonato
+    statistics_key: Estadisticas
 
 labels:
     PID: PID

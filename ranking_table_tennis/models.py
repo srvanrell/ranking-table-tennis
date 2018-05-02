@@ -381,21 +381,35 @@ class Ranking:
                 if rating <= self[ordered_actives[f][0]].rating:
                     self[pid].category = cat
 
-    def get_pids(self, category=''):
+    def get_pids(self, category='', status='all'):
         """
         Return a list of pids that may be filtered by category
 
         If no parameter is given, it won't filter the list
         :param category: It should be a known category
+        :param status: valid options are 'all' (default), 'active' or 'inactive'
         :return:
         """
         #TODO it should consider active, inactive or both
         pids = [p.pid for p in self if (not category or p.category == category)]
+        if status == 'active':
+            pids = [p.pid for p in self if (not category or p.category == category) and p.active]
+        elif status == 'inactive':
+            pids = [p.pid for p in self if (not category or p.category == category) and not p.active]
+
         return pids
 
     def get_statistics(self):
-        statistics = {cat: len(self.get_pids(cat)) for cat in categories}
-        statistics['total'] = len(self.get_pids())
+        """
+        Return a dictionary of dictionaries that summarizes the number of players
+        by active status and category
+        :return:
+        """
+        statistics = {}
+        for status in ['all', 'active', 'inactive']:
+            statistics_aux = {cat: len(self.get_pids(cat, status)) for cat in categories}
+            statistics_aux['total'] = len(self.get_pids(status=status))
+            statistics[status] = statistics_aux
         return statistics
 
 
@@ -438,6 +452,12 @@ class Tournament:
         return sorted(list(players_set))
 
     def get_statistics(self):
+        """
+        Return a dictionary with the number of players by category.
+
+        Category names and 'total' are the keys
+        :return:
+        """
         statistics = {cat: len(self.get_players_names(cat)) for cat in categories}
         statistics['total'] = len(self.get_players_names())
         return statistics
