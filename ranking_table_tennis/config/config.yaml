@@ -59,6 +59,7 @@ roundnames:
 
 aux:
     flag add bonus: to_add_bonus_points
+    sanction factor: 1.0
     flag promotion: promotion
     rating factor: 2.0
     category expected factor: 0.5
