@@ -98,8 +98,8 @@ for tid in tids:
             new_ranking[players.get_pid(match.loser_name)].category = match.category
         if match.winner_name == cfg["aux"]["flag add bonus"]:
             pid_bonus = players.get_pid(match.loser_name)
-            new_bonus = new_ranking[pid_bonus]
-            old_bonus = old_ranking[pid_bonus]
+            new_bonus = new_ranking[pid_bonus].bonus
+            old_bonus = old_ranking[pid_bonus].bonus
             new_ranking[pid_bonus].bonus = old_bonus + (new_bonus - old_bonus) * cfg["aux"]["sanction factor"]
 
     new_ranking.update_categories(n_first=10, n_second=10)
