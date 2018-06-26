@@ -60,7 +60,8 @@ utils.publish_details_sheets(tournament_sheetname, ranking, upload=upload)
 utils.publish_histories_sheet(ranking, players, tournament_sheetnames, upload=upload)
 
 # Testing publshing initial_ranking
-utils.publish_rating_sheet(tournament_sheetname, initial_ranking, players, initial_ranking, upload=upload)
+# TODO it's not working
+#utils.publish_rating_sheet(tournament_sheetname, initial_ranking, players, initial_ranking, upload=upload)
 
 # Testing statistics publishing
 utils.publish_statistics_sheet(tournament_sheetname, ranking, upload=upload)
