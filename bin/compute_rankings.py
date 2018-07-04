@@ -102,7 +102,11 @@ for tid in tids:
             old_bonus = old_ranking[pid_bonus].bonus
             new_ranking[pid_bonus].bonus = old_bonus + (new_bonus - old_bonus) * cfg["aux"]["sanction factor"]
 
-    new_ranking.update_categories(n_first=10, n_second=10)
+    # TODO threshold and tid limit may need to be read from config file
+    if tid < 6:
+        new_ranking.update_categories(n_first=10, n_second=10)
+    else:
+        new_ranking.update_categories_thresholds(th_first=500, th_second=250)
 
     # Saving new ranking
     utils.save_ranking_sheet(tournament_sheetname, new_ranking, players)

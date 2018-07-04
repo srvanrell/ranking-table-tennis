@@ -381,6 +381,29 @@ class Ranking:
                 if rating <= self[ordered_actives[f][0]].rating:
                     self[pid].category = cat
 
+    def update_categories_thresholds(self, th_first=500, th_second=250):
+        """ Players are ranked based on rating and given thresholds.
+
+        Players are ordered by rating and then assigned to a category
+
+        Example:
+        - rating >= 500        -> first category
+        - 500 > rating >= 250  -> second category
+        - 250 > rating         -> third category
+        """
+        players_to_order = [[e.pid, e.rating, e.active, e.category] for e in self
+                            if not e.category == categories[3]]
+
+        ordered_players = sorted(players_to_order, key=lambda k: (k[2], k[1]), reverse=True)
+
+        for pid, rating, active, category in ordered_players:
+            if rating >= th_first:
+                self[pid].category = categories[0]
+            if th_first > rating >= th_second:
+                self[pid].category = categories[1]
+            if th_second > rating:
+                self[pid].category = categories[2]
+
     def get_pids(self, category='', status='all'):
         """
         Return a list of pids that may be filtered by category
