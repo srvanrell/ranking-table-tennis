@@ -261,11 +261,12 @@ class Ranking:
         return [points_to_winner, points_to_loser]
 
     @staticmethod
-    def _get_factor(rating_winner, rating_loser, category_winner, category_loser):
-        """Returns factor for rating computation. It considers given winner and loser category."""
+    def _get_factor(rating_winner, rating_loser, category_winner, category_loser, not_own_category):
+        """Returns factor for rating computation. It considers given winner and loser category.
+        Players must play their own category """
         rating_diff = rating_winner - rating_loser
         category_factor = 1.0
-        if category_winner != category_loser:
+        if category_winner != category_loser and not not_own_category:
             category_factor = cfg["aux"]["category expected factor"]
             if rating_diff < 0:
                 category_factor = cfg["aux"]["category unexpected factor"]
@@ -274,7 +275,7 @@ class Ranking:
 
         return factor
 
-    def compute_new_ratings(self, old_ranking, matches):
+    def compute_new_ratings(self, old_ranking, matches, pid_not_own_category):
         """return assigned points per match
         (a list containing [winner_pid, loser_pid, points_to_winner, points_to_loser])"""
         # TODO make a better way to copy a ranking object
@@ -288,7 +289,8 @@ class Ranking:
             [to_winner, to_loser] = self._points_to_assign(old_ranking[winner_pid].rating,
                                                            old_ranking[loser_pid].rating)
             factor = self._get_factor(old_ranking[winner_pid].rating, old_ranking[loser_pid].rating,
-                                      old_ranking[winner_pid].category, old_ranking[loser_pid].category)
+                                      old_ranking[winner_pid].category, old_ranking[loser_pid].category,
+                                      winner_pid in pid_not_own_category or loser_pid in pid_not_own_category)
             to_winner = factor*to_winner
             to_loser = min(self[loser_pid].rating, factor*to_loser)
             self[winner_pid].rating += to_winner

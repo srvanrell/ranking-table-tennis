@@ -67,6 +67,20 @@ for tid in tids:
     best_rounds = {(categ, players.get_pid(name)): aux_best_rounds[categ, name]
                    for categ, name in aux_best_rounds.keys()}
 
+    # List of players that didn't play its own category but plyed the higher one
+    # Fans category is not considered in this list
+    # TODO tid limit may need to be read from config file
+    pid_not_own_category = []
+    if tid > 5:
+        pid_not_own_category = [pid for pid in pid_participation_list
+                                if (old_ranking[pid].category, pid) not in best_rounds
+                                and old_ranking[pid].category != models.categories[-1]]
+    # FIXME printing for debugging
+    if pid_not_own_category:
+        print("\nPlayers that didn't played their own category were identified\n")
+    for pid in pid_not_own_category:
+        print(tid, old_ranking[pid], players[pid])
+
     # Creating matches list with pid
     matches = []
     for match in tournament.matches:
@@ -76,7 +90,7 @@ for tid in tids:
                             match.round, match.category])
 
     new_ranking = models.Ranking(tournament.name, tournament.date, tournament.location, tid)
-    assigned_points_per_match = new_ranking.compute_new_ratings(old_ranking, matches)
+    assigned_points_per_match = new_ranking.compute_new_ratings(old_ranking, matches, pid_not_own_category)
     assigned_points_per_best_round = new_ranking.compute_bonus_points(best_rounds)
     assigned_participation_points = new_ranking.add_participation_points(pid_participation_list)
 
