@@ -19,20 +19,21 @@ class PostDevelopCommand(develop):
         develop.run(self)
 
 # Loads some names from config.yaml
-user_config_path = os.path.expanduser("~") + "/.config/ranking_table_tennis"
+user_config_path = os.path.expanduser("~") + "/.config/ranking_table_tennis/config.yaml"
 
 
 class PostInstallCommand(install):
     """Post-installation for installation mode."""
     def run(self):
         # PUT YOUR POST-INSTALL SCRIPT HERE or CALL A FUNCTION
+        import ranking_table_tennis as rtt
         # check_call("cp ranking_table_tennis/config/config.yaml ~/.config/ranking_table_tennis/config.yaml".split())
-        shutil.copytree(os.path.dirname(__file__) + "/config", user_config_path)
+        shutil.copy(os.path.dirname(rtt.__file__) + "/config/config.yaml", user_config_path)
         install.run(self)
 
 
 setup(name='ranking_table_tennis',
-      version='2018.4',
+      version='2018.4.1',
       description='A ranking table tennis system',
       url='http://github.com/srvanrell/ranking-table-tennis',
       author='Sebastian Vanrell',
