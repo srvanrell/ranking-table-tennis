@@ -4,6 +4,8 @@ from ranking_table_tennis import utils
 from ranking_table_tennis import models
 from ranking_table_tennis.models import cfg
 from urllib import request
+import pickle
+import os
 
 __author__ = 'sebastian'
 
@@ -35,17 +37,40 @@ players.load_list(utils.load_players_sheet())
 # Loading initial ranking and adding new players with 0
 ranking = utils.load_ranking_sheet(cfg["sheetname"]["initial_ranking"])
 
+# Loading temp ranking and players. It will be deleted after a successful preprocessing
+# FIXME this should be done in a single function inside utils
+players_temp_file = 'temp_players.pickle'
+ranking_temp = models.Ranking()
+print("\nDebugging version\n")
+if os.path.exists(players_temp_file):
+    with open(players_temp_file, 'rb') as f:
+        print(">Reading\t\tTemp list of players\t\tResuming preprocessing :)")
+        players_temp = pickle.load(f)
+else:
+    players_temp = models.PlayersList()
+
 for tid, tournament_sheetname in enumerate(tournament_sheetnames, start=1):
     # Loading tournament info
     tournament = utils.load_tournament_xlsx(tournament_sheetname)
 
     for name in tournament.get_players_names():
         if players.get_pid(name) is None:
-            association = input("Enter the association of %s: (optional field)\n" % name)
-            city = input("Enter the city of %s: (optional field)\n" % name)
-            # Assign a pid for the new given player and add it to the list
-            players.add_new_player(name, association, city)
+            if players_temp.get_pid(name) is None:
+                association = input("Enter the association of %s: (optional field)\n" % name)
+                city = input("Enter the city of %s: (optional field)\n" % name)
+                # Assign a pid for the new given player and add it to the list
+                players.add_new_player(name, association, city)
+                # Save a temp player to resume preprocessing, if necessary
+                players_temp.add_player(players[players.get_pid(name)])
+            else:
+                print(">>>>\tUNCOMPLETE preprocessing detected. Trying to resume from", players_temp_file)
+                players.add_player(players_temp[players_temp.get_pid(name)])
             print(players[players.get_pid(name)])
+
+        # TODO save temp ranking and players
+        with open(players_temp_file, 'wb') as f:
+            # Pickle the 'data' dictionary using the highest protocol available.
+            pickle.dump(players_temp, f, pickle.HIGHEST_PROTOCOL)
 
         pid = players.get_pid(name)
 
@@ -53,13 +78,17 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames, start=1):
             initial_rating = int(input("Enter the initial rating points for %s:\n" % name))
             ranking.add_new_entry(pid, initial_rating)
             print(ranking[pid])
+            # Save a temp ranking of the player to resume preprocessing, if necessary
+            ranking_temp.add_entry(ranking[pid])
 
         if ranking[pid].category is "":
             for option, category in enumerate(models.categories, start=1):
-                print("\n%d\t->\t%s" % (option, category))
+                print("%d\t->\t%s" % (option, category))
             selected_category = int(input("Enter the initial category (look above) for %s:\n" % name))
             ranking[pid].category = models.categories[selected_category-1]
             print(ranking[pid])
+            # Save a temp ranking of the player to resume preprocessing, if necessary
+            ranking_temp[pid].category = ranking[pid].category
 
     # Get the best round for each player in each category
     # Formatted like: best_rounds[(category, pid)] = best_round_value
