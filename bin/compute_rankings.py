@@ -72,6 +72,9 @@ for tid in tids:
     # TODO tid limit may need to be read from config file
     pid_not_own_category = []
     if tid > 5:
+        # Old ranking need to be updated so known old players are not misclassified
+        if tid > 6:
+            old_ranking.update_categories_thresholds(th_first=500, th_second=250)
         pid_not_own_category = [pid for pid in pid_participation_list
                                 if (old_ranking[pid].category, pid) not in best_rounds
                                 and old_ranking[pid].category != models.categories[-1]]
