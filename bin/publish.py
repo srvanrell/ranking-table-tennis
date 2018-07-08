@@ -44,8 +44,8 @@ for entry in ranking:
     if old_ranking.get_entry(entry.pid) is None:
         old_ranking.add_entry(initial_ranking[entry.pid])
 
-answer = input("\nDo you want to publish to temporal online sheets [YES/no]? (press Enter to continue)\n")
-upload = answer.lower() != "no"
+answer = input("\nDo you want to publish to temporal online sheets [y/n]? (press Enter to continue)\n")
+upload = answer.lower() != "n"
 
 # Publish formated rating of selected tournament
 utils.publish_rating_sheet(tournament_sheetname, ranking, players, old_ranking, upload=upload)
