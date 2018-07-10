@@ -84,7 +84,7 @@ for tid in tids:
     # Creating matches list with pid
     matches = []
     for match in tournament.matches:
-        if match.winner_name not in [cfg["aux"]["flag add bonus"], cfg["aux"]["flag promotion"]] \
+        if match.winner_name not in [cfg["aux"]["flag bonus sanction"], cfg["aux"]["flag add bonus"], cfg["aux"]["flag promotion"]] \
                 and match.category != models.categories[-1]:
             matches.append([players.get_pid(match.winner_name), players.get_pid(match.loser_name),
                             match.round, match.category])
@@ -110,7 +110,7 @@ for tid in tids:
     for match in tournament.matches:
         if match.winner_name == cfg["aux"]["flag promotion"]:
             new_ranking[players.get_pid(match.loser_name)].category = match.category
-        if match.winner_name == cfg["aux"]["flag add bonus"]:
+        if match.winner_name == cfg["aux"]["flag bonus sanction"]:
             pid_bonus = players.get_pid(match.loser_name)
             new_bonus = new_ranking[pid_bonus].bonus
             old_bonus = old_ranking[pid_bonus].bonus

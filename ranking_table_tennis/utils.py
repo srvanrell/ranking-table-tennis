@@ -212,6 +212,9 @@ def load_tournament_list(tournament_list):
         if int(sets1) >= 10 and int(sets2) >= 10:
             winner_name = cfg["aux"]["flag promotion"]
             loser_name = player2
+        elif int(sets1) <= -10 and int(sets2) <= -10:
+            winner_name = cfg["aux"]["flag bonus sanction"]
+            loser_name = player2
         elif int(sets1) < 0 and int(sets2) < 0:
             winner_name = cfg["aux"]["flag add bonus"]
             loser_name = player2
