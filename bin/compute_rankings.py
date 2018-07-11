@@ -119,6 +119,16 @@ for tid in tids:
             old_bonus = old_ranking[pid_bonus].bonus
             new_ranking[pid_bonus].bonus = old_bonus + (new_bonus - old_bonus) * cfg["aux"]["sanction factor"]
 
+            # list_item == [pid, points, best_round, category]
+            for list_item in assigned_points_per_best_round:
+                if list_item[0] == pid_bonus:
+                    list_item[1] *= cfg["aux"]["sanction factor"]
+
+            # list_item == [pid, points]
+            for list_item in assigned_participation_points:
+                if list_item[0] == pid_bonus:
+                    list_item[1] *= cfg["aux"]["sanction factor"]
+
     # TODO threshold and tid limit may need to be read from config file
     if tid < 6:
         new_ranking.update_categories(n_first=10, n_second=10)
