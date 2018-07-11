@@ -415,7 +415,7 @@ class Ranking:
         :param status: valid options are 'all' (default), 'active' or 'inactive'
         :return:
         """
-        #TODO it should consider active, inactive or both
+        # TODO it should consider active, inactive or both
         pids = [p.pid for p in self if (not category or p.category == category)]
         if status == 'active':
             pids = [p.pid for p in self if (not category or p.category == category) and p.active]
@@ -471,7 +471,8 @@ class Tournament:
         for match in self.matches:
             if not category or category == match.category:
                 # workaround to add extra bonus points from match list
-                if match.winner_name not in [cfg["aux"]["flag bonus sanction"], cfg["aux"]["flag add bonus"], cfg["aux"]["flag promotion"]]:
+                if match.winner_name not in [cfg["aux"]["flag bonus sanction"], cfg["aux"]["flag add bonus"],
+                                             cfg["aux"]["flag promotion"]]:
                     players_set.add(match.winner_name)
                 players_set.add(match.loser_name)
         return sorted(list(players_set))
