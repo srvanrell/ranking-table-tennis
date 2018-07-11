@@ -131,14 +131,17 @@ for tid in tids:
     # Saving points assigned in each match
     points_log_to_save = [[players[winner_pid].name + " (%d)" % old_ranking[winner_pid].rating,
                            players[loser_pid].name + " (%d)" % old_ranking[loser_pid].rating,
-                           old_ranking[winner_pid].rating - old_ranking[loser_pid].rating, winner_points, loser_points]
-                          for winner_pid, loser_pid, winner_points, loser_points in assigned_points_per_match]
+                           old_ranking[winner_pid].rating - old_ranking[loser_pid].rating, winner_points, loser_points,
+                           match_round, match_category]
+                          for winner_pid, loser_pid, winner_points, loser_points, match_round, match_category
+                          in assigned_points_per_match]
 
     utils.save_sheet_workbook(log_xlsx,
                               tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
                                                            cfg["sheetname"]["rating_details_key"]),
                               [cfg["labels"][key] for key in ["Winner", "Loser", "Difference",
-                                                              "Winner Points", "Loser Points"]],
+                                                              "Winner Points", "Loser Points",
+                                                              "Category", "Category"]],
                               points_log_to_save)
 
     # Saving points assigned per best round reached and for participation
