@@ -152,7 +152,7 @@ for tid in tids:
                                                            cfg["sheetname"]["rating_details_key"]),
                               [cfg["labels"][key] for key in ["Winner", "Loser", "Difference",
                                                               "Winner Points", "Loser Points",
-                                                              "Category", "Category"]],
+                                                              "Round", "Category"]],
                               points_log_to_save)
 
     # Saving points assigned per best round reached and for participation
