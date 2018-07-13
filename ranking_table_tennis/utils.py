@@ -394,6 +394,46 @@ def publish_details_sheets(sheetname, ranking, upload=False):
         load_and_upload_sheet(output_xlsx, bonus_details_sheetname, cfg["io"]["temporal_spreadsheet_id"])
 
 
+def publish_statistics_sheet(sheetname, ranking, upload=False):
+    """ Copy details from log and output details of given tournament"""
+    output_xlsx = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
+    output_xlsx = output_xlsx.replace("NN", "%d" % ranking.tid)
+
+    log_xlsx = cfg["io"]["data_folder"] + cfg["io"]["log_filename"]
+
+    # Saving points assigned in each match
+    statistics_sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"],
+                                             cfg["sheetname"]["statistics_key"])
+    statistics_log_saved = load_sheet_workbook(log_xlsx, statistics_sheetname, first_row=0)
+    save_sheet_workbook(output_xlsx, statistics_sheetname, statistics_log_saved[0], statistics_log_saved[1:])
+
+    if upload:
+        load_and_upload_sheet(output_xlsx, statistics_sheetname, cfg["io"]["temporal_spreadsheet_id"])
+
+
+def save_statistics(sheetname, tournament, ranking):
+    # Testing statistics of tournament and ranking
+    log_xlsx = cfg["io"]["data_folder"] + cfg["io"]["log_filename"]
+
+    stats_sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"],
+                                        cfg["sheetname"]["statistics_key"])
+
+    t_stats = tournament.get_statistics()
+    r_stats = ranking.get_statistics()
+
+    labels = ['total'] + models.categories
+    headers = ["tid", "description"] + labels
+    data_to_save = [[ranking.tid, "tournament participation"] + [t_stats[k] for k in labels],
+                    [ranking.tid, "ranked players"] + [r_stats['all'][k] for k in labels],
+                    [ranking.tid, "ranked active"] + [r_stats['active'][k] for k in labels],
+                    [ranking.tid, "ranked inactive"] + [r_stats['inactive'][k] for k in labels]]
+
+    save_sheet_workbook(log_xlsx,
+                        stats_sheetname,
+                        headers,
+                        data_to_save)
+
+
 def _get_gc():
     # Drive authorization
     scope = ['https://spreadsheets.google.com/feeds']
@@ -437,7 +477,7 @@ def upload_sheet(spreadsheet_id, sheetname, headers, rows_to_save):
         return
 
     # Concatenation of all cells values to be updated in batch mode
-    cell_list = ws.range("A1:" + ws.get_addr_int(row=num_rows, col=num_cols))
+    cell_list = ws.range("A1:" + gspread.utils.rowcol_to_a1(row=num_rows, col=num_cols))
     for i, value in enumerate(headers + [v for row in rows_to_save for v in row]):
         cell_list[i].value = value
 
@@ -474,7 +514,7 @@ def upload_ranking_sheet(sheetname, ranking, players):
         ws.update_acell("B4", ranking.tid)
 
         # Concatenation of all cells values to be updated in batch mode
-        cell_list = ws.range("A5:" + ws.get_addr_int(row=num_rows, col=num_cols))
+        cell_list = ws.range("A5:" + gspread.utils.rowcol_to_a1(row=num_rows, col=num_cols))
         for i, value in enumerate(headers + [v for row in list_to_save for v in row]):
             cell_list[i].value = value
 

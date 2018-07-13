@@ -353,6 +353,37 @@ class Ranking:
                 if rating <= self[ordered_actives[f][0]].rating:
                     self[pid].category = cat
 
+    def get_pids(self, category='', status='all'):
+        """
+        Return a list of pids that may be filtered by category
+
+        If no parameter is given, it won't filter the list
+        :param category: It should be a known category
+        :param status: valid options are 'all' (default), 'active' or 'inactive'
+        :return:
+        """
+        # TODO it should consider active, inactive or both
+        pids = [p.pid for p in self if (not category or p.category == category)]
+        if status == 'active':
+            pids = [p.pid for p in self if (not category or p.category == category) and p.active]
+        elif status == 'inactive':
+            pids = [p.pid for p in self if (not category or p.category == category) and not p.active]
+
+        return pids
+
+    def get_statistics(self):
+        """
+        Return a dictionary of dictionaries that summarizes the number of players
+        by active status and category
+        :return:
+        """
+        statistics = {}
+        for status in ['all', 'active', 'inactive']:
+            statistics_aux = {cat: len(self.get_pids(cat, status)) for cat in categories}
+            statistics_aux['total'] = len(self.get_pids(status=status))
+            statistics[status] = statistics_aux
+        return statistics
+
 
 class Match:
     def __init__(self, winner_name, loser_name, match_round, category):
@@ -375,18 +406,35 @@ class Tournament:
     def add_match(self, winner_name, loser_name, match_round, category):
         self.matches.append(Match(winner_name, loser_name, match_round, category))
 
-    def get_players_names(self):
+    def get_players_names(self, category=''):
+        """
+        Return a sorted list of players that played the tournament
+
+        If category is given, the list of players is filtered by category
+        """
         players_set = set()
         for match in self.matches:
-            # workaround to add extra bonus points from match list
-            if match.winner_name not in [cfg["aux"]["flag add bonus"], cfg["aux"]["flag promotion"]]:
-                players_set.add(match.winner_name)
-            players_set.add(match.loser_name)
+            if not category or category == match.category:
+                # workaround to add extra bonus points from match list
+                if match.winner_name not in [cfg["aux"]["flag add bonus"], cfg["aux"]["flag promotion"]]:
+                    players_set.add(match.winner_name)
+                players_set.add(match.loser_name)
         return sorted(list(players_set))
+
+    def get_statistics(self):
+        """
+        Return a dictionary with the number of players by category.
+
+        Category names and 'total' are the keys
+        :return:
+        """
+        statistics = {cat: len(self.get_players_names(cat)) for cat in categories}
+        statistics['total'] = len(self.get_players_names())
+        return statistics
 
     def compute_best_rounds(self):
         """
-        return a dictionary with the best round for each player and category
+        Return a dictionary with the best round for each player and category
 
         The keys of the dictionary are tuples like: (category, player_name)
 

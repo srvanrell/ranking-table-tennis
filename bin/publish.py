@@ -58,3 +58,6 @@ utils.publish_details_sheets(tournament_sheetname, ranking, upload=upload)
 
 # Saving complete histories of players
 utils.publish_histories_sheet(ranking, players, tournament_sheetnames, upload=upload)
+
+# Testing statistics publishing
+utils.publish_statistics_sheet(tournament_sheetname, ranking, upload=upload)

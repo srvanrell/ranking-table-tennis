@@ -129,3 +129,5 @@ for tid in tids:
                                                            cfg["sheetname"]["bonus_details_key"]),
                               [cfg["labels"][key] for key in ["Player", "Bonus Points", "Best Round", "Category"]],
                               points_log_to_save + participation_points_log_to_save)
+
+    utils.save_statistics(tournament_sheetname, tournament, new_ranking)

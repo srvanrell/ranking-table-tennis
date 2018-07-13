@@ -6,7 +6,7 @@ def readme():
         return f.read()
 
 setup(name='ranking_table_tennis',
-      version='2017.2',
+      version='2017.3',
       description='A ranking table tennis system',
       url='http://github.com/srvanrell/ranking-table-tennis',
       author='Sebastian Vanrell',
@@ -18,7 +18,7 @@ setup(name='ranking_table_tennis',
                'bin/publish.py'],
       include_package_data=True,
       install_requires=[
-          'gspread==0.6.2',
+          'gspread==3.0.0',
           'oauth2client==4.1.2',
           'PyYAML==3.12',
           'urllib3==1.22',
