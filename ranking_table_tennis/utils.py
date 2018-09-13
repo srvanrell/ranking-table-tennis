@@ -76,14 +76,16 @@ def _bold_and_center(ws, to_bold, to_center):
 def save_sheet_workbook(filename, sheetname, headers, list_to_save, overwrite=True):
     wb, ws = _wb_ws_to_save(filename, sheetname, overwrite)
 
-    ws.append(headers)
+    if headers:
+        ws.append(headers)
     
     for row in list_to_save:
         ws.append(row)
 
-    for col in range(1, ws.max_column+1):
-        cell = ws.cell(column=col, row=1)
-        cell.font = Font(bold=True)
+    if headers:
+        for col in range(1, ws.max_column+1):
+            cell = ws.cell(column=col, row=1)
+            cell.font = Font(bold=True)
 
     wb.save(filename)
 
