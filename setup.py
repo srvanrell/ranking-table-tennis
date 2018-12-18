@@ -45,10 +45,10 @@ setup(name='ranking_table_tennis',
                'bin/publish.py'],
       include_package_data=True,
       install_requires=[
-          'gspread==3.0.0',
+          'gspread==3.1.0',
           'oauth2client==4.1.2',
           'PyYAML==3.12',
-          'urllib3==1.22',
+          'urllib3>=1.23',
           'openpyxl==2.4.2',
           'Unidecode==1.0.22'
       ],
