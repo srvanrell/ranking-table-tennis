@@ -4,6 +4,7 @@ from ranking_table_tennis import models
 from ranking_table_tennis.models import cfg
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font, Alignment
+import pickle
 
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
@@ -530,3 +531,46 @@ def load_and_upload_sheet(filename, sheetname, spreadsheet_id):
     list_to_save = raw_sheet[1:]
 
     upload_sheet(spreadsheet_id, sheetname, headers, list_to_save)
+
+
+def load_temp_players_ranking():
+    """returns players_temp, ranking_temp"""
+    # Loading temp ranking and players. It shuould be deleted after a successful preprocessing
+    players_temp_file = cfg["io"]["players_temp_file"]
+    ranking_temp_file = cfg["io"]["ranking_temp_file"]
+    if os.path.exists(players_temp_file):
+        with open(players_temp_file, 'rb') as f:
+            print(">Reading\tTemp player list\tResume preprocessing from", players_temp_file)
+            players_temp = pickle.load(f)
+    else:
+        players_temp = models.PlayersList()
+    if os.path.exists(ranking_temp_file):
+        with open(ranking_temp_file, 'rb') as f:
+            print(">Reading\tTemp ranking list\tResume preprocessing from", ranking_temp_file)
+            ranking_temp = pickle.load(f)
+    else:
+        ranking_temp = models.Ranking()
+
+    return players_temp, ranking_temp
+
+
+def save_temp_players_ranking(players_temp, ranking_temp):
+    """returns players_temp, ranking_temp"""
+    # Loading temp ranking and players. It shuould be deleted after a successful preprocessing
+    players_temp_file = cfg["io"]["players_temp_file"]
+    ranking_temp_file = cfg["io"]["ranking_temp_file"]
+    print("<Saving\tTemps to resume preprocessing (if necessary)", ranking_temp_file, players_temp_file)
+    with open(players_temp_file, 'wb') as ptf, open(ranking_temp_file, 'wb') as rtf:
+        # Pickle the 'data' dictionary using the highest protocol available.
+        pickle.dump(players_temp, ptf, pickle.HIGHEST_PROTOCOL)
+        pickle.dump(ranking_temp, rtf, pickle.HIGHEST_PROTOCOL)
+
+
+def remove_temp_players_ranking():
+    players_temp_file = cfg["io"]["players_temp_file"]
+    ranking_temp_file = cfg["io"]["ranking_temp_file"]
+    print("Removing temp files created to resume preprocessing", players_temp_file, ranking_temp_file)
+    if os.path.exists(players_temp_file):
+        os.remove(players_temp_file)
+    if os.path.exists(ranking_temp_file):
+        os.remove(ranking_temp_file)
