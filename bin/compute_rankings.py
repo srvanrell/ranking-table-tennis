@@ -60,7 +60,7 @@ for tid in tids:
     # List of players that didn't play its own category but plyed the higher one
     # Fans category is not considered in this list
     # Old ranking need to be updated so known old players are not misclassified
-    old_ranking.update_categories_thresholds(th_first=500, th_second=250)
+    old_ranking.update_categories_thresholds()
     pid_not_own_category = [pid for pid in pid_participation_list
                             if (old_ranking[pid].category, pid) not in best_rounds
                             and old_ranking[pid].category != models.categories[-1]]
@@ -111,8 +111,7 @@ for tid in tids:
                 if list_item[0] == pid_bonus:
                     list_item[1] *= cfg["aux"]["sanction factor"]
 
-    # TODO threshold may need to be read from config file
-    new_ranking.update_categories_thresholds(th_first=500, th_second=250)
+    new_ranking.update_categories_thresholds()
 
     # Saving new ranking
     utils.save_ranking_sheet(tournament_sheetname, new_ranking, players)

@@ -393,6 +393,8 @@ class Ranking:
         - 500 > rating >= 250  -> second category
         - 250 > rating         -> third category
         """
+        th_first = cfg["aux"]["threshold_first"]
+        th_second = cfg["aux"]["threshold_second"]
         players_to_order = [[e.pid, e.rating, e.active, e.category] for e in self
                             if not e.category == categories[3]]
 
