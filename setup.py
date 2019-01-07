@@ -11,15 +11,18 @@ def readme():
         return f.read()
 
 
+# Loads some names from config.yaml
+user_config_path = os.path.expanduser("~") + "/.config/ranking_table_tennis/config.yaml"
+
+
 class PostDevelopCommand(develop):
     """Post-installation for development mode."""
 
     def run(self):
         # PUT YOUR POST-INSTALL SCRIPT HERE or CALL A FUNCTION
+        import ranking_table_tennis as rtt
+        shutil.copy(os.path.dirname(rtt.__file__) + "/config/config.yaml", user_config_path)
         develop.run(self)
-
-# Loads some names from config.yaml
-user_config_path = os.path.expanduser("~") + "/.config/ranking_table_tennis/config.yaml"
 
 
 class PostInstallCommand(install):
