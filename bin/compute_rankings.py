@@ -28,16 +28,8 @@ players.load_list(utils.load_players_sheet())
 # Loading initial ranking
 initial_ranking = utils.load_ranking_sheet(cfg["sheetname"]["initial_ranking"])
 
-# # Ask for the tournament data to be processed
-# print("\n0\t->\tCompute all from the beginning")
-# for tid, tournament_sheetname in enumerate(tournament_sheetnames, start=1):
-#     print("%d\t->\t%s" % (tid, tournament_sheetname))
-# tid = int(input("Enter the tournament to compute (look above):\n"))
-
 # Will compute all rankings from the beginning by default
 tids = range(1, len(tournament_sheetnames)+1)
-# if tid != 0:
-#     tids = [tid]
 
 for tid in tids:
     # Loading tournament info
@@ -51,12 +43,10 @@ for tid in tids:
         old_ranking = utils.load_ranking_sheet(tournament_sheetnames[tid - 2])
 
     # Load initial rankings for new players
-    pid_new_players = []
     for name in tournament.get_players_names():
         pid = players.get_pid(name)
         if old_ranking.get_entry(pid) is None:
             old_ranking.add_entry(initial_ranking[pid])
-            pid_new_players.append(pid)
 
     # Create list of players that partipate in the tournament
     pid_participation_list = [players.get_pid(name) for name in tournament.get_players_names()]
@@ -69,20 +59,11 @@ for tid in tids:
 
     # List of players that didn't play its own category but plyed the higher one
     # Fans category is not considered in this list
-    # TODO tid limit may need to be read from config file
-    pid_not_own_category = []
-    if tid > 5:
-        # Old ranking need to be updated so known old players are not misclassified
-        if tid > 6:
-            old_ranking.update_categories_thresholds(th_first=500, th_second=250)
-        pid_not_own_category = [pid for pid in pid_participation_list
-                                if (old_ranking[pid].category, pid) not in best_rounds
-                                and old_ranking[pid].category != models.categories[-1]]
-    # FIXME printing for debugging
-    if pid_not_own_category:
-        print("\nPlayers that didn't played their own category were identified\n")
-    for pid in pid_not_own_category:
-        print(tid, old_ranking[pid], players[pid])
+    # Old ranking need to be updated so known old players are not misclassified
+    old_ranking.update_categories_thresholds(th_first=500, th_second=250)
+    pid_not_own_category = [pid for pid in pid_participation_list
+                            if (old_ranking[pid].category, pid) not in best_rounds
+                            and old_ranking[pid].category != models.categories[-1]]
 
     # Creating matches list with pid
     matches = []
@@ -130,11 +111,8 @@ for tid in tids:
                 if list_item[0] == pid_bonus:
                     list_item[1] *= cfg["aux"]["sanction factor"]
 
-    # TODO threshold and tid limit may need to be read from config file
-    if tid < 6:
-        new_ranking.update_categories(n_first=10, n_second=10)
-    else:
-        new_ranking.update_categories_thresholds(th_first=500, th_second=250)
+    # TODO threshold may need to be read from config file
+    new_ranking.update_categories_thresholds(th_first=500, th_second=250)
 
     # Saving new ranking
     utils.save_ranking_sheet(tournament_sheetname, new_ranking, players)
