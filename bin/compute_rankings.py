@@ -28,16 +28,16 @@ players.load_list(utils.load_players_sheet())
 # Loading initial ranking
 initial_ranking = utils.load_ranking_sheet(cfg["sheetname"]["initial_ranking"])
 
-# Ask for the tournament data to be processed
-print("\n0\t->\tCompute all from the beginning")
-for tid, tournament_sheetname in enumerate(tournament_sheetnames, start=1):
-    print("%d\t->\t%s" % (tid, tournament_sheetname))
-tid = int(input("Enter the tournament to compute (look above):\n"))
+# # Ask for the tournament data to be processed
+# print("\n0\t->\tCompute all from the beginning")
+# for tid, tournament_sheetname in enumerate(tournament_sheetnames, start=1):
+#     print("%d\t->\t%s" % (tid, tournament_sheetname))
+# tid = int(input("Enter the tournament to compute (look above):\n"))
 
 # Will compute all rankings from the beginning by default
 tids = range(1, len(tournament_sheetnames)+1)
-if tid != 0:
-    tids = [tid]
+# if tid != 0:
+#     tids = [tid]
 
 for tid in tids:
     # Loading tournament info
