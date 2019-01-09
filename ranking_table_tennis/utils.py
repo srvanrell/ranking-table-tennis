@@ -424,7 +424,9 @@ def publish_masters_sheets(sheetname, ranking, upload=False):
     for cat in models.categories:
         masters_sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cat)
         sheet_saved = load_sheet_workbook(log_xlsx, masters_sheetname, first_row=0)
-        save_sheet_workbook(output_xlsx, masters_sheetname, sheet_saved[0], sheet_saved[1:])
+        headers = [cfg["labels"]["Position"]] + sheet_saved[0]
+        data = [[i + 1] + row for i, row in enumerate(sheet_saved[1:])]
+        save_sheet_workbook(output_xlsx, masters_sheetname, headers, data)
 
         if upload:
             load_and_upload_sheet(output_xlsx, masters_sheetname, cfg["io"]["temporal_spreadsheet_id"])
