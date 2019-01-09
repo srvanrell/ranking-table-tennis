@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+
+import argparse
+
+
+def main(cmd):
+    # FIXME calls are not performed in the best way.
+    if cmd == "preprocess":
+        import ranking_table_tennis.preprocess
+    elif cmd == "compute":
+        import ranking_table_tennis.compute_rankings
+    elif cmd == "publish":
+        import ranking_table_tennis.publish
+    else:
+        print("you shouldn't see this message")
+
+
+if __name__ == '__main__':
+    # enter here when executed as a script
+    parser = argparse.ArgumentParser(
+        description="Preprocess, compute, and publish table tennis rankings. "
+                    "Commands must be given in the right order!! They are splitted for usage simplicity.")
+    parser.add_argument("cmd",
+                        help='(1) preprocess: downloads tournament data and preprocess it.\n'
+                             '(2) compute: generates rankings from preprocessed data.\n'
+                             '(3) publish: provides formatted spreadsheets to upload rankings',
+                        choices=["preprocess", "compute", "publish"]
+                        )
+    args = parser.parse_args()
+
+    main(args.cmd)
