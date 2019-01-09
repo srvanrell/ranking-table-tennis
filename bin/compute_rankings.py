@@ -145,3 +145,6 @@ for tid in tids:
                               points_log_to_save + participation_points_log_to_save)
 
     utils.save_statistics(tournament_sheetname, tournament, new_ranking)
+
+# Compute and save masters cup into log
+utils.save_masters_cup()

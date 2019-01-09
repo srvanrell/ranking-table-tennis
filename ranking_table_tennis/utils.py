@@ -4,6 +4,7 @@ from ranking_table_tennis import models
 from ranking_table_tennis.models import cfg
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font, Alignment
+import pandas as pd
 import pickle
 
 import gspread
@@ -574,3 +575,64 @@ def remove_temp_players_ranking():
         os.remove(players_temp_file)
     if os.path.exists(ranking_temp_file):
         os.remove(ranking_temp_file)
+
+
+def save_masters_cup():
+    """
+    Compute and save masters cup up into log
+    :return: None
+    """
+    n_tournaments = cfg["aux"]["masters N tournaments to consider"]
+    n_classified = cfg["aux"]["masters N classified to list"]
+    log_xlsx = cfg["io"]["data_folder"] + cfg["io"]["log_filename"]
+
+    # Labels of columns, just to simplify notation
+    player_col = cfg["labels"]["Player"]
+    category_col = cfg["labels"]["Category"]
+    points_col = cfg["labels"]["Bonus Points"]
+    participations_col = cfg["labels"]["Participations"]
+
+    # Will compute all rankings from the beginning by default
+    tournament_sheetnames = get_tournament_sheetnames_by_date()
+    tids = range(1, len(tournament_sheetnames)+1)
+
+    df = pd.DataFrame()
+
+    for tid in tids:
+        tournament_sheetname = tournament_sheetnames[tid - 1]
+        bonus_log = load_sheet_workbook(log_xlsx,
+                                        tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
+                                                                     cfg["sheetname"]["bonus_details_key"]),
+                                        first_row=1)
+        temp_df = pd.DataFrame([[tid] + j for j in bonus_log],
+                               columns=[cfg["labels"][key] for key in ["Tournament", "Player", "Bonus Points",
+                                                                       "Best Round", "Category"]]
+                               )
+        temp_df = temp_df[temp_df[category_col] != ""]
+        df = df.append(temp_df, ignore_index=True)
+
+        pl_cat_best_n_tour = df[[player_col, category_col, points_col]]
+        if tid > 1:
+            pl_cat_best_n_tour = df.groupby([player_col, category_col])[points_col].nlargest(n_tournaments)
+        pl_cat_cumul = pl_cat_best_n_tour.groupby([player_col, category_col]).sum().reset_index()
+        pl_cat_count = df.groupby([player_col, category_col])[points_col].count().reset_index().rename(
+            columns={points_col: participations_col})
+
+        pl_cat = pd.merge(pl_cat_cumul, pl_cat_count).sort_values(points_col, ascending=False)
+
+        sort_by_point = pl_cat.groupby(category_col, as_index=False).apply(
+            lambda x: pd.DataFrame.nlargest(x, n=n_classified, columns=points_col))
+        # sort_by_count = pl_cat.groupby(category_col, as_index=False).apply(
+        #     lambda x: pd.DataFrame.nlargest(x, n=n_classified, columns=participations_col))
+
+        filename = cfg["io"]["data_folder"] + cfg["io"]["log_filename"]
+        tournament_sheetname = tournament_sheetnames[tid - 1]
+
+        for cat in models.categories:
+            df_cat_by_point = sort_by_point[sort_by_point[category_col] == cat]
+            df_cat_by_point = df_cat_by_point.drop(category_col, axis=1)
+
+            save_sheet_workbook(filename,
+                                tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"], cat),
+                                df_cat_by_point.columns.tolist(),
+                                df_cat_by_point.values.tolist())

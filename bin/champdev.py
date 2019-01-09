@@ -36,7 +36,7 @@ for tid in tids:
     df = df.append(temp_df, ignore_index=True)
 
 N_tournaments = 5
-N_classified = 10
+N_classified = 200
 
 pl_cat_N_tour = df.groupby([player_col, category_col])[points_col].nlargest(N_tournaments)
 
@@ -46,29 +46,19 @@ pl_cat_count = df.groupby([player_col, category_col])[points_col].count().reset_
 
 pl_cat = pd.merge(pl_cat_cumul, pl_cat_count).sort_values(points_col, ascending=False)
 
-pl_cat.to_excel(cfg["io"]["data_folder"] + "Copa Campeonato 2018 - " + str(N_tournaments) + " torneos.xlsx")
-
-# print(pl_cat_cumul.head())
-# print(pl_cat_count.head())
-print(pl_cat.head())
-
 sort_by_point = pl_cat.groupby(category_col, as_index=False).apply(lambda x: pd.DataFrame.nlargest(x, n=N_classified, columns=points_col))
 sort_by_count = pl_cat.groupby(category_col, as_index=False).apply(lambda x: pd.DataFrame.nlargest(x, n=N_classified, columns=participations_col))
 
-print(sort_by_point.head(40))
-#
-# for cat, data in pl_cat_count.groupby(category_col):
-#     print(cat)
-#     # data.nlargest(N_classified).to_csv(cat + " - Copa Campeonato 2018 - " + str(N_tournaments) + " torneos.csv")
-#
-#     print(data.reset_index()[[player_col, points_col]])
+filename = cfg["io"]["data_folder"] + "Copa Campeonato 2019 - " + str(N_tournaments) + " torneos.xlsx"
 
-# cum_by_cat["primera"].to_excel("prueba.xlsx")
+for cat in models.categories:
+    print(cat, tournament_sheetname)
 
-# print(df)
-# # print(grouped_pl_cat.head(20))
-# print(pl_cat_cum.head(20))
-# print(cum_by_cat)
+    df_cat_by_point = sort_by_point[sort_by_point[category_col] == cat]
+    df_cat_by_point.drop(category_col, axis=1, inplace=True)
 
-# print(grouped_by_category.head(N_classified*4))
-# print(grouped_sorted[[cfg["labels"][key] for key in ["Player", "Category"]]])
+    utils.save_sheet_workbook(filename,
+                              tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
+                                                           cat),
+                              df_cat_by_point.columns.tolist(),
+                              df_cat_by_point.values.tolist())
