@@ -71,7 +71,8 @@ aux:
     tournament window to activate: 4
     tournaments to activate: 2
     tournament window to inactivate: 4
-    threshold_first: 500
-    threshold_second: 250
+    categories thresholds:
+      - 500  # minimo de primera
+      - 250  # minimo de segunda
     masters N tournaments to consider: 8
     masters N classified to list: 10000

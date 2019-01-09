@@ -50,7 +50,7 @@ setup(name='ranking_table_tennis',
           'oauth2client==4.1.2',
           'PyYAML==3.12',
           'urllib3>=1.23',
-          'openpyxl==2.4.2',
+          'openpyxl>=2.4.2',
           'Unidecode==1.0.22',
           'pandas>=0.20.3'
       ],
