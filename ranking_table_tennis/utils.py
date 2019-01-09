@@ -414,6 +414,22 @@ def publish_statistics_sheet(sheetname, ranking, upload=False):
         load_and_upload_sheet(output_xlsx, statistics_sheetname, cfg["io"]["temporal_spreadsheet_id"])
 
 
+def publish_masters_sheets(sheetname, ranking, upload=False):
+    """ Copy details from log and output details of given tournament"""
+    output_xlsx = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
+    output_xlsx = output_xlsx.replace("NN", "%d" % ranking.tid)
+
+    log_xlsx = cfg["io"]["data_folder"] + cfg["io"]["log_filename"]
+
+    for cat in models.categories:
+        masters_sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cat)
+        sheet_saved = load_sheet_workbook(log_xlsx, masters_sheetname, first_row=0)
+        save_sheet_workbook(output_xlsx, masters_sheetname, sheet_saved[0], sheet_saved[1:])
+
+        if upload:
+            load_and_upload_sheet(output_xlsx, masters_sheetname, cfg["io"]["temporal_spreadsheet_id"])
+
+
 def save_statistics(sheetname, tournament, ranking):
     # Testing statistics of tournament and ranking
     log_xlsx = cfg["io"]["data_folder"] + cfg["io"]["log_filename"]
