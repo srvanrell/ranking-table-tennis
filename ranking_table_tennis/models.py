@@ -14,7 +14,7 @@ if not os.path.exists(user_config_path):
 
 with open(user_config_path + "/config.yaml", 'r') as cfgyaml:
     try:
-        cfg = yaml.load(cfgyaml)
+        cfg = yaml.safe_load(cfgyaml)
     except yaml.YAMLError as exc:
         print(exc)
 
