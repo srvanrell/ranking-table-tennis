@@ -474,7 +474,7 @@ class Tournament:
                 if match.winner_name not in [cfg["aux"]["flag bonus sanction"], cfg["aux"]["flag add bonus"],
                                              cfg["aux"]["flag promotion"]]:
                     players_set.add(match.winner_name)
-                players_set.add(match.loser_name)
+                    players_set.add(match.loser_name)
         return sorted(list(players_set))
 
     def get_statistics(self):
