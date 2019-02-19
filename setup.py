@@ -33,7 +33,7 @@ class PostInstallCommand(install):
 
 
 setup(name='ranking_table_tennis',
-      version='2018.5',
+      version='2018.6',
       description='A ranking table tennis system',
       url='http://github.com/srvanrell/ranking-table-tennis',
       author='Sebastian Vanrell',
