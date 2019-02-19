@@ -349,6 +349,7 @@ class Ranking:
 
     def update_categories(self, n_first=10, n_second=10):
         """ Players are ranked based on rating and their active state.
+        # WARNING: if sometime is used with more categories it should be modified
 
         Players are ordered by rating. Active players are sorted first.
 
@@ -360,14 +361,15 @@ class Ranking:
         Inactive players are ranked based on active players categories
         """
         actives_to_order = [[e.pid, e.rating, e.active, e.category] for e in self if e.active and
-                            not e.category == categories[3]]
+                            not e.category == categories[-1]]
         inactives_to_order = [[e.pid, e.rating, e.active, e.category] for e in self if not e.active and
-                              not e.category == categories[3]]
+                              not e.category == categories[-1]]
 
         ordered_actives = sorted(actives_to_order, key=lambda k: (k[2], k[1]), reverse=True)  # to use active player
         ordered_inactives = sorted(inactives_to_order, key=lambda k: (k[2], k[1]), reverse=True)  # to use active player
 
         # First and last player indexes by category
+        # TODO if sometimes is used with more categories it should be modified
         first = [0, n_first, n_first+n_second]
         last = [n_first-1, n_first+n_second-1, len(ordered_actives)-1]
 
@@ -383,7 +385,7 @@ class Ranking:
                 if rating <= self[ordered_actives[f][0]].rating:
                     self[pid].category = cat
 
-    def update_categories_thresholds(self, th_first=500, th_second=250):
+    def update_categories_thresholds(self):
         """ Players are ranked based on rating and given thresholds.
 
         Players are ordered by rating and then assigned to a category
@@ -393,18 +395,17 @@ class Ranking:
         - 500 > rating >= 250  -> second category
         - 250 > rating         -> third category
         """
+        thresholds = cfg["aux"]["categories thresholds"]
         players_to_order = [[e.pid, e.rating, e.active, e.category] for e in self
-                            if not e.category == categories[3]]
-
+                            if not e.category == categories[-1]]
         ordered_players = sorted(players_to_order, key=lambda k: (k[2], k[1]), reverse=True)
 
         for pid, rating, active, category in ordered_players:
-            if rating >= th_first:
-                self[pid].category = categories[0]
-            if th_first > rating >= th_second:
-                self[pid].category = categories[1]
-            if th_second > rating:
-                self[pid].category = categories[2]
+            self[pid].category = categories[-2]  # Last category that it's not fan
+            for j, th in enumerate(thresholds):
+                if rating >= th:
+                    self[pid].category = categories[j]
+                    break
 
     def get_pids(self, category='', status='all'):
         """
@@ -415,7 +416,6 @@ class Ranking:
         :param status: valid options are 'all' (default), 'active' or 'inactive'
         :return:
         """
-        # TODO it should consider active, inactive or both
         pids = [p.pid for p in self if (not category or p.category == category)]
         if status == 'active':
             pids = [p.pid for p in self if (not category or p.category == category) and p.active]

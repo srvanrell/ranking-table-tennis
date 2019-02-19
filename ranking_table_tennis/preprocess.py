@@ -4,8 +4,6 @@ from ranking_table_tennis import utils
 from ranking_table_tennis import models
 from ranking_table_tennis.models import cfg
 from urllib import request
-import pickle
-import os
 
 __author__ = 'sebastian'
 
@@ -38,22 +36,7 @@ players.load_list(utils.load_players_sheet())
 ranking = utils.load_ranking_sheet(cfg["sheetname"]["initial_ranking"])
 
 # Loading temp ranking and players. It will be deleted after a successful preprocessing
-# FIXME this should be done in a single function inside utils
-players_temp_file = 'temp_players.pickle'
-ranking_temp_file = 'temp_ranking.pickle'
-print("\nDebugging version\n")
-if os.path.exists(players_temp_file):
-    with open(players_temp_file, 'rb') as f:
-        print(">Reading\tTemp player list\tResume preprocessing from", players_temp_file)
-        players_temp = pickle.load(f)
-else:
-    players_temp = models.PlayersList()
-if os.path.exists(ranking_temp_file):
-    with open(ranking_temp_file, 'rb') as f:
-        print(">Reading\tTemp ranking list\tResume preprocessing from", ranking_temp_file)
-        ranking_temp = pickle.load(f)
-else:
-    ranking_temp = models.Ranking()
+players_temp, ranking_temp = utils.load_temp_players_ranking()
 
 for tid, tournament_sheetname in enumerate(tournament_sheetnames, start=1):
     # Loading tournament info
@@ -103,15 +86,9 @@ for tid, tournament_sheetname in enumerate(tournament_sheetnames, start=1):
                 ranking[pid].category = ranking_temp[pid].category
             print(ranking[pid])
 
-        # TODO save temp ranking and players
         if unknown_player:
             retrieve = input("press Enter to continue or Ctrl+C to forget last player data\n")
-            print("<Saving\tTemps to resume preprocessing (if necessary)",
-                  ranking_temp_file, players_temp_file)
-            with open(players_temp_file, 'wb') as ptf, open(ranking_temp_file, 'wb') as rtf:
-                # Pickle the 'data' dictionary using the highest protocol available.
-                pickle.dump(players_temp, ptf, pickle.HIGHEST_PROTOCOL)
-                pickle.dump(ranking_temp, rtf, pickle.HIGHEST_PROTOCOL)
+            utils.save_temp_players_ranking(players_temp, ranking_temp)
 
     # Get the best round for each player in each category
     # Formatted like: best_rounds[(category, pid)] = best_round_value
@@ -134,8 +111,4 @@ utils.save_players_sheet(players, upload=upload)
 utils.save_ranking_sheet(cfg["sheetname"]["initial_ranking"], ranking, players, upload=upload)
 
 # Remove temp files after a successful preprocessing
-print("Removing temp files created to resume preprocessing", players_temp_file, ranking_temp_file)
-if os.path.exists(players_temp_file):
-    os.remove(players_temp_file)
-if os.path.exists(ranking_temp_file):
-    os.remove(ranking_temp_file)
+utils.remove_temp_players_ranking()
