@@ -36,7 +36,7 @@ class PostInstallCommand(install):
 
 
 setup(name='ranking_table_tennis',
-      version='2019.1a',
+      version='2019.1',
       description='A ranking table tennis system',
       url='http://github.com/srvanrell/ranking-table-tennis',
       author='Sebastian Vanrell',
@@ -46,12 +46,12 @@ setup(name='ranking_table_tennis',
       scripts=['bin/rtt'],
       include_package_data=True,
       install_requires=[
-          'gspread==3.1.0',
-          'oauth2client==4.1.2',
-          'PyYAML==3.12',
+          'gspread>=3.1.0',
+          'oauth2client>=4.1.2',
+          'PyYAML>=3.12',
           'urllib3>=1.23',
           'openpyxl>=2.4.2',
-          'Unidecode==1.0.22',
+          'Unidecode>=1.0.22',
           'pandas>=0.20.3'
       ],
       cmdclass={
