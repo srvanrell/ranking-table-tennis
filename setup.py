@@ -18,7 +18,10 @@ class PostDevelopCommand(develop):
     """Post-installation for development mode."""
     def run(self):
         import ranking_table_tennis as rtt
-        shutil.copytree(os.path.dirname(rtt.__file__) + "/config", user_config_path)
+        pkg_path = os.path.dirname(rtt.__file__) + '/config'
+        files = os.listdir(pkg_path)
+        for f in files:
+            shutil.copy(os.path.join(pkg_path, f), user_config_path)
         develop.run(self)
 
 
@@ -26,12 +29,15 @@ class PostInstallCommand(install):
     """Post-installation for installation mode."""
     def run(self):
         import ranking_table_tennis as rtt
-        shutil.copytree(os.path.dirname(rtt.__file__) + "/config", user_config_path)
+        pkg_path = os.path.dirname(rtt.__file__) + '/config'
+        files = os.listdir(pkg_path)
+        for f in files:
+            shutil.copy(os.path.join(pkg_path, f), user_config_path)
         install.run(self)
 
 
 setup(name='ranking_table_tennis',
-      version='2019.2',
+      version='2019.3',
       description='A ranking table tennis system',
       url='http://github.com/srvanrell/ranking-table-tennis',
       author='Sebastian Vanrell',
