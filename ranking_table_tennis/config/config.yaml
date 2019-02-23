@@ -74,6 +74,6 @@ aux:
     categories thresholds:
       - 1500  # minimo de primera
       - 1250  # minimo de segunda
-      - 750   # minimo de tercera
+      - 1000   # minimo de tercera
     masters N tournaments to consider: 8
     masters N classified to list: 10000

@@ -1,7 +1,6 @@
 from setuptools import setup
 from setuptools.command.develop import develop
 from setuptools.command.install import install
-from subprocess import check_call
 import os
 import shutil
 
@@ -12,31 +11,27 @@ def readme():
 
 
 # Loads some names from config.yaml
-user_config_path = os.path.expanduser("~") + "/.config/ranking_table_tennis/config.yaml"
+user_config_path = os.path.expanduser("~") + "/.config/ranking_table_tennis"
 
 
 class PostDevelopCommand(develop):
     """Post-installation for development mode."""
-
     def run(self):
-        # PUT YOUR POST-INSTALL SCRIPT HERE or CALL A FUNCTION
         import ranking_table_tennis as rtt
-        shutil.copy(os.path.dirname(rtt.__file__) + "/config/config.yaml", user_config_path)
+        shutil.copytree(os.path.dirname(rtt.__file__) + "/config", user_config_path)
         develop.run(self)
 
 
 class PostInstallCommand(install):
     """Post-installation for installation mode."""
     def run(self):
-        # PUT YOUR POST-INSTALL SCRIPT HERE or CALL A FUNCTION
         import ranking_table_tennis as rtt
-        # check_call("cp ranking_table_tennis/config/config.yaml ~/.config/ranking_table_tennis/config.yaml".split())
-        shutil.copy(os.path.dirname(rtt.__file__) + "/config/config.yaml", user_config_path)
+        shutil.copytree(os.path.dirname(rtt.__file__) + "/config", user_config_path)
         install.run(self)
 
 
 setup(name='ranking_table_tennis',
-      version='2019.1',
+      version='2019.2',
       description='A ranking table tennis system',
       url='http://github.com/srvanrell/ranking-table-tennis',
       author='Sebastian Vanrell',
