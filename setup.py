@@ -19,9 +19,7 @@ class PostDevelopCommand(develop):
     def run(self):
         import ranking_table_tennis as rtt
         pkg_path = os.path.dirname(rtt.__file__) + '/config'
-        files = os.listdir(pkg_path)
-        for f in files:
-            shutil.copy(os.path.join(pkg_path, f), user_config_path)
+        shutil.copytree(pkg_path, user_config_path)
         develop.run(self)
 
 
@@ -30,9 +28,7 @@ class PostInstallCommand(install):
     def run(self):
         import ranking_table_tennis as rtt
         pkg_path = os.path.dirname(rtt.__file__) + '/config'
-        files = os.listdir(pkg_path)
-        for f in files:
-            shutil.copy(os.path.join(pkg_path, f), user_config_path)
+        shutil.copytree(pkg_path, user_config_path)  # FIXME esta tirando un error de que existe el archivo, revisar
         install.run(self)
 
 
@@ -51,7 +47,7 @@ setup(name='ranking_table_tennis',
           'oauth2client>=4.1.2',
           'PyYAML>=3.12',
           'urllib3>=1.23',
-          'openpyxl>=2.4.2',
+          'openpyxl>=2.4.2,<2.6',
           'Unidecode>=1.0.22',
           'pandas>=0.20.3'
       ],
