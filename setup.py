@@ -10,25 +10,27 @@ def readme():
         return f.read()
 
 
-# Loads some names from config.yaml
-user_config_path = os.path.expanduser("~") + "/.config/ranking_table_tennis"
+def copy_config_files():
+    import ranking_table_tennis as rtt
+    pkg_path = os.path.join(os.path.dirname(rtt.__file__), 'config')
+    user_config_path = os.path.expanduser(os.path.join("~", ".config/ranking_table_tennis"))
+    if not os.path.exists(user_config_path):
+        os.makedirs(user_config_path)
+    for file in os.listdir(pkg_path):
+        shutil.copy(os.path.join(pkg_path, file), user_config_path)
 
 
 class PostDevelopCommand(develop):
     """Post-installation for development mode."""
     def run(self):
-        import ranking_table_tennis as rtt
-        pkg_path = os.path.dirname(rtt.__file__) + '/config'
-        shutil.copytree(pkg_path, user_config_path)
+        copy_config_files()
         develop.run(self)
 
 
 class PostInstallCommand(install):
     """Post-installation for installation mode."""
     def run(self):
-        import ranking_table_tennis as rtt
-        pkg_path = os.path.dirname(rtt.__file__) + '/config'
-        shutil.copytree(pkg_path, user_config_path)  # FIXME esta tirando un error de que existe el archivo, revisar
+        copy_config_files()
         install.run(self)
 
 
