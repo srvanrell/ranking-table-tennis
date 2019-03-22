@@ -552,6 +552,44 @@ def load_and_upload_sheet(filename, sheetname, spreadsheet_id):
     upload_sheet(spreadsheet_id, sheetname, headers, list_to_save)
 
 
+def create_n_tour_sheet(spreadsheet_id, n_tour):
+    """
+    Create sheet corresponding to n_tour tournament by duplication of the first-tournament sheet.
+    A new sheeet is created in given spreadsheet_id as follows:
+    1- first-tournament sheet is duplicated
+    2- Two replacements are performed in the new sheet, considering n_tour.
+       For example, if n_tour=4, value of A1 cell and sheet title will change 'Tournament 01'->'Tournament 04'
+    :param spreadsheet_id: spreadsheet where duplication will be performed
+    :param n_tour: tournament to create
+    :return: None
+    """
+    first_key = cfg["labels"]["Tournament"] + " 01"
+    replacement_key = "%s %02d" % (cfg["labels"]["Tournament"], n_tour)
+    gc = _get_gc()
+    if gc:
+        wb = gc.open_by_key(spreadsheet_id)
+        sheetname_listed = [ws.title for ws in wb.worksheets() if first_key in ws.title]
+        if sheetname_listed:
+            sheetname = sheetname_listed[0]
+            new_sheetname = sheetname.replace(first_key, replacement_key)
+            if new_sheetname in [ws.title for ws in wb.worksheets()]:
+                out_ws = wb.worksheet(new_sheetname)
+                wb.del_worksheet(out_ws)
+            ws = wb.worksheet(sheetname)
+            dup_ws = wb.duplicate_sheet(ws.id, new_sheet_name=new_sheetname)
+            dup_cell_value = dup_ws.acell('A1', value_render_option='FORMULA').value
+            dup_ws.update_acell('A1', dup_cell_value.replace(first_key, replacement_key))
+            print("<<<Creating\t", new_sheetname, "\tfrom\t", sheetname, "\tin\t", spreadsheet_id)
+        else:
+            print("FAILED TO DUPLICATE\t", first_key, "\t not exist in\t", spreadsheet_id)
+
+
+def publish_to_web(ranking, show_on_web=False):
+    if show_on_web:
+        for spreadsheet_id in cfg["io"]["published_on_web_spreadsheets_id"]:
+            create_n_tour_sheet(spreadsheet_id, ranking.tid)
+
+
 def load_temp_players_ranking():
     """returns players_temp, ranking_temp"""
     # Loading temp ranking and players. It shuould be deleted after a successful preprocessing

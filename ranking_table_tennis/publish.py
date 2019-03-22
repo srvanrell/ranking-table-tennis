@@ -68,3 +68,8 @@ utils.publish_statistics_sheet(tournament_sheetname, ranking, upload=upload)
 
 # testing masters publishing
 utils.publish_masters_sheets(tournament_sheetname, ranking, upload=upload)
+
+answer = input("\nDo you want to publish to the web [y/n]? (press Enter to continue)\n")
+show_on_web = answer.lower() != "n"
+
+utils.publish_to_web(ranking, show_on_web)

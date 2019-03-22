@@ -9,6 +9,14 @@ io:
     temporal_spreadsheet_id: 1R_1__G0DAZP3_T4LCGjfcr_Gs9CXeRBQlgbUwa_We3k
     players_temp_file: temp_players.pickle
     ranking_temp_file: temp_ranking.pickle
+    published_on_web_spreadsheets_id:
+      - 1ERmL9bj3mvsF1pfDQEAhiKzjaEOxvUX2EqakO5HIkJY  # partidos
+      - 1HC7HdmT8tYlwLDmObDDoHfNYIxAUkLiY81J8YPm3xRo  # nivel de juego
+      - 118RnRL-YFEB3eg78MM_lDwCrbYzJ1p5MUUVHDpCgWFs  # detalles nivel de juego
+      - 1hhz3w-Zm7R7w1x2eWhj1BynU76Eo7R6EDB8RZH7m7QQ  # masters primera
+      - 1kUSmsmBXSTW-UcFrj_ZPWohIFlplfMdo3j5JQWs3TrY  # masters segunda
+      - 1CO-D1P1FYEYudKKZ6oGH9KBoodRKfaGj9zD3BfsSMlw  # masters tercera
+      - 1jGXffNwVW93edpm1zzIBGLN3KJi46qo9lzcfv1AnO_s  # masters cuarta
 
 sheetname:
     players: Jugadores
@@ -74,6 +82,6 @@ aux:
     categories thresholds:
       - 1500  # minimo de primera
       - 1250  # minimo de segunda
-      - 1000   # minimo de tercera
+      - 1000  # minimo de tercera
     masters N tournaments to consider: 8
     masters N classified to list: 10000
