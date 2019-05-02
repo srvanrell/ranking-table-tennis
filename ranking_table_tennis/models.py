@@ -81,7 +81,7 @@ class Player:
         if history is None:
             history = {}
         self.pid = pid
-        self.name = unidecode.unidecode(name)
+        self.name = unidecode.unidecode(name).title()
         self.association = association
         self.city = city
         self.last_tournament = last_tournament
@@ -157,7 +157,7 @@ class PlayersList:
 
     def get_pid(self, name):
         for player in self:
-            uname = unidecode.unidecode(name)
+            uname = unidecode.unidecode(name).title()
             if uname == player.name:
                 return player.pid
         print("WARNING: Unknown player:", name)
@@ -442,8 +442,8 @@ class Match:
     def __init__(self, winner_name, loser_name, match_round, category):
         winner_name = winner_name.strip()
         loser_name = loser_name.strip()
-        self.winner_name = unidecode.unidecode(winner_name)
-        self.loser_name = unidecode.unidecode(loser_name)
+        self.winner_name = unidecode.unidecode(winner_name).title()
+        self.loser_name = unidecode.unidecode(loser_name).title()
         self.round = match_round
         self.category = category
 
