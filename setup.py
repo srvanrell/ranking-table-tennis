@@ -40,7 +40,6 @@ setup(name='ranking_table_tennis',
       url='http://github.com/srvanrell/ranking-table-tennis',
       author='Sebastian Vanrell',
       author_email='srvanrell@gmail.com',
-      license='MIT',
       packages=['ranking_table_tennis'],
       scripts=['bin/rtt'],
       include_package_data=True,
@@ -57,5 +56,8 @@ setup(name='ranking_table_tennis',
         'develop': PostDevelopCommand,
         'install': PostInstallCommand,
       },
+      classifiers=[
+          'License :: OSI Approved :: MIT License'
+      ],
       zip_safe=False)
 
