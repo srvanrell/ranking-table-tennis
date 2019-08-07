@@ -442,6 +442,8 @@ class Match:
     def __init__(self, winner_name, loser_name, match_round, category):
         winner_name = winner_name.strip()
         loser_name = loser_name.strip()
+        match_round = match_round.strip().lower()
+        category = category.strip().lower()
         self.winner_name = unidecode.unidecode(winner_name).title()
         self.loser_name = unidecode.unidecode(loser_name).title()
         self.round = match_round
