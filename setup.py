@@ -4,9 +4,8 @@ from setuptools.command.install import install
 import os
 import shutil
 
-
 def readme():
-    with open('README.rst') as f:
+    with open('README.md') as f:
         return f.read()
 
 
@@ -37,6 +36,8 @@ class PostInstallCommand(install):
 setup(name='ranking_table_tennis',
       version='2019.4.3',
       description='A ranking table tennis system',
+      long_description=readme(),
+      long_description_content_type="text/markdown",
       url='http://github.com/srvanrell/ranking-table-tennis',
       author='Sebastian Vanrell',
       author_email='srvanrell@gmail.com',
@@ -57,7 +58,9 @@ setup(name='ranking_table_tennis',
         'install': PostInstallCommand,
       },
       classifiers=[
-          'License :: OSI Approved :: MIT License'
+          "Programming Language :: Python :: 3",
+          'License :: OSI Approved :: MIT License',
+          'Operating System :: POSIX :: Linux'
       ],
+      python_requires='>=3.6',
       zip_safe=False)
-
