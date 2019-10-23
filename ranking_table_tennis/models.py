@@ -473,8 +473,9 @@ class Tournament:
         for match in self.matches:
             if not category or category == match.category:
                 # workaround to add extra bonus points from match list
-                if match.winner_name not in [cfg["aux"]["flag bonus sanction"], cfg["aux"]["flag add bonus"],
-                                             cfg["aux"]["flag promotion"]]:
+                possible_flag = match.winner_name.lower()
+                if possible_flag not in [cfg["aux"]["flag bonus sanction"], cfg["aux"]["flag add bonus"],
+                                         cfg["aux"]["flag promotion"]]:
                     players_set.add(match.winner_name)
                     players_set.add(match.loser_name)
         return sorted(list(players_set))
@@ -513,14 +514,16 @@ class Tournament:
                 loser_round_match = match.round
 
             # workaround to avoid promotion entries being considered as matches
-            if match.winner_name == cfg["aux"]["flag promotion"]:
+            possible_flag = match.winner_name.lower()
+            if possible_flag == cfg["aux"]["flag promotion"]:
                 continue
 
             # finding best round per category of each player
             for name, played_round in [(match.winner_name, winner_round_match),
                                        (match.loser_name, loser_round_match)]:
                 # workaround to add extra bonus points from match list
-                if name == cfg["aux"]["flag add bonus"] or name == cfg["aux"]["flag bonus sanction"]:
+                possible_flag = name.lower()
+                if possible_flag == cfg["aux"]["flag add bonus"] or possible_flag == cfg["aux"]["flag bonus sanction"]:
                     continue
 
                 catname = (match.category, name)

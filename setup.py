@@ -34,7 +34,7 @@ class PostInstallCommand(install):
 
 
 setup(name='ranking_table_tennis',
-      version='2019.4.4',
+      version='2019.4.5',
       description='A ranking table tennis system',
       long_description=readme(),
       long_description_content_type="text/markdown",

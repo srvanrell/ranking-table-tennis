@@ -68,8 +68,9 @@ for tid in tids:
     # Creating matches list with pid
     matches = []
     for match in tournament.matches:
-        if match.winner_name not in [cfg["aux"]["flag bonus sanction"], cfg["aux"]["flag add bonus"],
-                                     cfg["aux"]["flag promotion"]] \
+        possible_flag = match.winner_name.lower()
+        if possible_flag not in [cfg["aux"]["flag bonus sanction"], cfg["aux"]["flag add bonus"],
+                                 cfg["aux"]["flag promotion"]] \
                 and match.category != models.categories[-1]:
             matches.append([players.get_pid(match.winner_name), players.get_pid(match.loser_name),
                             match.round, match.category])
@@ -93,9 +94,10 @@ for tid in tids:
     # Promote those players indicated in the matches list of the tournament
     # Add or substract bonus points
     for match in tournament.matches:
-        if match.winner_name == cfg["aux"]["flag promotion"]:
+        possible_flag = match.winner_name.lower()
+        if possible_flag == cfg["aux"]["flag promotion"]:
             new_ranking[players.get_pid(match.loser_name)].category = match.category
-        if match.winner_name == cfg["aux"]["flag bonus sanction"]:
+        if possible_flag == cfg["aux"]["flag bonus sanction"]:
             pid_bonus = players.get_pid(match.loser_name)
             new_bonus = new_ranking[pid_bonus].bonus
             old_bonus = old_ranking[pid_bonus].bonus
