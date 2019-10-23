@@ -676,10 +676,12 @@ def save_masters_cup():
 
         pl_cat = pd.merge(pl_cat_cumul, pl_cat_count).sort_values(points_col, ascending=False)
 
-        sort_by_point = pl_cat.groupby(category_col, as_index=False).apply(
-            lambda x: pd.DataFrame.nlargest(x, n=n_classified, columns=points_col))
+        # sort_by_point = pl_cat.groupby(category_col, as_index=False).apply(
+        #     lambda x: pd.DataFrame.nlargest(x, n=n_classified, columns=points_col))
         # sort_by_count = pl_cat.groupby(category_col, as_index=False).apply(
         #     lambda x: pd.DataFrame.nlargest(x, n=n_classified, columns=participations_col))
+        sort_by_point = pl_cat.groupby(category_col, as_index=False).apply(
+            lambda x: x.sort_values([points_col, participations_col], ascending=(False, True)))
 
         filename = cfg["io"]["data_folder"] + cfg["io"]["log_filename"]
         tournament_sheetname = tournament_sheetnames[tid - 1]
