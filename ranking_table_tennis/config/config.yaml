@@ -1,10 +1,10 @@
 io:
     data_folder: data/
-    tournaments_filename: Liga Dos Orillas 2019 - Carga de partidos.xlsx
-    rankings_filename: Liga Dos Orillas 2019 - Rankings Crudos.xlsx
-    log_filename: log2019.xlsx
-    publish_filename: Torneo NN 2019 para publicar.xlsx
-    tournaments_gdrive: https://docs.google.com/spreadsheets/d/e/2PACX-1vQh5XRw5FKbXLWehFUHKL69a8TCKv66-GaZcoxBKHREnSqFrMkSYIslLp7CmehC1SJ1TkQPWGKQFjNr/pub?output=xlsx
+    tournaments_filename: Liga Dos Orillas 2020dev - Carga de partidos.xlsx
+    rankings_filename: Liga Dos Orillas 2020dev - Rankings Crudos.xlsx
+    log_filename: log2020dev.xlsx
+    publish_filename: Torneo NN 2020dev para publicar.xlsx
+    tournaments_gdrive: https://docs.google.com/spreadsheets/d/e/2PACX-1vQtjV3DJ5TjVsxO5hDipQDpgH621ACzq5tfbzhDxy5-9iFjbHqlJ2Ho9MvL-pvSPOUIhL851I6Kc9uX/pub?output=xlsx
     tournaments_spreadsheet_id: 1e7UBtVbRQ82FmfUFIEM3DRk1EnZwG9IPKWKnybsNrBw
     temporal_spreadsheet_id: 1R_1__G0DAZP3_T4LCGjfcr_Gs9CXeRBQlgbUwa_We3k
     players_temp_file: temp_players.pickle
@@ -25,7 +25,7 @@ sheetname:
     bonus_details_key: Bonus
     rating_details_key: Rating
     rankings_key: Ranking
-    histories: Historiales 2019
+    histories: Historiales 2020dev
     championship_key: Campeonato
     statistics_key: Estadisticas
 
