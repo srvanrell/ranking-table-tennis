@@ -22,14 +22,6 @@ if not os.path.exists(cfg["io"]["data_folder"]):
     os.mkdir(cfg["io"]["data_folder"])
 
 
-def save_csv(filename, headers, list_to_save):
-    """Save list into a csv file with given header."""
-    with open(filename, 'w') as outcsv:
-        writer = csv.writer(outcsv)
-        writer.writerow(headers)
-        writer.writerows(list_to_save)
-
-
 def load_csv(filename, first_row=1):
     """Loads csv table into a list. By default first row is not read"""
     with open(filename, 'r') as incsv:

@@ -28,6 +28,9 @@ if retrieve.lower() != "n":
 # Listing tournament sheetnames by increasing date
 tournament_sheetnames = utils.get_tournament_sheetnames_by_date()
 
+print(tournament_sheetnames)
+print(utils.get_tournament_sheetnames_ordered())
+
 # Loading players list
 players = models.PlayersList()
 players.load_list(utils.load_players_sheet())

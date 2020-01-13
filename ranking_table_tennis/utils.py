@@ -1,4 +1,3 @@
-import csv
 import os
 from ranking_table_tennis import models
 from ranking_table_tennis.models import cfg
@@ -11,6 +10,17 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
 __author__ = 'sebastian'
+
+
+def get_tournament_sheetnames_ordered():
+    tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
+    filter_key = cfg["sheetname"]["tournaments_key"]
+    df_tournaments = pd.read_excel(tournaments_xlsx, sheet_name=None, header=None)
+    sheet_names = [s for s in df_tournaments.keys() if filter_key in s]
+
+    print(df_tournaments[sheet_names[0]])
+
+    return sorted(sheet_names)
 
 
 def get_tournament_sheetnames_by_date():
@@ -176,14 +186,6 @@ def load_ranking_sheet(sheetname):
     ranking.load_list([[rr[0], rr[1], rr[2], rr[3] == cfg["activeplayer"][True], rr[4]] for rr in raw_ranking[5:]])
 
     return ranking
-
-
-def load_tournament_csv(filename):
-    """Load a tournament csv and return a Tournament object"""
-    with open(filename, 'r') as incsv:
-        reader = csv.reader(incsv)
-        tournament_list = [row for row in reader]
-        return load_tournament_list(tournament_list)
 
 
 def load_tournament_xlsx(sheet_name):
