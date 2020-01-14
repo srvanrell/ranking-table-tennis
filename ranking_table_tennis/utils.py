@@ -4,6 +4,7 @@ from ranking_table_tennis.models import cfg
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font, Alignment
 import pandas as pd
+from unidecode import unidecode
 import pickle
 
 import gspread
@@ -12,26 +13,13 @@ from oauth2client.service_account import ServiceAccountCredentials
 __author__ = 'sebastian'
 
 
-def get_tournament_sheetnames_ordered():
+def get_tournament_sheet_names_ordered():
     tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
     filter_key = cfg["sheetname"]["tournaments_key"]
     df_tournaments = pd.read_excel(tournaments_xlsx, sheet_name=None, header=None)
     sheet_names = [s for s in df_tournaments.keys() if filter_key in s]
 
-    print(df_tournaments[sheet_names[0]])
-
     return sorted(sheet_names)
-
-
-def get_tournament_sheetnames_by_date():
-    tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
-    wb = load_workbook(tournaments_xlsx, read_only=True)
-    filter_key = cfg["sheetname"]["tournaments_key"]
-    sheetnames = [s for s in wb.sheetnames if filter_key in s]
-    namesdates = [(name, load_tournament_xlsx(name).date) for name in sheetnames]
-    namesdates.sort(key=lambda p: p[1])
-
-    return [name for name, date in namesdates]
 
 
 def load_sheet_workbook(filename, sheetname, first_row=1):
@@ -188,54 +176,71 @@ def load_ranking_sheet(sheetname):
     return ranking
 
 
-def load_tournament_xlsx(sheet_name):
-    """Load a tournament xlsx sheet and return a Tournament object
+def process_match(match_row):
+    # workaround to add extra bonus points from match list
+    match_row["winner"] = match_row["player_b"]
+    match_row["loser"] = match_row["player_b"]
+    if match_row["sets_a"] >= 10 and match_row["sets_b"] >= 10:
+        match_row["promote"] = True
+    elif match_row["sets_a"] <= -10 and match_row["sets_b"] <= -10:
+        match_row["sanction"] = True
+    elif match_row["sets_a"] < 0 and match_row["sets_b"] < 0:
+        match_row["bonus"] = True
+    elif match_row["sets_a"] > match_row["sets_b"]:
+        match_row["winner"] = match_row["player_a"]
+        match_row["loser"] = match_row["player_b"]
+    elif match_row["sets_a"] < match_row["sets_b"]:
+        match_row["winner"] = match_row["player_b"]
+        match_row["loser"] = match_row["player_a"]
+    else:
+        print("Failed to process matches, a tie was found between at:\n", match_row)
+        raise ImportError
 
-    tournaments xlsx database is defined in config.yaml
-    """
+    return match_row
+
+
+def get_tournaments_df():
     tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
+    filter_key = cfg["sheetname"]["tournaments_key"]
+    raw_tournaments = pd.read_excel(tournaments_xlsx, sheet_name=None, header=None)
+    sheet_names = sorted([s for s in raw_tournaments.keys() if filter_key in s])
 
-    return load_tournament_list(load_sheet_workbook(tournaments_xlsx, sheet_name, 0))
+    to_concat = []
+    for sheet_name in sheet_names:
+        print(">Reading\t", sheet_name, "\tfrom\t", tournaments_xlsx)
+        raw_tournament = raw_tournaments[sheet_name]
 
+        tournament_df = raw_tournament.iloc[5:].copy()
+        tournament_df.rename(columns={0: "player_a", 1: "player_b", 2: "sets_a", 3: "sets_b",
+                                      4: "round", 5: "category"}, inplace=True)
+        tournament_df.insert(0, "location", raw_tournament.iat[2, 1])
+        tournament_df.insert(0, "date", raw_tournament.iat[1, 1])
+        tournament_df.insert(0, "tournament_name", raw_tournament.iat[0, 1])
+        tournament_df.insert(0, "sheet_name", sheet_name)
+        tournament_df.insert(len(tournament_df.columns), "winner", None)
+        tournament_df.insert(len(tournament_df.columns), "loser", None)
+        tournament_df.insert(len(tournament_df.columns), "promote", False)
+        tournament_df.insert(len(tournament_df.columns), "sanction", False)
+        tournament_df.insert(len(tournament_df.columns), "bonus", False)
 
-def load_tournament_list(tournament_list):
-    """Load a tournament list sheet and return a Tournament object
-    name = cell(B1)
-    date = cell(B2)
-    location = cell(B3)
-    matches should be from sixth row containing:
-    player1, player2, sets1, sets2, match_round, category
-    """
-    name = tournament_list[0][1]
-    date = str(tournament_list[1][1])
-    location = tournament_list[2][1]
+        to_concat.append(tournament_df)
 
-    tournament = models.Tournament(name, date, location)
+    tournaments_df = pd.concat(to_concat, ignore_index=True)
+    tournaments_df = tournaments_df.apply(process_match, axis="columns")
 
-    # Reformated list of matches
-    for player1, player2, sets1, sets2, round_match, category in tournament_list[5:]:
-        # workaround to add extra bonus points from match list
-        if int(sets1) >= 10 and int(sets2) >= 10:
-            winner_name = cfg["aux"]["flag promotion"]
-            loser_name = player2
-        elif int(sets1) <= -10 and int(sets2) <= -10:
-            winner_name = cfg["aux"]["flag bonus sanction"]
-            loser_name = player2
-        elif int(sets1) < 0 and int(sets2) < 0:
-            winner_name = cfg["aux"]["flag add bonus"]
-            loser_name = player2
-        elif int(sets1) > int(sets2):
-            winner_name = player1
-            loser_name = player2
-        elif int(sets1) < int(sets2):
-            winner_name = player2
-            loser_name = player1
-        else:
-            print("Failed to process matches, a tie was found between %s and %s" % (player1, player2))
-            break
-        tournament.add_match(winner_name, loser_name, round_match, category)
+    cols_to_lower = ["round", "category"]
+    tournaments_df.loc[:, cols_to_lower] = tournaments_df.loc[:, cols_to_lower].applymap(
+        lambda cell: cell.strip().upper())
 
-    return tournament
+    cols_to_title = ["tournament_name", "date", "location", "player_a", "player_b"]
+    tournaments_df.loc[:, cols_to_title] = tournaments_df.loc[:, cols_to_title].applymap(
+        lambda cell: unidecode(cell).strip().title())
+
+    tournaments_df = tournaments_df.astype({"sets_a": "int", "sets_b": "int",
+                                            "round": "category", "category": "category",
+                                            "location": "category", "tournament_name": "category"})
+
+    return tournaments_df
 
 
 def _format_diff(diff):
