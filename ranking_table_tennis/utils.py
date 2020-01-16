@@ -151,6 +151,21 @@ def load_players_sheet():
                                cfg["sheetname"]["players"])
 
 
+def get_players_df():
+    tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
+    players_df = pd.read_excel(tournaments_xlsx, sheet_name=cfg["sheetname"]["players"], header=0)
+
+    players_df.rename(columns={cfg["labels"]["PID"]: "pid",
+                               cfg["labels"]["Player"]: "name",
+                               cfg["labels"]["Association"]: "affiliation",
+                               cfg["labels"]["City"]: "city",
+                               cfg["labels"]["Last Tournament"]: "last_tournament",
+                               cfg["labels"]["Participations"]: "history"},
+                      inplace=True)
+
+    return players_df
+
+
 def load_ranking_sheet(sheetname):
     """Load a ranking from a xlsx sheet and return a Ranking object
 
