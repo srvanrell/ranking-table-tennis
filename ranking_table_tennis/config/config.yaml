@@ -35,7 +35,7 @@ labels:
     Association: Asociación
     City: Ciudad
     Last Tournament: Último Torneo
-    Bonus Points: Puntos de Campeonato
+    Championship Points: Puntos de Campeonato
     Rating Points: Nivel de Juego
     Best Round: Mejor Ronda
     Round: Instancia
@@ -55,6 +55,12 @@ labels:
     Position: Posición
     Difference: Diferencia
     tid: ID torneo
+    Points CAT:
+      - Puntos Primera
+      - Puntos Segunda
+      - Puntos Tercera
+      - Puntos Cuarta
+      - Puntos Quinta
 
 activeplayer:
     True: activo

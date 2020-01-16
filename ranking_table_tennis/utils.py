@@ -166,6 +166,67 @@ def get_players_df():
     return players_df
 
 
+def get_initial_ranking_df():
+    tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
+    initial_ranking_df = pd.read_excel(tournaments_xlsx, sheet_name=cfg["sheetname"]["initial_ranking"], header=0)
+
+    initial_ranking_df.rename(columns={cfg["labels"]["tid"]: "tid",
+                                       cfg["labels"]["Tournament name"]: "tournament_name",
+                                       cfg["labels"]["Date"]: "date",
+                                       cfg["labels"]["Location"]: "location",
+                                       cfg["labels"]["PID"]: "pid",
+                                       cfg["labels"]["Player"]: "name",
+                                       cfg["labels"]["Rating Points"]: "rating",
+                                       cfg["labels"]["Category"]: "category",
+                                       cfg["labels"]["Active Player"]: "active",
+                                       cfg["labels"]["Points CAT"][0]: "points_cat1",  # FIXME
+                                       cfg["labels"]["Points CAT"][1]: "points_cat2",  # FIXME
+                                       cfg["labels"]["Points CAT"][2]: "points_cat3",  # FIXME
+                                       cfg["labels"]["Points CAT"][3]: "points_cat4",  # FIXME
+                                       cfg["labels"]["Points CAT"][4]: "points_cat5"   # FIXME
+                                       },
+                              inplace=True)
+
+    return initial_ranking_df
+
+    # to_concat = []
+    # for sheet_name in sheet_names:
+    #     print(">Reading\t", sheet_name, "\tfrom\t", tournaments_xlsx)
+    #     raw_tournament = raw_tournaments[sheet_name]
+    #
+    #     tournament_df = raw_tournament.iloc[5:].copy()
+    #     tournament_df.rename(columns={0: "player_a", 1: "player_b", 2: "sets_a", 3: "sets_b",
+    #                                   4: "round", 5: "category"}, inplace=True)
+    #     tournament_df.insert(0, "location", raw_tournament.iat[2, 1])
+    #     tournament_df.insert(0, "date", raw_tournament.iat[1, 1])
+    #     tournament_df.insert(0, "tournament_name", raw_tournament.iat[0, 1])
+    #     tournament_df.insert(0, "sheet_name", sheet_name)
+    #     tournament_df.insert(len(tournament_df.columns), "winner", None)
+    #     tournament_df.insert(len(tournament_df.columns), "loser", None)
+    #     tournament_df.insert(len(tournament_df.columns), "promote", False)
+    #     tournament_df.insert(len(tournament_df.columns), "sanction", False)
+    #     tournament_df.insert(len(tournament_df.columns), "bonus", False)
+    #
+    #     to_concat.append(tournament_df)
+    #
+    # tournaments_df = pd.concat(to_concat, ignore_index=True)
+    # tournaments_df = tournaments_df.apply(process_match, axis="columns")
+    #
+    # cols_to_lower = ["round", "category"]
+    # tournaments_df.loc[:, cols_to_lower] = tournaments_df.loc[:, cols_to_lower].applymap(
+    #     lambda cell: cell.strip().upper())
+    #
+    # cols_to_title = ["tournament_name", "date", "location", "player_a", "player_b"]
+    # tournaments_df.loc[:, cols_to_title] = tournaments_df.loc[:, cols_to_title].applymap(
+    #     lambda cell: unidecode(cell).strip().title())
+    #
+    # tournaments_df = tournaments_df.astype({"sets_a": "int", "sets_b": "int",
+    #                                         "round": "category", "category": "category",
+    #                                         "location": "category", "tournament_name": "category"})
+    #
+    # return tournaments_df
+
+
 def load_ranking_sheet(sheetname):
     """Load a ranking from a xlsx sheet and return a Ranking object
 
