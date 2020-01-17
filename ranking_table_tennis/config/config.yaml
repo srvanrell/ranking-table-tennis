@@ -20,7 +20,7 @@ io:
 
 sheetname:
     players: Jugadores
-    initial_ranking: Ranking inicial
+    initial_ranking: Ranking Torneo 00 2020
     tournaments_key: Partidos
     bonus_details_key: Bonus
     rating_details_key: Rating
@@ -54,7 +54,7 @@ labels:
     Participations: Torneos Jugados
     Position: Posición
     Difference: Diferencia
-    tid: ID torneo
+    tid: ID Torneo
     Points CAT:
       - Puntos Primera
       - Puntos Segunda

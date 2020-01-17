@@ -20,25 +20,28 @@ __author__ = 'sebastian'
 
 xlsx_file = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
 
-# retrieve = input("Do you want to retrieve online sheet [Y/n]? (press Enter to continue)\n")
-# if retrieve.lower() != "n":
-#     print("Downloading and saving %s\n" % xlsx_file)
-#     request.urlretrieve(cfg["io"]["tournaments_gdrive"], xlsx_file)
+retrieve = input("Do you want to retrieve online sheet [Y/n]? (press Enter to continue)\n")
+if retrieve.lower() != "n":
+    print("Downloading and saving %s\n" % xlsx_file)
+    request.urlretrieve(cfg["io"]["tournaments_gdrive"], xlsx_file)
 
 # Listing tournament sheetnames by increasing date
 tournaments_df = utils.get_tournaments_df()
 
-print(tournaments_df)
-print(tournaments_df.dtypes)
+# print(tournaments_df)
+# print(tournaments_df.dtypes)
 
 # Loading players list
 players_df = utils.get_players_df()
 
-print(players_df)
-print(players_df.dtypes)
+# print(players_df)
+# print(players_df.dtypes)
 
 # Loading initial ranking and adding new players with 0
-# ranking = utils.load_ranking_sheet(cfg["sheetname"]["initial_ranking"])
+ranking_df = utils.get_initial_ranking_df()
+
+# print(ranking_df)
+# print(ranking_df.dtypes)
 
 # # Loading temp ranking and players. It will be deleted after a successful preprocessing
 # players_temp, ranking_temp = utils.load_temp_players_ranking()
