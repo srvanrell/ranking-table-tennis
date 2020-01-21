@@ -32,10 +32,9 @@ tournaments_df = utils.get_tournaments_df()
 # print(tournaments_df.dtypes)
 
 # Loading players list
-players_df = utils.get_players_df()
+players = utils.load_players_sheet()
 
-# print(players_df)
-# print(players_df.dtypes)
+# print(players)
 
 # Loading initial ranking and adding new players with 0
 ranking_df = utils.get_initial_ranking_df()

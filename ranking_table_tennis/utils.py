@@ -146,12 +146,12 @@ def save_players_sheet(players, upload=False):
                      list_to_save)
 
 
+# def load_players_sheet():
+#     return load_sheet_workbook(cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"],
+#                                cfg["sheetname"]["players"])
+
+
 def load_players_sheet():
-    return load_sheet_workbook(cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"],
-                               cfg["sheetname"]["players"])
-
-
-def get_players_df():
     tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
     players_df = pd.read_excel(tournaments_xlsx, sheet_name=cfg["sheetname"]["players"], header=0)
     print(">Reading\t", cfg["sheetname"]["players"], "\tfrom\t", tournaments_xlsx)
@@ -164,7 +164,9 @@ def get_players_df():
                                cfg["labels"]["Participations"]: "history"},
                       inplace=True)
 
-    return players_df
+    players = models.Players(players_df)
+
+    return players
 
 
 def get_initial_ranking_df():

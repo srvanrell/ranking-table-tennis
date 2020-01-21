@@ -4,6 +4,7 @@ import yaml
 import ast
 import unidecode
 import shutil
+import pandas as pd
 
 
 # Loads some names from config.yaml
@@ -114,6 +115,28 @@ class Player:
         """
         return [[cat, tid, self.history[(cat, tid)]] for cat, tid in
                 sorted(self.history.keys())]
+
+
+class Players:
+    def __init__(self, players_df=None):
+        """
+        Create a players database from given players DataFrame
+        :param players_df: DataFrame with columns: pid, name, affiliation, city, last_tournament and history
+        """
+        self.players_df = pd.DataFrame(players_df,
+                                       columns=["pid", "name", "affiliation", "city", "last_tournament", "history"])
+        self.players_df.set_index("pid", drop=True, verify_integrity=True, inplace=True)
+
+    def __len__(self):
+        return len(self.players_df)
+
+    def __str__(self):
+        return str(self.players_df)
+
+
+
+
+
 
 
 class PlayersList:
