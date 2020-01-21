@@ -26,10 +26,9 @@ if retrieve.lower() != "n":
     request.urlretrieve(cfg["io"]["tournaments_gdrive"], xlsx_file)
 
 # Listing tournament sheetnames by increasing date
-tournaments_df = utils.get_tournaments_df()
+tournaments = utils.load_tournaments_sheets()
 
-# print(tournaments_df)
-# print(tournaments_df.dtypes)
+# print(tournaments)
 
 # Loading players list
 players = utils.load_players_sheet()

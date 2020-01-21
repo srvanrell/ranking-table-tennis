@@ -2,7 +2,7 @@ import os
 import csv
 import yaml
 import ast
-import unidecode
+from unidecode import unidecode
 import shutil
 import pandas as pd
 
@@ -74,7 +74,7 @@ class Player:
         if history is None:
             history = {}
         self.pid = pid
-        self.name = unidecode.unidecode(name).title()
+        self.name = unidecode(name).title()
         self.association = association
         self.city = city
         self.last_tournament = last_tournament
@@ -127,16 +127,17 @@ class Players:
                                        columns=["pid", "name", "affiliation", "city", "last_tournament", "history"])
         self.players_df.set_index("pid", drop=True, verify_integrity=True, inplace=True)
 
+        self.verify_and_normalize()
+
     def __len__(self):
         return len(self.players_df)
 
     def __str__(self):
         return str(self.players_df)
 
-
-
-
-
+    def verify_and_normalize(self):
+        # TODO verify and normalize name, affiliation, etc
+        pass
 
 
 class PlayersList:
@@ -172,7 +173,7 @@ class PlayersList:
 
     def get_pid(self, name):
         for player in self:
-            uname = unidecode.unidecode(name).title()
+            uname = unidecode(name).title()
             if uname == player.name:
                 return player.pid
         print("WARNING: Unknown player:", name)
@@ -459,8 +460,8 @@ class Match:
         loser_name = loser_name.strip()
         match_round = match_round.strip().lower()
         category = category.strip().lower()
-        self.winner_name = unidecode.unidecode(winner_name).title()
-        self.loser_name = unidecode.unidecode(loser_name).title()
+        self.winner_name = unidecode(winner_name).title()
+        self.loser_name = unidecode(loser_name).title()
         self.round = match_round
         self.category = category
 
@@ -549,3 +550,90 @@ class Tournament:
                     best_rounds[catname] = played_round
 
         return best_rounds
+
+
+class Tournaments:
+    def __init__(self, tournaments_df=None):
+        """
+        Create a tournaments database from given tournaments DataFrame.
+        Verification and normalization is performed on loading.
+
+        There are workarounds available to promote, sanction, or provide championship points
+
+        :param tournaments_df: DataFrame with columns: tournament_name, date, location,
+               player_a, player_b, sets_a, sets_b, round, category
+        """
+        self.tournaments_df = pd.DataFrame(tournaments_df,
+                                           columns=["tid", "sheet_name", "tournament_name", "date", "location",
+                                                    "player_a", "player_b", "sets_a", "sets_b", "round", "category"])
+        self.tournaments_df.insert(4, "year", None)
+        self.tournaments_df.insert(len(self.tournaments_df.columns), "winner", None)
+        self.tournaments_df.insert(len(self.tournaments_df.columns), "loser", None)
+        self.tournaments_df.insert(len(self.tournaments_df.columns), "promote", False)
+        self.tournaments_df.insert(len(self.tournaments_df.columns), "sanction", False)
+        self.tournaments_df.insert(len(self.tournaments_df.columns), "bonus", False)
+
+        self.verify_and_normalize()
+
+    def __len__(self):
+        return len(self.tournaments_df)
+
+    def __str__(self):
+        return str(self.tournaments_df)
+
+    @staticmethod
+    def _process_match(match_row):
+        # workaround to add extra bonus points from match list
+        match_row["winner"] = match_row["player_b"]
+        match_row["loser"] = match_row["player_b"]
+        if match_row["sets_a"] >= 10 and match_row["sets_b"] >= 10:
+            match_row["promote"] = True
+        elif match_row["sets_a"] <= -10 and match_row["sets_b"] <= -10:
+            match_row["sanction"] = True
+        elif match_row["sets_a"] < 0 and match_row["sets_b"] < 0:
+            match_row["bonus"] = True
+        elif match_row["sets_a"] > match_row["sets_b"]:
+            match_row["winner"] = match_row["player_a"]
+            match_row["loser"] = match_row["player_b"]
+        elif match_row["sets_a"] < match_row["sets_b"]:
+            match_row["winner"] = match_row["player_b"]
+            match_row["loser"] = match_row["player_a"]
+        else:
+            print("Failed to process matches, a tie was found at:\n", match_row)
+            raise ImportError
+
+        return match_row
+
+    def _assign_tid(self):
+        def tid_str(grp):
+            print(type(grp))
+            dates_ordered = sorted(grp["date"].unique())
+            numbered = {pd.Timestamp(date): num for num, date in enumerate(dates_ordered, 1)}
+            tids = grp["date"].apply(lambda row: "S%sT%02d" % (row.year, numbered[row]))
+
+            return tids
+
+        tid = self.tournaments_df.groupby("year", as_index=False).apply(tid_str)
+        print(type(tid))
+
+        self.tournaments_df["tid"] = tid
+
+    def verify_and_normalize(self):
+        self.tournaments_df = self.tournaments_df.apply(self._process_match, axis="columns")
+
+        cols_to_lower = ["round", "category"]
+        self.tournaments_df.loc[:, cols_to_lower] = self.tournaments_df.loc[:, cols_to_lower].applymap(
+            lambda cell: cell.strip().lower())
+
+        cols_to_title = ["tournament_name", "date", "location", "player_a", "player_b"]
+        self.tournaments_df.loc[:, cols_to_title] = self.tournaments_df.loc[:, cols_to_title].applymap(
+            lambda cell: unidecode(cell).strip().title())
+
+        self.tournaments_df = self.tournaments_df.astype({"round": "category", "category": "category",
+                                                          "location": "category", "tournament_name": "category"})
+
+        self.tournaments_df.date = pd.to_datetime(self.tournaments_df.date)
+        self.tournaments_df["year"] = self.tournaments_df.apply(lambda row: row["date"].year, axis="columns")
+        self._assign_tid()
+
+        print(self.tournaments_df)

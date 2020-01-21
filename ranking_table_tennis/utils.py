@@ -222,30 +222,7 @@ def load_ranking_sheet(sheetname):
     return ranking
 
 
-def process_match(match_row):
-    # workaround to add extra bonus points from match list
-    match_row["winner"] = match_row["player_b"]
-    match_row["loser"] = match_row["player_b"]
-    if match_row["sets_a"] >= 10 and match_row["sets_b"] >= 10:
-        match_row["promote"] = True
-    elif match_row["sets_a"] <= -10 and match_row["sets_b"] <= -10:
-        match_row["sanction"] = True
-    elif match_row["sets_a"] < 0 and match_row["sets_b"] < 0:
-        match_row["bonus"] = True
-    elif match_row["sets_a"] > match_row["sets_b"]:
-        match_row["winner"] = match_row["player_a"]
-        match_row["loser"] = match_row["player_b"]
-    elif match_row["sets_a"] < match_row["sets_b"]:
-        match_row["winner"] = match_row["player_b"]
-        match_row["loser"] = match_row["player_a"]
-    else:
-        print("Failed to process matches, a tie was found between at:\n", match_row)
-        raise ImportError
-
-    return match_row
-
-
-def get_tournaments_df():
+def load_tournaments_sheets():
     tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
     filter_key = cfg["sheetname"]["tournaments_key"]
     raw_tournaments = pd.read_excel(tournaments_xlsx, sheet_name=None, header=None)
@@ -263,30 +240,13 @@ def get_tournaments_df():
         tournament_df.insert(0, "date", raw_tournament.iat[1, 1])
         tournament_df.insert(0, "tournament_name", raw_tournament.iat[0, 1])
         tournament_df.insert(0, "sheet_name", sheet_name)
-        tournament_df.insert(len(tournament_df.columns), "winner", None)
-        tournament_df.insert(len(tournament_df.columns), "loser", None)
-        tournament_df.insert(len(tournament_df.columns), "promote", False)
-        tournament_df.insert(len(tournament_df.columns), "sanction", False)
-        tournament_df.insert(len(tournament_df.columns), "bonus", False)
 
         to_concat.append(tournament_df)
 
     tournaments_df = pd.concat(to_concat, ignore_index=True)
-    tournaments_df = tournaments_df.apply(process_match, axis="columns")
+    tournaments = models.Tournaments(tournaments_df)
 
-    cols_to_lower = ["round", "category"]
-    tournaments_df.loc[:, cols_to_lower] = tournaments_df.loc[:, cols_to_lower].applymap(
-        lambda cell: cell.strip().upper())
-
-    cols_to_title = ["tournament_name", "date", "location", "player_a", "player_b"]
-    tournaments_df.loc[:, cols_to_title] = tournaments_df.loc[:, cols_to_title].applymap(
-        lambda cell: unidecode(cell).strip().title())
-
-    tournaments_df = tournaments_df.astype({"sets_a": "int", "sets_b": "int",
-                                            "round": "category", "category": "category",
-                                            "location": "category", "tournament_name": "category"})
-
-    return tournaments_df
+    return tournaments
 
 
 def _format_diff(diff):
