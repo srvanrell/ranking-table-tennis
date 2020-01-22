@@ -131,24 +131,23 @@ def save_ranking_sheet(sheetname, ranking, players, overwrite=True, upload=False
 
 
 def save_players_sheet(players, upload=False):
-    headers = [cfg["labels"][key] for key in ["PID", "Player", "Association", "City",
-                                              "Last Tournament", "Participations"]]
-    list_to_save = sorted(players.to_list(), key=lambda l: l[1])
+    sorted_players_df = players.players_df.sort_values("name")
+    xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
+    players_sheet_name = cfg["sheetname"]["players"]
 
-    save_sheet_workbook(cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"],
-                        cfg["sheetname"]["players"],
-                        headers,
-                        list_to_save)
-    if upload:
-        upload_sheet(cfg["io"]["tournaments_spreadsheet_id"],
-                     cfg["sheetname"]["players"],
-                     headers,
-                     list_to_save)
+    with pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode='a') as writer:
+        writer.book.remove_sheet(writer.book.get_sheet_by_name(players_sheet_name))
+        headers = [cfg["labels"][key] for key in ["Player", "Association", "City",
+                                                  "Last Tournament", "Participations"]]
+        sorted_players_df.to_excel(writer, sheet_name=players_sheet_name,
+                                   index_label=cfg["labels"]["PID"], header=headers)
 
-
-# def load_players_sheet():
-#     return load_sheet_workbook(cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"],
-#                                cfg["sheetname"]["players"])
+    # TODO FIXME
+    # if upload:
+    #     upload_sheet(cfg["io"]["tournaments_spreadsheet_id"],
+    #                  cfg["sheetname"]["players"],
+    #                  headers,
+    #                  list_to_save)
 
 
 def load_players_sheet():

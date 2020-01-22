@@ -94,9 +94,9 @@ for tid in tournaments:
 #         if unknown_player:
 #             retrieve = input("press Enter to continue or Ctrl+C to forget last player data\n")
 #             utils.save_temp_players_ranking(players_temp, ranking_temp)
-#
-#     # Get the best round for each player in each category
-#     # Formatted like: best_rounds[(category, pid)] = best_round_value
+
+    # Get the best round for each player in each category
+    # Formatted like: best_rounds[(category, pid)] = best_round_value
     aux_best_rounds = tournaments.compute_best_rounds(tid)
     best_rounds = {(categ, players.get_pid(name)): aux_best_rounds[categ, name]
                    for categ, name in aux_best_rounds.keys()}
@@ -104,14 +104,13 @@ for tid in tournaments:
     # Log current tournament as the last played tournament
     # Also, best rounds reached in each category are saved into corresponding history
     players.update_histories(tid, best_rounds)
-    print(players)
-#
-# # Update the online version
-# answer = input("\nDo you want to update online sheets [y/n]? (press Enter to continue)\n")
-# upload = answer.lower() != "n"
-#
-# # Saving complete list of players, including new ones
-# utils.save_players_sheet(players, upload=upload)
+
+# Update the online version
+answer = input("\nDo you want to update online sheets [y/n]? (press Enter to continue)\n")
+upload = answer.lower() != "n"
+
+# Saving complete list of players, including new ones
+utils.save_players_sheet(players, upload=upload)
 #
 # # Saving initial rankings for all known players
 # utils.save_ranking_sheet(cfg["sheetname"]["initial_ranking"], ranking, players, upload=upload)

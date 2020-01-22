@@ -118,7 +118,7 @@ class Player:
 
 
 class Players:
-    def __init__(self, players_df=None):
+    def __init__(self, players_df=None, history_df=None):
         """
         Create a players database from given players DataFrame
         :param players_df: DataFrame with columns: pid, name, affiliation, city, last_tournament and history
@@ -126,7 +126,10 @@ class Players:
         self.players_df = pd.DataFrame(players_df,
                                        columns=["pid", "name", "affiliation", "city", "last_tournament", "history"])
         self.players_df.set_index("pid", drop=True, verify_integrity=True, inplace=True)
+
         # TODO add a history df to simplify writing and reading of history
+        self.history_df = pd.DataFrame(history_df,
+                                       columns=["tid", "pid", "category", "best_round", "last_tournament"])
 
         self.verify_and_normalize()
 
