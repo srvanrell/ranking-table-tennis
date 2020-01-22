@@ -139,8 +139,15 @@ class Players:
         return self.players_df.loc[pid]
 
     def verify_and_normalize(self):
-        # TODO verify and normalize name, affiliation, etc
-        pass
+        self.players_df.fillna("", inplace=True)
+
+        cols_to_upper = ["affiliation"]
+        self.players_df.loc[:, cols_to_upper] = self.players_df.loc[:, cols_to_upper].applymap(
+            lambda cell: cell.strip().upper())
+
+        cols_to_title = ["name", "city"]
+        self.players_df.loc[:, cols_to_title] = self.players_df.loc[:, cols_to_title].applymap(
+            lambda cell: unidecode(cell).strip().title())
 
     def get_pid(self, name):
         uname = unidecode(name).title()
@@ -154,7 +161,6 @@ class Players:
         pid = self.players_df.index.max() + 1
         self.players_df.loc[pid] = {"name": name, "affiliation": affiliation, "city": city,
                                     "last_tournament": last_tournament, "history": "{}"}
-        # FIXME it should complete and format the new data
         self.verify_and_normalize()
 
 
@@ -586,7 +592,9 @@ class Tournaments:
                                                     "player_a", "player_b", "sets_a", "sets_b", "round", "category"])
         self.tournaments_df.insert(4, "year", None)
         self.tournaments_df.insert(len(self.tournaments_df.columns), "winner", None)
+        self.tournaments_df.insert(len(self.tournaments_df.columns), "winner_round", None)
         self.tournaments_df.insert(len(self.tournaments_df.columns), "loser", None)
+        self.tournaments_df.insert(len(self.tournaments_df.columns), "loser_round", None)
         self.tournaments_df.insert(len(self.tournaments_df.columns), "promote", False)
         self.tournaments_df.insert(len(self.tournaments_df.columns), "sanction", False)
         self.tournaments_df.insert(len(self.tournaments_df.columns), "bonus", False)
@@ -623,6 +631,17 @@ class Tournaments:
         else:
             print("Failed to process matches, a tie was found at:\n", match_row)
             raise ImportError
+
+        # changing labels of finals round match
+        if match_row["round"] == cfg["roundnames"]["final"]:
+            match_row["winner_round"] = cfg["roundnames"]["champion"]
+            match_row["loser_round"] = cfg["roundnames"]["second"]
+        elif match_row["round"] == cfg["roundnames"]["third place playoff"]:
+            match_row["winner_round"] = cfg["roundnames"]["third"]
+            match_row["loser_round"] = cfg["roundnames"]["fourth"]
+        else:
+            match_row["winner_round"] = match_row["round"]
+            match_row["loser_round"] = match_row["round"]
 
         return match_row
 
@@ -669,3 +688,31 @@ class Tournaments:
         all_players = winner.append(loser, ignore_index=True).unique()
 
         return sorted(list(all_players))
+
+    def compute_best_rounds(self, tid):
+        """
+        Return a dictionary with the best round for each player and category
+
+        The keys of the dictionary are tuples like: (category, player_name)
+
+        To get a value use: best_rounds[(category, player_name)]
+        """
+        best_rounds = {}
+
+        for match_id, match_row in self.tournaments_df[self.tournaments_df.tid == tid].iterrows():
+            # workaround to avoid promotion entries being considered as matches
+            if match_row.promote:
+                continue
+
+            # finding best round per category of each player
+            for name, played_round in [(match_row.winner, match_row.winner_round),
+                                       (match_row.loser, match_row.loser_round)]:
+
+                catname = (match_row.category, name)
+                if best_rounds.get(catname):
+                    if bonus_rounds_priority[best_rounds.get(catname)] < bonus_rounds_priority[played_round]:
+                        best_rounds[catname] = played_round
+                else:
+                    best_rounds[catname] = played_round
+
+        return best_rounds

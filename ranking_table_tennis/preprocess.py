@@ -98,9 +98,9 @@ for tid in tournaments:
 #
 #     # Get the best round for each player in each category
 #     # Formatted like: best_rounds[(category, pid)] = best_round_value
-#     aux_best_rounds = tournament.compute_best_rounds()
-#     best_rounds = {(categ, players.get_pid(name)): aux_best_rounds[categ, name]
-#                    for categ, name in aux_best_rounds.keys()}
+    aux_best_rounds = tournaments.compute_best_rounds(tid)
+    best_rounds = {(categ, players.get_pid(name)): aux_best_rounds[categ, name]
+                   for categ, name in aux_best_rounds.keys()}
 #
 #     # Log current tournament as the last played tournament
 #     # Also, best rounds reached in each category are saved into corresponding history
