@@ -161,6 +161,9 @@ class Players:
 
         return pid
 
+    def add_player(self, player):
+        self.players_df = self.players_df.append(player)
+
     def add_new_player(self, name, affiliation="", city="", last_tournament=-1):
         pid = self.players_df.index.max() + 1
         self.players_df.loc[pid] = {"name": name, "affiliation": affiliation, "city": city,
