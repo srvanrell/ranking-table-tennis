@@ -4,6 +4,7 @@ from setuptools.command.install import install
 import os
 import shutil
 
+
 def readme():
     with open('README.md') as f:
         return f.read()
@@ -51,7 +52,8 @@ setup(name='ranking_table_tennis',
           'urllib3>=1.23',
           'openpyxl>=2.4.2,<2.6',
           'Unidecode>=1.0.22',
-          'pandas>=0.20.3'
+          'pandas>=0.20.3',
+          'xlrd >= 1.0.0'
       ],
       cmdclass={
         'develop': PostDevelopCommand,
