@@ -43,29 +43,28 @@ ranking_df = utils.get_initial_ranking_df()
 
 # # Loading temp ranking and players. It will be deleted after a successful preprocessing
 # players_temp, ranking_temp = utils.load_temp_players_ranking()
-#
-# for tid, tournament_sheetname in enumerate(tournament_sheetnames, start=1):
-#     # Loading tournament info
-#     tournament = utils.load_tournament_xlsx(tournament_sheetname)
-#
-#
-#     for name in tournament.get_players_names():
-#         unknown_player = False
-#         if players.get_pid(name) is None:
+
+for tid in tournaments:
+    print("\n", tid, "\n")
+
+    for name in tournaments.get_players_names(tid):
+        print(name, players.get_pid(name))
+        unknown_player = False
+        if players.get_pid(name) is None:
 #             if players_temp.get_pid(name) is None:
 #                 unknown_player = True
-#                 association = input("Enter the association of %s: (optional field)\n" % name)
-#                 city = input("Enter the city of %s: (optional field)\n" % name)
-#                 # Assign a pid for the new given player and add it to the list
-#                 players.add_new_player(name, association, city)
+            association = input("Enter the association of %s: (optional field)\n" % name)
+            city = input("Enter the city of %s: (optional field)\n" % name)
+            # Assign a pid for the new given player and add it to the list
+            players.add_new_player(name, association, city)
 #                 # Save a temp player to resume preprocessing, if necessary
 #                 players_temp.add_player(players[players.get_pid(name)])
 #             else:
 #                 print(">>>>\tUNCOMPLETE preprocessing detected. Resuming...")
 #                 players.add_player(players_temp[players_temp.get_pid(name)])
-#             print(players[players.get_pid(name)])
+            print(players[players.get_pid(name)])
 #
-#         pid = players.get_pid(name)
+        pid = players.get_pid(name)
 #
 #         if ranking.get_entry(pid) is None:
 #             if ranking_temp.get_entry(pid) is None:

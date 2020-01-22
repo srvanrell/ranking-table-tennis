@@ -135,9 +135,27 @@ class Players:
     def __str__(self):
         return str(self.players_df)
 
+    def __getitem__(self, pid):
+        return self.players_df.loc[pid]
+
     def verify_and_normalize(self):
         # TODO verify and normalize name, affiliation, etc
         pass
+
+    def get_pid(self, name):
+        uname = unidecode(name).title()
+        pid = self.players_df[self.players_df.name == uname].first_valid_index()
+        if pid is None:
+            print("WARNING: Unknown player:", uname)
+
+        return pid
+
+    def add_new_player(self, name, affiliation="", city="", last_tournament=-1):
+        pid = self.players_df.index.max() + 1
+        self.players_df.loc[pid] = {"name": name, "affiliation": affiliation, "city": city,
+                                    "last_tournament": last_tournament, "history": "{}"}
+        # FIXME it should complete and format the new data
+        self.verify_and_normalize()
 
 
 class PlayersList:
@@ -581,6 +599,10 @@ class Tournaments:
     def __str__(self):
         return str(self.tournaments_df)
 
+    def __iter__(self):
+        grouped = self.tournaments_df.groupby("tid").groups.keys()
+        return iter(grouped)
+
     @staticmethod
     def _process_match(match_row):
         # workaround to add extra bonus points from match list
@@ -616,8 +638,6 @@ class Tournaments:
         self.tournaments_df["tid"] = tid.transpose()
 
     def verify_and_normalize(self):
-        self.tournaments_df = self.tournaments_df.apply(self._process_match, axis="columns")
-
         cols_to_lower = ["round", "category"]
         self.tournaments_df.loc[:, cols_to_lower] = self.tournaments_df.loc[:, cols_to_lower].applymap(
             lambda cell: cell.strip().lower())
@@ -632,3 +652,20 @@ class Tournaments:
         self.tournaments_df.date = pd.to_datetime(self.tournaments_df.date)
         self.tournaments_df["year"] = self.tournaments_df.apply(lambda row: row["date"].year, axis="columns")
         self._assign_tid()
+        self.tournaments_df = self.tournaments_df.apply(self._process_match, axis="columns")
+
+    def get_players_names(self, tid, category=''):
+        """
+        Return a sorted list of players that played the tournament
+
+        If category is given, the list of players is filtered by category
+        """
+        criteria = self.tournaments_df.tid == tid
+        if category:
+            criteria = criteria & (self.tournaments_df.category == category)
+
+        winner = self.tournaments_df.loc[criteria, "winner"]
+        loser = self.tournaments_df.loc[criteria, "loser"]
+        all_players = winner.append(loser, ignore_index=True).unique()
+
+        return sorted(list(all_players))
