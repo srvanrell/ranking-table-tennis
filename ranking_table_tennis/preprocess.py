@@ -48,7 +48,6 @@ for tid in tournaments:
     print("\n", tid, "\n")
 
     for name in tournaments.get_players_names(tid):
-        print(name, players.get_pid(name))
         unknown_player = False
         if players.get_pid(name) is None:
 #             if players_temp.get_pid(name) is None:
@@ -101,10 +100,11 @@ for tid in tournaments:
     aux_best_rounds = tournaments.compute_best_rounds(tid)
     best_rounds = {(categ, players.get_pid(name)): aux_best_rounds[categ, name]
                    for categ, name in aux_best_rounds.keys()}
-#
-#     # Log current tournament as the last played tournament
-#     # Also, best rounds reached in each category are saved into corresponding history
-#     players.update_histories(tid, best_rounds)
+
+    # Log current tournament as the last played tournament
+    # Also, best rounds reached in each category are saved into corresponding history
+    players.update_histories(tid, best_rounds)
+    print(players)
 #
 # # Update the online version
 # answer = input("\nDo you want to update online sheets [y/n]? (press Enter to continue)\n")

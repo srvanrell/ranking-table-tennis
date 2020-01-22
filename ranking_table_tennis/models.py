@@ -126,6 +126,7 @@ class Players:
         self.players_df = pd.DataFrame(players_df,
                                        columns=["pid", "name", "affiliation", "city", "last_tournament", "history"])
         self.players_df.set_index("pid", drop=True, verify_integrity=True, inplace=True)
+        # TODO add a history df to simplify writing and reading of history
 
         self.verify_and_normalize()
 
@@ -141,9 +142,9 @@ class Players:
     def verify_and_normalize(self):
         self.players_df.fillna("", inplace=True)
 
-        cols_to_upper = ["affiliation"]
-        self.players_df.loc[:, cols_to_upper] = self.players_df.loc[:, cols_to_upper].applymap(
-            lambda cell: cell.strip().upper())
+        # cols_to_upper = ["affiliation"]
+        # self.players_df.loc[:, cols_to_upper] = self.players_df.loc[:, cols_to_upper].applymap(
+        #     lambda cell: cell.strip().upper())
 
         cols_to_title = ["name", "city"]
         self.players_df.loc[:, cols_to_title] = self.players_df.loc[:, cols_to_title].applymap(
@@ -162,6 +163,18 @@ class Players:
         self.players_df.loc[pid] = {"name": name, "affiliation": affiliation, "city": city,
                                     "last_tournament": last_tournament, "history": "{}"}
         self.verify_and_normalize()
+
+    def update_histories(self, tid, best_rounds):
+        """ Save player's best rounds into their histories and update
+        last_tournament.
+
+        Each history is a string that can be read as a dict with (category, tournament_id) as key.
+        """
+        for category, pid in best_rounds.keys():
+            history_dic = ast.literal_eval(self[pid].history)
+            history_dic[(category, tid)] = best_rounds[(category, pid)]
+            self.players_df.loc[pid, "history"] = str(history_dic)
+            self.players_df.loc[pid, "last_tournament"] = tid
 
 
 class PlayersList:
