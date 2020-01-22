@@ -606,17 +606,14 @@ class Tournaments:
 
     def _assign_tid(self):
         def tid_str(grp):
-            print(type(grp))
             dates_ordered = sorted(grp["date"].unique())
             numbered = {pd.Timestamp(date): num for num, date in enumerate(dates_ordered, 1)}
-            tids = grp["date"].apply(lambda row: "S%sT%02d" % (row.year, numbered[row]))
+            tids = grp["date"].transform(lambda row: "S%sT%02d" % (row.year, numbered[row]))
 
             return tids
-
-        tid = self.tournaments_df.groupby("year", as_index=False).apply(tid_str)
-        print(type(tid))
-
-        self.tournaments_df["tid"] = tid
+        # TODO verify, groupby gives an unexpected result and need to be transposed
+        tid = self.tournaments_df.groupby("year", as_index=False, group_keys=False).apply(tid_str)
+        self.tournaments_df["tid"] = tid.transpose()
 
     def verify_and_normalize(self):
         self.tournaments_df = self.tournaments_df.apply(self._process_match, axis="columns")
@@ -635,5 +632,3 @@ class Tournaments:
         self.tournaments_df.date = pd.to_datetime(self.tournaments_df.date)
         self.tournaments_df["year"] = self.tournaments_df.apply(lambda row: row["date"].year, axis="columns")
         self._assign_tid()
-
-        print(self.tournaments_df)
