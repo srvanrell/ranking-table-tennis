@@ -168,32 +168,22 @@ def load_players_sheet():
     return players
 
 
-def get_initial_ranking_df():
+def load_initial_ranking_sheet():
     tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
     initial_ranking_df = pd.read_excel(tournaments_xlsx, sheet_name=cfg["sheetname"]["initial_ranking"], header=0)
     print(">Reading\t", cfg["sheetname"]["initial_ranking"], "\tfrom\t", tournaments_xlsx)
 
-    initial_ranking_df.rename(columns={cfg["labels"]["tid"]: "tid",
-                                       cfg["labels"]["Tournament name"]: "tournament_name",
-                                       cfg["labels"]["Date"]: "date",
-                                       cfg["labels"]["Location"]: "location",
-                                       cfg["labels"]["PID"]: "pid",
-                                       cfg["labels"]["Player"]: "name",
-                                       cfg["labels"]["Rating Points"]: "rating",
-                                       cfg["labels"]["Category"]: "category",
-                                       cfg["labels"]["Active Player"]: "active",
-                                       cfg["labels"]["Points CAT"][0]: "points_cat1",  # FIXME
-                                       cfg["labels"]["Points CAT"][1]: "points_cat2",  # FIXME
-                                       cfg["labels"]["Points CAT"][2]: "points_cat3",  # FIXME
-                                       cfg["labels"]["Points CAT"][3]: "points_cat4",  # FIXME
-                                       cfg["labels"]["Points CAT"][4]: "points_cat5"   # FIXME
-                                       },
-                              inplace=True)
+    columns_translations = {cfg["labels"]["tid"]: "tid", cfg["labels"]["Tournament name"]: "tournament_name",
+                            cfg["labels"]["Date"]: "date", cfg["labels"]["Location"]: "location",
+                            cfg["labels"]["PID"]: "pid", cfg["labels"]["Player"]: "name",
+                            cfg["labels"]["Rating Points"]: "rating", cfg["labels"]["Category"]: "category",
+                            cfg["labels"]["Active Player"]: "active"}
+    categ_translations = {lab: "points_cat_%d" % i for i, lab in enumerate(cfg["labels"]["Points CAT"], 1)}
 
-    initial_ranking_df = initial_ranking_df.astype({"tid": "category", "tournament_name": "category",
-                                                    "location": "category", "category": "category"})
+    initial_ranking_df.rename(columns=dict(columns_translations, **categ_translations), inplace=True)
+    initial_ranking = models.Rankings(initial_ranking_df)
 
-    return initial_ranking_df
+    return initial_ranking
 
 
 def load_ranking_sheet(sheetname):
@@ -618,7 +608,7 @@ def load_temp_players_ranking():
             print(">Reading\t Temp ranking list\tResume preprocessing from", ranking_temp_file)
             ranking_temp = pickle.load(f)
     else:
-        ranking_temp = models.Ranking()
+        ranking_temp = models.Rankings()
 
     return players_temp, ranking_temp
 

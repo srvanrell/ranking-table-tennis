@@ -66,55 +66,55 @@ for i, categ in enumerate(categories):
 
     # Points for being part of a tournament
     participation_points[categ] = raw_participation_points[0][i]
-
-
-class Player:
-    def __init__(self, pid=-1, name="Apellido, Nombre", association="Asociación", city="Ciudad", last_tournament=-1,
-                 history=None):
-        if history is None:
-            history = {}
-        self.pid = pid
-        self.name = unidecode(name).title()
-        self.association = association
-        self.city = city
-        self.last_tournament = last_tournament
-        self.history = history
-
-    def __str__(self):
-        formated_history = ["\tCategory %s - Tournament %s: %s" % (cat, tid, best_round)
-                            for cat, tid, best_round in self.sorted_history]
-        return ";".join([str(self.pid), self.name, self.association, self.city, str(self.last_tournament),
-                         "\n".join([""] + formated_history)])
-
-    def find_last_tournament(self):
-        """ Update and return last tournament index based on player history.
-        If history is not available will not update it.
-
-        :return: last_tournament, zero-indexed
-        """
-        if self.history:
-            self.last_tournament = max(self.played_tournaments())
-        return self.last_tournament
-
-    @property
-    def n_tournaments(self):
-        """ Number of played tournaments, regardless of categories. """
-        return len(self.played_tournaments())
-
-    def played_tournaments(self):
-        """ Return sorted list of played tournaments. Empty history will result in an empty list. """
-        if self.history:
-            return sorted(set([tid for cat, tid in self.history.keys()]))
-        return []
-
-    @property
-    def sorted_history(self):
-        """ History sorted first by category and then by tournament_id.
-
-        Returns a list which elements are [cat, tid, best_round]
-        """
-        return [[cat, tid, self.history[(cat, tid)]] for cat, tid in
-                sorted(self.history.keys())]
+#
+#
+# class Player:
+#     def __init__(self, pid=-1, name="Apellido, Nombre", association="Asociación", city="Ciudad", last_tournament=-1,
+#                  history=None):
+#         if history is None:
+#             history = {}
+#         self.pid = pid
+#         self.name = unidecode(name).title()
+#         self.association = association
+#         self.city = city
+#         self.last_tournament = last_tournament
+#         self.history = history
+#
+#     def __str__(self):
+#         formated_history = ["\tCategory %s - Tournament %s: %s" % (cat, tid, best_round)
+#                             for cat, tid, best_round in self.sorted_history]
+#         return ";".join([str(self.pid), self.name, self.association, self.city, str(self.last_tournament),
+#                          "\n".join([""] + formated_history)])
+#
+#     def find_last_tournament(self):
+#         """ Update and return last tournament index based on player history.
+#         If history is not available will not update it.
+#
+#         :return: last_tournament, zero-indexed
+#         """
+#         if self.history:
+#             self.last_tournament = max(self.played_tournaments())
+#         return self.last_tournament
+#
+#     @property
+#     def n_tournaments(self):
+#         """ Number of played tournaments, regardless of categories. """
+#         return len(self.played_tournaments())
+#
+#     def played_tournaments(self):
+#         """ Return sorted list of played tournaments. Empty history will result in an empty list. """
+#         if self.history:
+#             return sorted(set([tid for cat, tid in self.history.keys()]))
+#         return []
+#
+#     @property
+#     def sorted_history(self):
+#         """ History sorted first by category and then by tournament_id.
+#
+#         Returns a list which elements are [cat, tid, best_round]
+#         """
+#         return [[cat, tid, self.history[(cat, tid)]] for cat, tid in
+#                 sorted(self.history.keys())]
 
 
 class Players:
@@ -127,9 +127,7 @@ class Players:
                                        columns=["pid", "name", "affiliation", "city", "last_tournament", "history"])
         self.players_df.set_index("pid", drop=True, verify_integrity=True, inplace=True)
 
-        # TODO add a history df to simplify writing and reading of history
-        self.history_df = pd.DataFrame(history_df,
-                                       columns=["tid", "pid", "category", "best_round", "last_tournament"])
+        self.history_df = pd.DataFrame(history_df, columns=["tid", "pid", "category", "best_round"])
 
         self.verify_and_normalize()
 
@@ -182,68 +180,72 @@ class Players:
             self.players_df.loc[pid, "history"] = str(history_dic)
             self.players_df.loc[pid, "last_tournament"] = tid
 
+        to_update = [{"tid": tid, "pid": pid, "category": category, "best_round": best_rounds[(category, pid)]}
+                     for category, pid in best_rounds.keys()]
+        self.history_df = self.history_df.append(to_update, ignore_index=True)
 
-class PlayersList:
-    def __init__(self):
-        self.players = {}
-
-    def __getitem__(self, pid):
-        return self.get_player(pid)
-
-    def __len__(self):
-        return len(self.players)
-
-    def __str__(self):
-        return "\n".join(str(p) for p in self)
-
-    def __iter__(self):
-        return iter(self.players.values())
-
-    def get_player(self, pid):
-        return self.players.get(pid)
-
-    def add_player(self, player):
-        if player.pid not in self.players:
-            self.players[player.pid] = player
-        else:
-            print("WARNING: Already exists a player for that pid. Check:", str(player))
-
-    def add_new_player(self, name, association="", city="", last_tournament=-1):
-        pid = 0
-        while pid in self.players:
-            pid += 1
-        self.add_player(Player(pid, name, association, city, last_tournament))
-
-    def get_pid(self, name):
-        for player in self:
-            uname = unidecode(name).title()
-            if uname == player.name:
-                return player.pid
-        print("WARNING: Unknown player:", name)
-        return None
-
-    def to_list(self):
-        players_list = [[p.pid, p.name, p.association, p.city, p.last_tournament, str(p.history)]
-                        for p in self]
-        return players_list
-
-    def load_list(self, players_list):
-        for pid, name, association, city, last_tournament, history_str in players_list:
-            if history_str:
-                history = ast.literal_eval(history_str)
-            else:
-                history = {}
-            self.add_player(Player(int(pid), name, association, city, int(last_tournament), history))
-
-    def update_histories(self, tid, best_rounds):
-        """ Save player's best rounds into their histories and update
-        last_tournament.
-
-        Each history is a dict with (tournament_id, category) as key.
-        """
-        for category, pid in best_rounds.keys():
-            self[pid].history[(category, tid)] = best_rounds[(category, pid)]
-            self[pid].last_tournament = tid
+#
+# class PlayersList:
+#     def __init__(self):
+#         self.players = {}
+#
+#     def __getitem__(self, pid):
+#         return self.get_player(pid)
+#
+#     def __len__(self):
+#         return len(self.players)
+#
+#     def __str__(self):
+#         return "\n".join(str(p) for p in self)
+#
+#     def __iter__(self):
+#         return iter(self.players.values())
+#
+#     def get_player(self, pid):
+#         return self.players.get(pid)
+#
+#     def add_player(self, player):
+#         if player.pid not in self.players:
+#             self.players[player.pid] = player
+#         else:
+#             print("WARNING: Already exists a player for that pid. Check:", str(player))
+#
+#     def add_new_player(self, name, association="", city="", last_tournament=-1):
+#         pid = 0
+#         while pid in self.players:
+#             pid += 1
+#         self.add_player(Player(pid, name, association, city, last_tournament))
+#
+#     def get_pid(self, name):
+#         for player in self:
+#             uname = unidecode(name).title()
+#             if uname == player.name:
+#                 return player.pid
+#         print("WARNING: Unknown player:", name)
+#         return None
+#
+#     def to_list(self):
+#         players_list = [[p.pid, p.name, p.association, p.city, p.last_tournament, str(p.history)]
+#                         for p in self]
+#         return players_list
+#
+#     def load_list(self, players_list):
+#         for pid, name, association, city, last_tournament, history_str in players_list:
+#             if history_str:
+#                 history = ast.literal_eval(history_str)
+#             else:
+#                 history = {}
+#             self.add_player(Player(int(pid), name, association, city, int(last_tournament), history))
+#
+#     def update_histories(self, tid, best_rounds):
+#         """ Save player's best rounds into their histories and update
+#         last_tournament.
+#
+#         Each history is a dict with (tournament_id, category) as key.
+#         """
+#         for category, pid in best_rounds.keys():
+#             self[pid].history[(category, tid)] = best_rounds[(category, pid)]
+#             self[pid].last_tournament = tid
 
 
 class RankingEntry:
@@ -262,7 +264,7 @@ class RankingEntry:
                          self.category, str(self.active)])
 
 
-class Ranking:
+class RankingOLD:
     def __init__(self, tournament_name="", date="", location="", tid=-1):
         self.ranking = {}
         self.date = date
@@ -497,102 +499,166 @@ class Ranking:
         return statistics
 
 
-class Match:
-    def __init__(self, winner_name, loser_name, match_round, category):
-        winner_name = winner_name.strip()
-        loser_name = loser_name.strip()
-        match_round = match_round.strip().lower()
-        category = category.strip().lower()
-        self.winner_name = unidecode(winner_name).title()
-        self.loser_name = unidecode(loser_name).title()
-        self.round = match_round
-        self.category = category
+class Rankings:
+    def __init__(self, ranking_df=None):
+        point_cat_columns = self._point_cat_columns()
+        self.ranking_df = pd.DataFrame(ranking_df,
+                                       columns=["tid", "pid", "rating", "category", "active"] + point_cat_columns)
+        self.ranking_df.loc[:, point_cat_columns].fillna(1, inplace=True)
+        duplicated = self.ranking_df.duplicated(["tid", "pid"], keep=False)
+        if pd.any(duplicated):
+            print()
+        # self.ranking_df.set_index(, verify_integrity=True, inplace=True)
+
+        # self.tournaments_df.insert(4, "year", None)
+        # self.tournaments_df.insert(len(self.tournaments_df.columns), "loser_round", None)
+        # self.tournaments_df.insert(len(self.tournaments_df.columns), "promote", False)
+
+        self.verify_and_normalize()
+
+    def __len__(self):
+        return len(self.ranking_df)
 
     def __str__(self):
-        return ";".join([self.winner_name, self.loser_name, self.round, self.category])
+        return str(self.ranking_df)
 
+    def __getitem__(self, tidpidcol):
+        return self.get_entry(*tidpidcol)
 
-class Tournament:
-    def __init__(self, name="", date="", location=""):
-        self.name = name
-        self.date = date
-        self.location = location
-        self.matches = []
+    def __setitem__(self, tidpidcol, value):
+        tid, pid, col = tidpidcol
+        self.ranking_df.loc[(tid, pid), col] = value
+        self.verify_and_normalize()
 
-    def add_match(self, winner_name, loser_name, match_round, category):
-        self.matches.append(Match(winner_name, loser_name, match_round, category))
+    @staticmethod
+    def _point_cat_columns():
+        return ["points_cat_%d" % d for d, _ in enumerate(categories, 1)]
 
-    def get_players_names(self, category=''):
-        """
-        Return a sorted list of players that played the tournament
-
-        If category is given, the list of players is filtered by category
-        """
-        players_set = set()
-        for match in self.matches:
-            if not category or category == match.category:
-                # workaround to add extra bonus points from match list
-                possible_flag = match.winner_name.lower()
-                if possible_flag not in [cfg["aux"]["flag bonus sanction"], cfg["aux"]["flag add bonus"],
-                                         cfg["aux"]["flag promotion"]]:
-                    players_set.add(match.winner_name)
-                    players_set.add(match.loser_name)
-        return sorted(list(players_set))
-
-    def get_statistics(self):
-        """
-        Return a dictionary with the number of players by category.
-
-        Category names and 'total' are the keys
-        :return:
-        """
-        statistics = {cat: len(self.get_players_names(cat)) for cat in categories}
-        statistics['total'] = len(self.get_players_names())
-        return statistics
-
-    def compute_best_rounds(self):
-        """
-        Return a dictionary with the best round for each player and category
-
-        The keys of the dictionary are tuples like: (category, player_name)
-
-        To get a value use: best_rounds[(category, player_name)]
-        """
-        best_rounds = {}
-
-        for match in self.matches:
-            # changing labels of finals round match
-            if match.round == cfg["roundnames"]["final"]:
-                winner_round_match = cfg["roundnames"]["champion"]
-                loser_round_match = cfg["roundnames"]["second"]
-            elif match.round == cfg["roundnames"]["third place playoff"]:
-                winner_round_match = cfg["roundnames"]["third"]
-                loser_round_match = cfg["roundnames"]["fourth"]
+    def get_entry(self, tid, pid=None, col=None):
+        if (tid, pid) in self.ranking_df.index:
+            if col:
+                return self.ranking_df.loc[(tid, pid), col]
             else:
-                winner_round_match = match.round
-                loser_round_match = match.round
+                return self.ranking_df.loc[(tid, pid)]
 
-            # workaround to avoid promotion entries being considered as matches
-            possible_flag = match.winner_name.lower()
-            if possible_flag == cfg["aux"]["flag promotion"]:
-                continue
+    def add_new_entry(self, tid, pid, initial_rating=-1000, active=False, initial_category=""):
+        point_cat_columns = self._point_cat_columns()
 
-            # finding best round per category of each player
-            for name, played_round in [(match.winner_name, winner_round_match),
-                                       (match.loser_name, loser_round_match)]:
-                # workaround to add extra bonus points from match list
-                possible_flag = name.lower()
-                if possible_flag == cfg["aux"]["flag add bonus"] or possible_flag == cfg["aux"]["flag bonus sanction"]:
-                    continue
+        self.ranking_df.loc[(tid, pid), "rating"] = initial_rating
+        self.ranking_df.loc[(tid, pid), "category"] = initial_category
+        self.ranking_df.loc[(tid, pid), "active"] = active
+        self.ranking_df.loc[(tid, pid), point_cat_columns] = 23
 
-                catname = (match.category, name)
-                if best_rounds.get(catname):
-                    if bonus_rounds_priority[best_rounds.get(catname)] < bonus_rounds_priority[played_round]:
-                        best_rounds[catname] = played_round
-                else:
-                    best_rounds[catname] = played_round
+        self.verify_and_normalize()
 
-        return best_rounds
+    def verify_and_normalize(self):
+        # initial_rating = -1000, active = False, initial_category = ""):
+        # point_cat_columns = self._point_cat_columns()
+        #
+        # self.ranking_df.loc[:, "rating"] = initial_rating
+        # self.ranking_df.loc[:, "category"] = initial_category
+        # self.ranking_df.loc[:, "active"] = active
+        # self.ranking_df.loc[:, point_cat_columns] = 0
+        # TODO
+        pass
+
+
+# class Match:
+#     def __init__(self, winner_name, loser_name, match_round, category):
+#         winner_name = winner_name.strip()
+#         loser_name = loser_name.strip()
+#         match_round = match_round.strip().lower()
+#         category = category.strip().lower()
+#         self.winner_name = unidecode(winner_name).title()
+#         self.loser_name = unidecode(loser_name).title()
+#         self.round = match_round
+#         self.category = category
+#
+#     def __str__(self):
+#         return ";".join([self.winner_name, self.loser_name, self.round, self.category])
+
+
+# class Tournament:
+#     def __init__(self, name="", date="", location=""):
+#         self.name = name
+#         self.date = date
+#         self.location = location
+#         self.matches = []
+#
+#     def add_match(self, winner_name, loser_name, match_round, category):
+#         self.matches.append(Match(winner_name, loser_name, match_round, category))
+#
+#     def get_players_names(self, category=''):
+#         """
+#         Return a sorted list of players that played the tournament
+#
+#         If category is given, the list of players is filtered by category
+#         """
+#         players_set = set()
+#         for match in self.matches:
+#             if not category or category == match.category:
+#                 # workaround to add extra bonus points from match list
+#                 possible_flag = match.winner_name.lower()
+#                 if possible_flag not in [cfg["aux"]["flag bonus sanction"], cfg["aux"]["flag add bonus"],
+#                                          cfg["aux"]["flag promotion"]]:
+#                     players_set.add(match.winner_name)
+#                     players_set.add(match.loser_name)
+#         return sorted(list(players_set))
+#
+#     def get_statistics(self):
+#         """
+#         Return a dictionary with the number of players by category.
+#
+#         Category names and 'total' are the keys
+#         :return:
+#         """
+#         statistics = {cat: len(self.get_players_names(cat)) for cat in categories}
+#         statistics['total'] = len(self.get_players_names())
+#         return statistics
+#
+#     def compute_best_rounds(self):
+#         """
+#         Return a dictionary with the best round for each player and category
+#
+#         The keys of the dictionary are tuples like: (category, player_name)
+#
+#         To get a value use: best_rounds[(category, player_name)]
+#         """
+#         best_rounds = {}
+#
+#         for match in self.matches:
+#             # changing labels of finals round match
+#             if match.round == cfg["roundnames"]["final"]:
+#                 winner_round_match = cfg["roundnames"]["champion"]
+#                 loser_round_match = cfg["roundnames"]["second"]
+#             elif match.round == cfg["roundnames"]["third place playoff"]:
+#                 winner_round_match = cfg["roundnames"]["third"]
+#                 loser_round_match = cfg["roundnames"]["fourth"]
+#             else:
+#                 winner_round_match = match.round
+#                 loser_round_match = match.round
+#
+#             # workaround to avoid promotion entries being considered as matches
+#             possible_flag = match.winner_name.lower()
+#             if possible_flag == cfg["aux"]["flag promotion"]:
+#                 continue
+#
+#             # finding best round per category of each player
+#             for name, played_round in [(match.winner_name, winner_round_match),
+#                                        (match.loser_name, loser_round_match)]:
+#                 # workaround to add extra bonus points from match list
+#                 possible_flag = name.lower()
+#                 if possible_flag == cfg["aux"]["flag add bonus"] or possible_flag == cfg["aux"]["flag bonus sanction"]:
+#                     continue
+#
+#                 catname = (match.category, name)
+#                 if best_rounds.get(catname):
+#                     if bonus_rounds_priority[best_rounds.get(catname)] < bonus_rounds_priority[played_round]:
+#                         best_rounds[catname] = played_round
+#                 else:
+#                     best_rounds[catname] = played_round
+#
+#         return best_rounds
 
 
 class Tournaments:

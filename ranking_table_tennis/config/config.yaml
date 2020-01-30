@@ -91,3 +91,4 @@ aux:
       - 1000  # minimo de tercera
     masters N tournaments to consider: 8
     masters N classified to list: 10000
+    initial tid: S2019T00

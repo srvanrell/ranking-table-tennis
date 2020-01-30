@@ -8,7 +8,7 @@ from urllib import request
 __author__ = 'sebastian'
 
 ##########################################
-# Script to run before computing_all.py
+# Script to run before computing_rankings.py
 # Input: xlsx tournaments database
 #        config.yaml
 # Output: xlsx tournaments database
@@ -25,27 +25,21 @@ if retrieve.lower() != "n":
     print("Downloading and saving %s\n" % xlsx_file)
     request.urlretrieve(cfg["io"]["tournaments_gdrive"], xlsx_file)
 
-# Listing tournament sheetnames by increasing date
+# Loading all tournament data
 tournaments = utils.load_tournaments_sheets()
-
-# print(tournaments)
 
 # Loading players list
 players = utils.load_players_sheet()
 
-# print(players)
-
-# Loading initial ranking and adding new players with 0
-ranking_df = utils.get_initial_ranking_df()
-
-# print(ranking_df)
-# print(ranking_df.dtypes)
+# Loading initial ranking
+rankings = utils.load_initial_ranking_sheet()
+initial_tid = cfg["aux"]["initial tid"]
 
 # Loading temp ranking and players. It will be deleted after a successful preprocessing
 players_temp, ranking_temp = utils.load_temp_players_ranking()
 
 for tid in tournaments:
-    print("\n", tid)
+    print(tid)
 
     for name in tournaments.get_players_names(tid):
         unknown_player = False
@@ -64,32 +58,34 @@ for tid in tournaments:
             print(players[players.get_pid(name)])
 
         pid = players.get_pid(name)
-#
-#         if ranking.get_entry(pid) is None:
+
+        if rankings[initial_tid, pid] is None:
 #             if ranking_temp.get_entry(pid) is None:
 #                 unknown_player = True
-#                 initial_rating = int(input("Enter the initial rating points for %s:\n" % name))
-#                 ranking.add_new_entry(pid, initial_rating)
+            initial_rating = int(input("Enter the initial rating points for %s:\n" % name))
+            rankings.add_new_entry(initial_tid, pid, initial_rating)
 #                 # Save a temp ranking of the player to resume preprocessing, if necessary
 #                 ranking_temp.add_entry(ranking[pid])
 #             else:
 #                 print(">>>>\tUNCOMPLETE preprocessing detected. Resuming...")
 #                 ranking.add_entry(ranking_temp[pid])
-#             print(ranking[pid])
-#
-#         if ranking[pid].category is "":
+            print(rankings[initial_tid, pid])
+
+        if rankings[initial_tid, pid].category is "":
 #             if ranking_temp[pid].category is "":
-#                 unknown_player = True
-#                 for option, category in enumerate(models.categories, start=1):
-#                     print("%d\t->\t%s" % (option, category))
-#                 selected_category = int(input("Enter the initial category (pick a number above) for %s:\n" % name))
-#                 ranking[pid].category = models.categories[selected_category-1]
+                unknown_player = True
+                for option, category in enumerate(models.categories, start=1):
+                    print("%d\t->\t%s" % (option, category))
+                selected_category = int(input("Enter the initial category (pick a number above) for %s:\n" % name))
+                rankings[initial_tid, pid, "category"] = models.categories[selected_category-1]
 #                 # Save a temp ranking of the player to resume preprocessing, if necessary
 #                 ranking_temp[pid].category = ranking[pid].category
 #             else:
 #                 print(">>>>\tUNCOMPLETE preprocessing detected. Resuming...")
 #                 ranking[pid].category = ranking_temp[pid].category
-#             print(ranking[pid])
+
+                print(rankings)
+                print(rankings[initial_tid, pid])
 #
         if unknown_player:
             retrieve = input("press Enter to continue or Ctrl+C to forget last player data\n")
@@ -106,7 +102,7 @@ for tid in tournaments:
     players.update_histories(tid, best_rounds)
 
 # Update the online version
-answer = input("\nDo you want to update online sheets [y/n]? (press Enter to continue)\n")
+answer = input("\nDo you want to update online sheets [Y/n]? (press Enter to continue)\n")
 upload = answer.lower() != "n"
 
 # Saving complete list of players, including new ones
