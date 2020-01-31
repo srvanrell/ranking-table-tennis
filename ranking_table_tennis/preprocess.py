@@ -34,12 +34,14 @@ players = utils.load_players_sheet()
 # Loading initial ranking
 rankings = utils.load_initial_ranking_sheet()
 initial_tid = cfg["aux"]["initial tid"]
+print(rankings)
 
 # Loading temp ranking and players. It will be deleted after a successful preprocessing
 players_temp, ranking_temp = utils.load_temp_players_ranking()
 
 for tid in tournaments:
     print(tid)
+    print(rankings[tid])
 
     for name in tournaments.get_players_names(tid):
         unknown_player = False
@@ -100,6 +102,8 @@ for tid in tournaments:
     # Log current tournament as the last played tournament
     # Also, best rounds reached in each category are saved into corresponding history
     players.update_histories(tid, best_rounds)
+
+print(rankings)
 
 # Update the online version
 answer = input("\nDo you want to update online sheets [Y/n]? (press Enter to continue)\n")

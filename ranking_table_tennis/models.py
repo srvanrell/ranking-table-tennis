@@ -504,11 +504,6 @@ class Rankings:
         point_cat_columns = self._point_cat_columns()
         self.ranking_df = pd.DataFrame(ranking_df,
                                        columns=["tid", "pid", "rating", "category", "active"] + point_cat_columns)
-        self.ranking_df.loc[:, point_cat_columns].fillna(1, inplace=True)
-        duplicated = self.ranking_df.duplicated(["tid", "pid"], keep=False)
-        if duplicated.any():
-            print(self.ranking_df[duplicated])
-
         self.verify_and_normalize()
 
     def __len__(self):
@@ -518,7 +513,10 @@ class Rankings:
         return str(self.ranking_df)
 
     def __getitem__(self, tidpidcol):
-        return self.get_entry(*tidpidcol)
+        if isinstance(tidpidcol, str):
+            return self.get_entries(tidpidcol)
+        else:
+            return self.get_entries(*tidpidcol)
 
     def __setitem__(self, tidpidcol, value):
         tid, pid, col = tidpidcol
@@ -529,12 +527,19 @@ class Rankings:
     def _point_cat_columns():
         return ["points_cat_%d" % d for d, _ in enumerate(categories, 1)]
 
-    def get_entry(self, tid, pid=None, col=None):
-        if (tid, pid) in self.ranking_df.index:
-            if col:
-                return self.ranking_df.loc[(tid, pid), col]
-            else:
-                return self.ranking_df.loc[(tid, pid)]
+    def get_entries(self, tid, pid=None, col=None):
+        entries_indexes = self.ranking_df.tid == tid
+        # print(tid, pid, col)
+        # print(entries_indexes)
+
+        if pid:
+            pid_indexes = self.ranking_df.pid == pid
+            entries_indexes = entries_indexes & pid_indexes
+
+        if col:
+            return self.ranking_df.loc[entries_indexes, col]
+        else:
+            return self.ranking_df.loc[entries_indexes]
 
     def add_new_entry(self, tid, pid, initial_rating=-1000, active=False, initial_category=""):
         point_cat_columns = self._point_cat_columns()
@@ -547,15 +552,20 @@ class Rankings:
         self.verify_and_normalize()
 
     def verify_and_normalize(self):
+        # TODO
         # initial_rating = -1000, active = False, initial_category = ""):
         # point_cat_columns = self._point_cat_columns()
         #
         # self.ranking_df.loc[:, "rating"] = initial_rating
         # self.ranking_df.loc[:, "category"] = initial_category
         # self.ranking_df.loc[:, "active"] = active
-        # self.ranking_df.loc[:, point_cat_columns] = 0
-        # TODO
-        pass
+
+        duplicated = self.ranking_df.duplicated(["tid", "pid"], keep=False)
+        if duplicated.any():
+            print(self.ranking_df[duplicated])
+
+        cat_cal_fillna = {cat_col: 0 for cat_col in self._point_cat_columns()}
+        self.ranking_df.fillna(value=cat_cal_fillna, inplace=True)
 
 
 # class Match:
