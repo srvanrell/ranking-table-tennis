@@ -506,13 +506,8 @@ class Rankings:
                                        columns=["tid", "pid", "rating", "category", "active"] + point_cat_columns)
         self.ranking_df.loc[:, point_cat_columns].fillna(1, inplace=True)
         duplicated = self.ranking_df.duplicated(["tid", "pid"], keep=False)
-        if pd.any(duplicated):
-            print()
-        # self.ranking_df.set_index(, verify_integrity=True, inplace=True)
-
-        # self.tournaments_df.insert(4, "year", None)
-        # self.tournaments_df.insert(len(self.tournaments_df.columns), "loser_round", None)
-        # self.tournaments_df.insert(len(self.tournaments_df.columns), "promote", False)
+        if duplicated.any():
+            print(self.ranking_df[duplicated])
 
         self.verify_and_normalize()
 
