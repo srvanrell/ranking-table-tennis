@@ -536,14 +536,19 @@ class Rankings:
             entries_indexes = entries_indexes & pid_indexes
 
         if col:
-            return self.ranking_df.loc[entries_indexes, col]
-        else:
+            at_index = self.ranking_df.loc[entries_indexes].first_valid_index()
+            return self.ranking_df.at[at_index, col]
+
+        if entries_indexes.any():
             return self.ranking_df.loc[entries_indexes]
 
+    def add_entry(self, ranking_entry):
+        self.ranking_df = self.ranking_df.append(ranking_entry)
+        self.verify_and_normalize()
+
     def add_new_entry(self, tid, pid, initial_rating=-1000, active=False, initial_category=""):
-        self[tid, pid, "rating"] = initial_rating
-        self[tid, pid, "category"] = initial_category
-        self[tid, pid, "active"] = active
+        self.ranking_df = self.ranking_df.append({"tid": tid, "pid": pid,  "rating": initial_rating, "active": active,
+                                                  "category": initial_category}, ignore_index=True)
         self.verify_and_normalize()
 
     def verify_and_normalize(self):

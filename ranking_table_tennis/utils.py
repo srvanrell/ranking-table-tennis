@@ -597,12 +597,14 @@ def load_temp_players_ranking():
     # Loading temp ranking and players. It shuould be deleted after a successful preprocessing
     players_temp_file = cfg["io"]["players_temp_file"]
     ranking_temp_file = cfg["io"]["ranking_temp_file"]
+
     if os.path.exists(players_temp_file):
         with open(players_temp_file, 'rb') as f:
             print(">Reading\t Temp player list\tResume preprocessing from", players_temp_file)
             players_temp = pickle.load(f)
     else:
         players_temp = models.Players()
+
     if os.path.exists(ranking_temp_file):
         with open(ranking_temp_file, 'rb') as f:
             print(">Reading\t Temp ranking list\tResume preprocessing from", ranking_temp_file)

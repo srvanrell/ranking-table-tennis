@@ -41,7 +41,6 @@ players_temp, ranking_temp = utils.load_temp_players_ranking()
 
 for tid in tournaments:
     print(tid)
-    print(rankings[tid])
 
     for name in tournaments.get_players_names(tid):
         unknown_player = False
@@ -62,32 +61,32 @@ for tid in tournaments:
         pid = players.get_pid(name)
 
         if rankings[initial_tid, pid] is None:
-#             if ranking_temp.get_entry(pid) is None:
-#                 unknown_player = True
-            initial_rating = int(input("Enter the initial rating points for %s:\n" % name))
-            rankings.add_new_entry(initial_tid, pid, initial_rating)
-#                 # Save a temp ranking of the player to resume preprocessing, if necessary
-#                 ranking_temp.add_entry(ranking[pid])
-#             else:
-#                 print(">>>>\tUNCOMPLETE preprocessing detected. Resuming...")
-#                 ranking.add_entry(ranking_temp[pid])
-            print(rankings[initial_tid, pid])
+            if ranking_temp[initial_tid, pid] is None:
+                unknown_player = True
+                initial_rating = int(input("Enter the initial rating points for %s:\n" % name))
+                rankings.add_new_entry(initial_tid, pid, initial_rating)
+                # Save a temp ranking of the player to resume preprocessing, if necessary
+                ranking_temp.add_entry(rankings[initial_tid, pid])
+            else:
+                print(">>>>\tUNCOMPLETE preprocessing detected. Resuming...")
+                rankings.add_entry(ranking_temp[initial_tid, pid])
 
-        if rankings[initial_tid, pid].category is "":
-#             if ranking_temp[pid].category is "":
+            print(rankings[initial_tid, pid], players[pid]["name"])
+
+        if rankings[initial_tid, pid, "category"] is "":
+            if ranking_temp[initial_tid, pid, "category"] is "":
                 unknown_player = True
                 for option, category in enumerate(models.categories, start=1):
                     print("%d\t->\t%s" % (option, category))
                 selected_category = int(input("Enter the initial category (pick a number above) for %s:\n" % name))
                 rankings[initial_tid, pid, "category"] = models.categories[selected_category-1]
-#                 # Save a temp ranking of the player to resume preprocessing, if necessary
-#                 ranking_temp[pid].category = ranking[pid].category
-#             else:
-#                 print(">>>>\tUNCOMPLETE preprocessing detected. Resuming...")
-#                 ranking[pid].category = ranking_temp[pid].category
+                # Save a temp ranking of the player to resume preprocessing, if necessary
+                ranking_temp[initial_tid, pid, "category"] = rankings[initial_tid, pid, "category"]
+            else:
+                print(">>>>\tUNCOMPLETE preprocessing detected. Resuming...")
+                rankings[initial_tid, pid, "category"] = ranking_temp[initial_tid, pid, "category"]
 
-                print(rankings)
-                print(rankings[initial_tid, pid])
+            print(rankings[initial_tid, pid], players[pid]["name"])
 #
         if unknown_player:
             retrieve = input("press Enter to continue or Ctrl+C to forget last player data\n")
@@ -113,7 +112,7 @@ upload = answer.lower() != "n"
 utils.save_players_sheet(players, upload=upload)
 
 # # Saving initial rankings for all known players
-# utils.save_ranking_sheet(cfg["sheetname"]["initial_ranking"], ranking, players, upload=upload)
+# utils.save_ranking_sheet(cfg["sheetname"]["initial_ranking"], rankings, players, upload=upload)
 
 # Remove temp files after a successful preprocessing
 utils.remove_temp_players_ranking()
