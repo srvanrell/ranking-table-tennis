@@ -8,7 +8,7 @@ from urllib import request
 __author__ = 'sebastian'
 
 ##########################################
-# Script to run before computing_rankings.py
+# Script to run before compute_rankings.py
 # Input: xlsx tournaments database
 #        config.yaml
 # Output: xlsx tournaments database
@@ -34,13 +34,12 @@ players = utils.load_players_sheet()
 # Loading initial ranking
 rankings = utils.load_initial_ranking_sheet()
 initial_tid = cfg["aux"]["initial tid"]
-print(rankings)
 
 # Loading temp ranking and players. It will be deleted after a successful preprocessing
 players_temp, ranking_temp = utils.load_temp_players_ranking()
 
 for tid in tournaments:
-    print(tid)
+    print("==", tid, "==")
 
     for name in tournaments.get_players_names(tid):
         unknown_player = False
@@ -71,14 +70,14 @@ for tid in tournaments:
                 print(">>>>\tUNCOMPLETE preprocessing detected. Resuming...")
                 rankings.add_entry(ranking_temp[initial_tid, pid])
 
-            print(rankings[initial_tid, pid], players[pid]["name"])
+            print(rankings[initial_tid, pid], players[pid]["name"], "\n")
 
         if rankings[initial_tid, pid, "category"] is "":
             if ranking_temp[initial_tid, pid, "category"] is "":
                 unknown_player = True
                 for option, category in enumerate(models.categories, start=1):
                     print("%d\t->\t%s" % (option, category))
-                selected_category = int(input("Enter the initial category (pick a number above) for %s:\n" % name))
+                selected_category = int(input("\nEnter the initial category (pick a number above) for %s:\n" % name))
                 rankings[initial_tid, pid, "category"] = models.categories[selected_category-1]
                 # Save a temp ranking of the player to resume preprocessing, if necessary
                 ranking_temp[initial_tid, pid, "category"] = rankings[initial_tid, pid, "category"]
@@ -86,7 +85,7 @@ for tid in tournaments:
                 print(">>>>\tUNCOMPLETE preprocessing detected. Resuming...")
                 rankings[initial_tid, pid, "category"] = ranking_temp[initial_tid, pid, "category"]
 
-            print(rankings[initial_tid, pid], players[pid]["name"])
+            print(rankings[initial_tid, pid], players[pid]["name"], "\n")
 #
         if unknown_player:
             retrieve = input("press Enter to continue or Ctrl+C to forget last player data\n")
@@ -102,8 +101,6 @@ for tid in tournaments:
     # Also, best rounds reached in each category are saved into corresponding history
     players.update_histories(tid, best_rounds)
 
-print(rankings)
-
 # Update the online version
 answer = input("\nDo you want to update online sheets [Y/n]? (press Enter to continue)\n")
 upload = answer.lower() != "n"
@@ -112,7 +109,7 @@ upload = answer.lower() != "n"
 utils.save_players_sheet(players, upload=upload)
 
 # # Saving initial rankings for all known players
-# utils.save_ranking_sheet(cfg["sheetname"]["initial_ranking"], rankings, players, upload=upload)
+utils.save_ranking_sheet(cfg["sheetname"]["initial_ranking"], rankings, players, upload=upload)
 
 # Remove temp files after a successful preprocessing
 utils.remove_temp_players_ranking()

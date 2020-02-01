@@ -564,7 +564,6 @@ class Rankings:
         cat_col_values = {cat_col: default_cat_value for cat_col in self._point_cat_columns()}
         default_values = {"rating": default_rating, "category": default_category, "active": default_active,
                           **cat_col_values}
-
         self.ranking_df.fillna(value=default_values, inplace=True)
 
 # class Match:

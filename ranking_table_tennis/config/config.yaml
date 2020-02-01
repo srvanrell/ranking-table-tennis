@@ -30,13 +30,14 @@ sheetname:
     statistics_key: Estadisticas
 
 labels:
-    PID: PID
+    tid: ID Torneo
+    pid: ID Jugador
     Player: Jugador
     Association: Asociación
     City: Ciudad
     Last Tournament: Último Torneo
     Championship Points: Puntos de Campeonato
-    Rating Points: Nivel de Juego
+    Rating: Nivel de Juego
     Best Round: Mejor Ronda
     Round: Instancia
     Winner: Ganador
@@ -54,7 +55,7 @@ labels:
     Participations: Torneos Jugados
     Position: Posición
     Difference: Diferencia
-    tid: ID Torneo
+
     Points CAT:
       - Puntos Primera
       - Puntos Segunda
