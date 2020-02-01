@@ -520,7 +520,8 @@ class Rankings:
 
     def __setitem__(self, tidpidcol, value):
         tid, pid, col = tidpidcol
-        self.ranking_df.loc[(tid, pid), col] = value
+        entries_indexes = (self.ranking_df.tid == tid) & (self.ranking_df.pid == pid)
+        self.ranking_df.loc[entries_indexes, col] = value
         self.verify_and_normalize()
 
     @staticmethod
@@ -529,8 +530,6 @@ class Rankings:
 
     def get_entries(self, tid, pid=None, col=None):
         entries_indexes = self.ranking_df.tid == tid
-        # print(tid, pid, col)
-        # print(entries_indexes)
 
         if pid:
             pid_indexes = self.ranking_df.pid == pid
@@ -542,31 +541,26 @@ class Rankings:
             return self.ranking_df.loc[entries_indexes]
 
     def add_new_entry(self, tid, pid, initial_rating=-1000, active=False, initial_category=""):
-        point_cat_columns = self._point_cat_columns()
-
-        self.ranking_df.loc[(tid, pid), "rating"] = initial_rating
-        self.ranking_df.loc[(tid, pid), "category"] = initial_category
-        self.ranking_df.loc[(tid, pid), "active"] = active
-        self.ranking_df.loc[(tid, pid), point_cat_columns] = 23
-
+        self[tid, pid, "rating"] = initial_rating
+        self[tid, pid, "category"] = initial_category
+        self[tid, pid, "active"] = active
         self.verify_and_normalize()
 
     def verify_and_normalize(self):
-        # TODO
-        # initial_rating = -1000, active = False, initial_category = ""):
-        # point_cat_columns = self._point_cat_columns()
-        #
-        # self.ranking_df.loc[:, "rating"] = initial_rating
-        # self.ranking_df.loc[:, "category"] = initial_category
-        # self.ranking_df.loc[:, "active"] = active
-
         duplicated = self.ranking_df.duplicated(["tid", "pid"], keep=False)
         if duplicated.any():
             print(self.ranking_df[duplicated])
 
-        cat_cal_fillna = {cat_col: 0 for cat_col in self._point_cat_columns()}
-        self.ranking_df.fillna(value=cat_cal_fillna, inplace=True)
+        default_rating = -1000
+        default_active = False
+        default_category = ""
+        default_cat_value = 0
 
+        cat_col_values = {cat_col: default_cat_value for cat_col in self._point_cat_columns()}
+        default_values = {"rating": default_rating, "category": default_category, "active": default_active,
+                          **cat_col_values}
+
+        self.ranking_df.fillna(value=default_values, inplace=True)
 
 # class Match:
 #     def __init__(self, winner_name, loser_name, match_round, category):
