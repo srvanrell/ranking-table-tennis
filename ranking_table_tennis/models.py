@@ -686,6 +686,8 @@ class Tournaments:
         self.tournaments_df.insert(len(self.tournaments_df.columns), "promote", False)
         self.tournaments_df.insert(len(self.tournaments_df.columns), "sanction", False)
         self.tournaments_df.insert(len(self.tournaments_df.columns), "bonus", False)
+        self.tournaments_df.insert(len(self.tournaments_df.columns), "pid_winner", False)
+        self.tournaments_df.insert(len(self.tournaments_df.columns), "pid_loser", False)
 
         self.verify_and_normalize()
 
@@ -804,3 +806,7 @@ class Tournaments:
                     best_rounds[catname] = played_round
 
         return best_rounds
+
+    def assign_pid_from_players(self, players):
+        self.tournaments_df["pid_winner"] = self.tournaments_df["winner"].apply(lambda name: players.get_pid(name))
+        self.tournaments_df["pid_loser"] = self.tournaments_df["loser"].apply(lambda name: players.get_pid(name))
