@@ -59,9 +59,9 @@ for tid in tournaments:
                             and rankings[tid, pid, "category"] != models.categories[-1]]
 
     assigned_points_per_match = rankings.compute_new_ratings(tid, prev_tid, tournaments, pid_not_own_category)
+    assigned_points_per_best_round = rankings.compute_category_points(tid, best_rounds)
 
-#     assigned_points_per_match = new_ranking.compute_new_ratings(old_ranking, matches, pid_not_own_category)
-#     assigned_points_per_best_round = new_ranking.compute_bonus_points(best_rounds)
+    print(rankings[tid])
 #
 #     # Include all known players even if they didn't play in the tournament
 #     for entry in rankings:

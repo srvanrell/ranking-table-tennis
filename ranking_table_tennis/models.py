@@ -566,6 +566,7 @@ class Rankings:
         entries_indexes = self.ranking_df.tid == prev_tid
         new_ranking = self.ranking_df.loc[entries_indexes].copy()
         new_ranking.loc[:, "tid"] = new_tid
+        new_ranking.loc[:, self._point_cat_columns()] = 0
         self.ranking_df = self.ranking_df.append(new_ranking, ignore_index=True)
 
     @staticmethod
@@ -639,8 +640,7 @@ class Rankings:
             factor = self._get_factor(self[prev_tid, winner_pid, "rating"], self[prev_tid, loser_pid, "rating"],
                                       self[prev_tid, winner_pid, "category"], self[prev_tid, loser_pid, "category"],
                                       (winner_pid in pid_not_own_category) or (loser_pid in pid_not_own_category))
-            to_winner = factor * to_winner
-            to_loser = factor * to_loser
+            to_winner, to_loser = factor * to_winner,  factor * to_loser
             self[new_tid, winner_pid, "rating"] += to_winner
             self[new_tid, loser_pid, "rating"] -= to_loser
 
@@ -649,6 +649,19 @@ class Rankings:
         self.update_categories()
 
         return assigned_points
+
+    def compute_category_points(self, tid, best_rounds):
+        # List of points assigned
+        assigned_points = []
+        point_cat_columns = self._point_cat_columns()
+
+        for (category, pid), best_round in best_rounds.items():
+            points = bonus_rounds_points[category][best_round]
+            cat_col = point_cat_columns[categories.index(category)]
+            self[tid, pid, cat_col] = points
+            assigned_points.append([pid, points, best_round, category])
+
+        return sorted(assigned_points, key=lambda l: (l[-1], l[1], l[0]), reverse=True)
 
 
 
