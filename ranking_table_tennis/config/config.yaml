@@ -88,8 +88,9 @@ aux:
     tournament window to inactivate: 4
     categories thresholds:
       - 1500  # minimo de primera
-      - 1250  # minimo de segunda
-      - 1000  # minimo de tercera
+      - 1100  # minimo de segunda
+      - 800   # minimo de tercera
+      - 600   # minimo de cuarta
     masters N tournaments to consider: 8
     masters N classified to list: 10000
     initial tid: S2019T00

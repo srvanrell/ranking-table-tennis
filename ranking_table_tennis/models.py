@@ -49,12 +49,10 @@ unexpected_result_table = load_csv(user_config_path + "/unexpected_result.csv")
 
 # points to be assigned by round and by participation
 raw_bonus_table = load_csv(user_config_path + "/points_per_round.csv", first_row=0)
-raw_participation_points = load_csv(user_config_path + "/participation_points.csv")
 
 categories = raw_bonus_table[0][2:]
 bonus_rounds_points = {}
 bonus_rounds_priority = {}
-participation_points = {}
 for i, categ in enumerate(categories):
     bonus_rounds_points[categ] = {}
     for bonus_row in raw_bonus_table[1:]:
@@ -64,8 +62,6 @@ for i, categ in enumerate(categories):
         bonus_rounds_points[categ][reached_round] = points
         bonus_rounds_priority[reached_round] = priority
 
-    # Points for being part of a tournament
-    participation_points[categ] = raw_participation_points[0][i]
 #
 #
 # class Player:
@@ -371,13 +367,13 @@ class RankingOLD:
             assigned_points.append([pid, round_points[best_rounds[categpid]], best_rounds[categpid], category])
         return sorted(assigned_points, key=lambda l: (l[-1], l[1], l[0]), reverse=True)
 
-    def add_participation_points(self, pid_list):
-        """Add bonus points for each participant given """
-        assigned_points = []
-        for pid in pid_list:
-            self[pid].bonus += participation_points[self[pid].category]
-            assigned_points.append([pid, participation_points[self[pid].category]])
-        return assigned_points
+    # def add_participation_points(self, pid_list):
+    #     """Add bonus points for each participant given """
+    #     assigned_points = []
+    #     for pid in pid_list:
+    #         self[pid].bonus += participation_points[self[pid].category]
+    #         assigned_points.append([pid, participation_points[self[pid].category]])
+    #     return assigned_points
 
     def bonus2rating(self):
         """For each entry, add bonus points to rating and then set bonus to zero."""
@@ -566,6 +562,104 @@ class Rankings:
                           **cat_col_values}
         self.ranking_df.fillna(value=default_values, inplace=True)
 
+    def initialize_new_ranking(self, new_tid, prev_tid):
+        entries_indexes = self.ranking_df.tid == prev_tid
+        new_ranking = self.ranking_df.loc[entries_indexes].copy()
+        new_ranking.loc[:, "tid"] = new_tid
+        self.ranking_df = self.ranking_df.append(new_ranking, ignore_index=True)
+
+    @staticmethod
+    def _rating_to_category(rating):
+        thresholds = cfg["aux"]["categories thresholds"]
+        category = categories[-2]  # Last category that it's not fan
+        for j, th in enumerate(thresholds):
+            if rating >= th:
+                category = categories[j]
+                break
+        return category
+
+    def update_categories(self):
+        """ Players are ranked based on rating and given thresholds.
+
+        Players are ordered by rating and then assigned to a category
+
+        Example:
+        - rating >= 500        -> first category
+        - 500 > rating >= 250  -> second category
+        - 250 > rating         -> third category
+        """
+        self.ranking_df.loc[:, "category"] = self.ranking_df.loc[:, "rating"].apply(self._rating_to_category)
+
+    @staticmethod
+    def _points_to_assign(rating_winner, rating_loser):
+        """Returns points to add to winner and to deduce from loser, given ratings of winner and loser."""
+        rating_diff = rating_winner - rating_loser
+
+        assignation_table = expected_result_table
+        if rating_diff < 0:
+            rating_diff *= -1.0
+            assignation_table = unexpected_result_table
+
+        j = 0
+        while rating_diff > assignation_table[j][0]:
+            j += 1
+
+        points_to_winner = assignation_table[j][1]
+        points_to_loser = assignation_table[j][2]
+
+        return [points_to_winner, points_to_loser]
+
+    @staticmethod
+    def _get_factor(rating_winner, rating_loser, category_winner, category_loser, not_own_category):
+        """Returns factor for rating computation. It considers given winner and loser category.
+        Players must play their own category """
+        rating_diff = rating_winner - rating_loser
+        category_factor = 1.0
+        if category_winner != category_loser and not not_own_category:
+            category_factor = cfg["aux"]["category expected factor"]
+            if rating_diff < 0:
+                category_factor = cfg["aux"]["category unexpected factor"]
+
+        factor = cfg["aux"]["rating factor"] * category_factor
+
+        return factor
+
+    def compute_new_ratings(self, new_tid, prev_tid, tournaments, pid_not_own_category):
+        """return assigned points per match
+        (a list containing [winner_pid, loser_pid, points_to_winner, points_to_loser])"""
+
+        # List of points assigned in each match
+        assigned_points = []
+
+        for match_index, match in tournaments.get_matches(new_tid).iterrows():
+
+            winner_pid, loser_pid = match["winner_pid"], match["loser_pid"]
+            [to_winner, to_loser] = self._points_to_assign(self[prev_tid, winner_pid, "rating"],
+                                                           self[prev_tid, loser_pid, "rating"])
+            factor = self._get_factor(self[prev_tid, winner_pid, "rating"], self[prev_tid, loser_pid, "rating"],
+                                      self[prev_tid, winner_pid, "category"], self[prev_tid, loser_pid, "category"],
+                                      (winner_pid in pid_not_own_category) or (loser_pid in pid_not_own_category))
+            to_winner = factor * to_winner
+            to_loser = factor * to_loser
+            self[new_tid, winner_pid, "rating"] += to_winner
+            self[new_tid, loser_pid, "rating"] -= to_loser
+
+            assigned_points.append([winner_pid, loser_pid, to_winner, -to_loser, match["round"], match["category"]])
+
+        self.update_categories()
+
+        return assigned_points
+
+
+
+
+
+
+
+
+
+
+
 # class Match:
 #     def __init__(self, winner_name, loser_name, match_round, category):
 #         winner_name = winner_name.strip()
@@ -686,8 +780,8 @@ class Tournaments:
         self.tournaments_df.insert(len(self.tournaments_df.columns), "promote", False)
         self.tournaments_df.insert(len(self.tournaments_df.columns), "sanction", False)
         self.tournaments_df.insert(len(self.tournaments_df.columns), "bonus", False)
-        self.tournaments_df.insert(len(self.tournaments_df.columns), "pid_winner", False)
-        self.tournaments_df.insert(len(self.tournaments_df.columns), "pid_loser", False)
+        self.tournaments_df.insert(len(self.tournaments_df.columns), "winner_pid", False)
+        self.tournaments_df.insert(len(self.tournaments_df.columns), "loser_pid", False)
 
         self.verify_and_normalize()
 
@@ -700,6 +794,10 @@ class Tournaments:
     def __iter__(self):
         grouped = self.tournaments_df.groupby("tid").groups.keys()
         return iter(grouped)
+
+    def __getitem__(self, tid):
+        criteria = self.tournaments_df.tid == tid
+        return self.tournaments_df.loc[criteria].copy()
 
     @staticmethod
     def _process_match(match_row):
@@ -808,5 +906,12 @@ class Tournaments:
         return best_rounds
 
     def assign_pid_from_players(self, players):
-        self.tournaments_df["pid_winner"] = self.tournaments_df["winner"].apply(lambda name: players.get_pid(name))
-        self.tournaments_df["pid_loser"] = self.tournaments_df["loser"].apply(lambda name: players.get_pid(name))
+        self.tournaments_df["winner_pid"] = self.tournaments_df["winner"].apply(lambda name: players.get_pid(name))
+        self.tournaments_df["loser_pid"] = self.tournaments_df["loser"].apply(lambda name: players.get_pid(name))
+
+    def get_matches(self, tid):
+        entries_indexes = (self.tournaments_df.loc[:, "tid"] == tid)
+        entries_indexes &= ~(self.tournaments_df.loc[:, "category"] == categories[-1])
+        entries_indexes &= ~self.tournaments_df.loc[:, ["sanction", "promote", "bonus"]].any(axis="columns")
+
+        return self.tournaments_df[entries_indexes]
