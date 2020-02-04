@@ -48,19 +48,19 @@ expected_result_table = load_csv(user_config_path + "/expected_result.csv")
 unexpected_result_table = load_csv(user_config_path + "/unexpected_result.csv")
 
 # points to be assigned by round and by participation
-raw_bonus_table = load_csv(user_config_path + "/points_per_round.csv", first_row=0)
+raw_points_per_round_table = load_csv(user_config_path + "/points_per_round.csv", first_row=0)
 
-categories = raw_bonus_table[0][2:]
-bonus_rounds_points = {}
-bonus_rounds_priority = {}
+categories = raw_points_per_round_table[0][2:]
+best_rounds_points = {}
+best_rounds_priority = {}
 for i, categ in enumerate(categories):
-    bonus_rounds_points[categ] = {}
-    for bonus_row in raw_bonus_table[1:]:
-        priority = bonus_row[0]
-        reached_round = bonus_row[1]
-        points = bonus_row[2 + i]
-        bonus_rounds_points[categ][reached_round] = points
-        bonus_rounds_priority[reached_round] = priority
+    best_rounds_points[categ] = {}
+    for points_per_round_row in raw_points_per_round_table[1:]:
+        priority = points_per_round_row[0]
+        reached_round = points_per_round_row[1]
+        points = points_per_round_row[2 + i]
+        best_rounds_points[categ][reached_round] = points
+        best_rounds_priority[reached_round] = priority
 
 #
 #
@@ -180,6 +180,12 @@ class Players:
                      for category, pid in best_rounds.keys()]
         self.history_df = self.history_df.append(to_update, ignore_index=True)
 
+    def played_tournaments(self, pid):
+        """ Return sorted list of played tournaments. Empty history will result in an empty list. """
+        history_dic = ast.literal_eval(self[pid].history)
+        if history_dic:
+            return sorted(set([tid for cat, tid in history_dic.keys()]))
+        return []
 #
 # class PlayersList:
 #     def __init__(self):
@@ -362,7 +368,7 @@ class RankingOLD:
         assigned_points = []
         for category, pid in best_rounds.keys():
             categpid = (category, pid)
-            round_points = bonus_rounds_points[category]
+            round_points = best_rounds_points[category]
             self[pid].bonus += round_points[best_rounds[categpid]]
             assigned_points.append([pid, round_points[best_rounds[categpid]], best_rounds[categpid], category])
         return sorted(assigned_points, key=lambda l: (l[-1], l[1], l[0]), reverse=True)
@@ -661,7 +667,7 @@ class Rankings:
         point_cat_columns = self._point_cat_columns()
 
         for (category, pid), best_round in best_rounds.items():
-            points = bonus_rounds_points[category][best_round]
+            points = best_rounds_points[category][best_round]
             cat_col = point_cat_columns[categories.index(category)]
             self[tid, pid, cat_col] = points
             assigned_points.append([pid, points, best_round, category])
@@ -724,14 +730,36 @@ class Rankings:
         # sort_by_point = pl_cat.groupby(category_col, as_index=False).apply(
         #     lambda x: x.sort_values([points_col, participations_col], ascending=(False, True)))
 
+    def update_active_players(self, tid, players, initial_tid):
+        # Avoid activate or inactivate players after the first tournament.
+        activate_window = cfg["aux"]["tournament window to activate"]
+        tourns_to_activate = cfg["aux"]["tournaments to activate"]
+        inactivate_window = cfg["aux"]["tournament window to inactivate"]
 
+        indexes = (self.ranking_df.tid == initial_tid) & self.ranking_df.active
+        initial_active_players = list(self.ranking_df.loc[indexes, "pid"].unique())
 
+        tids_list = self._get_tids_list()
+        active_window_tids = tids_list[max(0, tids_list.index(tid) - activate_window + 1):tids_list.index(tid) + 1]
+        inactive_window_tids = tids_list[max(0, tids_list.index(tid) - inactivate_window + 1):tids_list.index(tid) + 1]
 
+        for re_index, re in self.ranking_df[self.ranking_df.tid == tid].iterrows():
+            if not re.active:
+                last_tourns = [p_tid for p_tid in players.played_tournaments(re.pid) if p_tid in active_window_tids]
+                # activate if he has played at least tourns_to_activate tournaments
+                active = len(last_tourns) >= tourns_to_activate
+            else:
+                last_tourns = [p_tid for p_tid in players.played_tournaments(re.pid) if p_tid in inactive_window_tids]
+                # don't inactivate during tournaments window if it is an initial active player
+                if tids_list.index(tid) + 1 < inactivate_window and re.pid in initial_active_players:
+                    active = True
+                else:
+                    active = len(last_tourns) > 0
 
+            self[tid, re.pid, "active"] = active
 
-
-
-
+    def _get_tids_list(self):
+        return sorted(list(self.ranking_df.tid.unique()))
 
 
 # class Match:
@@ -824,7 +852,7 @@ class Rankings:
 #
 #                 catname = (match.category, name)
 #                 if best_rounds.get(catname):
-#                     if bonus_rounds_priority[best_rounds.get(catname)] < bonus_rounds_priority[played_round]:
+#                     if best_rounds_priority[best_rounds.get(catname)] < best_rounds_priority[played_round]:
 #                         best_rounds[catname] = played_round
 #                 else:
 #                     best_rounds[catname] = played_round
@@ -963,7 +991,7 @@ class Tournaments:
 
         for match_id, match_row in self.tournaments_df[self.tournaments_df.tid == tid].iterrows():
             # workaround to avoid promotion entries being considered as matches
-            if match_row.promote:
+            if match_row.promote or match_row.sanction:
                 continue
 
             # finding best round per category of each player
@@ -972,7 +1000,7 @@ class Tournaments:
 
                 catname = (match_row.category, name)
                 if best_rounds.get(catname):
-                    if bonus_rounds_priority[best_rounds.get(catname)] < bonus_rounds_priority[played_round]:
+                    if best_rounds_priority[best_rounds.get(catname)] < best_rounds_priority[played_round]:
                         best_rounds[catname] = played_round
                 else:
                     best_rounds[catname] = played_round
