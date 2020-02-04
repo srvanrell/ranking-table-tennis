@@ -173,7 +173,7 @@ def load_initial_ranking_sheet():
                             cfg["labels"]["pid"]: "pid", cfg["labels"]["Player"]: "name",
                             cfg["labels"]["Rating"]: "rating", cfg["labels"]["Category"]: "category",
                             cfg["labels"]["Active Player"]: "active",
-                            **{lab: "points_cat_%d" % i for i, lab in enumerate(cfg["labels"]["Points CAT"], 1)}
+                            # **{lab: "points_cat_%d" % i for i, lab in enumerate(cfg["labels"]["Points CAT"], 1)}
                             }
 
     initial_ranking_df.rename(columns=columns_translations, inplace=True)

@@ -497,9 +497,9 @@ class RankingOLD:
 
 class Rankings:
     def __init__(self, ranking_df=None):
-        point_cat_columns = self._point_cat_columns()
-        self.ranking_df = pd.DataFrame(ranking_df,
-                                       columns=["tid", "pid", "rating", "category", "active"] + point_cat_columns)
+        all_columns = ["tid", "pid", "rating", "category", "active"]
+        all_columns += self._point_cat_columns() + self._cum_point_cat_columns()
+        self.ranking_df = pd.DataFrame(ranking_df, columns=all_columns)
         self.verify_and_normalize()
 
     def __len__(self):
@@ -523,6 +523,10 @@ class Rankings:
     @staticmethod
     def _point_cat_columns():
         return ["points_cat_%d" % d for d, _ in enumerate(categories, 1)]
+
+    @staticmethod
+    def _cum_point_cat_columns():
+        return ["cum_points_cat_%d" % d for d, _ in enumerate(categories, 1)]
 
     def get_entries(self, tid, pid=None, col=None):
         entries_indexes = self.ranking_df.tid == tid
@@ -557,7 +561,8 @@ class Rankings:
         default_category = ""
         default_cat_value = 0
 
-        cat_col_values = {cat_col: default_cat_value for cat_col in self._point_cat_columns()}
+        point_cat_columns = self._point_cat_columns() + self._cum_point_cat_columns()
+        cat_col_values = {cat_col: default_cat_value for cat_col in point_cat_columns}
         default_values = {"rating": default_rating, "category": default_category, "active": default_active,
                           **cat_col_values}
         self.ranking_df.fillna(value=default_values, inplace=True)
@@ -662,6 +667,62 @@ class Rankings:
             assigned_points.append([pid, points, best_round, category])
 
         return sorted(assigned_points, key=lambda l: (l[-1], l[1], l[0]), reverse=True)
+
+    def compute_championship_points(self, tid):
+        """
+        Compute and save masters cup up into log
+        :return: None
+        """
+        n_tournaments = cfg["aux"]["masters N tournaments to consider"]
+        n_classified = cfg["aux"]["masters N classified to list"]
+
+        # # Labels of columns, just to simplify notation
+        # player_col = cfg["labels"]["Player"]
+        # category_col = cfg["labels"]["Category"]
+        # points_col = cfg["labels"]["Bonus Points"]
+        # participations_col = cfg["labels"]["Participations"]
+
+        def _sum_n_best_tournaments(pid_ranking):
+            suma = pid_ranking.loc[:, ["tid", cat_col]].nlargest(n_tournaments, columns=[cat_col]).sum()
+            print(suma)
+
+        for cat_col in self._point_cat_columns()[:1]:
+            pl_cat_best_n_tour = self.ranking_df.groupby(["pid"]).apply(_sum_n_best_tournaments)
+            # print(pl_cat_best_n_tour, type(pl_cat_best_n_tour))
+
+        # # Will compute all rankings from the beginning by default
+        # tournament_sheetnames = get_tournament_sheetnames_by_date()
+        # tids = range(1, len(tournament_sheetnames) + 1)
+
+
+        # for tid in tids:
+        #     tournament_sheetname = tournament_sheetnames[tid - 1]
+        #     bonus_log = load_sheet_workbook(log_xlsx,
+        #                                     tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
+        #                                                                  cfg["sheetname"]["bonus_details_key"]),
+        #                                     first_row=1)
+        #     temp_df = pd.DataFrame([[tid] + j for j in bonus_log],
+        #                            columns=[cfg["labels"][key] for key in ["Tournament", "Player", "Bonus Points",
+        #                                                                    "Best Round", "Category"]]
+        #                            )
+        #     temp_df = temp_df[temp_df[category_col] != ""]
+        #     df = df.append(temp_df, ignore_index=True)
+
+        # pl_cat_best_n_tour = df[[player_col, category_col, points_col]]
+        # if tid > 1:
+        #     pl_cat_best_n_tour = df.groupby([player_col, category_col])[points_col].nlargest(n_tournaments)
+        # pl_cat_cumul = pl_cat_best_n_tour.groupby([player_col, category_col]).sum().reset_index()
+        # pl_cat_count = df.groupby([player_col, category_col])[points_col].count().reset_index().rename(
+        #     columns={points_col: participations_col})
+
+        # pl_cat = pd.merge(pl_cat_cumul, pl_cat_count).sort_values(points_col, ascending=False)
+
+        # sort_by_point = pl_cat.groupby(category_col, as_index=False).apply(
+        #     lambda x: pd.DataFrame.nlargest(x, n=n_classified, columns=points_col))
+        # sort_by_count = pl_cat.groupby(category_col, as_index=False).apply(
+        #     lambda x: pd.DataFrame.nlargest(x, n=n_classified, columns=participations_col))
+        # sort_by_point = pl_cat.groupby(category_col, as_index=False).apply(
+        #     lambda x: x.sort_values([points_col, participations_col], ascending=(False, True)))
 
 
 

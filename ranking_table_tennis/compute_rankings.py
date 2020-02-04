@@ -61,7 +61,7 @@ for tid in tournaments:
     assigned_points_per_match = rankings.compute_new_ratings(tid, prev_tid, tournaments, pid_not_own_category)
     assigned_points_per_best_round = rankings.compute_category_points(tid, best_rounds)
 
-    print(rankings[tid])
+    # print(rankings[tid])
 #
 #     # Include all known players even if they didn't play in the tournament
 #     for entry in rankings:
@@ -92,6 +92,7 @@ for tid in tournaments:
 #                     list_item[1] *= cfg["aux"]["sanction factor"]
 
     rankings.update_categories()
+    rankings.compute_championship_points(tid)
 
 #     # Saving new ranking
 #     utils.save_ranking_sheet(tournament_sheetname, new_ranking, players)
