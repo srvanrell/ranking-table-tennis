@@ -62,26 +62,13 @@ for tid in tournaments:
     assigned_points_per_best_round = rankings.compute_category_points(tid, best_rounds)
     rankings.update_active_players(tid, players, initial_tid)
 
+    # Promote those players indicated in the matches list of the tournament
     rankings.promote_players(tid, tournaments)
+
+    # Substract championship points
     rankings.apply_sanction(tid, tournaments)
 
-#     # Promote those players indicated in the matches list of the tournament
-#     # Add or substract bonus points
-#     for match in tournament.matches:
-#         possible_flag = match.winner_name.lower()
-#         if possible_flag == cfg["aux"]["flag promotion"]:
-#             new_ranking[players.get_pid(match.loser_name)].category = match.category
-#         if possible_flag == cfg["aux"]["flag bonus sanction"]:
-#             pid_bonus = players.get_pid(match.loser_name)
-#             new_bonus = new_ranking[pid_bonus].bonus
-#             old_bonus = old_ranking[pid_bonus].bonus
-#             new_ranking[pid_bonus].bonus = old_bonus + (new_bonus - old_bonus) * cfg["aux"]["sanction factor"]
-#
-#             # list_item == [pid, points, best_round, category]
-#             for list_item in assigned_points_per_best_round:
-#                 if list_item[0] == pid_bonus:
-#                     list_item[1] *= cfg["aux"]["sanction factor"]
-
+    # TODO verify if it is necessary
     rankings.update_categories()
     rankings.compute_championship_points(tid)
 
@@ -111,6 +98,3 @@ for tid in tournaments:
 #                               points_log_to_save)
 #
 #     utils.save_statistics(tournament_sheetname, tournament, new_ranking)
-#
-# # Compute and save masters cup into log
-# utils.save_masters_cup()

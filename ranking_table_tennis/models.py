@@ -577,7 +577,7 @@ class Rankings:
         entries_indexes = self.ranking_df.tid == prev_tid
         new_ranking = self.ranking_df.loc[entries_indexes].copy()
         new_ranking.loc[:, "tid"] = new_tid
-        new_ranking.loc[:, self._point_cat_columns()] = 0
+        new_ranking.loc[:, self._point_cat_columns() + self._cum_point_cat_columns()] = 0
         self.ranking_df = self.ranking_df.append(new_ranking, ignore_index=True)
 
     @staticmethod
@@ -680,53 +680,16 @@ class Rankings:
         :return: None
         """
         n_tournaments = cfg["aux"]["masters N tournaments to consider"]
-        n_classified = cfg["aux"]["masters N classified to list"]
+        tid_indexes = self.ranking_df.tid == tid
 
-        # # Labels of columns, just to simplify notation
-        # player_col = cfg["labels"]["Player"]
-        # category_col = cfg["labels"]["Category"]
-        # points_col = cfg["labels"]["Bonus Points"]
-        # participations_col = cfg["labels"]["Participations"]
+        for cat_col, cum_cat_col in zip(self._point_cat_columns(), self._cum_point_cat_columns()):
 
-        def _sum_n_best_tournaments(pid_ranking):
-            suma = pid_ranking.loc[:, ["tid", cat_col]].nlargest(n_tournaments, columns=[cat_col]).sum()
-            print(suma)
+            pid_cum_points_cat = self.ranking_df.groupby(["pid"]).apply(
+                lambda ranking_pid: ranking_pid.loc[:, cat_col].nlargest(n_tournaments).sum())
 
-        for cat_col in self._point_cat_columns()[:1]:
-            pl_cat_best_n_tour = self.ranking_df.groupby(["pid"]).apply(_sum_n_best_tournaments)
-            # print(pl_cat_best_n_tour, type(pl_cat_best_n_tour))
+            self.ranking_df.loc[tid_indexes, cum_cat_col] = self.ranking_df.loc[tid_indexes].apply(
+                lambda re: pid_cum_points_cat[re.pid], axis="columns")
 
-        # # Will compute all rankings from the beginning by default
-        # tournament_sheetnames = get_tournament_sheetnames_by_date()
-        # tids = range(1, len(tournament_sheetnames) + 1)
-
-
-        # for tid in tids:
-        #     tournament_sheetname = tournament_sheetnames[tid - 1]
-        #     bonus_log = load_sheet_workbook(log_xlsx,
-        #                                     tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
-        #                                                                  cfg["sheetname"]["bonus_details_key"]),
-        #                                     first_row=1)
-        #     temp_df = pd.DataFrame([[tid] + j for j in bonus_log],
-        #                            columns=[cfg["labels"][key] for key in ["Tournament", "Player", "Bonus Points",
-        #                                                                    "Best Round", "Category"]]
-        #                            )
-        #     temp_df = temp_df[temp_df[category_col] != ""]
-        #     df = df.append(temp_df, ignore_index=True)
-
-        # pl_cat_best_n_tour = df[[player_col, category_col, points_col]]
-        # if tid > 1:
-        #     pl_cat_best_n_tour = df.groupby([player_col, category_col])[points_col].nlargest(n_tournaments)
-        # pl_cat_cumul = pl_cat_best_n_tour.groupby([player_col, category_col]).sum().reset_index()
-        # pl_cat_count = df.groupby([player_col, category_col])[points_col].count().reset_index().rename(
-        #     columns={points_col: participations_col})
-
-        # pl_cat = pd.merge(pl_cat_cumul, pl_cat_count).sort_values(points_col, ascending=False)
-
-        # sort_by_point = pl_cat.groupby(category_col, as_index=False).apply(
-        #     lambda x: pd.DataFrame.nlargest(x, n=n_classified, columns=points_col))
-        # sort_by_count = pl_cat.groupby(category_col, as_index=False).apply(
-        #     lambda x: pd.DataFrame.nlargest(x, n=n_classified, columns=participations_col))
         # sort_by_point = pl_cat.groupby(category_col, as_index=False).apply(
         #     lambda x: x.sort_values([points_col, participations_col], ascending=(False, True)))
 
