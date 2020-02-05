@@ -60,15 +60,10 @@ for tid in tournaments:
 
     assigned_points_per_match = rankings.compute_new_ratings(tid, prev_tid, tournaments, pid_not_own_category)
     assigned_points_per_best_round = rankings.compute_category_points(tid, best_rounds)
-
-#     # Include all known players even if they didn't play in the tournament
-#     for entry in rankings:
-#         if new_ranking.get_entry(entry.pid) is None:
-#             # Only include previously known players, not from future tournaments
-#             if entry.bonus > 0 or entry.active:
-#                 new_ranking.add_entry(entry)
-
     rankings.update_active_players(tid, players, initial_tid)
+
+    rankings.promote_players(tid, tournaments)
+    rankings.apply_sanction(tid, tournaments)
 
 #     # Promote those players indicated in the matches list of the tournament
 #     # Add or substract bonus points

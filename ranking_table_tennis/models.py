@@ -761,6 +761,19 @@ class Rankings:
     def _get_tids_list(self):
         return sorted(list(self.ranking_df.tid.unique()))
 
+    def promote_players(self, tid, tournaments):
+        tournament_df = tournaments[tid]
+        for match_index, match in tournament_df[tournament_df.promote].iterrows():
+            self[tid, match.winner_pid, "category"] = match.category
+            print(match.winner, "promoted to", match.category)
+
+    def apply_sanction(self, new_tid, tournaments):
+        tournament_df = tournaments[new_tid]
+        for match_index, match in tournament_df[tournament_df.sanction].iterrows():
+            for cat_col in self._point_cat_columns():
+                self[new_tid, match.loser_pid, cat_col] *= cfg["aux"]["sanction factor"]
+            print("Apply sanction on:\n", self[new_tid, match.loser_pid])
+
 
 # class Match:
 #     def __init__(self, winner_name, loser_name, match_round, category):
@@ -1012,6 +1025,7 @@ class Tournaments:
         self.tournaments_df["loser_pid"] = self.tournaments_df["loser"].apply(lambda name: players.get_pid(name))
 
     def get_matches(self, tid):
+        # FIXME it should provide the ability to exclude selectively
         entries_indexes = (self.tournaments_df.loc[:, "tid"] == tid)
         entries_indexes &= ~(self.tournaments_df.loc[:, "category"] == categories[-1])
         entries_indexes &= ~self.tournaments_df.loc[:, ["sanction", "promote", "bonus"]].any(axis="columns")
