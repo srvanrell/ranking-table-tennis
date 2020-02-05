@@ -116,8 +116,8 @@ def save_ranking_sheet(ranking_sheet_name, rankings, players, overwrite=True, up
         if ranking_sheet_name in writer.book.sheetnames:
             writer.book.remove_sheet(writer.book.get_sheet_by_name(ranking_sheet_name))
         headers = [cfg["labels"][key] for key in ["tid", "pid", "Player", "Rating", "Category", "Active Player"]]
-        headers += cfg["labels"]["Points CAT"]
-        sorted_rankings_df.to_excel(writer, sheet_name=ranking_sheet_name, index=False, header=headers)
+        columns = ["tid", "pid", "name", "rating", "category", "active"]
+        sorted_rankings_df.to_excel(writer, sheet_name=ranking_sheet_name, index=False, header=headers, columns=columns)
 
     # TODO FIXME
     # if upload:
