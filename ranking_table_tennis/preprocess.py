@@ -109,7 +109,7 @@ upload = answer.lower() != "n"
 utils.save_players_sheet(players, upload=upload)
 
 # # Saving initial rankings for all known players
-utils.save_ranking_sheet(cfg["sheetname"]["initial_ranking"], rankings, players, upload=upload)
+utils.save_ranking_sheet(initial_tid, tournaments, rankings, players, upload=upload)
 
 # Remove temp files after a successful preprocessing
 utils.remove_temp_players_ranking()

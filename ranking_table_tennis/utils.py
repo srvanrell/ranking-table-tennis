@@ -100,13 +100,16 @@ def _format_ranking_header_and_list(ranking, players):
     return headers, list_to_save
 
 
-def save_ranking_sheet(ranking_sheet_name, rankings, players, overwrite=True, upload=False):
-    if ranking_sheet_name == cfg["sheetname"]["initial_ranking"]:
+def save_ranking_sheet(tid, tournaments, rankings, players, overwrite=True, upload=False):
+    if tid == cfg["aux"]["initial tid"]:
+        ranking_sheet_name = cfg["sheetname"]["initial_ranking"]
         xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
     else:
         xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["rankings_filename"]
+        ranking_sheet_name = tournaments[tid].iloc[0].sheet_name
         ranking_sheet_name = ranking_sheet_name.replace(cfg["sheetname"]["tournaments_key"],
                                                         cfg["sheetname"]["rankings_key"])
+        print(ranking_sheet_name)
 
     sorted_rankings_df = rankings.ranking_df.sort_values("rating", ascending=False)
     sorted_rankings_df.loc[:, "active"] = sorted_rankings_df.loc[:, "active"].apply(lambda x:  cfg["activeplayer"][x])

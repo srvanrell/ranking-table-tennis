@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import pickle
 
 from ranking_table_tennis import utils
 from ranking_table_tennis import models
@@ -72,9 +73,14 @@ for tid in tournaments:
     rankings.update_categories()
     rankings.compute_championship_points(tid)
 
-#     # Saving new ranking
-#     utils.save_ranking_sheet(tournament_sheetname, new_ranking, players)
-#
+    # Saving new ranking
+    ranking_file = "rankings.pk"
+    with open(ranking_file, 'wb') as rf:
+        pickle.dump(rankings, rf, pickle.HIGHEST_PROTOCOL)
+
+    rankings.ranking_df.to_excel("rankings.xlsx")
+    # utils.save_ranking_sheet(tid, tournaments, rankings, players)
+
 #     # Saving points assigned in each match
 #     points_log_to_save = [[players[winner_pid].name + " (%d)" % old_ranking[winner_pid].rating,
 #                            players[loser_pid].name + " (%d)" % old_ranking[loser_pid].rating,

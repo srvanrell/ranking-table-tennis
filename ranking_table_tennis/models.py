@@ -5,6 +5,7 @@ import ast
 from unidecode import unidecode
 import shutil
 import pandas as pd
+import pickle
 
 
 # Loads some names from config.yaml
@@ -987,10 +988,10 @@ class Tournaments:
         self.tournaments_df["winner_pid"] = self.tournaments_df["winner"].apply(lambda name: players.get_pid(name))
         self.tournaments_df["loser_pid"] = self.tournaments_df["loser"].apply(lambda name: players.get_pid(name))
 
-    def get_matches(self, tid):
-        # FIXME it should provide the ability to exclude selectively
+    def get_matches(self, tid, exclude_fan_category=True, to_exclude=("sanction", "promote", "bonus")):
         entries_indexes = (self.tournaments_df.loc[:, "tid"] == tid)
-        entries_indexes &= ~(self.tournaments_df.loc[:, "category"] == categories[-1])
-        entries_indexes &= ~self.tournaments_df.loc[:, ["sanction", "promote", "bonus"]].any(axis="columns")
+        if exclude_fan_category:
+            entries_indexes &= ~(self.tournaments_df.loc[:, "category"] == categories[-1])
+        entries_indexes &= ~self.tournaments_df.loc[:, to_exclude].any(axis="columns")
 
         return self.tournaments_df[entries_indexes]
