@@ -43,10 +43,10 @@ def load_csv(filename, first_row=1):
 # Tables to assign points
 
 # difference, points to winner, points to loser
-expected_result_table = load_csv(user_config_path + "/expected_result.csv")
+expected_result_table = pd.read_csv(user_config_path + "/expected_result.csv").to_numpy()
 
 # negative difference, points to winner, points to loser
-unexpected_result_table = load_csv(user_config_path + "/unexpected_result.csv")
+unexpected_result_table = pd.read_csv(user_config_path + "/unexpected_result.csv").to_numpy()
 
 # points to be assigned by round and by participation
 raw_points_per_round_table = load_csv(user_config_path + "/points_per_round.csv", first_row=0)
