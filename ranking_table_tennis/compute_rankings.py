@@ -79,7 +79,6 @@ for tid in tournaments:
         pickle.dump(rankings, rf, pickle.HIGHEST_PROTOCOL)
 
     rankings.ranking_df.to_excel("rankings.xlsx")
-    # utils.save_ranking_sheet(tid, tournaments, rankings, players)
 
 #     # Saving points assigned in each match
 #     points_log_to_save = [[players[winner_pid].name + " (%d)" % old_ranking[winner_pid].rating,

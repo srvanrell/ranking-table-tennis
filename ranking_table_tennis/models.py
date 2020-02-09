@@ -138,6 +138,11 @@ class Players:
         return self.players_df.loc[pid]
 
     def verify_and_normalize(self):
+        duplicated = self.players_df.index.duplicated(keep=False)
+        if duplicated.any():
+            print("Players entries duplicated")
+            print(self.players_df[duplicated])
+
         self.players_df.fillna("", inplace=True)
 
         # cols_to_upper = ["affiliation"]
@@ -158,6 +163,7 @@ class Players:
 
     def add_player(self, player):
         self.players_df = self.players_df.append(player)
+        self.verify_and_normalize()
 
     def add_new_player(self, name, affiliation="", city="", last_tournament=-1):
         pid = self.players_df.index.max() + 1
@@ -561,6 +567,7 @@ class Rankings:
     def verify_and_normalize(self):
         duplicated = self.ranking_df.duplicated(["tid", "pid"], keep=False)
         if duplicated.any():
+            print("Ranking entries duplicated")
             print(self.ranking_df[duplicated])
 
         default_rating = -1000
