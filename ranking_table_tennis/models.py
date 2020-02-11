@@ -49,22 +49,12 @@ expected_result_table = pd.read_csv(user_config_path + "/expected_result.csv").t
 unexpected_result_table = pd.read_csv(user_config_path + "/unexpected_result.csv").to_numpy()
 
 # points to be assigned by round and by participation
-raw_points_per_round_table = load_csv(user_config_path + "/points_per_round.csv", first_row=0)
+raw_points_per_round_table = pd.read_csv(user_config_path + "/points_per_round.csv")
+best_rounds_priority = raw_points_per_round_table.loc[:, ["priority", "round_reached"]].set_index("round_reached")
+best_rounds_points = raw_points_per_round_table.drop(columns="priority").set_index("round_reached")
+categories = list(best_rounds_points.columns)
 
-categories = raw_points_per_round_table[0][2:]
-best_rounds_points = {}
-best_rounds_priority = {}
-for i, categ in enumerate(categories):
-    best_rounds_points[categ] = {}
-    for points_per_round_row in raw_points_per_round_table[1:]:
-        priority = points_per_round_row[0]
-        reached_round = points_per_round_row[1]
-        points = points_per_round_row[2 + i]
-        best_rounds_points[categ][reached_round] = points
-        best_rounds_priority[reached_round] = priority
 
-#
-#
 # class Player:
 #     def __init__(self, pid=-1, name="Apellido, Nombre", association="Asociación", city="Ciudad", last_tournament=-1,
 #                  history=None):
@@ -866,8 +856,8 @@ class Tournaments:
         self.tournaments_df.insert(len(self.tournaments_df.columns), "promote", False)
         self.tournaments_df.insert(len(self.tournaments_df.columns), "sanction", False)
         self.tournaments_df.insert(len(self.tournaments_df.columns), "bonus", False)
-        self.tournaments_df.insert(len(self.tournaments_df.columns), "winner_pid", False)
-        self.tournaments_df.insert(len(self.tournaments_df.columns), "loser_pid", False)
+        self.tournaments_df.insert(len(self.tournaments_df.columns), "winner_pid", None)
+        self.tournaments_df.insert(len(self.tournaments_df.columns), "loser_pid", None)
 
         self.verify_and_normalize()
 
