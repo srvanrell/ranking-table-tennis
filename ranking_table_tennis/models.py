@@ -1,5 +1,4 @@
 import os
-import csv
 import yaml
 import ast
 from unidecode import unidecode
@@ -23,23 +22,6 @@ with open(user_config_path + "/config.yaml", 'r') as cfgyaml:
 if not os.path.exists(cfg["io"]["data_folder"]):
     os.mkdir(cfg["io"]["data_folder"])
 
-
-def load_csv(filename, first_row=1):
-    """Loads csv table into a list. By default first row is not read"""
-    with open(filename, 'r') as incsv:
-        reader = csv.reader(incsv)
-        list_to_return = []
-        for row in reader:
-            aux_row = []
-            for item in row:
-                if item.isdigit():
-                    aux_row.append(int(item))
-                else:
-                    aux_row.append(item)
-            list_to_return.append(aux_row)
-        return list_to_return[first_row:]
-
-
 # Tables to assign points
 
 # difference, points to winner, points to loser
@@ -51,6 +33,7 @@ unexpected_result_table = pd.read_csv(user_config_path + "/unexpected_result.csv
 # points to be assigned by round and by participation
 raw_points_per_round_table = pd.read_csv(user_config_path + "/points_per_round.csv")
 best_rounds_priority = raw_points_per_round_table.loc[:, ["priority", "round_reached"]].set_index("round_reached")
+best_rounds_priority = best_rounds_priority.squeeze()
 best_rounds_points = raw_points_per_round_table.drop(columns="priority").set_index("round_reached")
 categories = list(best_rounds_points.columns)
 
