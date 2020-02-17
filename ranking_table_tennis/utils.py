@@ -638,6 +638,26 @@ def remove_temp_players_ranking():
         os.remove(ranking_temp_file)
 
 
+def save_rankings(rankings):
+    print("Save rankings. Ready to publish")
+    # Saving new ranking
+    ranking_file = "rankings.pk"  # FIXME filenames should be moved to config
+    with open(ranking_file, 'wb') as rf:
+        pickle.dump(rankings, rf, pickle.HIGHEST_PROTOCOL)
+
+    rankings.ranking_df.to_excel("rankings.xlsx")  # FIXME filenames should be moved to config
+
+
+def load_rankings():
+    print("Load rankings.")
+    # Saving new ranking
+    ranking_file = "rankings.pk"  # FIXME filenames should be moved to config
+    with open(ranking_file, 'rb') as rf:
+        rankings = pickle.load(rf)
+
+    return rankings
+
+
 def save_masters_cup():
     """
     Compute and save masters cup up into log
