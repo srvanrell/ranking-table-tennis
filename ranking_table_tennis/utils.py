@@ -307,7 +307,7 @@ def publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=F
     #         row[1] = (row[1][2]-100000, -1)
 
     to_bold = ["A1", "A2", "A3",
-               "A4", "B4", "C4", "D4", "E4", "F4"]
+               "A4", "B4", "C4", "D4", "E4"]
     to_center = to_bold + ["B1", "B2", "B3"]
 
     with pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode='a') as writer:
@@ -434,22 +434,24 @@ def publish_statistics_sheet(sheetname, ranking, upload=False):
         load_and_upload_sheet(output_xlsx, statistics_sheetname, cfg["io"]["temporal_spreadsheet_id"])
 
 
-def publish_masters_sheets(sheetname, ranking, upload=False):
-    """ Copy details from log and output details of given tournament"""
-    output_xlsx = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
-    output_xlsx = output_xlsx.replace("NN", "%d" % ranking.tid)
-
-    log_xlsx = cfg["io"]["data_folder"] + cfg["io"]["log_filename"]
-
-    for cat in models.categories:
-        masters_sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cat)
-        sheet_saved = load_sheet_workbook(log_xlsx, masters_sheetname, first_row=0)
-        headers = [cfg["labels"]["Position"]] + sheet_saved[0]
-        data = [[i + 1] + row for i, row in enumerate(sheet_saved[1:])]
-        save_sheet_workbook(output_xlsx, masters_sheetname, headers, data)
-
-        if upload:
-            load_and_upload_sheet(output_xlsx, masters_sheetname, cfg["io"]["temporal_spreadsheet_id"])
+def publish_masters_sheets(tournaments, rankings, players, tid, prev_tid, upload=False):
+    pass
+    # FIXME
+    # """ Copy details from log and output details of given tournament"""
+    # output_xlsx = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
+    # output_xlsx = output_xlsx.replace("NN", "%d" % ranking.tid)
+    #
+    # log_xlsx = cfg["io"]["data_folder"] + cfg["io"]["log_filename"]
+    #
+    # for cat in models.categories:
+    #     masters_sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cat)
+    #     sheet_saved = load_sheet_workbook(log_xlsx, masters_sheetname, first_row=0)
+    #     headers = [cfg["labels"]["Position"]] + sheet_saved[0]
+    #     data = [[i + 1] + row for i, row in enumerate(sheet_saved[1:])]
+    #     save_sheet_workbook(output_xlsx, masters_sheetname, headers, data)
+    #
+    #     if upload:
+    #         load_and_upload_sheet(output_xlsx, masters_sheetname, cfg["io"]["temporal_spreadsheet_id"])
 
 
 def save_statistics(sheetname, tournament, ranking):
