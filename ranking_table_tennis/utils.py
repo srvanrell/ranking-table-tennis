@@ -239,78 +239,89 @@ def load_tournaments_sheets():
     return tournaments
 
 
-def _format_diff(diff):
+def _format_diff(new_value, prev_value):
     """Return a formated str that indicates +##, -## or ="""
-    diff_str = str(diff)
+    diff = new_value - prev_value
+    diff_str = f"{diff:.0f}"
     if diff > 0:
         diff_str = "+" + diff_str
     elif diff == 0:
         diff_str = "="
-    return diff_str
+    formatted_str = f"{new_value:.0f} ({diff_str})"
+
+    return formatted_str
 
 
 def _publish_tournament_metadata(ws, tournament_tid):
+    ws.insert_rows(0, 3)
     ws["A1"] = cfg["labels"]["Tournament name"]
     ws["B1"] = tournament_tid["tournament_name"][0]
-    ws.merge_cells('B1:F1')
+    ws.merge_cells('B1:E1')
     ws["A2"] = cfg["labels"]["Date"]
     ws["B2"] = tournament_tid["date"][0]
-    ws.merge_cells('B2:F2')
+    ws.merge_cells('B2:E2')
     ws["A3"] = cfg["labels"]["Location"]
     ws["B3"] = tournament_tid["location"][0]
-    ws.merge_cells('B3:F3')
+    ws.merge_cells('B3:E3')
 
 
 def publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=False):
     """ Format a ranking to be published into a rating sheet
     """
-    sheet_name = tournaments[tid]["sheet_name"][0]
+    sheet_name = tournaments[tid]["sheet_name"].iloc[0]
     sheet_name = sheet_name.replace(cfg["sheetname"]["tournaments_key"], cfg["labels"]["Rating"])
 
-    filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
-    filename = filename.replace("NN", tid)
+    xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
+    xlsx_filename = xlsx_filename.replace("NN", tid)
 
-    # initialize the worksheet
-    wb, ws = _wb_ws_to_save(filename, sheet_name)
-
-    # publish and format tournament metadata
-    _publish_tournament_metadata(ws, tournaments[tid])
-
-    # headers
-    ws.append(cfg["labels"][key] for key in ["Category", "Rating", "Player", "City",
-                                             "Association", "Active Player"])
-
+    # Rankings sorted by rating
     sorted_rankings_df = rankings[tid].sort_values("rating", ascending=False)
+    prev_ranking = rankings[prev_tid]
+
+    # Filter inactive players or players that didn't played any tournament
+    nonzero_points = sorted_rankings_df.loc[:, rankings._cum_point_cat_columns()].any(axis="columns")
+    sorted_rankings_df = sorted_rankings_df.loc[sorted_rankings_df.active | nonzero_points]
+    # TODO filter players that didn't played for a long time, can I use inactive players for that?
+
+    # Format data and columns to write into the file
     sorted_rankings_df.loc[:, "active"] = sorted_rankings_df.loc[:, "active"].apply(lambda x: cfg["activeplayer"][x])
     sorted_rankings_df.insert(2, "name", sorted_rankings_df.loc[:, "pid"].apply(lambda pid: players[pid]["name"]))
-    print(sorted_rankings_df)
+    sorted_rankings_df.insert(4, "city", sorted_rankings_df.loc[:, "pid"].apply(lambda pid: players[pid]["city"]))
+    sorted_rankings_df.insert(5, "affiliation",
+                              sorted_rankings_df.loc[:, "pid"].apply(lambda pid: players[pid]["affiliation"]))
 
-    # list_to_save = [[e.category, (e.rating, old_ranking[e.pid].rating, e.bonus), players[e.pid].name,
-    #                  players[e.pid].city, players[e.pid].association, cfg["activeplayer"][e.active]] for e in ranking
-    #                 if e.bonus > 0 or ranking.tid < 6]  # Exclude players that didn't played for a long time
-    #
+    sorted_rankings_df.insert(4, "prev rating", sorted_rankings_df.loc[:, "pid"].apply(
+        lambda pid: prev_ranking.loc[prev_ranking.pid == pid, "rating"].iat[0]))
+    sorted_rankings_df.insert(6, "formatted rating", sorted_rankings_df.apply(
+        lambda row: _format_diff(row['rating'], row['prev rating']), axis="columns"))
+
+    # FIXME there must be a special treatment for fan category
+    # for row in sorted(list_to_save, key=lambda l: l[1][0], reverse=True):
+    #     if row[1][0] < 0:
+    #         row[1] = "NA"  # FIXME should read the value from config
+
     # for row in list_to_save:
     #     # Do not publish ratings of fans category
     #     if row[0] == models.categories[-1]:
     #         # Bonus points are used for fans. Negative values keep fans category at the end
     #         row[1] = (row[1][2]-100000, -1)
-    #
-    # for row in sorted(list_to_save, key=lambda l: l[1][0], reverse=True):
-    #     if row[1][0] < 0:
-    #         row[1] = "NA"  # FIXME should read the value from config
-    #     else:
-    #         # Save difference with previous rating
-    #         diff = row[1][0] - row[1][1]
-    #         row[1] = "%d (%s)" % (row[1][0], _format_diff(diff))
-    #     ws.append(row)
 
     to_bold = ["A1", "A2", "A3",
                "A4", "B4", "C4", "D4", "E4", "F4"]
     to_center = to_bold + ["B1", "B2", "B3"]
 
-    _bold_and_center(ws, to_bold, to_center)
+    with pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode='a') as writer:
+        if sheet_name in writer.book.sheetnames:
+            writer.book.remove_sheet(writer.book.get_sheet_by_name(sheet_name))
 
-    wb.save(filename)
+            headers = [cfg["labels"][key] for key in ["Category", "Rating", "Player", "City", "Association"]]
+            columns = ["category", "formatted rating", "name", "city", "affiliation"]
+            sorted_rankings_df.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=columns)
+
+            # publish and format tournament metadata
+            ws = writer.book.get_sheet_by_name(sheet_name)
+            _publish_tournament_metadata(ws, tournaments[tid])
+            _bold_and_center(ws, to_bold, to_center)
 
     # if upload:
     #     load_and_upload_sheet(filename, sheetname, cfg["io"]["temporal_spreadsheet_id"])

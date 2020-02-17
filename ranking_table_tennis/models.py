@@ -581,6 +581,7 @@ class Rankings:
         - 500 > rating >= 250  -> second category
         - 250 > rating         -> third category
         """
+        # FIXME it is not working for players of the fan category
         self.ranking_df.loc[:, "category"] = self.ranking_df.loc[:, "rating"].apply(self._rating_to_category)
 
     @staticmethod
