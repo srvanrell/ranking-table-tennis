@@ -45,7 +45,7 @@ answer = input("\nDo you want to publish to temporal online sheets [y/n]? (press
 upload = answer.lower() != "n"
 
 # Publish formated rating of selected tournament
-# utils.publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=upload)
+utils.publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=upload)
 
 # # Publish formated championship of selected tournament
 # utils.publish_championship_sheet(tournament_sheetname, ranking, players, old_ranking, upload=upload)

@@ -249,54 +249,60 @@ def _format_diff(diff):
     return diff_str
 
 
-def _publish_tournament_metadata(ws, ranking):
+def _publish_tournament_metadata(ws, tournament_tid):
     ws["A1"] = cfg["labels"]["Tournament name"]
-    ws["B1"] = ranking.tournament_name
+    ws["B1"] = tournament_tid["tournament_name"][0]
     ws.merge_cells('B1:F1')
     ws["A2"] = cfg["labels"]["Date"]
-    ws["B2"] = ranking.date
+    ws["B2"] = tournament_tid["date"][0]
     ws.merge_cells('B2:F2')
     ws["A3"] = cfg["labels"]["Location"]
-    ws["B3"] = ranking.location
+    ws["B3"] = tournament_tid["location"][0]
     ws.merge_cells('B3:F3')
 
 
-def publish_rating_sheet(sheetname, ranking, players, old_ranking, upload=False):
+def publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=False):
     """ Format a ranking to be published into a rating sheet
     """
-    sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cfg["labels"]["Rating"])
+    sheet_name = tournaments[tid]["sheet_name"][0]
+    sheet_name = sheet_name.replace(cfg["sheetname"]["tournaments_key"], cfg["labels"]["Rating"])
 
     filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
-    filename = filename.replace("NN", "%d" % ranking.tid)
+    filename = filename.replace("NN", tid)
 
     # initialize the worksheet
-    wb, ws = _wb_ws_to_save(filename, sheetname)
+    wb, ws = _wb_ws_to_save(filename, sheet_name)
 
     # publish and format tournament metadata
-    _publish_tournament_metadata(ws, ranking)
+    _publish_tournament_metadata(ws, tournaments[tid])
 
     # headers
     ws.append(cfg["labels"][key] for key in ["Category", "Rating", "Player", "City",
                                              "Association", "Active Player"])
 
-    list_to_save = [[e.category, (e.rating, old_ranking[e.pid].rating, e.bonus), players[e.pid].name,
-                     players[e.pid].city, players[e.pid].association, cfg["activeplayer"][e.active]] for e in ranking
-                    if e.bonus > 0 or ranking.tid < 6]  # Exclude players that didn't played for a long time
+    sorted_rankings_df = rankings[tid].sort_values("rating", ascending=False)
+    sorted_rankings_df.loc[:, "active"] = sorted_rankings_df.loc[:, "active"].apply(lambda x: cfg["activeplayer"][x])
+    sorted_rankings_df.insert(2, "name", sorted_rankings_df.loc[:, "pid"].apply(lambda pid: players[pid]["name"]))
+    print(sorted_rankings_df)
 
-    for row in list_to_save:
-        # Do not publish ratings of fans category
-        if row[0] == models.categories[-1]:
-            # Bonus points are used for fans. Negative values keep fans category at the end
-            row[1] = (row[1][2]-100000, -1)
-
-    for row in sorted(list_to_save, key=lambda l: l[1][0], reverse=True):
-        if row[1][0] < 0:
-            row[1] = "NA"  # FIXME should read the value from config
-        else:
-            # Save difference with previous rating
-            diff = row[1][0] - row[1][1]
-            row[1] = "%d (%s)" % (row[1][0], _format_diff(diff))
-        ws.append(row)
+    # list_to_save = [[e.category, (e.rating, old_ranking[e.pid].rating, e.bonus), players[e.pid].name,
+    #                  players[e.pid].city, players[e.pid].association, cfg["activeplayer"][e.active]] for e in ranking
+    #                 if e.bonus > 0 or ranking.tid < 6]  # Exclude players that didn't played for a long time
+    #
+    # for row in list_to_save:
+    #     # Do not publish ratings of fans category
+    #     if row[0] == models.categories[-1]:
+    #         # Bonus points are used for fans. Negative values keep fans category at the end
+    #         row[1] = (row[1][2]-100000, -1)
+    #
+    # for row in sorted(list_to_save, key=lambda l: l[1][0], reverse=True):
+    #     if row[1][0] < 0:
+    #         row[1] = "NA"  # FIXME should read the value from config
+    #     else:
+    #         # Save difference with previous rating
+    #         diff = row[1][0] - row[1][1]
+    #         row[1] = "%d (%s)" % (row[1][0], _format_diff(diff))
+    #     ws.append(row)
 
     to_bold = ["A1", "A2", "A3",
                "A4", "B4", "C4", "D4", "E4", "F4"]
@@ -306,8 +312,8 @@ def publish_rating_sheet(sheetname, ranking, players, old_ranking, upload=False)
 
     wb.save(filename)
 
-    if upload:
-        load_and_upload_sheet(filename, sheetname, cfg["io"]["temporal_spreadsheet_id"])
+    # if upload:
+    #     load_and_upload_sheet(filename, sheetname, cfg["io"]["temporal_spreadsheet_id"])
 
 
 def publish_championship_sheet(sheetname, ranking, players, old_ranking, upload=False):
