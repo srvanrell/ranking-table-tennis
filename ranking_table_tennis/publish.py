@@ -15,61 +15,58 @@ __author__ = 'sebastian'
 # Output: temp xlsx to publish a single ranking
 ###################################################
 
-# Listing tournament sheetnames by increasing date
-tournament_sheetnames = utils.get_tournament_sheetnames_by_date()
 
-# Loading players info list
-players = models.PlayersList()
-players.load_list(utils.load_players_sheet())
+# Loading all tournament data
+tournaments = utils.load_tournaments_sheets()
+
+# Loading players list
+players = utils.load_players_sheet()
+tournaments.assign_pid_from_players(players)
 
 # Loading initial ranking
-initial_ranking = utils.load_ranking_sheet(cfg["sheetname"]["initial_ranking"])
+rankings = utils.load_rankings()
+initial_tid = cfg["aux"]["initial tid"]
 
-for tid, tournament_sheetname in enumerate(tournament_sheetnames, start=1):
-    print("%d\t->\t%s" % (tid, tournament_sheetname))
-tid = int(input("Enter the tournament id to publish (look above):\n"))
-tournament_sheetname = tournament_sheetnames[tid-1]
+# Will compute all rankings from the beginning by default
+tids = [initial_tid] + [tid for tid in tournaments]
 
-# Loading tournament info
-tournament = utils.load_tournament_xlsx(tournament_sheetname)
-ranking = utils.load_ranking_sheet(tournament_sheetname)
+for tenum, tid in enumerate(tids[1:], 1):
+    print(f"{tenum:d}\t->\t{tid}")
 
-old_ranking = models.Ranking("pre_" + tournament.name, tournament.date, tournament.location, tid - 2)
-# Load previous ranking if exists
-if tid-1 > 0:
-    old_ranking = utils.load_ranking_sheet(tournament_sheetnames[tid - 2])
+t_num = int(input("Enter the tournament id to publish (look above):\n"))
+tid = tids[t_num]
 
-# Load initial rankings for new players
-for entry in ranking:
-    if old_ranking.get_entry(entry.pid) is None:
-        old_ranking.add_entry(initial_ranking[entry.pid])
+# Get the tid of the previous tournament
+prev_tid = tids[tids.index(tid) - 1]
+
+print(tid, prev_tid)
 
 answer = input("\nDo you want to publish to temporal online sheets [y/n]? (press Enter to continue)\n")
 upload = answer.lower() != "n"
 
 # Publish formated rating of selected tournament
-utils.publish_rating_sheet(tournament_sheetname, ranking, players, old_ranking, upload=upload)
+# utils.publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=upload)
 
-# Publish formated championship of selected tournament
-utils.publish_championship_sheet(tournament_sheetname, ranking, players, old_ranking, upload=upload)
-
-# Publish points assigned in each match and points assigned per best round reached and for participation
-utils.publish_details_sheets(tournament_sheetname, ranking, upload=upload)
-
-# Saving complete histories of players
-utils.publish_histories_sheet(ranking, players, tournament_sheetnames, upload=upload)
-
-# Testing publshing initial_ranking
-# TODO it's not working
-# utils.publish_rating_sheet(tournament_sheetname, initial_ranking, players, initial_ranking, upload=upload)
-
-# Publish statistics
-utils.publish_statistics_sheet(tournament_sheetname, ranking, upload=upload)
-
-# testing masters publishing
-utils.publish_masters_sheets(tournament_sheetname, ranking, upload=upload)
-
-answer = input("\nDo you want to publish to the web [y/n]? (press Enter to continue)\n")
-show_on_web = answer.lower() != "n"
-
-utils.publish_to_web(ranking, show_on_web)
+# # Publish formated championship of selected tournament
+# utils.publish_championship_sheet(tournament_sheetname, ranking, players, old_ranking, upload=upload)
+#
+# # Publish points assigned in each match and points assigned per best round reached and for participation
+# utils.publish_details_sheets(tournament_sheetname, ranking, upload=upload)
+#
+# # Saving complete histories of players
+# utils.publish_histories_sheet(ranking, players, tournament_sheetnames, upload=upload)
+#
+# # Testing publshing initial_ranking
+# # TODO it's not working
+# # utils.publish_rating_sheet(tournament_sheetname, initial_ranking, players, initial_ranking, upload=upload)
+#
+# # Publish statistics
+# utils.publish_statistics_sheet(tournament_sheetname, ranking, upload=upload)
+#
+# # testing masters publishing
+# utils.publish_masters_sheets(tournament_sheetname, ranking, upload=upload)
+#
+# answer = input("\nDo you want to publish to the web [y/n]? (press Enter to continue)\n")
+# show_on_web = answer.lower() != "n"
+#
+# utils.publish_to_web(ranking, show_on_web)
