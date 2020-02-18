@@ -273,6 +273,14 @@ def _get_writer_mode(xlsx_file_path):
     return mode
 
 
+def _add_players_metadata_columns(this_ranking, players):
+    """Adds name, city, and affiliation columns to this_ranking. Info is taken from players"""
+    # Format data and columns to write into the file
+    this_ranking.insert(3, "name", this_ranking.loc[:, "pid"].apply(lambda pid: players[pid]["name"]))
+    this_ranking.insert(4, "city", this_ranking.loc[:, "pid"].apply(lambda pid: players[pid]["city"]))
+    this_ranking.insert(5, "affiliation", this_ranking.loc[:, "pid"].apply(lambda pid: players[pid]["affiliation"]))
+
+
 def publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=False):
     """ Format a ranking to be published into a rating sheet
     """
@@ -291,10 +299,7 @@ def publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=F
     # TODO filter players that didn't played for a long time, can I use inactive players for that?
 
     # Format data and columns to write into the file
-    sorted_rankings_df.insert(2, "name", sorted_rankings_df.loc[:, "pid"].apply(lambda pid: players[pid]["name"]))
-    sorted_rankings_df.insert(4, "city", sorted_rankings_df.loc[:, "pid"].apply(lambda pid: players[pid]["city"]))
-    sorted_rankings_df.insert(5, "affiliation",
-                              sorted_rankings_df.loc[:, "pid"].apply(lambda pid: players[pid]["affiliation"]))
+    _add_players_metadata_columns(sorted_rankings_df, players)
 
     sorted_rankings_df.insert(4, "prev rating", sorted_rankings_df.loc[:, "pid"].apply(
         lambda pid: prev_ranking.loc[prev_ranking.pid == pid, "rating"].iat[0]))
@@ -444,21 +449,20 @@ def publish_masters_sheets(tournaments, rankings, players, tid, prev_tid, upload
     """Publish championship sheets, per category"""
     xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"].replace("NN", tid)
 
-    # Rankings sorted by rating
+    # Rankings to be sorted by cum_points
     this_ranking = rankings[tid]
     prev_ranking = rankings[prev_tid]
 
     # Format data and columns to write into the file
-    this_ranking.insert(2, "name", this_ranking.loc[:, "pid"].apply(lambda pid: players[pid]["name"]))
-    this_ranking.insert(4, "city", this_ranking.loc[:, "pid"].apply(lambda pid: players[pid]["city"]))
-    this_ranking.insert(5, "affiliation", this_ranking.loc[:, "pid"].apply(lambda pid: players[pid]["affiliation"]))
+    _add_players_metadata_columns(this_ranking, players)
 
     to_bold = ["A1", "A2", "A3",
                "A4", "B4", "C4", "D4", "E4"]
     to_center = to_bold + ["B1", "B2", "B3"]
 
-    headers = [cfg["labels"][key] for key in ["Position", "Player", "Championship Points", "Participations"]]
-    columns = ["position", "name", "formatted points", "pid"]
+    headers = [cfg["labels"][key] for key in ["Position", "Championship Points", "Participations",
+                                              "Player", "City", "Association"]]
+    columns = ["position", "formatted points", "pid", "name", "city", "affiliation"]
 
     for cat, point_col in zip(models.categories, rankings._cum_point_cat_columns()):
         sheet_name = tournaments[tid]["sheet_name"].iloc[0]
@@ -468,6 +472,7 @@ def publish_masters_sheets(tournaments, rankings, players, tid, prev_tid, upload
         unsorted_ranking = this_ranking.loc[this_ranking.loc[:, point_col] > 0].copy()
         sorted_ranking = unsorted_ranking.sort_values(point_col, ascending=False)
 
+        # Format data and columns to write into the file
         sorted_ranking.insert(0, "position", range(1, len(sorted_ranking.index)+1))
         sorted_ranking.insert(4, "prev " + point_col, sorted_ranking.loc[:, "pid"].apply(
             lambda pid: prev_ranking.loc[prev_ranking.pid == pid, point_col].iat[0]))
@@ -485,15 +490,6 @@ def publish_masters_sheets(tournaments, rankings, players, tid, prev_tid, upload
             _publish_tournament_metadata(ws, tournaments[tid])
             _bold_and_center(ws, to_bold, to_center)  # FIXME This should be part of publish metadata, to merge the right cells
 
-
-
-
-
-    #     sheet_saved = load_sheet_workbook(log_xlsx, masters_sheetname, first_row=0)
-    #     headers = [cfg["labels"]["Position"]] + sheet_saved[0]
-    #     data = [[i + 1] + row for i, row in enumerate(sheet_saved[1:])]
-    #     save_sheet_workbook(output_xlsx, masters_sheetname, headers, data)
-    #
     #     if upload:
     #         load_and_upload_sheet(output_xlsx, masters_sheetname, cfg["io"]["temporal_spreadsheet_id"])
 
