@@ -294,7 +294,7 @@ def publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=F
     prev_ranking = rankings[prev_tid]
 
     # Filter inactive players or players that didn't played any tournament
-    nonzero_points = sorted_rankings_df.loc[:, rankings._cum_point_cat_columns()].any(axis="columns")
+    nonzero_points = sorted_rankings_df.loc[:, rankings.cum_points_cat_columns()].any(axis="columns")
     sorted_rankings_df = sorted_rankings_df.loc[sorted_rankings_df.active | nonzero_points]
     # TODO filter players that didn't played for a long time, can I use inactive players for that?
 
@@ -462,15 +462,16 @@ def publish_masters_sheets(tournaments, rankings, players, tid, prev_tid, upload
 
     headers = [cfg["labels"][key] for key in ["Position", "Championship Points", "Participations",
                                               "Player", "City", "Association"]]
-    columns = ["position", "formatted points", "pid", "name", "city", "affiliation"]
+    columns = ["position", "formatted points", "participations", "name", "city", "affiliation"]
 
-    for cat, point_col in zip(models.categories, rankings._cum_point_cat_columns()):
+    for cat, point_col, participations_col in zip(models.categories, rankings.cum_points_cat_columns(),
+                                                  rankings.participations_cat_columns()):
         sheet_name = tournaments[tid]["sheet_name"].iloc[0]
         sheet_name = sheet_name.replace(cfg["sheetname"]["tournaments_key"], cat.title())
 
         # Filter inactive players or players that didn't played any tournament
         unsorted_ranking = this_ranking.loc[this_ranking.loc[:, point_col] > 0].copy()
-        sorted_ranking = unsorted_ranking.sort_values(point_col, ascending=False)
+        sorted_ranking = unsorted_ranking.sort_values([point_col, participations_col], ascending=[False, True])
 
         # Format data and columns to write into the file
         sorted_ranking.insert(0, "position", range(1, len(sorted_ranking.index)+1))
@@ -478,6 +479,7 @@ def publish_masters_sheets(tournaments, rankings, players, tid, prev_tid, upload
             lambda pid: prev_ranking.loc[prev_ranking.pid == pid, point_col].iat[0]))
         sorted_ranking.insert(6, "formatted points", sorted_ranking.apply(
             lambda row: _format_diff(row[point_col], row["prev " + point_col]), axis="columns"))
+        sorted_ranking.loc[:, "participations"] = sorted_ranking.loc[:, participations_col]  # FIXME should not change name
 
         with pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode=_get_writer_mode(xlsx_filename)) as writer:
             if sheet_name in writer.book.sheetnames:

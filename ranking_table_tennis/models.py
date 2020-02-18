@@ -484,7 +484,7 @@ class RankingOLD:
 class Rankings:
     def __init__(self, ranking_df=None):
         all_columns = ["tid", "pid", "rating", "category", "active"]
-        all_columns += self._point_cat_columns() + self._cum_point_cat_columns()
+        all_columns += self.points_cat_columns() + self.cum_points_cat_columns() + self.participations_cat_columns()
         self.ranking_df = pd.DataFrame(ranking_df, columns=all_columns)
         self.verify_and_normalize()
 
@@ -507,12 +507,16 @@ class Rankings:
         self.verify_and_normalize()
 
     @staticmethod
-    def _point_cat_columns():
+    def points_cat_columns():
         return ["points_cat_%d" % d for d, _ in enumerate(categories, 1)]
 
     @staticmethod
-    def _cum_point_cat_columns():
+    def cum_points_cat_columns():
         return ["cum_points_cat_%d" % d for d, _ in enumerate(categories, 1)]
+
+    @staticmethod
+    def participations_cat_columns():
+        return ["participations_cat_%d" % d for d, _ in enumerate(categories, 1)]
 
     def get_entries(self, tid, pid=None, col=None):
         entries_indexes = self.ranking_df.tid == tid
@@ -548,8 +552,8 @@ class Rankings:
         default_category = ""
         default_cat_value = 0
 
-        point_cat_columns = self._point_cat_columns() + self._cum_point_cat_columns()
-        cat_col_values = {cat_col: default_cat_value for cat_col in point_cat_columns}
+        cat_columns = self.points_cat_columns() + self.cum_points_cat_columns() + self.participations_cat_columns()
+        cat_col_values = {cat_col: default_cat_value for cat_col in cat_columns}
         default_values = {"rating": default_rating, "category": default_category, "active": default_active,
                           **cat_col_values}
         self.ranking_df.fillna(value=default_values, inplace=True)
@@ -558,7 +562,8 @@ class Rankings:
         entries_indexes = self.ranking_df.tid == prev_tid
         new_ranking = self.ranking_df.loc[entries_indexes].copy()
         new_ranking.loc[:, "tid"] = new_tid
-        new_ranking.loc[:, self._point_cat_columns() + self._cum_point_cat_columns()] = 0
+        new_ranking.loc[:, self.points_cat_columns() + self.cum_points_cat_columns()] = 0
+        new_ranking.loc[:, self.participations_cat_columns()] = 0
         self.ranking_df = self.ranking_df.append(new_ranking, ignore_index=True)
 
     @staticmethod
@@ -646,7 +651,7 @@ class Rankings:
     def compute_category_points(self, tid, best_rounds):
         # List of points assigned
         assigned_points = []
-        point_cat_columns = self._point_cat_columns()
+        point_cat_columns = self.points_cat_columns()
 
         for (category, pid), best_round in best_rounds.items():
             points = best_rounds_points[category][best_round]
@@ -664,16 +669,20 @@ class Rankings:
         n_tournaments = cfg["aux"]["masters N tournaments to consider"]
         tid_indexes = self.ranking_df.tid == tid
 
-        for cat_col, cum_cat_col in zip(self._point_cat_columns(), self._cum_point_cat_columns()):
-
+        for points_cat_col, cum_points_cat_col, participations_cat_col in zip(self.points_cat_columns(),
+                                                                              self.cum_points_cat_columns(),
+                                                                              self.participations_cat_columns()):
+            # Cumulated points of the best n_tournaments
             pid_cum_points_cat = self.ranking_df.groupby(["pid"]).apply(
-                lambda ranking_pid: ranking_pid.loc[:, cat_col].nlargest(n_tournaments).sum())
-
-            self.ranking_df.loc[tid_indexes, cum_cat_col] = self.ranking_df.loc[tid_indexes].apply(
+                lambda ranking_pid: ranking_pid.loc[:, points_cat_col].nlargest(n_tournaments).sum())
+            self.ranking_df.loc[tid_indexes, cum_points_cat_col] = self.ranking_df.loc[tid_indexes].apply(
                 lambda re: pid_cum_points_cat[re.pid], axis="columns")
 
-        # sort_by_point = pl_cat.groupby(category_col, as_index=False).apply(
-        #     lambda x: x.sort_values([points_col, participations_col], ascending=(False, True)))
+            # Total number of participations
+            pid_participations_cat = self.ranking_df.groupby(["pid"]).apply(
+                lambda ranking_pid: (ranking_pid.loc[:, points_cat_col] != 0).sum())
+            self.ranking_df.loc[tid_indexes, participations_cat_col] = self.ranking_df.loc[tid_indexes].apply(
+                lambda re: pid_participations_cat[re.pid], axis="columns")
 
     def update_active_players(self, tid, players, initial_tid):
         # Avoid activate or inactivate players after the first tournament.
@@ -715,7 +724,7 @@ class Rankings:
     def apply_sanction(self, new_tid, tournaments):
         tournament_df = tournaments[new_tid]
         for match_index, match in tournament_df[tournament_df.sanction].iterrows():
-            for cat_col in self._point_cat_columns():
+            for cat_col in self.points_cat_columns():
                 self[new_tid, match.loser_pid, cat_col] *= cfg["aux"]["sanction factor"]
             print("Apply sanction on:\n", self[new_tid, match.loser_pid])
 
