@@ -271,8 +271,7 @@ def publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=F
     sheet_name = tournaments[tid]["sheet_name"].iloc[0]
     sheet_name = sheet_name.replace(cfg["sheetname"]["tournaments_key"], cfg["labels"]["Rating"])
 
-    xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
-    xlsx_filename = xlsx_filename.replace("NN", tid)
+    xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"].replace("NN", tid)
 
     # Rankings sorted by rating
     sorted_rankings_df = rankings[tid].sort_values("rating", ascending=False)
@@ -284,7 +283,6 @@ def publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=F
     # TODO filter players that didn't played for a long time, can I use inactive players for that?
 
     # Format data and columns to write into the file
-    sorted_rankings_df.loc[:, "active"] = sorted_rankings_df.loc[:, "active"].apply(lambda x: cfg["activeplayer"][x])
     sorted_rankings_df.insert(2, "name", sorted_rankings_df.loc[:, "pid"].apply(lambda pid: players[pid]["name"]))
     sorted_rankings_df.insert(4, "city", sorted_rankings_df.loc[:, "pid"].apply(lambda pid: players[pid]["city"]))
     sorted_rankings_df.insert(5, "affiliation",
@@ -314,14 +312,14 @@ def publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=F
         if sheet_name in writer.book.sheetnames:
             writer.book.remove_sheet(writer.book.get_sheet_by_name(sheet_name))
 
-            headers = [cfg["labels"][key] for key in ["Category", "Rating", "Player", "City", "Association"]]
-            columns = ["category", "formatted rating", "name", "city", "affiliation"]
-            sorted_rankings_df.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=columns)
+        headers = [cfg["labels"][key] for key in ["Category", "Rating", "Player", "City", "Association"]]
+        columns = ["category", "formatted rating", "name", "city", "affiliation"]
+        sorted_rankings_df.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=columns)
 
-            # publish and format tournament metadata
-            ws = writer.book.get_sheet_by_name(sheet_name)
-            _publish_tournament_metadata(ws, tournaments[tid])
-            _bold_and_center(ws, to_bold, to_center)
+        # publish and format tournament metadata
+        ws = writer.book.get_sheet_by_name(sheet_name)
+        _publish_tournament_metadata(ws, tournaments[tid])
+        _bold_and_center(ws, to_bold, to_center)
 
     # if upload:
     #     load_and_upload_sheet(filename, sheetname, cfg["io"]["temporal_spreadsheet_id"])
@@ -435,16 +433,54 @@ def publish_statistics_sheet(sheetname, ranking, upload=False):
 
 
 def publish_masters_sheets(tournaments, rankings, players, tid, prev_tid, upload=False):
-    pass
-    # FIXME
-    # """ Copy details from log and output details of given tournament"""
-    # output_xlsx = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
-    # output_xlsx = output_xlsx.replace("NN", "%d" % ranking.tid)
-    #
-    # log_xlsx = cfg["io"]["data_folder"] + cfg["io"]["log_filename"]
-    #
-    # for cat in models.categories:
-    #     masters_sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cat)
+    """Publish championship sheets, per category"""
+    xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"].replace("NN", tid)
+
+    # Rankings sorted by rating
+    this_ranking = rankings[tid]
+    prev_ranking = rankings[prev_tid]
+
+    # Format data and columns to write into the file
+    this_ranking.insert(2, "name", this_ranking.loc[:, "pid"].apply(lambda pid: players[pid]["name"]))
+    this_ranking.insert(4, "city", this_ranking.loc[:, "pid"].apply(lambda pid: players[pid]["city"]))
+    this_ranking.insert(5, "affiliation", this_ranking.loc[:, "pid"].apply(lambda pid: players[pid]["affiliation"]))
+
+    to_bold = ["A1", "A2", "A3",
+               "A4", "B4", "C4", "D4", "E4"]
+    to_center = to_bold + ["B1", "B2", "B3"]
+
+    headers = [cfg["labels"][key] for key in ["Position", "Player", "Championship Points", "Participations"]]
+    columns = ["position", "name", "formatted points", "pid"]
+
+    for cat, point_col in zip(models.categories, rankings._cum_point_cat_columns()):
+        sheet_name = tournaments[tid]["sheet_name"].iloc[0]
+        sheet_name = sheet_name.replace(cfg["sheetname"]["tournaments_key"], cat.title())
+
+        # Filter inactive players or players that didn't played any tournament
+        unsorted_ranking = this_ranking.loc[this_ranking.loc[:, point_col] > 0].copy()
+        sorted_ranking = unsorted_ranking.sort_values(point_col, ascending=False)
+
+        sorted_ranking.insert(0, "position", range(1, len(sorted_ranking.index)+1))
+        sorted_ranking.insert(4, "prev " + point_col, sorted_ranking.loc[:, "pid"].apply(
+            lambda pid: prev_ranking.loc[prev_ranking.pid == pid, point_col].iat[0]))
+        sorted_ranking.insert(6, "formatted points", sorted_ranking.apply(
+            lambda row: _format_diff(row[point_col], row["prev " + point_col]), axis="columns"))
+
+        with pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode='a') as writer:
+            if sheet_name in writer.book.sheetnames:
+                writer.book.remove_sheet(writer.book.get_sheet_by_name(sheet_name))
+
+            sorted_ranking.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=columns)
+
+            # publish and format tournament metadata
+            ws = writer.book.get_sheet_by_name(sheet_name)
+            _publish_tournament_metadata(ws, tournaments[tid])
+            _bold_and_center(ws, to_bold, to_center)  # FIXME This should be part of publish metadata, to merge the right cells
+
+
+
+
+
     #     sheet_saved = load_sheet_workbook(log_xlsx, masters_sheetname, first_row=0)
     #     headers = [cfg["labels"]["Position"]] + sheet_saved[0]
     #     data = [[i + 1] + row for i, row in enumerate(sheet_saved[1:])]
