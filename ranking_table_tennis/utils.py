@@ -255,14 +255,22 @@ def _format_diff(new_value, prev_value):
 def _publish_tournament_metadata(ws, tournament_tid):
     ws.insert_rows(0, 3)
     ws["A1"] = cfg["labels"]["Tournament name"]
-    ws["B1"] = tournament_tid["tournament_name"][0]
+    ws["B1"] = tournament_tid["tournament_name"].iloc[0]
     ws.merge_cells('B1:E1')
     ws["A2"] = cfg["labels"]["Date"]
-    ws["B2"] = tournament_tid["date"][0]
+    ws["B2"] = tournament_tid["date"].iloc[0]
     ws.merge_cells('B2:E2')
     ws["A3"] = cfg["labels"]["Location"]
-    ws["B3"] = tournament_tid["location"][0]
+    ws["B3"] = tournament_tid["location"].iloc[0]
     ws.merge_cells('B3:E3')
+
+
+def _get_writer_mode(xlsx_file_path):
+    mode = 'a'
+    if not os.path.exists(xlsx_file_path):
+        mode = 'w'
+
+    return mode
 
 
 def publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=False):
@@ -308,7 +316,7 @@ def publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=F
                "A4", "B4", "C4", "D4", "E4"]
     to_center = to_bold + ["B1", "B2", "B3"]
 
-    with pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode='a') as writer:
+    with pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode=_get_writer_mode(xlsx_filename)) as writer:
         if sheet_name in writer.book.sheetnames:
             writer.book.remove_sheet(writer.book.get_sheet_by_name(sheet_name))
 
@@ -466,7 +474,7 @@ def publish_masters_sheets(tournaments, rankings, players, tid, prev_tid, upload
         sorted_ranking.insert(6, "formatted points", sorted_ranking.apply(
             lambda row: _format_diff(row[point_col], row["prev " + point_col]), axis="columns"))
 
-        with pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode='a') as writer:
+        with pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode=_get_writer_mode(xlsx_filename)) as writer:
             if sheet_name in writer.book.sheetnames:
                 writer.book.remove_sheet(writer.book.get_sheet_by_name(sheet_name))
 
