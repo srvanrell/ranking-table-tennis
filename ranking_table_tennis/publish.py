@@ -48,7 +48,7 @@ upload = answer.lower() != "n"
 utils.publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=upload)
 
 # Publish formated masters championship of selected tournament
-utils.publish_masters_sheets(tournaments, rankings, players, tid, prev_tid, upload=upload)
+utils.publish_championship_sheets(tournaments, rankings, players, tid, prev_tid, upload=upload)
 
 # # Publish points assigned in each match and points assigned per best round reached and for participation
 # utils.publish_details_sheets(tournament_sheetname, ranking, upload=upload)

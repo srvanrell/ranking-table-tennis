@@ -338,46 +338,6 @@ def publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=F
     #     load_and_upload_sheet(filename, sheetname, cfg["io"]["temporal_spreadsheet_id"])
 
 
-def publish_championship_sheet(sheetname, ranking, players, old_ranking, upload=False):
-    """ Format a ranking to be published into a rating sheet"""
-    sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["championship_key"])
-
-    filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
-    filename = filename.replace("NN", "%d" % ranking.tid)
-
-    # initialize the worksheet
-    wb, ws = _wb_ws_to_save(filename, sheetname)
-
-    # publish and format tournament metadata
-    _publish_tournament_metadata(ws, ranking)
-
-    # headers
-    ws.append(cfg["labels"][key] for key in ["Position", "Bonus Points", "Player", "City",
-                                             "Association", "Active Player", "Category"])
-
-    list_to_save = [[(e.bonus, old_ranking[e.pid].bonus), players[e.pid].name, players[e.pid].city,
-                     players[e.pid].association, cfg["activeplayer"][e.active], e.category] for e in ranking
-                    if e.bonus > 0 or ranking.tid < 6]  # Exclude players that didn't played for a long time
-    sorted_list = sorted(list_to_save, key=lambda l: l[0][0], reverse=True)
-
-    for i, row in enumerate(sorted_list):
-        # Save difference with previous bonus
-        diff = row[0][0] - row[0][1]
-        row[0] = "%d (%s)" % (row[0][0], _format_diff(diff))
-        ws.append([i + 1] + row)
-
-    to_bold = ["A1", "A2", "A3",
-               "A4", "B4", "C4", "D4", "E4", "F4", "G4"]
-    to_center = to_bold + ["B1", "B2", "B3"]
-
-    _bold_and_center(ws, to_bold, to_center)
-
-    wb.save(filename)
-
-    if upload:
-        load_and_upload_sheet(filename, sheetname, cfg["io"]["temporal_spreadsheet_id"])
-
-
 def publish_histories_sheet(ranking, players, tournament_sheetnames, upload=False):
     """ Format histories to be published into a sheet"""
     output_xlsx = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
@@ -445,7 +405,7 @@ def publish_statistics_sheet(sheetname, ranking, upload=False):
         load_and_upload_sheet(output_xlsx, statistics_sheetname, cfg["io"]["temporal_spreadsheet_id"])
 
 
-def publish_masters_sheets(tournaments, rankings, players, tid, prev_tid, upload=False):
+def publish_championship_sheets(tournaments, rankings, players, tid, prev_tid, upload=False):
     """Publish championship sheets, per category"""
     xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"].replace("NN", tid)
 
@@ -717,66 +677,3 @@ def load_rankings():
         rankings = pickle.load(rf)
 
     return rankings
-
-
-def save_masters_cup():
-    """
-    Compute and save masters cup up into log
-    :return: None
-    """
-    n_tournaments = cfg["aux"]["masters N tournaments to consider"]
-    n_classified = cfg["aux"]["masters N classified to list"]
-    log_xlsx = cfg["io"]["data_folder"] + cfg["io"]["log_filename"]
-
-    # Labels of columns, just to simplify notation
-    player_col = cfg["labels"]["Player"]
-    category_col = cfg["labels"]["Category"]
-    points_col = cfg["labels"]["Bonus Points"]
-    participations_col = cfg["labels"]["Participations"]
-
-    # Will compute all rankings from the beginning by default
-    tournament_sheetnames = get_tournament_sheetnames_by_date()
-    tids = range(1, len(tournament_sheetnames)+1)
-
-    df = pd.DataFrame()
-
-    for tid in tids:
-        tournament_sheetname = tournament_sheetnames[tid - 1]
-        bonus_log = load_sheet_workbook(log_xlsx,
-                                        tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
-                                                                     cfg["sheetname"]["bonus_details_key"]),
-                                        first_row=1)
-        temp_df = pd.DataFrame([[tid] + j for j in bonus_log],
-                               columns=[cfg["labels"][key] for key in ["Tournament", "Player", "Bonus Points",
-                                                                       "Best Round", "Category"]]
-                               )
-        temp_df = temp_df[temp_df[category_col] != ""]
-        df = df.append(temp_df, ignore_index=True)
-
-        pl_cat_best_n_tour = df[[player_col, category_col, points_col]]
-        if tid > 1:
-            pl_cat_best_n_tour = df.groupby([player_col, category_col])[points_col].nlargest(n_tournaments)
-        pl_cat_cumul = pl_cat_best_n_tour.groupby([player_col, category_col]).sum().reset_index()
-        pl_cat_count = df.groupby([player_col, category_col])[points_col].count().reset_index().rename(
-            columns={points_col: participations_col})
-
-        pl_cat = pd.merge(pl_cat_cumul, pl_cat_count).sort_values(points_col, ascending=False)
-
-        # sort_by_point = pl_cat.groupby(category_col, as_index=False).apply(
-        #     lambda x: pd.DataFrame.nlargest(x, n=n_classified, columns=points_col))
-        # sort_by_count = pl_cat.groupby(category_col, as_index=False).apply(
-        #     lambda x: pd.DataFrame.nlargest(x, n=n_classified, columns=participations_col))
-        sort_by_point = pl_cat.groupby(category_col, as_index=False).apply(
-            lambda x: x.sort_values([points_col, participations_col], ascending=(False, True)))
-
-        filename = cfg["io"]["data_folder"] + cfg["io"]["log_filename"]
-        tournament_sheetname = tournament_sheetnames[tid - 1]
-
-        for cat in models.categories:
-            df_cat_by_point = sort_by_point[sort_by_point[category_col] == cat]
-            df_cat_by_point = df_cat_by_point.drop(category_col, axis=1)
-
-            save_sheet_workbook(filename,
-                                tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"], cat),
-                                df_cat_by_point.columns.tolist(),
-                                df_cat_by_point.values.tolist())
