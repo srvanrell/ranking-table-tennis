@@ -364,7 +364,7 @@ def publish_histories_sheet(ranking, players, tournament_sheetnames, upload=Fals
         load_and_upload_sheet(output_xlsx, cfg["sheetname"]["histories"], cfg["io"]["temporal_spreadsheet_id"])
 
 
-def publish_details_sheets(tournaments, rankings, players, tid, prev_tid, upload=upload):
+def publish_details_sheets(tournaments, rankings, players, tid, prev_tid, upload):
     """ Copy details from log and output details of given tournament"""
     #
     # # Saving points assigned per best round reached and for participation
