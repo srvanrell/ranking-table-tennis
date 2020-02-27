@@ -364,28 +364,70 @@ def publish_histories_sheet(ranking, players, tournament_sheetnames, upload=Fals
         load_and_upload_sheet(output_xlsx, cfg["sheetname"]["histories"], cfg["io"]["temporal_spreadsheet_id"])
 
 
-def publish_details_sheets(sheetname, ranking, upload=False):
+def publish_details_sheets(tournaments, rankings, players, tid, prev_tid, upload=upload):
     """ Copy details from log and output details of given tournament"""
-    output_xlsx = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
-    output_xlsx = output_xlsx.replace("NN", "%d" % ranking.tid)
+    #
+    # # Saving points assigned per best round reached and for participation
+    # bonus_details_sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"],
+    #                                             cfg["sheetname"]["bonus_details_key"])
+    # bonus_log_saved = load_sheet_workbook(log_xlsx, bonus_details_sheetname, first_row=0)
+    # save_sheet_workbook(output_xlsx, bonus_details_sheetname, bonus_log_saved[0], bonus_log_saved[1:])
+    #
+    # if upload:
+    #     load_and_upload_sheet(output_xlsx, rating_details_sheetname, cfg["io"]["temporal_spreadsheet_id"])
+    #     load_and_upload_sheet(output_xlsx, bonus_details_sheetname, cfg["io"]["temporal_spreadsheet_id"])
 
-    log_xlsx = cfg["io"]["data_folder"] + cfg["io"]["log_filename"]
+    """ Format a rating details to be published into a sheet
+    """
+    sheet_name = tournaments[tid]["sheet_name"].iloc[0]
+    sheet_name = sheet_name.replace(cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["rating_details_key"])
 
-    # Saving points assigned in each match
-    rating_details_sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"],
-                                                 cfg["sheetname"]["rating_details_key"])
-    rating_log_saved = load_sheet_workbook(log_xlsx, rating_details_sheetname, first_row=0)
-    save_sheet_workbook(output_xlsx, rating_details_sheetname, rating_log_saved[0], rating_log_saved[1:])
+    xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"].replace("NN", tid)
 
-    # Saving points assigned per best round reached and for participation
-    bonus_details_sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"],
-                                                cfg["sheetname"]["bonus_details_key"])
-    bonus_log_saved = load_sheet_workbook(log_xlsx, bonus_details_sheetname, first_row=0)
-    save_sheet_workbook(output_xlsx, bonus_details_sheetname, bonus_log_saved[0], bonus_log_saved[1:])
-
-    if upload:
-        load_and_upload_sheet(output_xlsx, rating_details_sheetname, cfg["io"]["temporal_spreadsheet_id"])
-        load_and_upload_sheet(output_xlsx, bonus_details_sheetname, cfg["io"]["temporal_spreadsheet_id"])
+    # # Rankings sorted by rating
+    # sorted_rankings_df = rankings[tid].sort_values("rating", ascending=False)
+    # prev_ranking = rankings[prev_tid]
+    #
+    # # Filter inactive players or players that didn't played any tournament
+    # nonzero_points = sorted_rankings_df.loc[:, rankings.cum_points_cat_columns()].any(axis="columns")
+    # sorted_rankings_df = sorted_rankings_df.loc[sorted_rankings_df.active | nonzero_points]
+    # # TODO filter players that didn't played for a long time, can I use inactive players for that?
+    #
+    # # Format data and columns to write into the file
+    # _add_players_metadata_columns(sorted_rankings_df, players)
+    #
+    # sorted_rankings_df.insert(4, "prev rating", sorted_rankings_df.loc[:, "pid"].apply(
+    #     lambda pid: prev_ranking.loc[prev_ranking.pid == pid, "rating"].iat[0]))
+    # sorted_rankings_df.insert(6, "formatted rating", sorted_rankings_df.apply(
+    #     lambda row: _format_diff(row['rating'], row['prev rating']), axis="columns"))
+    #
+    # # FIXME there must be a special treatment for fan category
+    # # for row in sorted(list_to_save, key=lambda l: l[1][0], reverse=True):
+    # #     if row[1][0] < 0:
+    # #         row[1] = "NA"  # FIXME should read the value from config
+    #
+    # # for row in list_to_save:
+    # #     # Do not publish ratings of fans category
+    # #     if row[0] == models.categories[-1]:
+    # #         # Bonus points are used for fans. Negative values keep fans category at the end
+    # #         row[1] = (row[1][2]-100000, -1)
+    #
+    # to_bold = ["A1", "A2", "A3",
+    #            "A4", "B4", "C4", "D4", "E4"]
+    # to_center = to_bold + ["B1", "B2", "B3"]
+    #
+    # with pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode=_get_writer_mode(xlsx_filename)) as writer:
+    #     if sheet_name in writer.book.sheetnames:
+    #         writer.book.remove_sheet(writer.book.get_sheet_by_name(sheet_name))
+    #
+    #     headers = [cfg["labels"][key] for key in ["Category", "Rating", "Player", "City", "Association"]]
+    #     columns = ["category", "formatted rating", "name", "city", "affiliation"]
+    #     sorted_rankings_df.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=columns)
+    #
+    #     # publish and format tournament metadata
+    #     ws = writer.book.get_sheet_by_name(sheet_name)
+    #     _publish_tournament_metadata(ws, tournaments[tid])
+    #     _bold_and_center(ws, to_bold, to_center)
 
 
 def publish_statistics_sheet(sheetname, ranking, upload=False):
