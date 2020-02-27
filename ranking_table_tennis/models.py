@@ -486,6 +486,8 @@ class Rankings:
         all_columns = ["tid", "pid", "rating", "category", "active"]
         all_columns += self.points_cat_columns() + self.cum_points_cat_columns() + self.participations_cat_columns()
         self.ranking_df = pd.DataFrame(ranking_df, columns=all_columns)
+        self.rating_details_df = pd.DataFrame()
+        self.championship_details_df = pd.DataFrame()
         self.verify_and_normalize()
 
     def __len__(self):
@@ -623,30 +625,35 @@ class Rankings:
 
         return factor
 
-    def compute_new_ratings(self, new_tid, prev_tid, tournaments, pid_not_own_category):
-        """return assigned points per match
-        (a list containing [winner_pid, loser_pid, points_to_winner, points_to_loser])"""
+    def _new_ratings_from_match(self, match, new_tid, old_tid, pid_not_own_category):
+        winner_pid, loser_pid = match["winner_pid"], match["loser_pid"]
+        [to_winner, to_loser] = self._points_to_assign(self[old_tid, winner_pid, "rating"],
+                                                       self[old_tid, loser_pid, "rating"])
+        factor = self._get_factor(self[old_tid, winner_pid, "rating"], self[old_tid, loser_pid, "rating"],
+                                  self[old_tid, winner_pid, "category"], self[old_tid, loser_pid, "category"],
+                                  (winner_pid in pid_not_own_category) or (loser_pid in pid_not_own_category))
+        to_winner, to_loser = factor * to_winner, factor * to_loser
+        self[new_tid, winner_pid, "rating"] += to_winner
+        self[new_tid, loser_pid, "rating"] -= to_loser
+        match["rating_to_winner"] = to_winner
+        match["rating_to_loser"] = -to_loser
 
-        # List of points assigned in each match
-        assigned_points = []
+        return match
 
-        for match_index, match in tournaments.get_matches(new_tid).iterrows():
+    def compute_new_ratings(self, new_tid, old_tid, tournaments, pid_not_own_category):
+        """Compute ratings(new_tid) based on matches(new_tid) and ratings(old_tid).
+        Details of rating changes per match are stored in rating_details_df.
+        """
+        matches_to_process = tournaments.get_matches(new_tid).copy()
+        # TODO verify which columns are necessary to store un rating_details_df
+        matches_to_process.insert(len(matches_to_process.columns), "rating_to_winner", None)
+        matches_to_process.insert(len(matches_to_process.columns), "rating_to_loser", None)
 
-            winner_pid, loser_pid = match["winner_pid"], match["loser_pid"]
-            [to_winner, to_loser] = self._points_to_assign(self[prev_tid, winner_pid, "rating"],
-                                                           self[prev_tid, loser_pid, "rating"])
-            factor = self._get_factor(self[prev_tid, winner_pid, "rating"], self[prev_tid, loser_pid, "rating"],
-                                      self[prev_tid, winner_pid, "category"], self[prev_tid, loser_pid, "category"],
-                                      (winner_pid in pid_not_own_category) or (loser_pid in pid_not_own_category))
-            to_winner, to_loser = factor * to_winner,  factor * to_loser
-            self[new_tid, winner_pid, "rating"] += to_winner
-            self[new_tid, loser_pid, "rating"] -= to_loser
+        matches_processed = matches_to_process.apply(self._new_ratings_from_match, axis="columns",
+                                                     args=(new_tid, old_tid, pid_not_own_category))
 
-            assigned_points.append([winner_pid, loser_pid, to_winner, -to_loser, match["round"], match["category"]])
-
+        self.rating_details_df = self.rating_details_df.append(matches_processed)
         self.update_categories()
-
-        return assigned_points
 
     def compute_category_points(self, tid, best_rounds):
         # List of points assigned

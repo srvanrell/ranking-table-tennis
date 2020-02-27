@@ -85,7 +85,7 @@ for tid in tournaments:
                             and rankings[tid, pid, "category"] != models.categories[-1]]
 
     t0 = time.time()
-    assigned_points_per_match = rankings.compute_new_ratings(tid, prev_tid, tournaments, pid_not_own_category)
+    rankings.compute_new_ratings(tid, prev_tid, tournaments, pid_not_own_category)
     t1 = time.time()
     print("compute new rankings:", t1 - t0)
     t0 = time.time()
@@ -119,22 +119,6 @@ for tid in tournaments:
     t1 = time.time()
     print("Compute championship points:", t1 - t0)
 
-#     # Saving points assigned in each match
-#     points_log_to_save = [[players[winner_pid].name + " (%d)" % old_ranking[winner_pid].rating,
-#                            players[loser_pid].name + " (%d)" % old_ranking[loser_pid].rating,
-#                            old_ranking[winner_pid].rating - old_ranking[loser_pid].rating, winner_points, loser_points,
-#                            match_round, match_category]
-#                           for winner_pid, loser_pid, winner_points, loser_points, match_round, match_category
-#                           in assigned_points_per_match]
-#
-#     utils.save_sheet_workbook(log_xlsx,
-#                               tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
-#                                                            cfg["sheetname"]["rating_details_key"]),
-#                               [cfg["labels"][key] for key in ["Winner", "Loser", "Difference",
-#                                                               "Winner Points", "Loser Points",
-#                                                               "Round", "Category"]],
-#                               points_log_to_save)
-#
 #     utils.save_sheet_workbook(log_xlsx,
 #                               tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
 #                                                            cfg["sheetname"]["bonus_details_key"]),
