@@ -656,6 +656,7 @@ class Rankings:
         self.update_categories()
 
     def compute_category_points(self, tid, best_rounds):
+        print(best_rounds)
         # List of points assigned
         assigned_points = []
         point_cat_columns = self.points_cat_columns()
@@ -956,15 +957,11 @@ class Tournaments:
 
         return sorted(list(all_players))
 
-    def compute_best_rounds(self, tid):
+    def compute_best_rounds(self, tid, players):
         """
-        Return a dictionary with the best round for each player and category
-
-        The keys of the dictionary are tuples like: (category, player_name)
-
-        To get a value use: best_rounds[(category, player_name)]
+        Return a DataFramey with the best round for each player and category. pid is assigned from players
         """
-        best_rounds = {}
+        best_rounds = pd.DataFrame(columns=["name", "category", "best_round"])
 
         for match_id, match_row in self.tournaments_df[self.tournaments_df.tid == tid].iterrows():
             # workaround to avoid promotion entries being considered as matches
@@ -975,12 +972,17 @@ class Tournaments:
             for name, played_round in [(match_row.winner, match_row.winner_round),
                                        (match_row.loser, match_row.loser_round)]:
 
-                catname = (match_row.category, name)
-                if best_rounds.get(catname):
-                    if best_rounds_priority[best_rounds.get(catname)] < best_rounds_priority[played_round]:
-                        best_rounds[catname] = played_round
+                index_cat_name = (best_rounds.category == match_row.category) & (best_rounds.name == name)
+
+                if not best_rounds.loc[index_cat_name].empty:
+                    temp_best_round = best_rounds.loc[index_cat_name, "best_round"].iloc[0]
+                    if best_rounds_priority[temp_best_round] < best_rounds_priority[played_round]:
+                        best_rounds.loc[index_cat_name, "best_round"] = played_round
                 else:
-                    best_rounds[catname] = played_round
+                    best_rounds = best_rounds.append({"name": name,
+                                                      "pid": players.get_pid(name),
+                                                      "category": match_row.category,
+                                                      "best_round": played_round}, ignore_index=True)
 
         return best_rounds
 
