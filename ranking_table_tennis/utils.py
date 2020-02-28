@@ -9,6 +9,7 @@ import pickle
 
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+from df2gspread import df2gspread as d2g
 
 __author__ = 'sebastian'
 
@@ -140,12 +141,22 @@ def save_players_sheet(players, upload=False):
         sorted_players_df.to_excel(writer, sheet_name=players_sheet_name,
                                    index_label=cfg["labels"]["pid"], header=headers)
 
-    # TODO FIXME
-    # if upload:
-    #     upload_sheet(cfg["io"]["tournaments_spreadsheet_id"],
-    #                  cfg["sheetname"]["players"],
-    #                  headers,
-    #                  list_to_save)
+    if upload:
+        headers_df = [cfg["labels"]["pid"]] + headers
+        upload_sheet_from_df(cfg["io"]["tournaments_spreadsheet_id"], cfg["sheetname"]["players"],
+                             sorted_players_df, headers_df, upload_index=True)  # index is pid
+
+
+def upload_sheet_from_df(spreadsheet_id, sheet_name, df, headers, upload_index=False):
+    """ Saves headers and df data into given sheet_name.
+        If sheet_name does not exist, it will be created. """
+    ws = d2g.upload(df, spreadsheet_id, sheet_name, row_names=upload_index)
+
+    # Concatenation of header cells values to be updated in batch mode
+    cell_list = ws.range("A1:" + gspread.utils.rowcol_to_a1(row=1, col=len(headers)))
+    for i, value in enumerate(headers):
+        cell_list[i].value = value
+    ws.update_cells(cell_list)
 
 
 def load_players_sheet():
@@ -533,7 +544,8 @@ def save_statistics(sheetname, tournament, ranking):
 
 def _get_gc():
     # Drive authorization
-    scope = ['https://spreadsheets.google.com/feeds']
+    scope = ['https://spreadsheets.google.com/feeds',
+             'https://www.googleapis.com/auth/drive']
     key_filename = models.user_config_path + "/key-for-gspread.json"
     gc = None
     try:

@@ -53,7 +53,8 @@ setup(name='ranking_table_tennis',
           'openpyxl>=2.4.2,<2.6',
           'Unidecode>=1.0.22',
           'pandas>=0.24.0',
-          'xlrd >= 1.0.0'
+          'xlrd >= 1.0.0',
+          'df2gspread'
       ],
       cmdclass={
         'develop': PostDevelopCommand,
