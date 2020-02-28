@@ -742,6 +742,9 @@ class Rankings:
     def get_rating_details(self, tid):
         return self.rating_details_df.loc[self.rating_details_df.tid == tid].copy()
 
+    def get_championship_details(self, tid):
+        return self.championship_details_df.loc[self.championship_details_df.tid == tid].copy()
+
 
 # class Match:
 #     def __init__(self, winner_name, loser_name, match_round, category):

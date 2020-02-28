@@ -413,37 +413,23 @@ def publish_championship_details_sheet(tournaments, rankings, players, tid, prev
     """Format and publish championship details of given tournament into sheets"""
 
     sheet_name = tournaments[tid]["sheet_name"].iloc[0]
-    sheet_name = sheet_name.replace(cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["bonus_details_key"])
+    sheet_name = sheet_name.replace(cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["championship_key"])
 
     xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"].replace("NN", tid)
 
-    rating_details = rankings.get_rating_details(tid)
-
-    rating_details.insert(4, "winner_rating", rating_details.loc[:, "winner_pid"].apply(
-        lambda pid: rankings[prev_tid, pid, "rating"]))
-    rating_details.insert(4, "loser_rating", rating_details.loc[:, "loser_pid"].apply(
-        lambda pid: rankings[prev_tid, pid, "rating"]))
-
-    rating_details.insert(4, "winner_name_rating", rating_details.apply(
-        lambda row: f"{row['winner']} ({row['winner_rating']:.0f})", axis="columns"))
-    rating_details.insert(4, "loser_name_rating", rating_details.apply(
-        lambda row: f"{row['loser']} ({row['loser_rating']:.0f})", axis="columns"))
-    rating_details.insert(4, "diff_rating", rating_details.apply(
-        lambda row: f"{row['winner_rating'] - row['loser_rating']:.0f}", axis="columns"))
+    championship_details = rankings.get_championship_details(tid)
 
     to_bold = ["A1", "A2", "A3",
-               "A4", "B4", "C4", "D4", "E4", "F4", "G4"]
+               "A4", "B4", "C4", "D4"]
     to_center = to_bold + ["B1", "B2", "B3"]
 
     with pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode=_get_writer_mode(xlsx_filename)) as writer:
         if sheet_name in writer.book.sheetnames:
             writer.book.remove_sheet(writer.book.get_sheet_by_name(sheet_name))
 
-        headers = [cfg["labels"][key] for key in ["Winner", "Loser", "Difference", "Winner Points", "Loser Points",
-                                                  "Round", "Category"]]
-        columns = ["winner_name_rating", "loser_name_rating", "diff_rating", "rating_to_winner", "rating_to_loser",
-                   "round", "category"]
-        rating_details.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=columns)
+        headers = [cfg["labels"][key] for key in ["Player", "Category", "Best Round", "Championship Points"]]
+        columns = ["name", "category", "best_round", "points"]
+        championship_details.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=columns)
 
         # publish and format tournament metadata
         ws = writer.book.get_sheet_by_name(sheet_name)
