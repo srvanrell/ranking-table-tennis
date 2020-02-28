@@ -117,12 +117,6 @@ for tid in tournaments:
     t1 = time.time()
     print("Compute championship points:", t1 - t0)
 
-#     utils.save_sheet_workbook(log_xlsx,
-#                               tournament_sheetname.replace(cfg["sheetname"]["tournaments_key"],
-#                                                            cfg["sheetname"]["bonus_details_key"]),
-#                               [cfg["labels"][key] for key in ["Player", "Bonus Points", "Best Round", "Category"]],
-#                               points_log_to_save)
-#
 #     utils.save_statistics(tournament_sheetname, tournament, new_ranking)
 
 t0 = time.time()
