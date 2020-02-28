@@ -268,7 +268,7 @@ def _publish_tournament_metadata(ws, tournament_tid):
     ws["B1"] = tournament_tid["tournament_name"].iloc[0]
     ws.merge_cells('B1:E1')
     ws["A2"] = cfg["labels"]["Date"]
-    ws["B2"] = tournament_tid["date"].iloc[0]
+    ws["B2"] = tournament_tid["date"].iloc[0].strftime("%Y %m %d")
     ws.merge_cells('B2:E2')
     ws["A3"] = cfg["labels"]["Location"]
     ws["B3"] = tournament_tid["location"].iloc[0]
@@ -334,6 +334,7 @@ def publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=F
     with pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode=_get_writer_mode(xlsx_filename)) as writer:
         if sheet_name in writer.book.sheetnames:
             writer.book.remove_sheet(writer.book.get_sheet_by_name(sheet_name))
+        print("<<<Saving\t", sheet_name, "\tin\t", xlsx_filename)
 
         headers = [cfg["labels"][key] for key in ["Category", "Rating", "Player", "City", "Association"]]
         columns = ["category", "formatted rating", "name", "city", "affiliation"]
@@ -344,8 +345,8 @@ def publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=F
         _publish_tournament_metadata(ws, tournaments[tid])
         _bold_and_center(ws, to_bold, to_center)
 
-    # if upload:
-    #     load_and_upload_sheet(filename, sheetname, cfg["io"]["temporal_spreadsheet_id"])
+    if upload:
+        load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
 
 def publish_histories_sheet(ranking, players, tournament_sheetnames, upload=False):
@@ -403,6 +404,7 @@ def publish_rating_details_sheet(tournaments, rankings, players, tid, prev_tid, 
     with pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode=_get_writer_mode(xlsx_filename)) as writer:
         if sheet_name in writer.book.sheetnames:
             writer.book.remove_sheet(writer.book.get_sheet_by_name(sheet_name))
+        print("<<<Saving\t", sheet_name, "\tin\t", xlsx_filename)
 
         headers = [cfg["labels"][key] for key in ["Winner", "Loser", "Difference", "Winner Points", "Loser Points",
                                                   "Round", "Category"]]
@@ -415,15 +417,15 @@ def publish_rating_details_sheet(tournaments, rankings, players, tid, prev_tid, 
         _publish_tournament_metadata(ws, tournaments[tid])
         _bold_and_center(ws, to_bold, to_center)
 
-    # if upload:
-    #     load_and_upload_sheet(output_xlsx, rating_details_sheetname, cfg["io"]["temporal_spreadsheet_id"])
+    if upload:
+        load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
 
 def publish_championship_details_sheet(tournaments, rankings, players, tid, prev_tid, upload):
     """Format and publish championship details of given tournament into sheets"""
 
     sheet_name = tournaments[tid]["sheet_name"].iloc[0]
-    sheet_name = sheet_name.replace(cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["championship_key"])
+    sheet_name = sheet_name.replace(cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["championship_details_key"])
 
     xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"].replace("NN", tid)
 
@@ -436,6 +438,7 @@ def publish_championship_details_sheet(tournaments, rankings, players, tid, prev
     with pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode=_get_writer_mode(xlsx_filename)) as writer:
         if sheet_name in writer.book.sheetnames:
             writer.book.remove_sheet(writer.book.get_sheet_by_name(sheet_name))
+        print("<<<Saving\t", sheet_name, "\tin\t", xlsx_filename)
 
         headers = [cfg["labels"][key] for key in ["Player", "Category", "Best Round", "Championship Points"]]
         columns = ["name", "category", "best_round", "points"]
@@ -446,8 +449,8 @@ def publish_championship_details_sheet(tournaments, rankings, players, tid, prev
         _publish_tournament_metadata(ws, tournaments[tid])
         _bold_and_center(ws, to_bold, to_center)
 
-    # if upload:
-    #     load_and_upload_sheet(output_xlsx, bonus_details_sheetname, cfg["io"]["temporal_spreadsheet_id"])
+    if upload:
+        load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
 
 def publish_statistics_sheet(sheetname, ranking, upload=False):
@@ -495,6 +498,9 @@ def publish_championship_sheets(tournaments, rankings, players, tid, prev_tid, u
         unsorted_ranking = this_ranking.loc[this_ranking.loc[:, point_col] > 0].copy()
         sorted_ranking = unsorted_ranking.sort_values([point_col, participations_col], ascending=[False, True])
 
+        if sorted_ranking.empty:
+            continue
+
         # Format data and columns to write into the file
         sorted_ranking.insert(0, "position", range(1, len(sorted_ranking.index)+1))
         sorted_ranking.insert(4, "prev " + point_col, sorted_ranking.loc[:, "pid"].apply(
@@ -506,6 +512,7 @@ def publish_championship_sheets(tournaments, rankings, players, tid, prev_tid, u
         with pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode=_get_writer_mode(xlsx_filename)) as writer:
             if sheet_name in writer.book.sheetnames:
                 writer.book.remove_sheet(writer.book.get_sheet_by_name(sheet_name))
+            print("<<<Saving\t", sheet_name, "\tin\t", xlsx_filename)
 
             sorted_ranking.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=columns)
 
@@ -514,8 +521,8 @@ def publish_championship_sheets(tournaments, rankings, players, tid, prev_tid, u
             _publish_tournament_metadata(ws, tournaments[tid])
             _bold_and_center(ws, to_bold, to_center)  # FIXME This should be part of publish metadata, to merge the right cells
 
-    #     if upload:
-    #         load_and_upload_sheet(output_xlsx, masters_sheetname, cfg["io"]["temporal_spreadsheet_id"])
+        if upload:
+            load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
 
 def save_statistics(sheetname, tournament, ranking):
@@ -733,7 +740,7 @@ def save_rankings(rankings):
 
 
 def load_rankings():
-    print("Load rankings.")
+    print("Load rankings.pk")
     # Saving new ranking
     ranking_file = "rankings.pk"  # FIXME filenames should be moved to config
     with open(ranking_file, 'rb') as rf:

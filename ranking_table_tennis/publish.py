@@ -39,9 +39,7 @@ tid = tids[t_num]
 # Get the tid of the previous tournament
 prev_tid = tids[tids.index(tid) - 1]
 
-print(tid, prev_tid)
-
-answer = input("\nDo you want to publish to temporal online sheets [y/n]? (press Enter to continue)\n")
+answer = input("\nDo you want to publish to temporal online sheets [Y/n]? (press Enter to continue)\n")
 upload = answer.lower() != "n"
 
 # Publish formated rating of selected tournament
