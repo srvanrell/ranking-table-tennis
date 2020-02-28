@@ -542,6 +542,7 @@ class Rankings:
         self.ranking_df = self.ranking_df.append({"tid": tid, "pid": pid,  "rating": initial_rating, "active": active,
                                                   "category": initial_category}, ignore_index=True)
         self.verify_and_normalize()
+        self.update_categories()
 
     def verify_and_normalize(self):
         duplicated = self.ranking_df.duplicated(["tid", "pid"], keep=False)
