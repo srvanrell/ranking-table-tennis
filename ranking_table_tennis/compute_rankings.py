@@ -65,11 +65,8 @@ for tid in tournaments:
     print("PID participation list:", t1 - t0)
 
     # Get the best round for each player in each category
-    # Formatted like: best_rounds[(category, pid)] = best_round_value
     t0 = time.time()
-    aux_best_rounds = tournaments.compute_best_rounds(tid)
-    best_rounds = {(categ, players.get_pid(name)): aux_best_rounds[categ, name]
-                   for categ, name in aux_best_rounds.keys()}
+    best_rounds = tournaments.compute_best_rounds(tid, players)
     t1 = time.time()
     print("Compute best round:", t1 - t0)
 
@@ -81,13 +78,14 @@ for tid in tournaments:
     t1 = time.time()
     print("Update categories:", t1 - t0)
     pid_not_own_category = [pid for pid in pid_participation_list
-                            if (rankings[tid, pid, "category"], pid) not in best_rounds
+                            if best_rounds[(best_rounds.pid == pid) &
+                                           (best_rounds.category == rankings[tid, pid, "category"])].empty
                             and rankings[tid, pid, "category"] != models.categories[-1]]
 
     t0 = time.time()
     rankings.compute_new_ratings(tid, prev_tid, tournaments, pid_not_own_category)
     t1 = time.time()
-    print("compute new rankings:", t1 - t0)
+    print("compute new ratings:", t1 - t0)
     t0 = time.time()
     assigned_points_per_best_round = rankings.compute_category_points(tid, best_rounds)
     t1 = time.time()
