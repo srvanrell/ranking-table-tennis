@@ -150,14 +150,14 @@ class Players:
 
         Each history is a string that can be read as a dict with (category, tournament_id) as key.
         """
-        for category, pid in best_rounds.keys():
-            history_dic = ast.literal_eval(self[pid].history)
-            history_dic[(category, tid)] = best_rounds[(category, pid)]
-            self.players_df.loc[pid, "history"] = str(history_dic)
-            self.players_df.loc[pid, "last_tournament"] = tid
+        for row_id, row in best_rounds.iterrows():
+            history_dic = ast.literal_eval(self[row.pid].history)
+            history_dic[(row.category, tid)] = row.best_round
+            self.players_df.loc[row.pid, "history"] = str(history_dic)
+            self.players_df.loc[row.pid, "last_tournament"] = tid
 
-        to_update = [{"tid": tid, "pid": pid, "category": category, "best_round": best_rounds[(category, pid)]}
-                     for category, pid in best_rounds.keys()]
+        to_update = [{"tid": tid, "pid": row.pid, "category": row.category, "best_round": row.best_round}
+                     for row_id, row in best_rounds.iterrows()]
         self.history_df = self.history_df.append(to_update, ignore_index=True)
 
     def played_tournaments(self, pid):
