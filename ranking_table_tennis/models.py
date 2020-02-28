@@ -656,18 +656,21 @@ class Rankings:
         self.update_categories()
 
     def compute_category_points(self, tid, best_rounds):
-        print(best_rounds)
-        # List of points assigned
-        assigned_points = []
         point_cat_columns = self.points_cat_columns()
 
-        for (category, pid), best_round in best_rounds.items():
-            points = best_rounds_points[category][best_round]
-            cat_col = point_cat_columns[categories.index(category)]
-            self[tid, pid, cat_col] = points
-            assigned_points.append([pid, points, best_round, category])
+        for row_id, row in best_rounds.iterrows():
+            points = best_rounds_points[row.category][row.best_round]
+            cat_col = point_cat_columns[categories.index(row.category)]
+            self[tid, row.pid, cat_col] = points
 
-        return sorted(assigned_points, key=lambda l: (l[-1], l[1], l[0]), reverse=True)
+        # Save details of assigned points
+        assigned_points = best_rounds.copy()
+        assigned_points.insert(0, "tid", tid)
+        assigned_points.insert(len(assigned_points.columns), "points",
+                               assigned_points.apply(lambda br_row: best_rounds_points[br_row.category][br_row.best_round],
+                                                     axis="columns"))
+
+        self.championship_details_df = self.championship_details_df.append(assigned_points)
 
     def compute_championship_points(self, tid):
         """
