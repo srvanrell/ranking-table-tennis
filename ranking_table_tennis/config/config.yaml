@@ -94,3 +94,9 @@ aux:
     masters N tournaments to consider: 8
     masters N classified to list: 10000
     initial tid: S2019T00
+
+default:
+    tournament_name: Inicial 2019 - Liga Dos Orillas
+    date: 2019 01 01
+    location: No aplica
+    category:

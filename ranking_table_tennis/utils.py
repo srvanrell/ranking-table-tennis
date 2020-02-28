@@ -119,13 +119,14 @@ def save_ranking_sheet(tid, tournaments, rankings, players, overwrite=True, uplo
     with pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode='a') as writer:
         if ranking_sheet_name in writer.book.sheetnames:
             writer.book.remove_sheet(writer.book.get_sheet_by_name(ranking_sheet_name))
-        headers = [cfg["labels"][key] for key in ["tid", "pid", "Player", "Rating", "Category", "Active Player"]]
-        columns = ["tid", "pid", "name", "rating", "category", "active"]
+        headers = [cfg["labels"][key] for key in ["tid", "Tournament name", "Date", "Location",
+                                                  "pid", "Player", "Rating", "Category", "Active Player"]]
+        columns = ["tid", "tournament_name", "date", "location", "pid", "name", "rating", "category", "active"]
         sorted_rankings_df.to_excel(writer, sheet_name=ranking_sheet_name, index=False, header=headers, columns=columns)
 
-    # TODO FIXME
-    # if upload:
-    #     upload_ranking_sheet(cfg["sheetname"]["initial_ranking"], ranking, players)
+    if upload:
+        upload_sheet_from_df(cfg["io"]["tournaments_spreadsheet_id"], cfg["sheetname"]["initial_ranking"],
+                             sorted_rankings_df.loc[:, columns], headers)
 
 
 def save_players_sheet(players, upload=False):
@@ -150,7 +151,7 @@ def save_players_sheet(players, upload=False):
 def upload_sheet_from_df(spreadsheet_id, sheet_name, df, headers, upload_index=False):
     """ Saves headers and df data into given sheet_name.
         If sheet_name does not exist, it will be created. """
-    ws = d2g.upload(df, spreadsheet_id, sheet_name, row_names=upload_index)
+    ws = d2g.upload(df, spreadsheet_id, sheet_name, row_names=upload_index, df_size=True)
 
     # Concatenation of header cells values to be updated in batch mode
     cell_list = ws.range("A1:" + gspread.utils.rowcol_to_a1(row=1, col=len(headers)))
@@ -186,9 +187,7 @@ def load_initial_ranking_sheet():
                             cfg["labels"]["Date"]: "date", cfg["labels"]["Location"]: "location",
                             cfg["labels"]["pid"]: "pid", cfg["labels"]["Player"]: "name",
                             cfg["labels"]["Rating"]: "rating", cfg["labels"]["Category"]: "category",
-                            cfg["labels"]["Active Player"]: "active",
-                            # **{lab: "points_cat_%d" % i for i, lab in enumerate(cfg["labels"]["Points CAT"], 1)}
-                            }
+                            cfg["labels"]["Active Player"]: "active"}
 
     initial_ranking_df.rename(columns=columns_translations, inplace=True)
     initial_ranking_df.loc[:, "active"] = initial_ranking_df.loc[:, "active"].apply(lambda x:

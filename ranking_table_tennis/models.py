@@ -483,7 +483,7 @@ class RankingOLD:
 
 class Rankings:
     def __init__(self, ranking_df=None):
-        all_columns = ["tid", "pid", "rating", "category", "active"]
+        all_columns = ["tid", "tournament_name", "date", "location", "pid", "rating", "category", "active"]
         all_columns += self.points_cat_columns() + self.cum_points_cat_columns() + self.participations_cat_columns()
         self.ranking_df = pd.DataFrame(ranking_df, columns=all_columns)
         self.rating_details_df = pd.DataFrame()
@@ -558,6 +558,8 @@ class Rankings:
         cat_columns = self.points_cat_columns() + self.cum_points_cat_columns() + self.participations_cat_columns()
         cat_col_values = {cat_col: default_cat_value for cat_col in cat_columns}
         default_values = {"rating": default_rating, "category": default_category, "active": default_active,
+                          "tournament_name": cfg["default"]["tournament_name"], "date": cfg["default"]["date"],
+                          "location": cfg["default"]["location"],
                           **cat_col_values}
         self.ranking_df.fillna(value=default_values, inplace=True)
 
@@ -747,48 +749,7 @@ class Rankings:
         return self.championship_details_df.loc[self.championship_details_df.tid == tid].copy()
 
 
-# class Match:
-#     def __init__(self, winner_name, loser_name, match_round, category):
-#         winner_name = winner_name.strip()
-#         loser_name = loser_name.strip()
-#         match_round = match_round.strip().lower()
-#         category = category.strip().lower()
-#         self.winner_name = unidecode(winner_name).title()
-#         self.loser_name = unidecode(loser_name).title()
-#         self.round = match_round
-#         self.category = category
-#
-#     def __str__(self):
-#         return ";".join([self.winner_name, self.loser_name, self.round, self.category])
-
-
 # class Tournament:
-#     def __init__(self, name="", date="", location=""):
-#         self.name = name
-#         self.date = date
-#         self.location = location
-#         self.matches = []
-#
-#     def add_match(self, winner_name, loser_name, match_round, category):
-#         self.matches.append(Match(winner_name, loser_name, match_round, category))
-#
-#     def get_players_names(self, category=''):
-#         """
-#         Return a sorted list of players that played the tournament
-#
-#         If category is given, the list of players is filtered by category
-#         """
-#         players_set = set()
-#         for match in self.matches:
-#             if not category or category == match.category:
-#                 # workaround to add extra bonus points from match list
-#                 possible_flag = match.winner_name.lower()
-#                 if possible_flag not in [cfg["aux"]["flag bonus sanction"], cfg["aux"]["flag add bonus"],
-#                                          cfg["aux"]["flag promotion"]]:
-#                     players_set.add(match.winner_name)
-#                     players_set.add(match.loser_name)
-#         return sorted(list(players_set))
-#
 #     def get_statistics(self):
 #         """
 #         Return a dictionary with the number of players by category.
@@ -800,49 +761,6 @@ class Rankings:
 #         statistics['total'] = len(self.get_players_names())
 #         return statistics
 #
-#     def compute_best_rounds(self):
-#         """
-#         Return a dictionary with the best round for each player and category
-#
-#         The keys of the dictionary are tuples like: (category, player_name)
-#
-#         To get a value use: best_rounds[(category, player_name)]
-#         """
-#         best_rounds = {}
-#
-#         for match in self.matches:
-#             # changing labels of finals round match
-#             if match.round == cfg["roundnames"]["final"]:
-#                 winner_round_match = cfg["roundnames"]["champion"]
-#                 loser_round_match = cfg["roundnames"]["second"]
-#             elif match.round == cfg["roundnames"]["third place playoff"]:
-#                 winner_round_match = cfg["roundnames"]["third"]
-#                 loser_round_match = cfg["roundnames"]["fourth"]
-#             else:
-#                 winner_round_match = match.round
-#                 loser_round_match = match.round
-#
-#             # workaround to avoid promotion entries being considered as matches
-#             possible_flag = match.winner_name.lower()
-#             if possible_flag == cfg["aux"]["flag promotion"]:
-#                 continue
-#
-#             # finding best round per category of each player
-#             for name, played_round in [(match.winner_name, winner_round_match),
-#                                        (match.loser_name, loser_round_match)]:
-#                 # workaround to add extra bonus points from match list
-#                 possible_flag = name.lower()
-#                 if possible_flag == cfg["aux"]["flag add bonus"] or possible_flag == cfg["aux"]["flag bonus sanction"]:
-#                     continue
-#
-#                 catname = (match.category, name)
-#                 if best_rounds.get(catname):
-#                     if best_rounds_priority[best_rounds.get(catname)] < best_rounds_priority[played_round]:
-#                         best_rounds[catname] = played_round
-#                 else:
-#                     best_rounds[catname] = played_round
-#
-#         return best_rounds
 
 
 class Tournaments:
