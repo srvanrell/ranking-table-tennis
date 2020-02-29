@@ -562,6 +562,7 @@ class Rankings:
                           "location": cfg["default"]["location"],
                           **cat_col_values}
         self.ranking_df.fillna(value=default_values, inplace=True)
+        self.ranking_df.date = pd.to_datetime(self.ranking_df.date)
 
     def initialize_new_ranking(self, new_tid, prev_tid):
         entries_indexes = self.ranking_df.tid == prev_tid

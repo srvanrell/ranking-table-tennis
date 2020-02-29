@@ -72,7 +72,7 @@ for tid in tournaments:
                 print(">>>>\tUNCOMPLETE preprocessing detected. Resuming...")
                 rankings.add_entry(ranking_temp[initial_tid, pid])
 
-            print(rankings[initial_tid, pid], players[pid]["name"], "\n")
+            print(rankings[initial_tid, pid][["tid", "pid", "rating", "category"]], players[pid]["name"], "\n")
 
         # if rankings[initial_tid, pid, "category"] is "":
         #     if ranking_temp[initial_tid, pid, "category"] is "":
