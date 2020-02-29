@@ -72,7 +72,7 @@ for tid in tournaments:
                 print(">>>>\tUNCOMPLETE preprocessing detected. Resuming...")
                 rankings.add_entry(ranking_temp[initial_tid, pid])
 
-            print(rankings[initial_tid, pid], players[pid]["name"], "\n")
+            print(rankings[initial_tid, pid][["tid", "pid", "rating", "category"]], players[pid]["name"], "\n")
 
         # if rankings[initial_tid, pid, "category"] is "":
         #     if ranking_temp[initial_tid, pid, "category"] is "":
@@ -94,7 +94,6 @@ for tid in tournaments:
             utils.save_temp_players_ranking(players_temp, ranking_temp)
 
     # Get the best round for each player in each category
-    # Formatted like: best_rounds[(category, pid)] = best_round_value
     best_rounds = tournaments.compute_best_rounds(tid, players)
 
     # Log current tournament as the last played tournament

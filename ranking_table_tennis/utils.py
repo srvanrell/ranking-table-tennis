@@ -4,7 +4,6 @@ from ranking_table_tennis.models import cfg
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font, Alignment
 import pandas as pd
-from unidecode import unidecode
 import pickle
 
 import gspread
@@ -115,6 +114,7 @@ def save_ranking_sheet(tid, tournaments, rankings, players, overwrite=True, uplo
     sorted_rankings_df = rankings.ranking_df.sort_values("rating", ascending=False)
     sorted_rankings_df.loc[:, "active"] = sorted_rankings_df.loc[:, "active"].apply(lambda x:  cfg["activeplayer"][x])
     sorted_rankings_df.insert(2, "name", sorted_rankings_df.loc[:, "pid"].apply(lambda pid: players[pid]["name"]))
+    sorted_rankings_df.loc[:, "date"] = sorted_rankings_df.loc[:, "date"].apply(lambda d: d.strftime("%Y %m %d"))
 
     with pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode='a') as writer:
         if ranking_sheet_name in writer.book.sheetnames:
