@@ -4,7 +4,6 @@ from ranking_table_tennis.models import cfg
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font, Alignment
 import pandas as pd
-from unidecode import unidecode
 import pickle
 
 import gspread

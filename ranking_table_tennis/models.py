@@ -166,319 +166,38 @@ class Players:
         if history_dic:
             return sorted(set([tid for cat, tid in history_dic.keys()]))
         return []
-#
-# class PlayersList:
-#     def __init__(self):
-#         self.players = {}
-#
-#     def __getitem__(self, pid):
-#         return self.get_player(pid)
-#
-#     def __len__(self):
-#         return len(self.players)
-#
-#     def __str__(self):
-#         return "\n".join(str(p) for p in self)
-#
-#     def __iter__(self):
-#         return iter(self.players.values())
-#
-#     def get_player(self, pid):
-#         return self.players.get(pid)
-#
-#     def add_player(self, player):
-#         if player.pid not in self.players:
-#             self.players[player.pid] = player
-#         else:
-#             print("WARNING: Already exists a player for that pid. Check:", str(player))
-#
-#     def add_new_player(self, name, association="", city="", last_tournament=-1):
-#         pid = 0
-#         while pid in self.players:
-#             pid += 1
-#         self.add_player(Player(pid, name, association, city, last_tournament))
-#
-#     def get_pid(self, name):
-#         for player in self:
-#             uname = unidecode(name).title()
-#             if uname == player.name:
-#                 return player.pid
-#         print("WARNING: Unknown player:", name)
-#         return None
-#
-#     def to_list(self):
-#         players_list = [[p.pid, p.name, p.association, p.city, p.last_tournament, str(p.history)]
-#                         for p in self]
-#         return players_list
-#
-#     def load_list(self, players_list):
-#         for pid, name, association, city, last_tournament, history_str in players_list:
-#             if history_str:
-#                 history = ast.literal_eval(history_str)
-#             else:
-#                 history = {}
-#             self.add_player(Player(int(pid), name, association, city, int(last_tournament), history))
-#
-#     def update_histories(self, tid, best_rounds):
-#         """ Save player's best rounds into their histories and update
-#         last_tournament.
-#
-#         Each history is a dict with (tournament_id, category) as key.
+
+
+# class RankingOLD:
+#     def get_pids(self, category='', status='all'):
 #         """
-#         for category, pid in best_rounds.keys():
-#             self[pid].history[(category, tid)] = best_rounds[(category, pid)]
-#             self[pid].last_tournament = tid
-
-
-class RankingEntry:
-    def __init__(self, pid, rating, bonus, active=False, category=""):
-        self.pid = pid
-        self.rating = rating
-        self.bonus = bonus
-        self.category = category
-        self.active = active
-
-    def get_total(self):
-        return self.bonus + self.rating
-
-    def __str__(self):
-        return ";".join([str(self.pid), str(self.rating), str(self.bonus),
-                         self.category, str(self.active)])
-
-
-class RankingOLD:
-    def __init__(self, tournament_name="", date="", location="", tid=-1):
-        self.ranking = {}
-        self.date = date
-        self.tournament_name = tournament_name
-        self.location = location
-        self.tid = tid
-
-    def __iter__(self):
-        return iter(self.ranking.values())
-
-    def add_entry(self, entry):
-        if entry.pid not in self.ranking:
-            self.ranking[entry.pid] = RankingEntry(entry.pid, entry.rating, entry.bonus, entry.active, entry.category)
-        else:
-            print("WARNING: Already exists an entry for pid:", entry.pid)
-
-    def add_new_entry(self, pid, initial_rating=0, initial_bonus=0, active=False, initial_category=""):
-        self.add_entry(RankingEntry(pid, initial_rating, initial_bonus, active, initial_category))
-
-    def get_entry(self, pid):
-        return self.ranking.get(pid)
-
-    def __getitem__(self, pid):
-        return self.get_entry(pid)
-
-    def __str__(self):
-        aux = "%s (%s - %s)\n" % (self.tournament_name, self.location, self.date)
-        return aux + "\n".join(str(re) for re in self)
-
-    def load_list(self, ranking_list):
-        for pid, rating, bonus, active, category in ranking_list:
-            self.add_entry(RankingEntry(int(pid), int(rating), int(bonus), bool(active), str(category)))
-
-    def to_list(self):
-        ranking_list = [[p.pid, p.rating, p.bonus] for p in self]
-        return ranking_list
-
-    @staticmethod
-    def _points_to_assign(rating_winner, rating_loser):
-        """Returns points to add to winner and to deduce from loser, given ratings of winner and loser."""
-        rating_diff = rating_winner - rating_loser
-
-        assignation_table = expected_result_table
-        if rating_diff < 0:
-            rating_diff *= -1.0
-            assignation_table = unexpected_result_table
-
-        j = 0
-        while rating_diff > assignation_table[j][0]:
-            j += 1
-
-        points_to_winner = assignation_table[j][1]
-        points_to_loser = assignation_table[j][2]
-
-        return [points_to_winner, points_to_loser]
-
-    @staticmethod
-    def _get_factor(rating_winner, rating_loser, category_winner, category_loser, not_own_category):
-        """Returns factor for rating computation. It considers given winner and loser category.
-        Players must play their own category """
-        rating_diff = rating_winner - rating_loser
-        category_factor = 1.0
-        if category_winner != category_loser and not not_own_category:
-            category_factor = cfg["aux"]["category expected factor"]
-            if rating_diff < 0:
-                category_factor = cfg["aux"]["category unexpected factor"]
-
-        factor = cfg["aux"]["rating factor"] * category_factor
-
-        return factor
-
-    def compute_new_ratings(self, old_ranking, matches, pid_not_own_category):
-        """return assigned points per match
-        (a list containing [winner_pid, loser_pid, points_to_winner, points_to_loser])"""
-        # TODO make a better way to copy a ranking object
-        for entry in old_ranking:
-            self.add_entry(entry)
-
-        # List of points assigned in each match
-        assigned_points = []
-
-        for winner_pid, loser_pid, match_round, match_category in matches:
-            [to_winner, to_loser] = self._points_to_assign(old_ranking[winner_pid].rating,
-                                                           old_ranking[loser_pid].rating)
-            factor = self._get_factor(old_ranking[winner_pid].rating, old_ranking[loser_pid].rating,
-                                      old_ranking[winner_pid].category, old_ranking[loser_pid].category,
-                                      winner_pid in pid_not_own_category or loser_pid in pid_not_own_category)
-            to_winner = factor*to_winner
-            to_loser = min(self[loser_pid].rating, factor*to_loser)
-            self[winner_pid].rating += to_winner
-            self[loser_pid].rating -= to_loser
-
-            assigned_points.append([winner_pid, loser_pid, to_winner, -to_loser, match_round, match_category])
-
-        return assigned_points
-
-    def compute_bonus_points(self, best_rounds):
-        # List of points assigned in each match
-        assigned_points = []
-        for category, pid in best_rounds.keys():
-            categpid = (category, pid)
-            round_points = best_rounds_points[category]
-            self[pid].bonus += round_points[best_rounds[categpid]]
-            assigned_points.append([pid, round_points[best_rounds[categpid]], best_rounds[categpid], category])
-        return sorted(assigned_points, key=lambda l: (l[-1], l[1], l[0]), reverse=True)
-
-    # def add_participation_points(self, pid_list):
-    #     """Add bonus points for each participant given """
-    #     assigned_points = []
-    #     for pid in pid_list:
-    #         self[pid].bonus += participation_points[self[pid].category]
-    #         assigned_points.append([pid, participation_points[self[pid].category]])
-    #     return assigned_points
-
-    def bonus2rating(self):
-        """For each entry, add bonus points to rating and then set bonus to zero."""
-        for entry in self:
-            entry.rating += entry.bonus
-            entry.bonus = 0
-
-    def update_active_players(self, players, initial_active_players):
-        # Avoid activate or inactivate players after the first tournament.
-        activate_window = cfg["aux"]["tournament window to activate"]
-        tourns_to_activate = cfg["aux"]["tournaments to activate"]
-        inactivate_window = cfg["aux"]["tournament window to inactivate"]
-
-        for re in self:
-            if not re.active:
-                last_tourns = [tid for tid in players[re.pid].played_tournaments()
-                               if self.tid >= tid > self.tid - activate_window]
-                # activate if he has played at least tourns_to_activate tournaments
-                active = len(last_tourns) >= tourns_to_activate
-            else:
-                last_tourns = [tid for tid in players[re.pid].played_tournaments()
-                               if self.tid >= tid > self.tid - inactivate_window]
-                # don't inactivate during tournaments window if it is an initial active player
-                if self.tid < inactivate_window and re.pid in initial_active_players:
-                    active = True
-                else:
-                    active = len(last_tourns) > 0
-
-            self[re.pid].active = active
-
-    def update_categories(self, n_first=10, n_second=10):
-        """ Players are ranked based on rating and their active state.
-        # WARNING: if sometime is used with more categories it should be modified
-
-        Players are ordered by rating. Active players are sorted first.
-
-        Active players are ranked like this (n_first=12, n_second=16):
-        - 1:12    -> first category
-        - 13:28   -> second category
-        - 29:last -> third category
-
-        Inactive players are ranked based on active players categories
-        """
-        actives_to_order = [[e.pid, e.rating, e.active, e.category] for e in self if e.active and
-                            not e.category == categories[-1]]
-        inactives_to_order = [[e.pid, e.rating, e.active, e.category] for e in self if not e.active and
-                              not e.category == categories[-1]]
-
-        ordered_actives = sorted(actives_to_order, key=lambda k: (k[2], k[1]), reverse=True)  # to use active player
-        ordered_inactives = sorted(inactives_to_order, key=lambda k: (k[2], k[1]), reverse=True)  # to use active player
-
-        # First and last player indexes by category
-        # TODO if sometimes is used with more categories it should be modified
-        first = [0, n_first, n_first+n_second]
-        last = [n_first-1, n_first+n_second-1, len(ordered_actives)-1]
-
-        for cat, f, l in zip(categories[:3], first, last):
-            for pid, rating, active, category in ordered_actives[f:l+1]:
-                self[pid].category = cat
-
-        for pid, rating, active, category in ordered_inactives:
-            # By defaut it is assigned to first category. It will be downgraded if necessary
-            self[pid].category = categories[0]
-
-            for cat, f, l in zip(categories[:3], first, last):
-                if rating <= self[ordered_actives[f][0]].rating:
-                    self[pid].category = cat
-
-    def update_categories_thresholds(self):
-        """ Players are ranked based on rating and given thresholds.
-
-        Players are ordered by rating and then assigned to a category
-
-        Example:
-        - rating >= 500        -> first category
-        - 500 > rating >= 250  -> second category
-        - 250 > rating         -> third category
-        """
-        thresholds = cfg["aux"]["categories thresholds"]
-        players_to_order = [[e.pid, e.rating, e.active, e.category] for e in self
-                            if not e.category == categories[-1]]
-        ordered_players = sorted(players_to_order, key=lambda k: (k[2], k[1]), reverse=True)
-
-        for pid, rating, active, category in ordered_players:
-            self[pid].category = categories[-2]  # Last category that it's not fan
-            for j, th in enumerate(thresholds):
-                if rating >= th:
-                    self[pid].category = categories[j]
-                    break
-
-    def get_pids(self, category='', status='all'):
-        """
-        Return a list of pids that may be filtered by category
-
-        If no parameter is given, it won't filter the list
-        :param category: It should be a known category
-        :param status: valid options are 'all' (default), 'active' or 'inactive'
-        :return:
-        """
-        pids = [p.pid for p in self if (not category or p.category == category)]
-        if status == 'active':
-            pids = [p.pid for p in self if (not category or p.category == category) and p.active]
-        elif status == 'inactive':
-            pids = [p.pid for p in self if (not category or p.category == category) and not p.active]
-
-        return pids
-
-    def get_statistics(self):
-        """
-        Return a dictionary of dictionaries that summarizes the number of players
-        by active status and category
-        :return:
-        """
-        statistics = {}
-        for status in ['all', 'active', 'inactive']:
-            statistics_aux = {cat: len(self.get_pids(cat, status)) for cat in categories}
-            statistics_aux['total'] = len(self.get_pids(status=status))
-            statistics[status] = statistics_aux
-        return statistics
+#         Return a list of pids that may be filtered by category
+#
+#         If no parameter is given, it won't filter the list
+#         :param category: It should be a known category
+#         :param status: valid options are 'all' (default), 'active' or 'inactive'
+#         :return:
+#         """
+#         pids = [p.pid for p in self if (not category or p.category == category)]
+#         if status == 'active':
+#             pids = [p.pid for p in self if (not category or p.category == category) and p.active]
+#         elif status == 'inactive':
+#             pids = [p.pid for p in self if (not category or p.category == category) and not p.active]
+#
+#         return pids
+#
+#     def get_statistics(self):
+#         """
+#         Return a dictionary of dictionaries that summarizes the number of players
+#         by active status and category
+#         :return:
+#         """
+#         statistics = {}
+#         for status in ['all', 'active', 'inactive']:
+#             statistics_aux = {cat: len(self.get_pids(cat, status)) for cat in categories}
+#             statistics_aux['total'] = len(self.get_pids(status=status))
+#             statistics[status] = statistics_aux
+#         return statistics
 
 
 class Rankings:
