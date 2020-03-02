@@ -168,38 +168,6 @@ class Players:
         return []
 
 
-# class RankingOLD:
-#     def get_pids(self, category='', status='all'):
-#         """
-#         Return a list of pids that may be filtered by category
-#
-#         If no parameter is given, it won't filter the list
-#         :param category: It should be a known category
-#         :param status: valid options are 'all' (default), 'active' or 'inactive'
-#         :return:
-#         """
-#         pids = [p.pid for p in self if (not category or p.category == category)]
-#         if status == 'active':
-#             pids = [p.pid for p in self if (not category or p.category == category) and p.active]
-#         elif status == 'inactive':
-#             pids = [p.pid for p in self if (not category or p.category == category) and not p.active]
-#
-#         return pids
-#
-#     def get_statistics(self):
-#         """
-#         Return a dictionary of dictionaries that summarizes the number of players
-#         by active status and category
-#         :return:
-#         """
-#         statistics = {}
-#         for status in ['all', 'active', 'inactive']:
-#             statistics_aux = {cat: len(self.get_pids(cat, status)) for cat in categories}
-#             statistics_aux['total'] = len(self.get_pids(status=status))
-#             statistics[status] = statistics_aux
-#         return statistics
-
-
 class Rankings:
     def __init__(self, ranking_df=None):
         all_columns = ["tid", "tournament_name", "date", "location", "pid", "rating", "category", "active"]
@@ -467,6 +435,42 @@ class Rankings:
 
     def get_championship_details(self, tid):
         return self.championship_details_df.loc[self.championship_details_df.tid == tid].copy()
+
+    #     def get_pids(self, category='', status='all'):
+    #         """
+    #         Return a list of pids that may be filtered by category
+    #
+    #         If no parameter is given, it won't filter the list
+    #         :param category: It should be a known category
+    #         :param status: valid options are 'all' (default), 'active' or 'inactive'
+    #         :return:
+    #         """
+    #         pids = [p.pid for p in self if (not category or p.category == category)]
+    #         if status == 'active':
+    #             pids = [p.pid for p in self if (not category or p.category == category) and p.active]
+    #         elif status == 'inactive':
+    #             pids = [p.pid for p in self if (not category or p.category == category) and not p.active]
+    #
+    #         return pids
+
+    def get_statistics(self, tid):
+        """
+        Return a DataFrame that summarizes total and in each category:
+        - the number of players that have participated up to tournament(tid)
+        - the number of players that have participated in tournament(tid)
+        """
+
+        criteria = self.ranking_df.tid == tid
+        this_ranking = self.ranking_df.loc[criteria].copy()
+
+        print(this_ranking)
+
+    #         statistics = {}
+    #         for status in ['all', 'active', 'inactive']:
+    #             statistics_aux = {cat: len(self.get_pids(cat, status)) for cat in categories}
+    #             statistics_aux['total'] = len(self.get_pids(status=status))
+    #             statistics[status] = statistics_aux
+    #         return statistics
 
 
 # class Tournament:
