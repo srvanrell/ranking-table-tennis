@@ -54,7 +54,7 @@ utils.publish_championship_sheets(tournaments, rankings, players, tid, prev_tid,
 # Publish points assigned per best round reached
 utils.publish_championship_details_sheet(tournaments, rankings, players, tid, prev_tid, upload=upload)
 
-stats = rankings.get_statistics(tid)
+stats = rankings.get_statistics()
 print("Stats\n", stats)
 
 # # Saving complete histories of players

@@ -453,38 +453,18 @@ class Rankings:
     #
     #         return pids
 
-    def get_statistics(self, tid):
+    def get_statistics(self):
         """
         Return a DataFrame that summarizes total and in each category:
         - the number of players that have participated up to tournament(tid)
         - the number of players that have participated in tournament(tid)
         """
+        columns = ["tid"] + self.cum_points_cat_columns() + self.points_cat_columns()
+        stats = self.ranking_df.loc[:, columns].groupby("tid").apply(lambda df: (df > 0).sum(axis=0))
+        # FIXME change col names of result
+        # TODO add total number of unique participants per tournament
 
-        criteria = self.ranking_df.tid == tid
-        this_ranking = self.ranking_df.loc[criteria].copy()
-
-        print(this_ranking)
-
-    #         statistics = {}
-    #         for status in ['all', 'active', 'inactive']:
-    #             statistics_aux = {cat: len(self.get_pids(cat, status)) for cat in categories}
-    #             statistics_aux['total'] = len(self.get_pids(status=status))
-    #             statistics[status] = statistics_aux
-    #         return statistics
-
-
-# class Tournament:
-#     def get_statistics(self):
-#         """
-#         Return a dictionary with the number of players by category.
-#
-#         Category names and 'total' are the keys
-#         :return:
-#         """
-#         statistics = {cat: len(self.get_players_names(cat)) for cat in categories}
-#         statistics['total'] = len(self.get_players_names())
-#         return statistics
-#
+        return stats
 
 
 class Tournaments:
