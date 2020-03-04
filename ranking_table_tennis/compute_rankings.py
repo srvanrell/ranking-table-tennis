@@ -20,13 +20,13 @@ __author__ = 'sebastian'
 
 t0 = time.time()
 # Loading all tournament data
-tournaments = utils.load_tournaments_sheets()
+tournaments = utils.load_tournaments()
 t1 = time.time()
 print("Load tournaments time diff:", t1-t0)
 
 # Loading players list
 t0 = time.time()
-players = utils.load_players_sheet()
+players = utils.load_players()
 t1 = time.time()
 print("Load players time diff:", t1-t0)
 t0 = time.time()
@@ -117,5 +117,7 @@ for tid in tournaments:
 
 t0 = time.time()
 utils.save_rankings(rankings)
+utils.save_tournaments(tournaments)
+utils.save_players(players)
 t1 = time.time()
 print("Save rankings:", t1 - t0)

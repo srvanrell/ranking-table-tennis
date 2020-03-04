@@ -132,7 +132,7 @@ def save_players_sheet(players, upload=False):
     sheet_name = cfg["sheetname"]["players"]
 
     with _get_writer(xlsx_filename, sheet_name) as writer:
-        headers = [cfg["labels"][key] for key in ["Player", "Association", "City", "Participations"]]
+        headers = [cfg["labels"][key] for key in ["Player", "Association", "City"]]
         sorted_players_df.to_excel(writer, sheet_name=sheet_name, index_label=cfg["labels"]["pid"], header=headers)
 
     if upload:
@@ -161,8 +161,7 @@ def load_players_sheet():
     players_df.rename(columns={cfg["labels"]["pid"]: "pid",
                                cfg["labels"]["Player"]: "name",
                                cfg["labels"]["Association"]: "affiliation",
-                               cfg["labels"]["City"]: "city",
-                               cfg["labels"]["Participations"]: "history"},
+                               cfg["labels"]["City"]: "city"},
                       inplace=True)
 
     players = models.Players(players_df)
@@ -321,30 +320,27 @@ def publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=F
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
 
-def publish_histories_sheet(ranking, players, tournament_sheetnames, upload=False):
+def publish_histories_sheet(tournaments, rankings, players, tid, prev_tid, upload=False):
     """ Format histories to be published into a sheet"""
-    output_xlsx = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
-    output_xlsx = output_xlsx.replace("NN", "%d" % ranking.tid)
+    xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"].replace("NN", tid)
+    sheet_name = cfg["sheetname"]["histories"]
 
-    histories = []
-    for player in sorted(players, key=lambda l: l.name):
-        if len(player.sorted_history) > 0:
-            histories.append([player.name, "", "", ""])
-            old_cat = ""
-            for cat, tid, best_round in player.sorted_history:
-                if cat == old_cat:
-                    cat = ""
-                else:
-                    old_cat = cat
-                histories.append(["", cat, best_round, " ".join(tournament_sheetnames[tid - 1].split()[1:])])
+    history_df = players.history_df.copy()
+    # Add name of players to a column
+    history_df.loc[:, "name"] = history_df.loc[:, "pid"].apply(lambda pid: players[pid]["name"])
+    # Sort histories by name, category and tid
+    history_df = history_df.sort_values(["name", "category", "tid"], ascending=[True, False, True])
+    # Remove repeated strings to show a cleaner sheet
+    history_df.loc[history_df['name'] == history_df['name'].shift(1), "name"] = ""
+    history_df.loc[history_df['category'] == history_df['category'].shift(1), "category"] = ""
 
-    save_sheet_workbook(output_xlsx,
-                        cfg["sheetname"]["histories"],
-                        [cfg["labels"][key] for key in ["Player", "Category", "Best Round", "Tournament"]],
-                        histories)
+    with _get_writer(xlsx_filename, sheet_name) as writer:
+        headers = [cfg["labels"][key] for key in ["Player", "Category", "Best Round", "Tournament"]]
+        columns = ["name", "category", "best_round", "tid"]
+        history_df.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=columns)
 
     if upload:
-        load_and_upload_sheet(output_xlsx, cfg["sheetname"]["histories"], cfg["io"]["temporal_spreadsheet_id"])
+        load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
 
 def publish_rating_details_sheet(tournaments, rankings, players, tid, prev_tid, upload):
@@ -671,6 +667,7 @@ def remove_temp_players_ranking():
         os.remove(ranking_temp_file)
 
 
+# TODO move functions to each class
 def save_rankings(rankings):
     print("Save rankings. Ready to publish")
     # Saving new ranking
@@ -683,9 +680,39 @@ def save_rankings(rankings):
 
 def load_rankings():
     print("Load rankings.pk")
-    # Saving new ranking
     ranking_file = "rankings.pk"  # FIXME filenames should be moved to config
     with open(ranking_file, 'rb') as rf:
         rankings = pickle.load(rf)
 
     return rankings
+
+
+def save_tournaments(tournaments):
+    print("Save tournaments")
+    tournaments_file = "tournaments.pk"  # FIXME filenames should be moved to config
+    with open(tournaments_file, 'wb') as tf:
+        pickle.dump(tournaments, tf, pickle.HIGHEST_PROTOCOL)
+
+
+def load_tournaments():
+    print("Load tournaments")
+    tournaments_file = "tournaments.pk"  # FIXME filenames should be moved to config
+    with open(tournaments_file, 'rb') as tf:
+        tournaments = pickle.load(tf)
+
+    return tournaments
+
+def save_players(players):
+    print("Save players")
+    players_file = "players.pk"  # FIXME filenames should be moved to config
+    with open(players_file, 'wb') as pf:
+        pickle.dump(players, pf, pickle.HIGHEST_PROTOCOL)
+
+
+def load_players():
+    print("Load players")
+    players_file = "players.pk"  # FIXME filenames should be moved to config
+    with open(players_file, 'rb') as pf:
+        players = pickle.load(pf)
+
+    return players

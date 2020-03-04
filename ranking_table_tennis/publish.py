@@ -16,10 +16,10 @@ __author__ = 'sebastian'
 
 
 # Loading all tournament data
-tournaments = utils.load_tournaments_sheets()
+tournaments = utils.load_tournaments()
 
 # Loading players list
-players = utils.load_players_sheet()
+players = utils.load_players()
 tournaments.assign_pid_from_players(players)
 
 # Loading initial ranking
@@ -53,9 +53,9 @@ utils.publish_championship_sheets(tournaments, rankings, players, tid, prev_tid,
 # Publish points assigned per best round reached
 utils.publish_championship_details_sheet(tournaments, rankings, players, tid, prev_tid, upload=upload)
 
-# # Saving complete histories of players
-# utils.publish_histories_sheet(ranking, players, tournament_sheetnames, upload=upload)
-#
+# Saving complete histories of players
+utils.publish_histories_sheet(tournaments, rankings, players, tid, prev_tid, upload=upload)
+
 # # Testing publshing initial_ranking
 # # TODO it's not working
 # # utils.publish_rating_sheet(tournament_sheetname, initial_ranking, players, initial_ranking, upload=upload)

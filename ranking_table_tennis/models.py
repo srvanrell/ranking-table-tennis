@@ -44,7 +44,7 @@ class Players:
         Create a players database from given players DataFrame
         :param players_df: DataFrame with columns: pid, name, affiliation, city, and history
         """
-        self.players_df = pd.DataFrame(players_df, columns=["pid", "name", "affiliation", "city", "history"])
+        self.players_df = pd.DataFrame(players_df, columns=["pid", "name", "affiliation", "city"])
         self.players_df.set_index("pid", drop=True, verify_integrity=True, inplace=True)
 
         self.history_df = pd.DataFrame(history_df, columns=["tid", "pid", "category", "best_round"])
@@ -90,7 +90,7 @@ class Players:
 
     def add_new_player(self, name, affiliation="", city=""):
         pid = self.players_df.index.max() + 1
-        self.players_df.loc[pid] = {"name": name, "affiliation": affiliation, "city": city, "history": "{}"}
+        self.players_df.loc[pid] = {"name": name, "affiliation": affiliation, "city": city}
         self.verify_and_normalize()
 
     def update_histories(self, tid, best_rounds):
@@ -98,11 +98,6 @@ class Players:
 
         Each history is a string that can be read as a dict with (category, tournament_id) as key.
         """
-        for row_id, row in best_rounds.iterrows():
-            history_dic = ast.literal_eval(self[row.pid].history)
-            history_dic[(row.category, tid)] = row.best_round
-            self.players_df.loc[row.pid, "history"] = str(history_dic)
-
         to_update = [{"tid": tid, "pid": row.pid, "category": row.category, "best_round": row.best_round}
                      for row_id, row in best_rounds.iterrows()]
         self.history_df = self.history_df.append(to_update, ignore_index=True)
