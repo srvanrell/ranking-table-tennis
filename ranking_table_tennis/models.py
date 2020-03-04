@@ -38,63 +38,13 @@ best_rounds_points = raw_points_per_round_table.drop(columns="priority").set_ind
 categories = list(best_rounds_points.columns)
 
 
-# class Player:
-#     def __init__(self, pid=-1, name="Apellido, Nombre", association="Asociación", city="Ciudad", last_tournament=-1,
-#                  history=None):
-#         if history is None:
-#             history = {}
-#         self.pid = pid
-#         self.name = unidecode(name).title()
-#         self.association = association
-#         self.city = city
-#         self.last_tournament = last_tournament
-#         self.history = history
-#
-#     def __str__(self):
-#         formated_history = ["\tCategory %s - Tournament %s: %s" % (cat, tid, best_round)
-#                             for cat, tid, best_round in self.sorted_history]
-#         return ";".join([str(self.pid), self.name, self.association, self.city, str(self.last_tournament),
-#                          "\n".join([""] + formated_history)])
-#
-#     def find_last_tournament(self):
-#         """ Update and return last tournament index based on player history.
-#         If history is not available will not update it.
-#
-#         :return: last_tournament, zero-indexed
-#         """
-#         if self.history:
-#             self.last_tournament = max(self.played_tournaments())
-#         return self.last_tournament
-#
-#     @property
-#     def n_tournaments(self):
-#         """ Number of played tournaments, regardless of categories. """
-#         return len(self.played_tournaments())
-#
-#     def played_tournaments(self):
-#         """ Return sorted list of played tournaments. Empty history will result in an empty list. """
-#         if self.history:
-#             return sorted(set([tid for cat, tid in self.history.keys()]))
-#         return []
-#
-#     @property
-#     def sorted_history(self):
-#         """ History sorted first by category and then by tournament_id.
-#
-#         Returns a list which elements are [cat, tid, best_round]
-#         """
-#         return [[cat, tid, self.history[(cat, tid)]] for cat, tid in
-#                 sorted(self.history.keys())]
-
-
 class Players:
     def __init__(self, players_df=None, history_df=None):
         """
         Create a players database from given players DataFrame
-        :param players_df: DataFrame with columns: pid, name, affiliation, city, last_tournament and history
+        :param players_df: DataFrame with columns: pid, name, affiliation, city, and history
         """
-        self.players_df = pd.DataFrame(players_df,
-                                       columns=["pid", "name", "affiliation", "city", "last_tournament", "history"])
+        self.players_df = pd.DataFrame(players_df, columns=["pid", "name", "affiliation", "city"])
         self.players_df.set_index("pid", drop=True, verify_integrity=True, inplace=True)
 
         self.history_df = pd.DataFrame(history_df, columns=["tid", "pid", "category", "best_round"])
@@ -138,24 +88,16 @@ class Players:
         self.players_df = self.players_df.append(player)
         self.verify_and_normalize()
 
-    def add_new_player(self, name, affiliation="", city="", last_tournament=-1):
+    def add_new_player(self, name, affiliation="", city=""):
         pid = self.players_df.index.max() + 1
-        self.players_df.loc[pid] = {"name": name, "affiliation": affiliation, "city": city,
-                                    "last_tournament": last_tournament, "history": "{}"}
+        self.players_df.loc[pid] = {"name": name, "affiliation": affiliation, "city": city}
         self.verify_and_normalize()
 
     def update_histories(self, tid, best_rounds):
-        """ Save player's best rounds into their histories and update
-        last_tournament.
+        """ Save player's best rounds into their histories.
 
         Each history is a string that can be read as a dict with (category, tournament_id) as key.
         """
-        for row_id, row in best_rounds.iterrows():
-            history_dic = ast.literal_eval(self[row.pid].history)
-            history_dic[(row.category, tid)] = row.best_round
-            self.players_df.loc[row.pid, "history"] = str(history_dic)
-            self.players_df.loc[row.pid, "last_tournament"] = tid
-
         to_update = [{"tid": tid, "pid": row.pid, "category": row.category, "best_round": row.best_round}
                      for row_id, row in best_rounds.iterrows()]
         self.history_df = self.history_df.append(to_update, ignore_index=True)
@@ -166,38 +108,6 @@ class Players:
         if history_dic:
             return sorted(set([tid for cat, tid in history_dic.keys()]))
         return []
-
-
-# class RankingOLD:
-#     def get_pids(self, category='', status='all'):
-#         """
-#         Return a list of pids that may be filtered by category
-#
-#         If no parameter is given, it won't filter the list
-#         :param category: It should be a known category
-#         :param status: valid options are 'all' (default), 'active' or 'inactive'
-#         :return:
-#         """
-#         pids = [p.pid for p in self if (not category or p.category == category)]
-#         if status == 'active':
-#             pids = [p.pid for p in self if (not category or p.category == category) and p.active]
-#         elif status == 'inactive':
-#             pids = [p.pid for p in self if (not category or p.category == category) and not p.active]
-#
-#         return pids
-#
-#     def get_statistics(self):
-#         """
-#         Return a dictionary of dictionaries that summarizes the number of players
-#         by active status and category
-#         :return:
-#         """
-#         statistics = {}
-#         for status in ['all', 'active', 'inactive']:
-#             statistics_aux = {cat: len(self.get_pids(cat, status)) for cat in categories}
-#             statistics_aux['total'] = len(self.get_pids(status=status))
-#             statistics[status] = statistics_aux
-#         return statistics
 
 
 class Rankings:
@@ -468,19 +378,58 @@ class Rankings:
     def get_championship_details(self, tid):
         return self.championship_details_df.loc[self.championship_details_df.tid == tid].copy()
 
+    #     def get_pids(self, category='', status='all'):
+    #         """
+    #         Return a list of pids that may be filtered by category
+    #
+    #         If no parameter is given, it won't filter the list
+    #         :param category: It should be a known category
+    #         :param status: valid options are 'all' (default), 'active' or 'inactive'
+    #         :return:
+    #         """
+    #         pids = [p.pid for p in self if (not category or p.category == category)]
+    #         if status == 'active':
+    #             pids = [p.pid for p in self if (not category or p.category == category) and p.active]
+    #         elif status == 'inactive':
+    #             pids = [p.pid for p in self if (not category or p.category == category) and not p.active]
+    #
+    #         return pids
 
-# class Tournament:
-#     def get_statistics(self):
-#         """
-#         Return a dictionary with the number of players by category.
-#
-#         Category names and 'total' are the keys
-#         :return:
-#         """
-#         statistics = {cat: len(self.get_players_names(cat)) for cat in categories}
-#         statistics['total'] = len(self.get_players_names())
-#         return statistics
-#
+    @staticmethod
+    def _count_unique_pids(df, points_columns):
+        any_cat_participations = (df.loc[:, points_columns] > 0).any(axis="columns")
+        pid_count = df.loc[any_cat_participations, "pid"].nunique()
+
+        return pid_count
+
+    def get_statistics(self):
+        """
+        Return a DataFrame that summarizes total and in each category participations:
+        - the number of players that have participated up to tournament(tid)
+        - the number of players that have participated in tournament(tid)
+        """
+        # stats by category
+        columns = ["tid"] + self.cum_points_cat_columns() + self.points_cat_columns()
+        stats_cat = self.ranking_df.loc[:, columns].groupby("tid").apply(lambda df: (df > 0).sum(axis=0))
+        stats_cat.rename(lambda col: col.replace("points", "participation"), axis="columns", inplace=True)
+
+        # total stats cumulated. multi category players on a tournament are counted once
+        columns = ["tid", "pid"] + self.cum_points_cat_columns()
+        cum_participation_total = self.ranking_df.loc[:, columns].groupby("tid").apply(
+            self._count_unique_pids, self.cum_points_cat_columns())
+        cum_participation_total.rename("cum_participation_total", inplace=True)
+
+        # total stats. multi category players on a tournament are counted once
+        columns = ["tid", "pid"] + self.points_cat_columns()
+        participation_total = self.ranking_df.loc[:, columns].groupby("tid").apply(
+            self._count_unique_pids, self.points_cat_columns())
+        participation_total.rename("participation_total", inplace=True)
+
+        # Join results in a single table
+        stats = stats_cat.join([participation_total, cum_participation_total]).sort_index(axis="columns")
+        stats.drop(cfg["aux"]["initial tid"], inplace=True)
+
+        return stats
 
 
 class Tournaments:

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 from ranking_table_tennis import utils
-from ranking_table_tennis import models
 from ranking_table_tennis.models import cfg
 from urllib import request
 
@@ -74,21 +73,6 @@ for tid in tournaments:
 
             print(rankings[initial_tid, pid][["tid", "pid", "rating", "category"]], players[pid]["name"], "\n")
 
-        # if rankings[initial_tid, pid, "category"] is "":
-        #     if ranking_temp[initial_tid, pid, "category"] is "":
-        #         unknown_player = True
-        #         for option, category in enumerate(models.categories, start=1):
-        #             print("%d\t->\t%s" % (option, category))
-        #         selected_category = int(input("\nEnter the initial category (pick a number above) for %s:\n" % name))
-        #         rankings[initial_tid, pid, "category"] = models.categories[selected_category-1]
-        #         # Save a temp ranking of the player to resume preprocessing, if necessary
-        #         ranking_temp[initial_tid, pid, "category"] = rankings[initial_tid, pid, "category"]
-        #     else:
-        #         print(">>>>\tUNCOMPLETE preprocessing detected. Resuming...")
-        #         rankings[initial_tid, pid, "category"] = ranking_temp[initial_tid, pid, "category"]
-        #
-        #     print(rankings[initial_tid, pid], players[pid]["name"], "\n")
-#
         if unknown_player:
             retrieve = input("press Enter to continue or Ctrl+C to forget last player data\n")
             utils.save_temp_players_ranking(players_temp, ranking_temp)
@@ -112,3 +96,6 @@ utils.save_ranking_sheet(initial_tid, tournaments, rankings, players, upload=upl
 
 # Remove temp files after a successful preprocessing
 utils.remove_temp_players_ranking()
+
+utils.save_tournaments(tournaments)
+utils.save_players(players)
