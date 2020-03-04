@@ -102,27 +102,24 @@ def _format_ranking_header_and_list(ranking, players):
 
 def save_ranking_sheet(tid, tournaments, rankings, players, overwrite=True, upload=False):
     if tid == cfg["aux"]["initial tid"]:
-        ranking_sheet_name = cfg["sheetname"]["initial_ranking"]
+        sheet_name = cfg["sheetname"]["initial_ranking"]
         xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
     else:
         xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["rankings_filename"]
-        ranking_sheet_name = tournaments[tid].iloc[0].sheet_name
-        ranking_sheet_name = ranking_sheet_name.replace(cfg["sheetname"]["tournaments_key"],
-                                                        cfg["sheetname"]["rankings_key"])
-        print(ranking_sheet_name)
+        sheet_name = tournaments[tid].iloc[0].sheet_name
+        sheet_name = sheet_name.replace(cfg["sheetname"]["tournaments_key"],
+                                        cfg["sheetname"]["rankings_key"])
 
     sorted_rankings_df = rankings.ranking_df.sort_values("rating", ascending=False)
     sorted_rankings_df.loc[:, "active"] = sorted_rankings_df.loc[:, "active"].apply(lambda x:  cfg["activeplayer"][x])
     sorted_rankings_df.insert(2, "name", sorted_rankings_df.loc[:, "pid"].apply(lambda pid: players[pid]["name"]))
     sorted_rankings_df.loc[:, "date"] = sorted_rankings_df.loc[:, "date"].apply(lambda d: d.strftime("%Y %m %d"))
 
-    with pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode='a') as writer:
-        if ranking_sheet_name in writer.book.sheetnames:
-            writer.book.remove_sheet(writer.book.get_sheet_by_name(ranking_sheet_name))
+    with _get_writer(xlsx_filename, sheet_name) as writer:
         headers = [cfg["labels"][key] for key in ["tid", "Tournament name", "Date", "Location",
                                                   "pid", "Player", "Rating", "Category", "Active Player"]]
         columns = ["tid", "tournament_name", "date", "location", "pid", "name", "rating", "category", "active"]
-        sorted_rankings_df.to_excel(writer, sheet_name=ranking_sheet_name, index=False, header=headers, columns=columns)
+        sorted_rankings_df.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=columns)
 
     if upload:
         upload_sheet_from_df(cfg["io"]["tournaments_spreadsheet_id"], cfg["sheetname"]["initial_ranking"],
@@ -132,15 +129,12 @@ def save_ranking_sheet(tid, tournaments, rankings, players, overwrite=True, uplo
 def save_players_sheet(players, upload=False):
     sorted_players_df = players.players_df.sort_values("name")
     xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
-    players_sheet_name = cfg["sheetname"]["players"]
+    sheet_name = cfg["sheetname"]["players"]
 
-    with pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode='a') as writer:
-        if players_sheet_name in writer.book.sheetnames:
-            writer.book.remove_sheet(writer.book.get_sheet_by_name(players_sheet_name))
+    with _get_writer(xlsx_filename, sheet_name) as writer:
         headers = [cfg["labels"][key] for key in ["Player", "Association", "City",
                                                   "Last Tournament", "Participations"]]
-        sorted_players_df.to_excel(writer, sheet_name=players_sheet_name,
-                                   index_label=cfg["labels"]["pid"], header=headers)
+        sorted_players_df.to_excel(writer, sheet_name=sheet_name, index_label=cfg["labels"]["pid"], header=headers)
 
     if upload:
         headers_df = [cfg["labels"]["pid"]] + headers
@@ -340,11 +334,7 @@ def publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=F
                "A4", "B4", "C4", "D4", "E4"]
     to_center = to_bold + ["B1", "B2", "B3"]
 
-    with pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode=_get_writer_mode(xlsx_filename)) as writer:
-        if sheet_name in writer.book.sheetnames:
-            writer.book.remove_sheet(writer.book.get_sheet_by_name(sheet_name))
-        print("<<<Saving\t", sheet_name, "\tin\t", xlsx_filename)
-
+    with _get_writer(xlsx_filename, sheet_name) as writer:
         headers = [cfg["labels"][key] for key in ["Category", "Rating", "Player", "City", "Association"]]
         columns = ["category", "formatted rating", "name", "city", "affiliation"]
         sorted_rankings_df.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=columns)
@@ -410,11 +400,7 @@ def publish_rating_details_sheet(tournaments, rankings, players, tid, prev_tid, 
                "A4", "B4", "C4", "D4", "E4", "F4", "G4"]
     to_center = to_bold + ["B1", "B2", "B3"]
 
-    with pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode=_get_writer_mode(xlsx_filename)) as writer:
-        if sheet_name in writer.book.sheetnames:
-            writer.book.remove_sheet(writer.book.get_sheet_by_name(sheet_name))
-        print("<<<Saving\t", sheet_name, "\tin\t", xlsx_filename)
-
+    with _get_writer(xlsx_filename, sheet_name) as writer:
         headers = [cfg["labels"][key] for key in ["Winner", "Loser", "Difference", "Winner Points", "Loser Points",
                                                   "Round", "Category"]]
         columns = ["winner_name_rating", "loser_name_rating", "diff_rating", "rating_to_winner", "rating_to_loser",
@@ -444,11 +430,7 @@ def publish_championship_details_sheet(tournaments, rankings, players, tid, prev
                "A4", "B4", "C4", "D4"]
     to_center = to_bold + ["B1", "B2", "B3"]
 
-    with pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode=_get_writer_mode(xlsx_filename)) as writer:
-        if sheet_name in writer.book.sheetnames:
-            writer.book.remove_sheet(writer.book.get_sheet_by_name(sheet_name))
-        print("<<<Saving\t", sheet_name, "\tin\t", xlsx_filename)
-
+    with _get_writer(xlsx_filename, sheet_name) as writer:
         headers = [cfg["labels"][key] for key in ["Player", "Category", "Best Round", "Championship Points"]]
         columns = ["name", "category", "best_round", "points"]
         championship_details.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=columns)
@@ -523,11 +505,7 @@ def publish_championship_sheets(tournaments, rankings, players, tid, prev_tid, u
             lambda row: _format_diff(row[point_col], row["prev " + point_col]), axis="columns"))
         sorted_ranking.loc[:, "participations"] = sorted_ranking.loc[:, participations_col]  # FIXME should not change name
 
-        with pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode=_get_writer_mode(xlsx_filename)) as writer:
-            if sheet_name in writer.book.sheetnames:
-                writer.book.remove_sheet(writer.book.get_sheet_by_name(sheet_name))
-            print("<<<Saving\t", sheet_name, "\tin\t", xlsx_filename)
-
+        with _get_writer(xlsx_filename, sheet_name) as writer:
             sorted_ranking.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=columns)
 
             # publish and format tournament metadata
