@@ -465,7 +465,9 @@ class Rankings:
         stats_cat.rename(lambda col: col.replace("points", "participation"), axis="columns", inplace=True)
 
         # total stats cumulated. multi category players on a tournament are counted once
-        columns = ["tid"] + self.cum_points_cat_columns()
+        columns = ["tid", "pid"] + self.cum_points_cat_columns()
+        cum_participation_total = self.ranking_df.loc[:, columns].groupby("tid").apply(
+            lambda df: print(df))
         cum_participation_total = self.ranking_df.loc[:, columns].groupby("tid").apply(
             lambda df: (df > 0).sum(axis=1).sum())
         cum_participation_total.rename("cum_participation_total", inplace=True)
