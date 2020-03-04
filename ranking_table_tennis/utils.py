@@ -283,6 +283,15 @@ def _get_writer_mode(xlsx_file_path):
     return mode
 
 
+def _get_writer_(xlsx_filename, sheet_name):
+    writer = pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode=_get_writer_mode(xlsx_filename))
+    if sheet_name in writer.book.sheetnames:
+        writer.book.remove_sheet(writer.book.get_sheet_by_name(sheet_name))
+    print("<<<Saving\t", sheet_name, "\tin\t", xlsx_filename)
+
+    return writer
+
+
 def _add_players_metadata_columns(this_ranking, players):
     """Adds name, city, and affiliation columns to this_ranking. Info is taken from players"""
     # Format data and columns to write into the file
@@ -453,21 +462,23 @@ def publish_championship_details_sheet(tournaments, rankings, players, tid, prev
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
 
-def publish_statistics_sheet(sheetname, ranking, upload=False):
+def publish_statistics_sheet(tournaments, rankings, players, tid, prev_tid, upload=False):
     """ Copy details from log and output details of given tournament"""
-    output_xlsx = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"]
-    output_xlsx = output_xlsx.replace("NN", "%d" % ranking.tid)
+    xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"].replace("NN", tid)
+    sheet_name = cfg["sheetname"]["statistics_key"]
 
-    log_xlsx = cfg["io"]["data_folder"] + cfg["io"]["log_filename"]
+    stats = rankings.get_statistics()
+    headers = models.categories + ['total'] + models.categories + ['total']
 
-    # Saving points assigned in each match
-    statistics_sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"],
-                                             cfg["sheetname"]["statistics_key"])
-    statistics_log_saved = load_sheet_workbook(log_xlsx, statistics_sheetname, first_row=0)
-    save_sheet_workbook(output_xlsx, statistics_sheetname, statistics_log_saved[0], statistics_log_saved[1:])
+    with pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode=_get_writer_mode(xlsx_filename)) as writer:
+        if sheet_name in writer.book.sheetnames:
+            writer.book.remove_sheet(writer.book.get_sheet_by_name(sheet_name))
+        print("<<<Saving\t", sheet_name, "\tin\t", xlsx_filename)
+
+        stats.to_excel(writer, sheet_name=sheet_name, index=True, header=headers, index_label=cfg["labels"]["tid"])
 
     if upload:
-        load_and_upload_sheet(output_xlsx, statistics_sheetname, cfg["io"]["temporal_spreadsheet_id"])
+        load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
 
 def publish_championship_sheets(tournaments, rankings, players, tid, prev_tid, upload=False):
@@ -523,29 +534,6 @@ def publish_championship_sheets(tournaments, rankings, players, tid, prev_tid, u
 
         if upload:
             load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
-
-
-def save_statistics(sheetname, tournament, ranking):
-    # Testing statistics of tournament and ranking
-    log_xlsx = cfg["io"]["data_folder"] + cfg["io"]["log_filename"]
-
-    stats_sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"],
-                                        cfg["sheetname"]["statistics_key"])
-
-    t_stats = tournament.get_statistics()
-    r_stats = ranking.get_statistics()
-
-    labels = ['total'] + models.categories
-    headers = ["tid", "description"] + labels
-    data_to_save = [[ranking.tid, "tournament participation"] + [t_stats[k] for k in labels],
-                    [ranking.tid, "ranked players"] + [r_stats['all'][k] for k in labels],
-                    [ranking.tid, "ranked active"] + [r_stats['active'][k] for k in labels],
-                    [ranking.tid, "ranked inactive"] + [r_stats['inactive'][k] for k in labels]]
-
-    save_sheet_workbook(log_xlsx,
-                        stats_sheetname,
-                        headers,
-                        data_to_save)
 
 
 def _get_gc():

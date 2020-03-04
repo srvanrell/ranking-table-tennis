@@ -455,14 +455,28 @@ class Rankings:
 
     def get_statistics(self):
         """
-        Return a DataFrame that summarizes total and in each category:
+        Return a DataFrame that summarizes total and in each category participations:
         - the number of players that have participated up to tournament(tid)
         - the number of players that have participated in tournament(tid)
         """
+        # stats by category
         columns = ["tid"] + self.cum_points_cat_columns() + self.points_cat_columns()
-        stats = self.ranking_df.loc[:, columns].groupby("tid").apply(lambda df: (df > 0).sum(axis=0))
-        # FIXME change col names of result
-        # TODO add total number of unique participants per tournament
+        stats_cat = self.ranking_df.loc[:, columns].groupby("tid").apply(lambda df: (df > 0).sum(axis=0))
+        stats_cat.rename(lambda col: col.replace("points", "participation"), axis="columns", inplace=True)
+
+        # total stats cumulated. multi category players on a tournament are counted once
+        columns = ["tid"] + self.cum_points_cat_columns()
+        cum_participation_total = self.ranking_df.loc[:, columns].groupby("tid").apply(
+            lambda df: (df > 0).sum(axis=1).sum())
+        cum_participation_total.rename("cum_participation_total", inplace=True)
+
+        # total stats. multi category players on a tournament are counted once
+        columns = ["tid"] + self.points_cat_columns()
+        participation_total = self.ranking_df.loc[:, columns].groupby("tid").apply(
+            lambda df: (df > 0).sum(axis=1).sum())
+        participation_total.rename("participation_total", inplace=True)
+
+        stats = stats_cat.join([participation_total, cum_participation_total]).sort_index(axis="columns")
 
         return stats
 

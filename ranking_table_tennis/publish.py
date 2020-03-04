@@ -54,18 +54,15 @@ utils.publish_championship_sheets(tournaments, rankings, players, tid, prev_tid,
 # Publish points assigned per best round reached
 utils.publish_championship_details_sheet(tournaments, rankings, players, tid, prev_tid, upload=upload)
 
-stats = rankings.get_statistics()
-print("Stats\n", stats)
-
 # # Saving complete histories of players
 # utils.publish_histories_sheet(ranking, players, tournament_sheetnames, upload=upload)
 #
 # # Testing publshing initial_ranking
 # # TODO it's not working
 # # utils.publish_rating_sheet(tournament_sheetname, initial_ranking, players, initial_ranking, upload=upload)
-#
-# # Publish statistics
-# utils.publish_statistics_sheet(tournament_sheetname, ranking, upload=upload)
+
+# Publish statistics
+utils.publish_statistics_sheet(tournaments, rankings, players, tid, prev_tid, upload=upload)
 
 answer = input("\nDo you want to publish to the web [Y/n]? (press Enter to continue)\n")
 show_on_web = answer.lower() != "n"
