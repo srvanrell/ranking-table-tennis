@@ -2,7 +2,6 @@ io:
     data_folder: data/
     tournaments_filename: Liga Dos Orillas 2020dev - Carga de partidos.xlsx
     rankings_filename: Liga Dos Orillas 2020dev - Rankings Crudos.xlsx
-    log_filename: log2020dev.xlsx
     publish_filename: Torneo NN para publicar.xlsx
     tournaments_gdrive: https://docs.google.com/spreadsheets/d/e/2PACX-1vQtjV3DJ5TjVsxO5hDipQDpgH621ACzq5tfbzhDxy5-9iFjbHqlJ2Ho9MvL-pvSPOUIhL851I6Kc9uX/pub?output=xlsx
     tournaments_spreadsheet_id: 1HDqOZGqROrG9Ypqh6ZqFDmHNYkf6PlnfX3Sx7eiQNsM
@@ -45,7 +44,6 @@ labels:
     Winner Points: Puntos Ganador
     Loser Points: Puntos Perdedor
     Category: Categoría
-    Participation Points: Puntos por participar
     Total Points: Total puntos
     Active Player: Jugador Activo
     Date: Fecha
@@ -76,10 +74,7 @@ roundnames:
     third place playoff: tercer puesto
 
 aux:
-    flag add bonus: to_add_bonus_points
-    flag bonus sanction: to_subtract_bonus_points
     sanction factor: 0.5
-    flag promotion: promotion
     rating factor: 2.0
     category expected factor: 0.5
     category unexpected factor: 1.5

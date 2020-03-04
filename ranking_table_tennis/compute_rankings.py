@@ -18,8 +18,6 @@ __author__ = 'sebastian'
 #         xlsx log file
 ##########################################
 
-log_xlsx = cfg["io"]["data_folder"] + cfg["io"]["log_filename"]
-
 t0 = time.time()
 # Loading all tournament data
 tournaments = utils.load_tournaments_sheets()
@@ -116,8 +114,6 @@ for tid in tournaments:
     rankings.compute_championship_points(tid)
     t1 = time.time()
     print("Compute championship points:", t1 - t0)
-
-#     utils.save_statistics(tournament_sheetname, tournament, new_ranking)
 
 t0 = time.time()
 utils.save_rankings(rankings)
