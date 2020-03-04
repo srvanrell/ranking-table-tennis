@@ -132,8 +132,7 @@ def save_players_sheet(players, upload=False):
     sheet_name = cfg["sheetname"]["players"]
 
     with _get_writer(xlsx_filename, sheet_name) as writer:
-        headers = [cfg["labels"][key] for key in ["Player", "Association", "City",
-                                                  "Last Tournament", "Participations"]]
+        headers = [cfg["labels"][key] for key in ["Player", "Association", "City", "Participations"]]
         sorted_players_df.to_excel(writer, sheet_name=sheet_name, index_label=cfg["labels"]["pid"], header=headers)
 
     if upload:
@@ -163,7 +162,6 @@ def load_players_sheet():
                                cfg["labels"]["Player"]: "name",
                                cfg["labels"]["Association"]: "affiliation",
                                cfg["labels"]["City"]: "city",
-                               cfg["labels"]["Last Tournament"]: "last_tournament",
                                cfg["labels"]["Participations"]: "history"},
                       inplace=True)
 

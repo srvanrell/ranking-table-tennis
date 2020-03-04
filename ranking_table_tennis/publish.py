@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 from ranking_table_tennis import utils
-from ranking_table_tennis import models
 from ranking_table_tennis.models import cfg
 
 __author__ = 'sebastian'

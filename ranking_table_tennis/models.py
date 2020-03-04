@@ -38,63 +38,13 @@ best_rounds_points = raw_points_per_round_table.drop(columns="priority").set_ind
 categories = list(best_rounds_points.columns)
 
 
-# class Player:
-#     def __init__(self, pid=-1, name="Apellido, Nombre", association="Asociación", city="Ciudad", last_tournament=-1,
-#                  history=None):
-#         if history is None:
-#             history = {}
-#         self.pid = pid
-#         self.name = unidecode(name).title()
-#         self.association = association
-#         self.city = city
-#         self.last_tournament = last_tournament
-#         self.history = history
-#
-#     def __str__(self):
-#         formated_history = ["\tCategory %s - Tournament %s: %s" % (cat, tid, best_round)
-#                             for cat, tid, best_round in self.sorted_history]
-#         return ";".join([str(self.pid), self.name, self.association, self.city, str(self.last_tournament),
-#                          "\n".join([""] + formated_history)])
-#
-#     def find_last_tournament(self):
-#         """ Update and return last tournament index based on player history.
-#         If history is not available will not update it.
-#
-#         :return: last_tournament, zero-indexed
-#         """
-#         if self.history:
-#             self.last_tournament = max(self.played_tournaments())
-#         return self.last_tournament
-#
-#     @property
-#     def n_tournaments(self):
-#         """ Number of played tournaments, regardless of categories. """
-#         return len(self.played_tournaments())
-#
-#     def played_tournaments(self):
-#         """ Return sorted list of played tournaments. Empty history will result in an empty list. """
-#         if self.history:
-#             return sorted(set([tid for cat, tid in self.history.keys()]))
-#         return []
-#
-#     @property
-#     def sorted_history(self):
-#         """ History sorted first by category and then by tournament_id.
-#
-#         Returns a list which elements are [cat, tid, best_round]
-#         """
-#         return [[cat, tid, self.history[(cat, tid)]] for cat, tid in
-#                 sorted(self.history.keys())]
-
-
 class Players:
     def __init__(self, players_df=None, history_df=None):
         """
         Create a players database from given players DataFrame
-        :param players_df: DataFrame with columns: pid, name, affiliation, city, last_tournament and history
+        :param players_df: DataFrame with columns: pid, name, affiliation, city, and history
         """
-        self.players_df = pd.DataFrame(players_df,
-                                       columns=["pid", "name", "affiliation", "city", "last_tournament", "history"])
+        self.players_df = pd.DataFrame(players_df, columns=["pid", "name", "affiliation", "city", "history"])
         self.players_df.set_index("pid", drop=True, verify_integrity=True, inplace=True)
 
         self.history_df = pd.DataFrame(history_df, columns=["tid", "pid", "category", "best_round"])
@@ -138,15 +88,13 @@ class Players:
         self.players_df = self.players_df.append(player)
         self.verify_and_normalize()
 
-    def add_new_player(self, name, affiliation="", city="", last_tournament=-1):
+    def add_new_player(self, name, affiliation="", city=""):
         pid = self.players_df.index.max() + 1
-        self.players_df.loc[pid] = {"name": name, "affiliation": affiliation, "city": city,
-                                    "last_tournament": last_tournament, "history": "{}"}
+        self.players_df.loc[pid] = {"name": name, "affiliation": affiliation, "city": city, "history": "{}"}
         self.verify_and_normalize()
 
     def update_histories(self, tid, best_rounds):
-        """ Save player's best rounds into their histories and update
-        last_tournament.
+        """ Save player's best rounds into their histories.
 
         Each history is a string that can be read as a dict with (category, tournament_id) as key.
         """
@@ -154,7 +102,6 @@ class Players:
             history_dic = ast.literal_eval(self[row.pid].history)
             history_dic[(row.category, tid)] = row.best_round
             self.players_df.loc[row.pid, "history"] = str(history_dic)
-            self.players_df.loc[row.pid, "last_tournament"] = tid
 
         to_update = [{"tid": tid, "pid": row.pid, "category": row.category, "best_round": row.best_round}
                      for row_id, row in best_rounds.iterrows()]
