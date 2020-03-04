@@ -191,31 +191,6 @@ def load_initial_ranking_sheet():
     return initial_ranking
 
 
-def load_ranking_sheet(sheetname):
-    """Load a ranking from a xlsx sheet and return a Ranking object
-
-    :param sheetname: tournament sheetname (will be replaced with ranking sheetname by default)
-    Except that sheetname match with initial ranking name.
-
-    :return: Ranking object
-    """
-    if sheetname == cfg["sheetname"]["initial_ranking"]:
-        filename = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
-    else:
-        filename = cfg["io"]["data_folder"] + cfg["io"]["rankings_filename"]
-        sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["rankings_key"])
-
-    raw_ranking = load_sheet_workbook(filename, sheetname, first_row=0)
-    name = raw_ranking[0][1]
-    date = str(raw_ranking[1][1])
-    location = raw_ranking[2][1]
-    tid = raw_ranking[3][1]
-    ranking = models.Ranking(name, date, location, tid)
-    ranking.load_list([[rr[0], rr[1], rr[2], rr[3] == cfg["activeplayer"][True], rr[4]] for rr in raw_ranking[5:]])
-
-    return ranking
-
-
 def load_tournaments_sheets():
     tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
     filter_key = cfg["sheetname"]["tournaments_key"]
