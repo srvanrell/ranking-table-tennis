@@ -104,9 +104,9 @@ class Players:
 
     def played_tournaments(self, pid):
         """ Return sorted list of played tournaments. Empty history will result in an empty list. """
-        history_dic = ast.literal_eval(self[pid].history)
-        if history_dic:
-            return sorted(set([tid for cat, tid in history_dic.keys()]))
+        tids = self.history_df.loc[self.history_df.pid == float(pid), "tid"]
+        if not tids.empty:
+            return sorted(set(tids))
         return []
 
 
