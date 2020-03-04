@@ -283,7 +283,7 @@ def _get_writer_mode(xlsx_file_path):
     return mode
 
 
-def _get_writer_(xlsx_filename, sheet_name):
+def _get_writer(xlsx_filename, sheet_name):
     writer = pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode=_get_writer_mode(xlsx_filename))
     if sheet_name in writer.book.sheetnames:
         writer.book.remove_sheet(writer.book.get_sheet_by_name(sheet_name))
@@ -470,12 +470,15 @@ def publish_statistics_sheet(tournaments, rankings, players, tid, prev_tid, uplo
     stats = rankings.get_statistics()
     headers = models.categories + ['total'] + models.categories + ['total']
 
-    with pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode=_get_writer_mode(xlsx_filename)) as writer:
-        if sheet_name in writer.book.sheetnames:
-            writer.book.remove_sheet(writer.book.get_sheet_by_name(sheet_name))
-        print("<<<Saving\t", sheet_name, "\tin\t", xlsx_filename)
-
+    with _get_writer(xlsx_filename, sheet_name) as writer:
         stats.to_excel(writer, sheet_name=sheet_name, index=True, header=headers, index_label=cfg["labels"]["tid"])
+
+        ws = writer.book.get_sheet_by_name(sheet_name)
+        ws.insert_rows(0, 1)
+        ws["B1"] = "Acumulado"  # FIXME this should be read from cfg
+        ws.merge_cells('B1:H1')
+        ws["I1"] = "Por torneo"  # FIXME this should be read from cfg
+        ws.merge_cells('I1:O1')
 
     if upload:
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])

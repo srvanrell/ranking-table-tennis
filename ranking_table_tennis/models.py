@@ -453,6 +453,13 @@ class Rankings:
     #
     #         return pids
 
+    @staticmethod
+    def _count_unique_pids(df, points_columns):
+        any_cat_participations = (df.loc[:, points_columns] > 0).any(axis="columns")
+        pid_count = df.loc[any_cat_participations, "pid"].nunique()
+
+        return pid_count
+
     def get_statistics(self):
         """
         Return a DataFrame that summarizes total and in each category participations:
@@ -467,18 +474,18 @@ class Rankings:
         # total stats cumulated. multi category players on a tournament are counted once
         columns = ["tid", "pid"] + self.cum_points_cat_columns()
         cum_participation_total = self.ranking_df.loc[:, columns].groupby("tid").apply(
-            lambda df: print(df))
-        cum_participation_total = self.ranking_df.loc[:, columns].groupby("tid").apply(
-            lambda df: (df > 0).sum(axis=1).sum())
+            self._count_unique_pids, self.cum_points_cat_columns())
         cum_participation_total.rename("cum_participation_total", inplace=True)
 
         # total stats. multi category players on a tournament are counted once
-        columns = ["tid"] + self.points_cat_columns()
+        columns = ["tid", "pid"] + self.points_cat_columns()
         participation_total = self.ranking_df.loc[:, columns].groupby("tid").apply(
-            lambda df: (df > 0).sum(axis=1).sum())
+            self._count_unique_pids, self.points_cat_columns())
         participation_total.rename("participation_total", inplace=True)
 
+        # Join results in a single table
         stats = stats_cat.join([participation_total, cum_participation_total]).sort_index(axis="columns")
+        stats.drop(cfg["aux"]["initial tid"], inplace=True)
 
         return stats
 
