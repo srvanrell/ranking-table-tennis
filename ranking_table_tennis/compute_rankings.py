@@ -48,10 +48,7 @@ for tid in tournaments:
     print("Initialize new rankings:", t1 - t0)
 
     # Create list of players that partipate in the tournament
-    t0 = time.time()
-    pid_participation_list = [players.get_pid(name) for name in tournaments.get_players_names(tid)]
-    t1 = time.time()
-    print("PID participation list:", t1 - t0)
+    pid_participation_list = tournaments.get_players_pids(tid)
 
     # Get the best round for each player in each category
     t0 = time.time()

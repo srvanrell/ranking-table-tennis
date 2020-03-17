@@ -571,6 +571,22 @@ class Tournaments:
 
         return sorted(list(all_players))
 
+    def get_players_pids(self, tid, category=''):
+        """
+        Return a list of pid players that played the tournament
+
+        If category is given, the list of players is filtered by category
+        """
+        criteria = self.tournaments_df.tid == tid
+        if category:
+            criteria = criteria & (self.tournaments_df.category == category)
+
+        winner = self.tournaments_df.loc[criteria, "winner_pid"]
+        loser = self.tournaments_df.loc[criteria, "loser_pid"]
+        all_players = winner.append(loser, ignore_index=True).unique()
+
+        return sorted(list(all_players))
+
     def compute_best_rounds(self, tid, players):
         """
         Return a DataFramey with the best round for each player and category. pid is assigned from players
