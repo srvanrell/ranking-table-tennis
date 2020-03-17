@@ -1,7 +1,7 @@
 import os
 from ranking_table_tennis import models
 from ranking_table_tennis.models import cfg
-from openpyxl import Workbook, load_workbook
+from openpyxl import load_workbook
 from openpyxl.styles import Font, Alignment
 import pandas as pd
 import pickle
@@ -44,25 +44,6 @@ def load_sheet_workbook(filename, sheetname, first_row=1):
     return list_to_return[first_row:]
 
 
-def _wb_ws_to_save(filename, sheetname, overwrite=True):
-    print("<<<Saving\t", sheetname, "\tin\t", filename)
-    if os.path.isfile(filename):
-        wb = load_workbook(filename)
-        if overwrite and sheetname in wb:
-            wb.remove_sheet(wb.get_sheet_by_name(sheetname))
-        if sheetname in wb:
-            ws = wb.get_sheet_by_name(sheetname)
-        else:
-            ws = wb.create_sheet()
-    else:
-        wb = Workbook()
-        ws = wb.active
-
-    ws.title = sheetname
-
-    return wb, ws
-
-
 def _bold_and_center(ws, to_bold, to_center):
     """Bold and center cells in given worksheet (ws)"""
     for colrow in to_bold:
@@ -73,34 +54,7 @@ def _bold_and_center(ws, to_bold, to_center):
         cell.alignment = Alignment(horizontal='center')
 
 
-def save_sheet_workbook(filename, sheetname, headers, list_to_save, overwrite=True):
-    wb, ws = _wb_ws_to_save(filename, sheetname, overwrite)
-
-    if headers:
-        ws.append(headers)
-    
-    for row in list_to_save:
-        ws.append(row)
-
-    if headers:
-        for col in range(1, ws.max_column+1):
-            cell = ws.cell(column=col, row=1)
-            cell.font = Font(bold=True)
-
-    wb.save(filename)
-
-
-def _format_ranking_header_and_list(ranking, players):
-    headers = [cfg["labels"][key] for key in ["pid", "Rating", "Bonus Points",
-                                              "Active Player", "Category", "Player"]]
-    list_to_save = [[e.pid, e.rating, e.bonus, cfg["activeplayer"][e.active],
-                     e.category, players[e.pid].name] for e in ranking]
-    list_to_save.sort(key=lambda l: l[1], reverse=True)
-
-    return headers, list_to_save
-
-
-def save_ranking_sheet(tid, tournaments, rankings, players, overwrite=True, upload=False):
+def save_ranking_sheet(tid, tournaments, rankings, players, upload=False):
     if tid == cfg["aux"]["initial tid"]:
         sheet_name = cfg["sheetname"]["initial_ranking"]
         xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
@@ -147,7 +101,7 @@ def upload_sheet_from_df(spreadsheet_id, sheet_name, df, headers, upload_index=F
     ws = d2g.upload(df, spreadsheet_id, sheet_name, row_names=upload_index, df_size=True)
 
     # Concatenation of header cells values to be updated in batch mode
-    cell_list = ws.range("A1:" + gspread.utils.rowcol_to_a1(row=1, col=len(headers)))
+    cell_list = ws.range("A1:" + d2g.gspread.utils.rowcol_to_a1(row=1, col=len(headers)))
     for i, value in enumerate(headers):
         cell_list[i].value = value
     ws.update_cells(cell_list)
@@ -502,86 +456,10 @@ def _get_gc():
     return gc
 
 
-def _wb_ws_to_upload(spreadsheet_id, sheetname, num_rows, num_cols):
-    print("<<<Saving\t", sheetname, "\tin\t", spreadsheet_id)
-    wb, ws = None, None
-    gc = _get_gc()
-    # FIXME it should raise an exception to abort uploading
-    if gc:
-        wb = gc.open_by_key(spreadsheet_id)   
-
-        # Overwrites an existing sheet or creates a new one
-        if sheetname in [ws.title for ws in wb.worksheets()]:
-            ws = wb.worksheet(sheetname)
-            ws.resize(rows=num_rows, cols=num_cols)
-        else:
-            ws = wb.add_worksheet(title=sheetname, rows=num_rows, cols=num_cols)
-
-    return wb, ws
-
-
-def upload_sheet(spreadsheet_id, sheetname, headers, rows_to_save):
-    """ Saves headers and rows_to_save into given sheet_name.
-        If sheet_name does not exist, it will be created. """
-    num_rows = len(rows_to_save) + 1  # +1 because of header
-    num_cols = len(headers)
-
-    wb, ws = _wb_ws_to_upload(spreadsheet_id, sheetname, num_rows, num_cols)
-    if wb is None and ws is None:
-        print("Updating has failed. Skipping...")
-        return
-
-    # Concatenation of all cells values to be updated in batch mode
-    cell_list = ws.range("A1:" + gspread.utils.rowcol_to_a1(row=num_rows, col=num_cols))
-    for i, value in enumerate(headers + [v for row in rows_to_save for v in row]):
-        cell_list[i].value = value
-
-    ws.update_cells(cell_list)
-
-
-# FIXME It should allow uploading more than initial ranking
-def upload_ranking_sheet(sheetname, ranking, players):
-    """ Saves ranking into given sheet_name.
-        If sheet_name does not exist, it will be created. """
-    if sheetname == cfg["sheetname"]["initial_ranking"]:
-        spreadsheet_id = cfg["io"]["tournaments_spreadsheet_id"]
-        # else:
-        #     spreadsheet_id = cfg["io"]["not_existent_spreadsheet_id"]
-        #     sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["rankings_key"])
-
-        headers, list_to_save = _format_ranking_header_and_list(ranking, players)
-
-        num_cols = len(headers)
-        num_rows = len(list_to_save) + 1 + 4  # +1 because of header + 4 because of tournament metadata
-
-        wb, ws = _wb_ws_to_upload(spreadsheet_id, sheetname, num_rows, num_cols)
-        if wb is None and ws is None:
-            print("Updating has failed. Skipping...")
-            return
-
-        ws.update_acell("A1", cfg["labels"]["Tournament name"])
-        ws.update_acell("B1", ranking.tournament_name)
-        ws.update_acell("A2", cfg["labels"]["Date"])
-        ws.update_acell("B2", ranking.date)
-        ws.update_acell("A3", cfg["labels"]["Location"])
-        ws.update_acell("B3", ranking.location)
-        ws.update_acell("A4", cfg["labels"]["tid"])
-        ws.update_acell("B4", ranking.tid)
-
-        # Concatenation of all cells values to be updated in batch mode
-        cell_list = ws.range("A5:" + gspread.utils.rowcol_to_a1(row=num_rows, col=num_cols))
-        for i, value in enumerate(headers + [v for row in list_to_save for v in row]):
-            cell_list[i].value = value
-
-        ws.update_cells(cell_list)
-
-
-def load_and_upload_sheet(filename, sheetname, spreadsheet_id):
-    raw_sheet = load_sheet_workbook(filename, sheetname, first_row=0)
-    headers = raw_sheet[0]
-    list_to_save = raw_sheet[1:]
-
-    upload_sheet(spreadsheet_id, sheetname, headers, list_to_save)
+def load_and_upload_sheet(filename, sheet_name, spreadsheet_id):
+    print("<<<Saving\t", sheet_name, "\tin\t", spreadsheet_id)
+    df = pd.read_excel(filename, sheet_name, index_col=None, header=None, na_filter=False)
+    d2g.upload(df, spreadsheet_id, sheet_name, row_names=False, col_names=False, df_size=True)
 
 
 def create_n_tour_sheet(spreadsheet_id, n_tour):
