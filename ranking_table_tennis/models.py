@@ -84,6 +84,13 @@ class Players:
 
         return pid
 
+    def get_name2pid(self):
+        name2pid = self.players_df.loc[:, 'name'].copy()
+        name2pid = name2pid.reset_index()
+        name2pid.set_index("name", inplace=True)
+
+        return name2pid.loc[:, "pid"]
+
     def add_player(self, player):
         self.players_df = self.players_df.append(player)
         self.verify_and_normalize()
@@ -581,8 +588,9 @@ class Tournaments:
         return best_rounds
 
     def assign_pid_from_players(self, players):
-        self.tournaments_df["winner_pid"] = self.tournaments_df["winner"].apply(lambda name: players.get_pid(name))
-        self.tournaments_df["loser_pid"] = self.tournaments_df["loser"].apply(lambda name: players.get_pid(name))
+        name2pid = players.get_name2pid()
+        self.tournaments_df["winner_pid"] = self.tournaments_df["winner"].apply(lambda name: name2pid[name])
+        self.tournaments_df["loser_pid"] = self.tournaments_df["loser"].apply(lambda name: name2pid[name])
 
     def get_matches(self, tid, exclude_fan_category=True, to_exclude=("sanction", "promote", "bonus")):
         entries_indexes = (self.tournaments_df.loc[:, "tid"] == tid)
