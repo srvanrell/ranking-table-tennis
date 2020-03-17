@@ -1,11 +1,11 @@
 import os
 import yaml
-import ast
 from unidecode import unidecode
 import shutil
 import pandas as pd
 import pickle
 
+import time
 
 # Loads some names from config.yaml
 user_config_path = os.path.expanduser("~") + "/.config/ranking_table_tennis"
@@ -241,12 +241,8 @@ class Rankings:
             rating_diff *= -1.0
             assignation_table = unexpected_result_table
 
-        j = 0
-        while rating_diff > assignation_table[j][0]:
-            j += 1
-
-        points_to_winner = assignation_table[j][1]
-        points_to_loser = assignation_table[j][2]
+        # Select first row that is appropiate for given rating_diff
+        diff_threshold, points_to_winner, points_to_loser = assignation_table[assignation_table[:, 0] > rating_diff][0]
 
         return [points_to_winner, points_to_loser]
 
@@ -266,19 +262,24 @@ class Rankings:
         return factor
 
     def _new_ratings_from_match(self, match, new_tid, old_tid, pid_not_own_category):
+        t0 = time.time()
         winner_pid, loser_pid = match["winner_pid"], match["loser_pid"]
         [to_winner, to_loser] = self._points_to_assign(self[old_tid, winner_pid, "rating"],
                                                        self[old_tid, loser_pid, "rating"])
+        t1 = time.time()
         factor = self._get_factor(self[old_tid, winner_pid, "rating"], self[old_tid, loser_pid, "rating"],
                                   self[old_tid, winner_pid, "category"], self[old_tid, loser_pid, "category"],
                                   (winner_pid in pid_not_own_category) or (loser_pid in pid_not_own_category))
+        t2 = time.time()
+        print("new rating internal function", t1 - t0, t2 - t1)
         to_winner, to_loser = factor * to_winner, factor * to_loser
-        self[new_tid, winner_pid, "rating"] += to_winner
-        self[new_tid, loser_pid, "rating"] -= to_loser
         match["rating_to_winner"] = to_winner
         match["rating_to_loser"] = -to_loser
 
         return match
+
+    def _apply_rating_changes(self, pid_change, new_tid):
+        self[new_tid, pid_change.name, "rating"] += pid_change.rating_change  # pid_change.name == pid
 
     def compute_new_ratings(self, new_tid, old_tid, tournaments, pid_not_own_category):
         """Compute ratings(new_tid) based on matches(new_tid) and ratings(old_tid).
@@ -289,8 +290,20 @@ class Rankings:
         matches_to_process.insert(len(matches_to_process.columns), "rating_to_winner", None)
         matches_to_process.insert(len(matches_to_process.columns), "rating_to_loser", None)
 
+        t0 = time.time()
         matches_processed = matches_to_process.apply(self._new_ratings_from_match, axis="columns",
                                                      args=(new_tid, old_tid, pid_not_own_category))
+
+        translations = {"rating_to_winner": "rating_change", "rating_to_loser": "rating_change",
+                        "winner_pid": "pid", "loser_pid": "pid"}
+        winner_changes = matches_processed.loc[:, ["winner_pid", "rating_to_winner"]].rename(columns=translations)
+        loser_changes = matches_processed.loc[:, ["loser_pid", "rating_to_loser"]].rename(columns=translations)
+        rating_changes = pd.concat([winner_changes, loser_changes], ignore_index=True)
+        rating_changes = rating_changes.groupby("pid").sum()
+        rating_changes.apply(self._apply_rating_changes, axis="columns", args=[new_tid])
+
+        t1 = time.time()
+        print("process", t1 - t0)
 
         self.rating_details_df = self.rating_details_df.append(matches_processed)
         self.update_categories()

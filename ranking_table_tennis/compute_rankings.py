@@ -62,10 +62,7 @@ for tid in tournaments:
     # List of players that didn't play its own category but plyed the higher one
     # Fans category is not considered in this list
     # Old ranking need to be updated so known old players are not misclassified
-    t0 = time.time()
     rankings.update_categories()
-    t1 = time.time()
-    print("Update categories:", t1 - t0)
     pid_not_own_category = [pid for pid in pid_participation_list
                             if best_rounds[(best_rounds.pid == pid) &
                                            (best_rounds.category == rankings[tid, pid, "category"])].empty
@@ -106,7 +103,4 @@ for tid in tournaments:
     t1 = time.time()
     print("Compute championship points:", t1 - t0)
 
-t0 = time.time()
 utils.save_to_pickle(players=players, tournaments=tournaments, rankings=rankings)
-t1 = time.time()
-print("Save rankings:", t1 - t0)
