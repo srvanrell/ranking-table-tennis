@@ -8,6 +8,9 @@ io:
     temporal_spreadsheet_id: 1qnyhYKj6PT7ChUOP3SPVaVnS12VYQtTN7WNFqR-Nzyg
     players_temp_file: temp_players.pickle
     ranking_temp_file: temp_ranking.pickle
+    players_pickle: players.pk
+    tournaments_pickle: tournaments.pk
+    rankings_pickle: rankings.pk
     published_on_web_spreadsheets_id:
       - 1A-Jx-gBTeS2bXnRoVX19jWn58KdUp1foT5Av7boR3uc  # partidos
 #      - 1HC7HdmT8tYlwLDmObDDoHfNYIxAUkLiY81J8YPm3xRo  # nivel de juego

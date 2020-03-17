@@ -116,8 +116,6 @@ for tid in tournaments:
     print("Compute championship points:", t1 - t0)
 
 t0 = time.time()
-utils.save_rankings(rankings)
-utils.save_tournaments(tournaments)
-utils.save_players(players)
+utils.save_to_pickle(players=players, tournaments=tournaments, rankings=rankings)
 t1 = time.time()
 print("Save rankings:", t1 - t0)

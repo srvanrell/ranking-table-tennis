@@ -545,50 +545,38 @@ def remove_temp_players_ranking():
         os.remove(ranking_temp_file)
 
 
-# TODO move functions to each class
-def save_rankings(rankings):
-    print("Save rankings. Ready to publish")
-    # Saving new ranking
-    ranking_file = "rankings.pk"  # FIXME filenames should be moved to config
-    with open(ranking_file, 'wb') as rf:
-        pickle.dump(rankings, rf, pickle.HIGHEST_PROTOCOL)
+def save_to_pickle(players=None, rankings=None, tournaments=None):
+    objects = [players, rankings, tournaments]
+    filenames = [cfg["io"]["players_pickle"], cfg["io"]["rankings_pickle"], cfg["io"]["tournaments_pickle"]]
+    objects_filenames = [(obj, fn) for obj, fn in zip(objects, filenames) if obj]
+
+    for obj, fn in objects_filenames:
+        print("<Saving\t", fn)
+        with open(os.path.join(cfg["io"]["data_folder"] + fn), 'wb') as fo:
+            pickle.dump(obj, fo, pickle.HIGHEST_PROTOCOL)
 
 
 def load_rankings():
     print("Load rankings.pk")
-    ranking_file = "rankings.pk"  # FIXME filenames should be moved to config
+    ranking_file = cfg["io"]["rankings_pickle"]  # FIXME filenames should be moved to config
     with open(ranking_file, 'rb') as rf:
         rankings = pickle.load(rf)
 
     return rankings
 
 
-def save_tournaments(tournaments):
-    print("Save tournaments")
-    tournaments_file = "tournaments.pk"  # FIXME filenames should be moved to config
-    with open(tournaments_file, 'wb') as tf:
-        pickle.dump(tournaments, tf, pickle.HIGHEST_PROTOCOL)
-
-
 def load_tournaments():
     print("Load tournaments")
-    tournaments_file = "tournaments.pk"  # FIXME filenames should be moved to config
+    tournaments_file = cfg["io"]["tournaments_pickle"] # FIXME filenames should be moved to config
     with open(tournaments_file, 'rb') as tf:
         tournaments = pickle.load(tf)
 
     return tournaments
 
 
-def save_players(players):
-    print("Save players")
-    players_file = "players.pk"  # FIXME filenames should be moved to config
-    with open(players_file, 'wb') as pf:
-        pickle.dump(players, pf, pickle.HIGHEST_PROTOCOL)
-
-
 def load_players():
     print("Load players")
-    players_file = "players.pk"  # FIXME filenames should be moved to config
+    players_file = cfg["io"]["players_pickle"]  # FIXME filenames should be moved to config
     with open(players_file, 'rb') as pf:
         players = pickle.load(pf)
 

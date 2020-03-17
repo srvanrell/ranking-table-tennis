@@ -97,5 +97,4 @@ utils.save_ranking_sheet(initial_tid, tournaments, rankings, players, upload=upl
 # Remove temp files after a successful preprocessing
 utils.remove_temp_players_ranking()
 
-utils.save_tournaments(tournaments)
-utils.save_players(players)
+utils.save_to_pickle(players=players, tournaments=tournaments)
