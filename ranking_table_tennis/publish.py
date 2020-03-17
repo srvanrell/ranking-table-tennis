@@ -16,14 +16,14 @@ __author__ = 'sebastian'
 
 
 # Loading all tournament data
-tournaments = utils.load_tournaments()
+tournaments = utils.load_from_pickle(cfg["io"]["tournaments_pickle"])
 
 # Loading players list
-players = utils.load_players()
+players = utils.load_from_pickle(cfg["io"]["players_pickle"])
 tournaments.assign_pid_from_players(players)
 
 # Loading initial ranking
-rankings = utils.load_rankings()
+rankings = utils.load_from_pickle(cfg["io"]["rankings_pickle"])
 initial_tid = cfg["aux"]["initial tid"]
 
 # Will compute all rankings from the beginning by default
@@ -57,8 +57,8 @@ utils.publish_championship_details_sheet(tournaments, rankings, players, tid, pr
 utils.publish_histories_sheet(tournaments, rankings, players, tid, prev_tid, upload=upload)
 
 # # Testing publshing initial_ranking
-# # TODO it's not working
-# # utils.publish_rating_sheet(tournament_sheetname, initial_ranking, players, initial_ranking, upload=upload)
+# TODO it's not working
+# utils.publish_rating_sheet(tournament_sheetname, initial_ranking, players, initial_ranking, upload=upload)
 
 # Publish statistics
 utils.publish_statistics_sheet(tournaments, rankings, players, tid, prev_tid, upload=upload)

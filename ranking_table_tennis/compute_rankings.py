@@ -20,13 +20,13 @@ __author__ = 'sebastian'
 
 t0 = time.time()
 # Loading all tournament data
-tournaments = utils.load_tournaments()
+tournaments = utils.load_from_pickle(cfg["io"]["tournaments_pickle"])
 t1 = time.time()
 print("Load tournaments time diff:", t1-t0)
 
 # Loading players list
 t0 = time.time()
-players = utils.load_players()
+players = utils.load_from_pickle(cfg["io"]["players_pickle"])
 t1 = time.time()
 print("Load players time diff:", t1-t0)
 t0 = time.time()

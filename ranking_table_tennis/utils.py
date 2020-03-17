@@ -551,33 +551,14 @@ def save_to_pickle(players=None, rankings=None, tournaments=None):
     objects_filenames = [(obj, fn) for obj, fn in zip(objects, filenames) if obj]
 
     for obj, fn in objects_filenames:
-        print("<Saving\t", fn)
+        print("<<<Saving\t", fn)
         with open(os.path.join(cfg["io"]["data_folder"] + fn), 'wb') as fo:
             pickle.dump(obj, fo, pickle.HIGHEST_PROTOCOL)
 
 
-def load_rankings():
-    print("Load rankings.pk")
-    ranking_file = cfg["io"]["rankings_pickle"]  # FIXME filenames should be moved to config
-    with open(ranking_file, 'rb') as rf:
-        rankings = pickle.load(rf)
+def load_from_pickle(filename):
+    print(">>>Loading\tfrom\t", filename)
+    with open(os.path.join(cfg["io"]["data_folder"] + filename), 'rb') as fo:
+        obj = pickle.load(fo)
 
-    return rankings
-
-
-def load_tournaments():
-    print("Load tournaments")
-    tournaments_file = cfg["io"]["tournaments_pickle"] # FIXME filenames should be moved to config
-    with open(tournaments_file, 'rb') as tf:
-        tournaments = pickle.load(tf)
-
-    return tournaments
-
-
-def load_players():
-    print("Load players")
-    players_file = cfg["io"]["players_pickle"]  # FIXME filenames should be moved to config
-    with open(players_file, 'rb') as pf:
-        players = pickle.load(pf)
-
-    return players
+    return obj
