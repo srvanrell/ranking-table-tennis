@@ -261,17 +261,16 @@ class Rankings:
 
         return factor
 
-    def _new_ratings_from_match(self, match, new_tid, old_tid, pid_not_own_category):
-        t0 = time.time()
+    def _new_ratings_from_match(self, match, old_tid):
         winner_pid, loser_pid = match["winner_pid"], match["loser_pid"]
-        [to_winner, to_loser] = self._points_to_assign(self[old_tid, winner_pid, "rating"],
-                                                       self[old_tid, loser_pid, "rating"])
-        t1 = time.time()
-        factor = self._get_factor(self[old_tid, winner_pid, "rating"], self[old_tid, loser_pid, "rating"],
+        winner_old_rating, loser_old_rating = self[old_tid, winner_pid, "rating"], self[old_tid, loser_pid, "rating"]
+
+        [to_winner, to_loser] = self._points_to_assign(winner_old_rating, loser_old_rating)
+
+        factor = self._get_factor(winner_old_rating, loser_old_rating,
                                   self[old_tid, winner_pid, "category"], self[old_tid, loser_pid, "category"],
-                                  (winner_pid in pid_not_own_category) or (loser_pid in pid_not_own_category))
-        t2 = time.time()
-        print("new rating internal function", t1 - t0, t2 - t1)
+                                  match["not_own_category"])
+
         to_winner, to_loser = factor * to_winner, factor * to_loser
         match["rating_to_winner"] = to_winner
         match["rating_to_loser"] = -to_loser
@@ -281,18 +280,22 @@ class Rankings:
     def _apply_rating_changes(self, pid_change, new_tid):
         self[new_tid, pid_change.name, "rating"] += pid_change.rating_change  # pid_change.name == pid
 
+    @staticmethod
+    def _any_not_own_category(match, pid_not_own_category):
+        return (match["winner_pid"] in pid_not_own_category) or (match["loser_pid"] in pid_not_own_category)
+
     def compute_new_ratings(self, new_tid, old_tid, tournaments, pid_not_own_category):
         """Compute ratings(new_tid) based on matches(new_tid) and ratings(old_tid).
         Details of rating changes per match are stored in rating_details_df.
         """
         matches_to_process = tournaments.get_matches(new_tid).copy()
-        # TODO verify which columns are necessary to store un rating_details_df
         matches_to_process.insert(len(matches_to_process.columns), "rating_to_winner", None)
         matches_to_process.insert(len(matches_to_process.columns), "rating_to_loser", None)
 
-        t0 = time.time()
-        matches_processed = matches_to_process.apply(self._new_ratings_from_match, axis="columns",
-                                                     args=(new_tid, old_tid, pid_not_own_category))
+        matches_to_process["not_own_category"] = matches_to_process.apply(self._any_not_own_category, axis="columns",
+                                                                          args=[pid_not_own_category])
+
+        matches_processed = matches_to_process.apply(self._new_ratings_from_match, axis="columns", args=[old_tid])
 
         translations = {"rating_to_winner": "rating_change", "rating_to_loser": "rating_change",
                         "winner_pid": "pid", "loser_pid": "pid"}
@@ -302,8 +305,6 @@ class Rankings:
         rating_changes = rating_changes.groupby("pid").sum()
         rating_changes.apply(self._apply_rating_changes, axis="columns", args=[new_tid])
 
-        t1 = time.time()
-        print("process", t1 - t0)
 
         self.rating_details_df = self.rating_details_df.append(matches_processed)
         self.update_categories()
