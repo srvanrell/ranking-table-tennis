@@ -462,7 +462,7 @@ def load_and_upload_sheet(filename, sheet_name, spreadsheet_id):
     d2g.upload(df, spreadsheet_id, sheet_name, row_names=False, col_names=False, df_size=True)
 
 
-def create_n_tour_sheet(spreadsheet_id, n_tour):
+def create_n_tour_sheet(spreadsheet_id, tid):
     """
     Create sheet corresponding to n_tour tournament by duplication of the first-tournament sheet.
     A new sheeet is created in given spreadsheet_id as follows:
@@ -470,11 +470,11 @@ def create_n_tour_sheet(spreadsheet_id, n_tour):
     2- Two replacements are performed in the new sheet, considering n_tour.
        For example, if n_tour=4, value of A1 cell and sheet title will change 'Tournament 01'->'Tournament 04'
     :param spreadsheet_id: spreadsheet where duplication will be performed
-    :param n_tour: tournament to create
+    :param tid: tournament to create
     :return: None
     """
-    first_key = cfg["labels"]["Tournament"] + " 01"
-    replacement_key = "%s %02d" % (cfg["labels"]["Tournament"], n_tour)
+    first_key = f'{cfg["labels"]["Tournament"]} 01'
+    replacement_key = f'{cfg["labels"]["Tournament"]} {tid[-2:]}'
     gc = _get_gc()
     if gc:
         wb = gc.open_by_key(spreadsheet_id)
@@ -494,10 +494,10 @@ def create_n_tour_sheet(spreadsheet_id, n_tour):
             print("FAILED TO DUPLICATE\t", first_key, "\t not exist in\t", spreadsheet_id)
 
 
-def publish_to_web(ranking, show_on_web=False):
+def publish_to_web(tid, show_on_web=False):
     if show_on_web:
         for spreadsheet_id in cfg["io"]["published_on_web_spreadsheets_id"]:
-            create_n_tour_sheet(spreadsheet_id, ranking.tid)
+            create_n_tour_sheet(spreadsheet_id, tid)
 
 
 def load_temp_players_ranking():
@@ -553,8 +553,6 @@ def save_rankings(rankings):
     with open(ranking_file, 'wb') as rf:
         pickle.dump(rankings, rf, pickle.HIGHEST_PROTOCOL)
 
-    rankings.ranking_df.to_excel("rankings.xlsx")  # FIXME filenames should be moved to config
-
 
 def load_rankings():
     print("Load rankings.pk")
@@ -579,6 +577,7 @@ def load_tournaments():
         tournaments = pickle.load(tf)
 
     return tournaments
+
 
 def save_players(players):
     print("Save players")

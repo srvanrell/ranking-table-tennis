@@ -66,4 +66,4 @@ utils.publish_statistics_sheet(tournaments, rankings, players, tid, prev_tid, up
 answer = input("\nDo you want to publish to the web [Y/n]? (press Enter to continue)\n")
 show_on_web = answer.lower() != "n"
 
-# utils.publish_to_web(ranking, show_on_web) # TODO
+utils.publish_to_web(tid, show_on_web)
