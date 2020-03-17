@@ -551,13 +551,13 @@ def save_to_pickle(players=None, rankings=None, tournaments=None):
     objects_filenames = [(obj, fn) for obj, fn in zip(objects, filenames) if obj]
 
     for obj, fn in objects_filenames:
-        print("<<<Saving\t", fn)
+        print(f'<<<Saving\t{fn}\tin\t{cfg["io"]["data_folder"]}')
         with open(os.path.join(cfg["io"]["data_folder"] + fn), 'wb') as fo:
             pickle.dump(obj, fo, pickle.HIGHEST_PROTOCOL)
 
 
 def load_from_pickle(filename):
-    print(">>>Loading\tfrom\t", filename)
+    print(f'>>>Loading\t{filename}\tfrom\t{cfg["io"]["data_folder"]}')
     with open(os.path.join(cfg["io"]["data_folder"] + filename), 'rb') as fo:
         obj = pickle.load(fo)
 
