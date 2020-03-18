@@ -347,10 +347,33 @@ class Rankings:
             self.ranking_df.loc[tid_indexes, participations_cat_col] = self.ranking_df.loc[tid_indexes].apply(
                 lambda re: pid_participations_cat[re.pid], axis="columns")
 
-    def update_active_players(self, tid, players, initial_tid):
+    @staticmethod
+    def _activate_or_inactivate_player(ranking_entry, tids_list, active_window_tids, inactive_window_tids,
+                                       players, initial_active_players):
         # Avoid activate or inactivate players after the first tournament.
         activate_window = cfg["aux"]["tournament window to activate"]
         tourns_to_activate = cfg["aux"]["tournaments to activate"]
+        inactivate_window = cfg["aux"]["tournament window to inactivate"]
+
+        played_tids = players.played_tournaments(ranking_entry.pid)
+
+        if not ranking_entry.active:
+            last_tourns = [p_tid for p_tid in played_tids if p_tid in active_window_tids]
+            # activate if he has played at least tourns_to_activate tournaments
+            active = len(last_tourns) >= tourns_to_activate
+        else:
+            last_tourns = [p_tid for p_tid in played_tids if p_tid in inactive_window_tids]
+            # don't inactivate during tournaments window if it is an initial active player
+            if tids_list.index(ranking_entry.tid) + 1 < inactivate_window and ranking_entry.pid in initial_active_players:
+                active = True
+            else:
+                active = len(last_tourns) > 0
+
+        return active
+
+    def update_active_players(self, tid, players, initial_tid):
+        # Avoid activate or inactivate players after the first tournament.
+        activate_window = cfg["aux"]["tournament window to activate"]
         inactivate_window = cfg["aux"]["tournament window to inactivate"]
 
         indexes = (self.ranking_df.tid == initial_tid) & self.ranking_df.active
@@ -360,20 +383,11 @@ class Rankings:
         active_window_tids = tids_list[max(0, tids_list.index(tid) - activate_window + 1):tids_list.index(tid) + 1]
         inactive_window_tids = tids_list[max(0, tids_list.index(tid) - inactivate_window + 1):tids_list.index(tid) + 1]
 
-        for re_index, re in self.ranking_df[self.ranking_df.tid == tid].iterrows():
-            if not re.active:
-                last_tourns = [p_tid for p_tid in players.played_tournaments(re.pid) if p_tid in active_window_tids]
-                # activate if he has played at least tourns_to_activate tournaments
-                active = len(last_tourns) >= tourns_to_activate
-            else:
-                last_tourns = [p_tid for p_tid in players.played_tournaments(re.pid) if p_tid in inactive_window_tids]
-                # don't inactivate during tournaments window if it is an initial active player
-                if tids_list.index(tid) + 1 < inactivate_window and re.pid in initial_active_players:
-                    active = True
-                else:
-                    active = len(last_tourns) > 0
+        tid_criteria = self.ranking_df.tid == tid
 
-            self[tid, re.pid, "active"] = active
+        self.ranking_df.loc[tid_criteria, "active"] = self.ranking_df[tid_criteria].apply(
+            self._activate_or_inactivate_player, axis="columns",
+            args=(tids_list, active_window_tids, inactive_window_tids, players, initial_active_players))
 
     def _get_tids_list(self):
         return sorted(list(self.ranking_df.tid.unique()))
