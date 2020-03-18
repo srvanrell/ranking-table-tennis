@@ -1,7 +1,7 @@
 import os
 from ranking_table_tennis import models
 from ranking_table_tennis.models import cfg
-from openpyxl import Workbook, load_workbook
+from openpyxl import load_workbook
 from openpyxl.styles import Font, Alignment
 import pandas as pd
 import pickle
@@ -44,25 +44,6 @@ def load_sheet_workbook(filename, sheetname, first_row=1):
     return list_to_return[first_row:]
 
 
-def _wb_ws_to_save(filename, sheetname, overwrite=True):
-    print("<<<Saving\t", sheetname, "\tin\t", filename)
-    if os.path.isfile(filename):
-        wb = load_workbook(filename)
-        if overwrite and sheetname in wb:
-            wb.remove_sheet(wb.get_sheet_by_name(sheetname))
-        if sheetname in wb:
-            ws = wb.get_sheet_by_name(sheetname)
-        else:
-            ws = wb.create_sheet()
-    else:
-        wb = Workbook()
-        ws = wb.active
-
-    ws.title = sheetname
-
-    return wb, ws
-
-
 def _bold_and_center(ws, to_bold, to_center):
     """Bold and center cells in given worksheet (ws)"""
     for colrow in to_bold:
@@ -73,34 +54,7 @@ def _bold_and_center(ws, to_bold, to_center):
         cell.alignment = Alignment(horizontal='center')
 
 
-def save_sheet_workbook(filename, sheetname, headers, list_to_save, overwrite=True):
-    wb, ws = _wb_ws_to_save(filename, sheetname, overwrite)
-
-    if headers:
-        ws.append(headers)
-    
-    for row in list_to_save:
-        ws.append(row)
-
-    if headers:
-        for col in range(1, ws.max_column+1):
-            cell = ws.cell(column=col, row=1)
-            cell.font = Font(bold=True)
-
-    wb.save(filename)
-
-
-def _format_ranking_header_and_list(ranking, players):
-    headers = [cfg["labels"][key] for key in ["pid", "Rating", "Bonus Points",
-                                              "Active Player", "Category", "Player"]]
-    list_to_save = [[e.pid, e.rating, e.bonus, cfg["activeplayer"][e.active],
-                     e.category, players[e.pid].name] for e in ranking]
-    list_to_save.sort(key=lambda l: l[1], reverse=True)
-
-    return headers, list_to_save
-
-
-def save_ranking_sheet(tid, tournaments, rankings, players, overwrite=True, upload=False):
+def save_ranking_sheet(tid, tournaments, rankings, players, upload=False):
     if tid == cfg["aux"]["initial tid"]:
         sheet_name = cfg["sheetname"]["initial_ranking"]
         xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
@@ -147,7 +101,7 @@ def upload_sheet_from_df(spreadsheet_id, sheet_name, df, headers, upload_index=F
     ws = d2g.upload(df, spreadsheet_id, sheet_name, row_names=upload_index, df_size=True)
 
     # Concatenation of header cells values to be updated in batch mode
-    cell_list = ws.range("A1:" + gspread.utils.rowcol_to_a1(row=1, col=len(headers)))
+    cell_list = ws.range("A1:" + d2g.gspread.utils.rowcol_to_a1(row=1, col=len(headers)))
     for i, value in enumerate(headers):
         cell_list[i].value = value
     ws.update_cells(cell_list)
@@ -451,11 +405,13 @@ def publish_championship_sheets(tournaments, rankings, players, tid, prev_tid, u
     to_center = to_bold + ["B1", "B2", "B3"]
 
     headers = [cfg["labels"][key] for key in ["Position", "Championship Points", "Participations",
-                                              "Player", "City", "Association"]]
-    columns = ["position", "formatted points", "participations", "name", "city", "affiliation"]
+                                              "Player", "City", "Association", "Selected Tournaments"]]
+    columns = ["position", "formatted points", "participations", "name", "city", "affiliation", "selected_tids"]
 
-    for cat, point_col, participations_col in zip(models.categories, rankings.cum_points_cat_columns(),
-                                                  rankings.participations_cat_columns()):
+    for cat, point_col, selected_tids_col, participations_col in zip(models.categories,
+                                                                     rankings.cum_points_cat_columns(),
+                                                                     rankings.cum_tids_cat_columns(),
+                                                                     rankings.participations_cat_columns()):
         sheet_name = tournaments[tid]["sheet_name"].iloc[0]
         sheet_name = sheet_name.replace(cfg["sheetname"]["tournaments_key"], cat.title())
 
@@ -468,14 +424,21 @@ def publish_championship_sheets(tournaments, rankings, players, tid, prev_tid, u
 
         # Format data and columns to write into the file
         sorted_ranking.insert(0, "position", range(1, len(sorted_ranking.index)+1))
+        criteria = sorted_ranking[point_col] == sorted_ranking[point_col].shift(1)
+        criteria &= sorted_ranking[participations_col] == sorted_ranking[participations_col].shift(1)
+        sorted_ranking.loc[criteria, "position"] = None  # Equivalent positions will be deleted to avoid misleading
+
         sorted_ranking.insert(4, "prev " + point_col, sorted_ranking.loc[:, "pid"].apply(
             lambda pid: prev_ranking.loc[prev_ranking.pid == pid, point_col].iat[0]))
         sorted_ranking.insert(6, "formatted points", sorted_ranking.apply(
             lambda row: _format_diff(row[point_col], row["prev " + point_col]), axis="columns"))
-        sorted_ranking.loc[:, "participations"] = sorted_ranking.loc[:, participations_col]  # FIXME should not change name
+        sorted_ranking.loc[:, selected_tids_col] = sorted_ranking.loc[:, selected_tids_col].str.replace(tid[:-3], "")
+
+        replacements = {"participations": participations_col, "selected_tids": selected_tids_col}
+        _columns = [replacements[c] if c in replacements else c for c in columns]
 
         with _get_writer(xlsx_filename, sheet_name) as writer:
-            sorted_ranking.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=columns)
+            sorted_ranking.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=_columns)
 
             # publish and format tournament metadata
             ws = writer.book.get_sheet_by_name(sheet_name)
@@ -502,89 +465,13 @@ def _get_gc():
     return gc
 
 
-def _wb_ws_to_upload(spreadsheet_id, sheetname, num_rows, num_cols):
-    print("<<<Saving\t", sheetname, "\tin\t", spreadsheet_id)
-    wb, ws = None, None
-    gc = _get_gc()
-    # FIXME it should raise an exception to abort uploading
-    if gc:
-        wb = gc.open_by_key(spreadsheet_id)   
-
-        # Overwrites an existing sheet or creates a new one
-        if sheetname in [ws.title for ws in wb.worksheets()]:
-            ws = wb.worksheet(sheetname)
-            ws.resize(rows=num_rows, cols=num_cols)
-        else:
-            ws = wb.add_worksheet(title=sheetname, rows=num_rows, cols=num_cols)
-
-    return wb, ws
+def load_and_upload_sheet(filename, sheet_name, spreadsheet_id):
+    print("<<<Saving\t", sheet_name, "\tin\t", spreadsheet_id)
+    df = pd.read_excel(filename, sheet_name, index_col=None, header=None, na_filter=False)
+    d2g.upload(df, spreadsheet_id, sheet_name, row_names=False, col_names=False, df_size=True)
 
 
-def upload_sheet(spreadsheet_id, sheetname, headers, rows_to_save):
-    """ Saves headers and rows_to_save into given sheet_name.
-        If sheet_name does not exist, it will be created. """
-    num_rows = len(rows_to_save) + 1  # +1 because of header
-    num_cols = len(headers)
-
-    wb, ws = _wb_ws_to_upload(spreadsheet_id, sheetname, num_rows, num_cols)
-    if wb is None and ws is None:
-        print("Updating has failed. Skipping...")
-        return
-
-    # Concatenation of all cells values to be updated in batch mode
-    cell_list = ws.range("A1:" + gspread.utils.rowcol_to_a1(row=num_rows, col=num_cols))
-    for i, value in enumerate(headers + [v for row in rows_to_save for v in row]):
-        cell_list[i].value = value
-
-    ws.update_cells(cell_list)
-
-
-# FIXME It should allow uploading more than initial ranking
-def upload_ranking_sheet(sheetname, ranking, players):
-    """ Saves ranking into given sheet_name.
-        If sheet_name does not exist, it will be created. """
-    if sheetname == cfg["sheetname"]["initial_ranking"]:
-        spreadsheet_id = cfg["io"]["tournaments_spreadsheet_id"]
-        # else:
-        #     spreadsheet_id = cfg["io"]["not_existent_spreadsheet_id"]
-        #     sheetname = sheetname.replace(cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["rankings_key"])
-
-        headers, list_to_save = _format_ranking_header_and_list(ranking, players)
-
-        num_cols = len(headers)
-        num_rows = len(list_to_save) + 1 + 4  # +1 because of header + 4 because of tournament metadata
-
-        wb, ws = _wb_ws_to_upload(spreadsheet_id, sheetname, num_rows, num_cols)
-        if wb is None and ws is None:
-            print("Updating has failed. Skipping...")
-            return
-
-        ws.update_acell("A1", cfg["labels"]["Tournament name"])
-        ws.update_acell("B1", ranking.tournament_name)
-        ws.update_acell("A2", cfg["labels"]["Date"])
-        ws.update_acell("B2", ranking.date)
-        ws.update_acell("A3", cfg["labels"]["Location"])
-        ws.update_acell("B3", ranking.location)
-        ws.update_acell("A4", cfg["labels"]["tid"])
-        ws.update_acell("B4", ranking.tid)
-
-        # Concatenation of all cells values to be updated in batch mode
-        cell_list = ws.range("A5:" + gspread.utils.rowcol_to_a1(row=num_rows, col=num_cols))
-        for i, value in enumerate(headers + [v for row in list_to_save for v in row]):
-            cell_list[i].value = value
-
-        ws.update_cells(cell_list)
-
-
-def load_and_upload_sheet(filename, sheetname, spreadsheet_id):
-    raw_sheet = load_sheet_workbook(filename, sheetname, first_row=0)
-    headers = raw_sheet[0]
-    list_to_save = raw_sheet[1:]
-
-    upload_sheet(spreadsheet_id, sheetname, headers, list_to_save)
-
-
-def create_n_tour_sheet(spreadsheet_id, n_tour):
+def create_n_tour_sheet(spreadsheet_id, tid):
     """
     Create sheet corresponding to n_tour tournament by duplication of the first-tournament sheet.
     A new sheeet is created in given spreadsheet_id as follows:
@@ -592,11 +479,11 @@ def create_n_tour_sheet(spreadsheet_id, n_tour):
     2- Two replacements are performed in the new sheet, considering n_tour.
        For example, if n_tour=4, value of A1 cell and sheet title will change 'Tournament 01'->'Tournament 04'
     :param spreadsheet_id: spreadsheet where duplication will be performed
-    :param n_tour: tournament to create
+    :param tid: tournament to create
     :return: None
     """
-    first_key = cfg["labels"]["Tournament"] + " 01"
-    replacement_key = "%s %02d" % (cfg["labels"]["Tournament"], n_tour)
+    first_key = f'{cfg["labels"]["Tournament"]} 01'
+    replacement_key = f'{cfg["labels"]["Tournament"]} {tid[-2:]}'
     gc = _get_gc()
     if gc:
         wb = gc.open_by_key(spreadsheet_id)
@@ -616,10 +503,10 @@ def create_n_tour_sheet(spreadsheet_id, n_tour):
             print("FAILED TO DUPLICATE\t", first_key, "\t not exist in\t", spreadsheet_id)
 
 
-def publish_to_web(ranking, show_on_web=False):
+def publish_to_web(tid, show_on_web=False):
     if show_on_web:
         for spreadsheet_id in cfg["io"]["published_on_web_spreadsheets_id"]:
-            create_n_tour_sheet(spreadsheet_id, ranking.tid)
+            create_n_tour_sheet(spreadsheet_id, tid)
 
 
 def load_temp_players_ranking():
@@ -667,52 +554,20 @@ def remove_temp_players_ranking():
         os.remove(ranking_temp_file)
 
 
-# TODO move functions to each class
-def save_rankings(rankings):
-    print("Save rankings. Ready to publish")
-    # Saving new ranking
-    ranking_file = "rankings.pk"  # FIXME filenames should be moved to config
-    with open(ranking_file, 'wb') as rf:
-        pickle.dump(rankings, rf, pickle.HIGHEST_PROTOCOL)
+def save_to_pickle(players=None, rankings=None, tournaments=None):
+    objects = [players, rankings, tournaments]
+    filenames = [cfg["io"]["players_pickle"], cfg["io"]["rankings_pickle"], cfg["io"]["tournaments_pickle"]]
+    objects_filenames = [(obj, fn) for obj, fn in zip(objects, filenames) if obj]
 
-    rankings.ranking_df.to_excel("rankings.xlsx")  # FIXME filenames should be moved to config
-
-
-def load_rankings():
-    print("Load rankings.pk")
-    ranking_file = "rankings.pk"  # FIXME filenames should be moved to config
-    with open(ranking_file, 'rb') as rf:
-        rankings = pickle.load(rf)
-
-    return rankings
+    for obj, fn in objects_filenames:
+        print(f'<<<Saving\t{fn}\tin\t{cfg["io"]["data_folder"]}')
+        with open(os.path.join(cfg["io"]["data_folder"] + fn), 'wb') as fo:
+            pickle.dump(obj, fo, pickle.HIGHEST_PROTOCOL)
 
 
-def save_tournaments(tournaments):
-    print("Save tournaments")
-    tournaments_file = "tournaments.pk"  # FIXME filenames should be moved to config
-    with open(tournaments_file, 'wb') as tf:
-        pickle.dump(tournaments, tf, pickle.HIGHEST_PROTOCOL)
+def load_from_pickle(filename):
+    print(f'>>>Loading\t{filename}\tfrom\t{cfg["io"]["data_folder"]}')
+    with open(os.path.join(cfg["io"]["data_folder"] + filename), 'rb') as fo:
+        obj = pickle.load(fo)
 
-
-def load_tournaments():
-    print("Load tournaments")
-    tournaments_file = "tournaments.pk"  # FIXME filenames should be moved to config
-    with open(tournaments_file, 'rb') as tf:
-        tournaments = pickle.load(tf)
-
-    return tournaments
-
-def save_players(players):
-    print("Save players")
-    players_file = "players.pk"  # FIXME filenames should be moved to config
-    with open(players_file, 'wb') as pf:
-        pickle.dump(players, pf, pickle.HIGHEST_PROTOCOL)
-
-
-def load_players():
-    print("Load players")
-    players_file = "players.pk"  # FIXME filenames should be moved to config
-    with open(players_file, 'rb') as pf:
-        players = pickle.load(pf)
-
-    return players
+    return obj

@@ -8,6 +8,9 @@ io:
     temporal_spreadsheet_id: 134W18TVOjpUVs25IOoxHMVZud8Ucaxe44XJutzTI1Ak
     players_temp_file: temp_players.pickle
     ranking_temp_file: temp_ranking.pickle
+    players_pickle: players.pk
+    tournaments_pickle: tournaments.pk
+    rankings_pickle: rankings.pk
     published_on_web_spreadsheets_id:
       - 1ERmL9bj3mvsF1pfDQEAhiKzjaEOxvUX2EqakO5HIkJY  # partidos
       - 1HC7HdmT8tYlwLDmObDDoHfNYIxAUkLiY81J8YPm3xRo  # nivel de juego
@@ -53,7 +56,7 @@ labels:
     Participations: Torneos Jugados
     Position: Posición
     Difference: Diferencia
-
+    Selected Tournaments: Puntos sumados
     Points CAT:
       - Puntos Primera
       - Puntos Segunda
