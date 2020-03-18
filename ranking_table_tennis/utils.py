@@ -424,7 +424,10 @@ def publish_championship_sheets(tournaments, rankings, players, tid, prev_tid, u
 
         # Format data and columns to write into the file
         sorted_ranking.insert(0, "position", range(1, len(sorted_ranking.index)+1))
-        # sorted_ranking[]history_df.loc[history_df['name'] == history_df['name'].shift(1), "name"] = ""
+        criteria = sorted_ranking[point_col] == sorted_ranking[point_col].shift(1)
+        criteria &= sorted_ranking[participations_col] == sorted_ranking[participations_col].shift(1)
+        sorted_ranking.loc[criteria, "position"] = None  # Equivalent positions will be deleted to avoid misleading
+
         sorted_ranking.insert(4, "prev " + point_col, sorted_ranking.loc[:, "pid"].apply(
             lambda pid: prev_ranking.loc[prev_ranking.pid == pid, point_col].iat[0]))
         sorted_ranking.insert(6, "formatted points", sorted_ranking.apply(
