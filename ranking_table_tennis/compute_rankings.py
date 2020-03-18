@@ -73,28 +73,17 @@ for tid in tournaments:
     assigned_points_per_best_round = rankings.compute_category_points(tid, best_rounds)
     t1 = time.time()
     print("compute category points:", t1 - t0)
-    t0 = time.time()
+
     rankings.update_active_players(tid, players, initial_tid)
-    t1 = time.time()
-    print("Update active players:", t1 - t0)
 
     # Promote those players indicated in the matches list of the tournament
-    t0 = time.time()
     rankings.promote_players(tid, tournaments)
-    t1 = time.time()
-    print("promote:", t1 - t0)
 
     # Substract championship points
-    t0 = time.time()
     rankings.apply_sanction(tid, tournaments)
-    t1 = time.time()
-    print("apply sanction:", t1 - t0)
 
     # TODO verify if it is necessary
-    t0 = time.time()
     rankings.update_categories()
-    t1 = time.time()
-    print("Update categories:", t1 - t0)
     t0 = time.time()
     rankings.compute_championship_points(tid)
     t1 = time.time()

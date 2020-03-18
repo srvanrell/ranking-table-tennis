@@ -329,6 +329,16 @@ class Rankings:
 
         self.championship_details_df = self.championship_details_df.append(assigned_points)
 
+    @staticmethod
+    def _format_selected_tids(rows, points_cat_col):
+        points_and_tids = ""
+        # rows = rows[rows[points_cat_col] > 0]
+        if not rows.empty:
+            formatted_rows = rows.agg(lambda row: f"{row[points_cat_col]:.0f} ({row['tid']})", axis='columns')
+            points_and_tids = ' + '.join(formatted_rows)
+
+        return points_and_tids
+
     def compute_championship_points(self, tid):
         """
         Compute and save championship points, selected tids, and participations per category
@@ -342,19 +352,22 @@ class Rankings:
                 self.points_cat_columns(), self.cum_points_cat_columns(), self.cum_tids_cat_columns(),
                 self.participations_cat_columns()):
 
-            # Cumulated points of the best n_tournaments
-            n_best = rankings.sort_values(by=[points_cat_col], ascending=False).groupby("pid").head(n_tournaments)
-            pid_cum_points_cat = n_best.groupby("pid")[points_cat_col].sum()
-            pid_selected_tids_cat = n_best.groupby("pid")["tid"].agg(lambda col: ' + '.join(col))
+            not_null_rankings = rankings[rankings[points_cat_col] > 0].copy()
 
-            self.ranking_df.loc[tid_indexes, cum_points_cat_col] = rankings.loc[tid_indexes].apply(
+            # Cumulated points of the best n_tournaments
+            n_best = not_null_rankings.sort_values(by=[points_cat_col], ascending=False).groupby("pid").head(n_tournaments)
+            pid_cum_points_cat = n_best.groupby("pid")[points_cat_col].sum()
+            pid_selected_tids_cat = n_best.groupby("pid").agg(self._format_selected_tids, points_cat_col)[cum_tids_cat_col]
+            # print(pid_selected_tids_cat)
+
+            self.ranking_df.loc[tid_indexes, cum_points_cat_col] = not_null_rankings.loc[tid_indexes].apply(
                 lambda re: pid_cum_points_cat.at[re.pid], axis="columns")
-            self.ranking_df.loc[tid_indexes, cum_tids_cat_col] = rankings.loc[tid_indexes].apply(
+            self.ranking_df.loc[tid_indexes, cum_tids_cat_col] = not_null_rankings.loc[tid_indexes].apply(
                 lambda re: pid_selected_tids_cat.at[re.pid], axis="columns")
 
             # Total number of participations
-            pid_participations_cat = rankings.groupby(["pid"])[points_cat_col].agg(lambda col: (col != 0).sum())
-            self.ranking_df.loc[tid_indexes, participations_cat_col] = rankings.loc[tid_indexes].apply(
+            pid_participations_cat = not_null_rankings.groupby(["pid"])[points_cat_col].agg(lambda col: (col != 0).sum())
+            self.ranking_df.loc[tid_indexes, participations_cat_col] = not_null_rankings.loc[tid_indexes].apply(
                 lambda re: pid_participations_cat[re.pid], axis="columns")
 
     @staticmethod

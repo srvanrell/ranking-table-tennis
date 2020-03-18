@@ -405,11 +405,13 @@ def publish_championship_sheets(tournaments, rankings, players, tid, prev_tid, u
     to_center = to_bold + ["B1", "B2", "B3"]
 
     headers = [cfg["labels"][key] for key in ["Position", "Championship Points", "Participations",
-                                              "Player", "City", "Association"]]
-    columns = ["position", "formatted points", "participations", "name", "city", "affiliation"]
+                                              "Player", "City", "Association", "Selected Tournaments"]]
+    columns = ["position", "formatted points", "participations", "name", "city", "affiliation", "selected_tids"]
 
-    for cat, point_col, participations_col in zip(models.categories, rankings.cum_points_cat_columns(),
-                                                  rankings.participations_cat_columns()):
+    for cat, point_col, selected_tids_col, participations_col in zip(models.categories,
+                                                                     rankings.cum_points_cat_columns(),
+                                                                     rankings.cum_tids_cat_columns(),
+                                                                     rankings.participations_cat_columns()):
         sheet_name = tournaments[tid]["sheet_name"].iloc[0]
         sheet_name = sheet_name.replace(cfg["sheetname"]["tournaments_key"], cat.title())
 
@@ -422,14 +424,18 @@ def publish_championship_sheets(tournaments, rankings, players, tid, prev_tid, u
 
         # Format data and columns to write into the file
         sorted_ranking.insert(0, "position", range(1, len(sorted_ranking.index)+1))
+        # sorted_ranking[]history_df.loc[history_df['name'] == history_df['name'].shift(1), "name"] = ""
         sorted_ranking.insert(4, "prev " + point_col, sorted_ranking.loc[:, "pid"].apply(
             lambda pid: prev_ranking.loc[prev_ranking.pid == pid, point_col].iat[0]))
         sorted_ranking.insert(6, "formatted points", sorted_ranking.apply(
             lambda row: _format_diff(row[point_col], row["prev " + point_col]), axis="columns"))
-        sorted_ranking.loc[:, "participations"] = sorted_ranking.loc[:, participations_col]  # FIXME should not change name
+        sorted_ranking.loc[:, selected_tids_col] = sorted_ranking.loc[:, selected_tids_col].str.replace(tid[:-3], "")
+
+        replacements = {"participations": participations_col, "selected_tids": selected_tids_col}
+        _columns = [replacements[c] if c in replacements else c for c in columns]
 
         with _get_writer(xlsx_filename, sheet_name) as writer:
-            sorted_ranking.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=columns)
+            sorted_ranking.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=_columns)
 
             # publish and format tournament metadata
             ws = writer.book.get_sheet_by_name(sheet_name)
