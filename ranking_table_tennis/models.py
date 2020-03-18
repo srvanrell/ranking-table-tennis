@@ -162,6 +162,8 @@ class Rankings:
         if pid:
             pid_indexes = self.ranking_df.pid == pid
             entries_indexes = entries_indexes & pid_indexes
+            if not col and entries_indexes.any():
+                return self.ranking_df.loc[entries_indexes].iloc[0]
 
         if col:
             at_index = self.ranking_df.loc[entries_indexes].first_valid_index()
@@ -262,18 +264,15 @@ class Rankings:
         return factor
 
     def _new_ratings_from_match(self, match, old_tid):
-        winner_pid, loser_pid = match["winner_pid"], match["loser_pid"]
-        winner_old_rating, loser_old_rating = self[old_tid, winner_pid, "rating"], self[old_tid, loser_pid, "rating"]
 
-        [to_winner, to_loser] = self._points_to_assign(winner_old_rating, loser_old_rating)
+        winner, loser = self[old_tid, match["winner_pid"]], self[old_tid, match["loser_pid"]]
 
-        factor = self._get_factor(winner_old_rating, loser_old_rating,
-                                  self[old_tid, winner_pid, "category"], self[old_tid, loser_pid, "category"],
+        [to_winner, to_loser] = self._points_to_assign(winner.rating, loser.rating)
+        factor = self._get_factor(winner.rating, loser.rating, winner.category, loser.category,
                                   match["not_own_category"])
 
         to_winner, to_loser = factor * to_winner, factor * to_loser
-        match["rating_to_winner"] = to_winner
-        match["rating_to_loser"] = -to_loser
+        match["rating_to_winner"], match["rating_to_loser"] = to_winner, -to_loser
 
         return match
 
@@ -304,7 +303,6 @@ class Rankings:
         rating_changes = pd.concat([winner_changes, loser_changes], ignore_index=True)
         rating_changes = rating_changes.groupby("pid").sum()
         rating_changes.apply(self._apply_rating_changes, axis="columns", args=[new_tid])
-
 
         self.rating_details_df = self.rating_details_df.append(matches_processed)
         self.update_categories()
@@ -391,7 +389,7 @@ class Rankings:
         for match_index, match in tournament_df[tournament_df.sanction].iterrows():
             for cat_col in self.points_cat_columns():
                 self[new_tid, match.loser_pid, cat_col] *= cfg["aux"]["sanction factor"]
-            print("Apply sanction on:\n", self[new_tid, match.loser_pid])
+            print("Apply sanction on:\n", self[new_tid, match.loser_pid].pid)
 
     def get_rating_details(self, tid):
         return self.rating_details_df.loc[self.rating_details_df.tid == tid].copy()
