@@ -4,7 +4,6 @@ from unidecode import unidecode
 import shutil
 import pandas as pd
 
-import time
 
 # Loads some names from config.yaml
 user_config_path = os.path.expanduser("~") + "/.config/ranking_table_tennis"
@@ -360,7 +359,7 @@ class Rankings:
 
     @staticmethod
     def _activate_or_inactivate_player(ranking_entry, tids_list, active_window_tids, inactive_window_tids,
-                                       players, initial_active_players):
+                                       players, initial_active_pids):
         # Avoid activate or inactivate players after the first tournament.
         activate_window = cfg["aux"]["tournament window to activate"]
         tourns_to_activate = cfg["aux"]["tournaments to activate"]
@@ -375,7 +374,7 @@ class Rankings:
         else:
             last_tourns = [p_tid for p_tid in played_tids if p_tid in inactive_window_tids]
             # don't inactivate during tournaments window if it is an initial active player
-            if tids_list.index(ranking_entry.tid) + 1 < inactivate_window and ranking_entry.pid in initial_active_players:
+            if tids_list.index(ranking_entry.tid) + 1 < inactivate_window and ranking_entry.pid in initial_active_pids:
                 active = True
             else:
                 active = len(last_tourns) > 0
