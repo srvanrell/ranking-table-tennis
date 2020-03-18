@@ -3,7 +3,6 @@ import yaml
 from unidecode import unidecode
 import shutil
 import pandas as pd
-import pickle
 
 import time
 
@@ -121,6 +120,7 @@ class Rankings:
     def __init__(self, ranking_df=None):
         all_columns = ["tid", "tournament_name", "date", "location", "pid", "rating", "category", "active"]
         all_columns += self.points_cat_columns() + self.cum_points_cat_columns() + self.participations_cat_columns()
+        all_columns += self.cum_tids_cat_columns()
         self.ranking_df = pd.DataFrame(ranking_df, columns=all_columns)
         self.rating_details_df = pd.DataFrame()
         self.championship_details_df = pd.DataFrame()
@@ -145,12 +145,16 @@ class Rankings:
         self.verify_and_normalize()
 
     @staticmethod
-    def points_cat_columns():
+    def points_cat_columns() -> list:
         return ["points_cat_%d" % d for d, _ in enumerate(categories, 1)]
 
     @staticmethod
     def cum_points_cat_columns():
         return ["cum_points_cat_%d" % d for d, _ in enumerate(categories, 1)]
+
+    @staticmethod
+    def cum_tids_cat_columns():
+        return ["cum_tids_cat_%d" % d for d, _ in enumerate(categories, 1)]
 
     @staticmethod
     def participations_cat_columns():
@@ -192,13 +196,15 @@ class Rankings:
         default_active = False
         default_category = ""
         default_cat_value = 0
+        default_cum_tid_value = ""
 
         cat_columns = self.points_cat_columns() + self.cum_points_cat_columns() + self.participations_cat_columns()
+        cum_tid_values = {cum_tid_col: default_cum_tid_value for cum_tid_col in self.cum_tids_cat_columns()}
         cat_col_values = {cat_col: default_cat_value for cat_col in cat_columns}
         default_values = {"rating": default_rating, "category": default_category, "active": default_active,
                           "tournament_name": cfg["default"]["tournament_name"], "date": cfg["default"]["date"],
                           "location": cfg["default"]["location"],
-                          **cat_col_values}
+                          **cat_col_values, **cum_tid_values}
         self.ranking_df.fillna(value=default_values, inplace=True)
         self.ranking_df.date = pd.to_datetime(self.ranking_df.date)
 
@@ -326,25 +332,30 @@ class Rankings:
 
     def compute_championship_points(self, tid):
         """
-        Compute and save masters cup up into log
+        Compute and save championship points, selected tids, and participations per category
         :return: None
         """
         n_tournaments = cfg["aux"]["masters N tournaments to consider"]
         tid_indexes = self.ranking_df.tid == tid
+        rankings = self.ranking_df[self.ranking_df.tid != cfg["aux"]["initial tid"]]  # Remove initial tid data
 
-        for points_cat_col, cum_points_cat_col, participations_cat_col in zip(self.points_cat_columns(),
-                                                                              self.cum_points_cat_columns(),
-                                                                              self.participations_cat_columns()):
+        for points_cat_col, cum_points_cat_col, cum_tids_cat_col, participations_cat_col in zip(
+                self.points_cat_columns(), self.cum_points_cat_columns(), self.cum_tids_cat_columns(),
+                self.participations_cat_columns()):
+
             # Cumulated points of the best n_tournaments
-            pid_cum_points_cat = self.ranking_df.groupby(["pid"]).apply(
-                lambda ranking_pid: ranking_pid.loc[:, points_cat_col].nlargest(n_tournaments).sum())
-            self.ranking_df.loc[tid_indexes, cum_points_cat_col] = self.ranking_df.loc[tid_indexes].apply(
-                lambda re: pid_cum_points_cat[re.pid], axis="columns")
+            n_best = rankings.sort_values(by=[points_cat_col], ascending=False).groupby("pid").head(n_tournaments)
+            pid_cum_points_cat = n_best.groupby("pid")[points_cat_col].sum()
+            pid_selected_tids_cat = n_best.groupby("pid")["tid"].agg(lambda col: ' + '.join(col))
+
+            self.ranking_df.loc[tid_indexes, cum_points_cat_col] = rankings.loc[tid_indexes].apply(
+                lambda re: pid_cum_points_cat.at[re.pid], axis="columns")
+            self.ranking_df.loc[tid_indexes, cum_tids_cat_col] = rankings.loc[tid_indexes].apply(
+                lambda re: pid_selected_tids_cat.at[re.pid], axis="columns")
 
             # Total number of participations
-            pid_participations_cat = self.ranking_df.groupby(["pid"]).apply(
-                lambda ranking_pid: (ranking_pid.loc[:, points_cat_col] != 0).sum())
-            self.ranking_df.loc[tid_indexes, participations_cat_col] = self.ranking_df.loc[tid_indexes].apply(
+            pid_participations_cat = rankings.groupby(["pid"])[points_cat_col].agg(lambda col: (col != 0).sum())
+            self.ranking_df.loc[tid_indexes, participations_cat_col] = rankings.loc[tid_indexes].apply(
                 lambda re: pid_participations_cat[re.pid], axis="columns")
 
     @staticmethod
@@ -410,23 +421,6 @@ class Rankings:
 
     def get_championship_details(self, tid):
         return self.championship_details_df.loc[self.championship_details_df.tid == tid].copy()
-
-    #     def get_pids(self, category='', status='all'):
-    #         """
-    #         Return a list of pids that may be filtered by category
-    #
-    #         If no parameter is given, it won't filter the list
-    #         :param category: It should be a known category
-    #         :param status: valid options are 'all' (default), 'active' or 'inactive'
-    #         :return:
-    #         """
-    #         pids = [p.pid for p in self if (not category or p.category == category)]
-    #         if status == 'active':
-    #             pids = [p.pid for p in self if (not category or p.category == category) and p.active]
-    #         elif status == 'inactive':
-    #             pids = [p.pid for p in self if (not category or p.category == category) and not p.active]
-    #
-    #         return pids
 
     @staticmethod
     def _count_unique_pids(df, points_columns):
