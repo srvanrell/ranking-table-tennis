@@ -274,6 +274,15 @@ def publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=F
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
 
+def _keep_name_new_row(df):
+    """Function to insert row in the dataframe"""
+    empty_row = pd.DataFrame({'tid': '', 'pid': '', 'category': '', 'best_round': '',
+                              'name': df.loc[df.first_valid_index(), 'name']}, index=[-1])
+    df.loc[df.first_valid_index(), 'name'] = ""
+
+    return pd.concat([empty_row, df])
+
+
 def publish_histories_sheet(tournaments, rankings, players, tid, prev_tid, upload=False):
     """ Format histories to be published into a sheet"""
     xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"].replace("NN", tid)
@@ -286,6 +295,9 @@ def publish_histories_sheet(tournaments, rankings, players, tid, prev_tid, uploa
     history_df = history_df.sort_values(["name", "category", "tid"], ascending=[True, False, True])
     # Remove repeated strings to show a cleaner sheet
     history_df.loc[history_df['name'] == history_df['name'].shift(1), "name"] = ""
+    # insert an empty row into history. This is a format workaround
+    history_df = history_df.groupby('pid', sort=False, group_keys=False).apply(_keep_name_new_row)
+    # Remove repeated strings to show a cleaner sheet
     history_df.loc[history_df['category'] == history_df['category'].shift(1), "category"] = ""
 
     with _get_writer(xlsx_filename, sheet_name) as writer:
