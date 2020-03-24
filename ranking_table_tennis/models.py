@@ -6,7 +6,7 @@ import pandas as pd
 
 
 # Loads some names from config.yaml
-user_config_path = os.path.expanduser("~") + "/.config/ranking_table_tennis"
+user_config_path = os.path.join("data_rtt", "config")
 
 if not os.path.exists(user_config_path):
     shutil.copytree(os.path.dirname(__file__) + "/config", user_config_path)

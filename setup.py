@@ -13,7 +13,7 @@ def readme():
 def copy_config_files():
     import ranking_table_tennis as rtt
     pkg_path = os.path.join(os.path.dirname(rtt.__file__), 'config')
-    user_config_path = os.path.expanduser(os.path.join("~", ".config/ranking_table_tennis"))
+    user_config_path = os.path.join("data_rtt", "config")
     if not os.path.exists(user_config_path):
         os.makedirs(user_config_path)
     for file in os.listdir(pkg_path):
@@ -35,7 +35,7 @@ class PostInstallCommand(install):
 
 
 setup(name='ranking_table_tennis',
-      version='2020.03.18',
+      version='2020.03.23',
       description='A ranking table tennis system',
       long_description=readme(),
       long_description_content_type="text/markdown",

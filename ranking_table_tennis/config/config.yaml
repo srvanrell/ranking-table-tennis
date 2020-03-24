@@ -1,5 +1,5 @@
 io:
-    data_folder: data/
+    data_folder: data_rtt/
     tournaments_filename: Liga Dos Orillas 2020 - Carga de partidos.xlsx
     rankings_filename: Liga Dos Orillas 2020 - Rankings Crudos.xlsx
     publish_filename: Torneo NN para publicar.xlsx
@@ -12,13 +12,15 @@ io:
     tournaments_pickle: tournaments.pk
     rankings_pickle: rankings.pk
     published_on_web_spreadsheets_id:
-      - 1ERmL9bj3mvsF1pfDQEAhiKzjaEOxvUX2EqakO5HIkJY  # partidos
-      - 1HC7HdmT8tYlwLDmObDDoHfNYIxAUkLiY81J8YPm3xRo  # nivel de juego
-      - 118RnRL-YFEB3eg78MM_lDwCrbYzJ1p5MUUVHDpCgWFs  # detalles nivel de juego
-      - 1hhz3w-Zm7R7w1x2eWhj1BynU76Eo7R6EDB8RZH7m7QQ  # masters primera
-      - 1kUSmsmBXSTW-UcFrj_ZPWohIFlplfMdo3j5JQWs3TrY  # masters segunda
-      - 1CO-D1P1FYEYudKKZ6oGH9KBoodRKfaGj9zD3BfsSMlw  # masters tercera
-      - 1jGXffNwVW93edpm1zzIBGLN3KJi46qo9lzcfv1AnO_s  # masters cuarta
+      - 1QhZZqltiD9KUXCeeT9IwcR7GH-HQ-V49b7ISVLkUlCY  # partidos
+      - 1kW7IocinP1WxtK0KRC84sXxjuQmaewsibN6H9TW6e-g  # nivel de juego
+      - 1r-UzvU8yUdfn0CLlbWKVJe2-EaBNFCy2WbaSjF10538  # detalles nivel de juego
+      - 1E_FsouAAnqVsTJ2pEJ8lzCkqtzYKBXO04a4OMmtvBYs  # campeonato primera
+      - 1oMcD1oJ06aN4rUNIDGNs-Z_hhGSPLNwX9lyw2iIKQW4  # campeonato segunda
+      - 1uKCnlbvp_r2Qr-J-H8uO90DERAjohqcZZ5o64rePss8  # campeonato tercera
+      - 1o7pIa8BERQk5baCvWR1j5UZAEUsDCv5Tdowu-uSUZxI  # campeonato cuarta
+      - 1CThfYo10XqXubDoZ1zvBS5yPQ40OW4-WDB7dLpVyGI0  # campeonato quinta
+      - 1_BONV3xFNLtdunP_PqdvG2HksRAVbNiX_LQmU5c1FLw  # detalles campeonato
 
 sheetname:
     players: Jugadores
@@ -35,7 +37,7 @@ labels:
     tid: ID Torneo
     pid: ID Jugador
     Player: Jugador
-    Association: Asociación
+    Association: Afiliación
     City: Ciudad
     Last Tournament: Último Torneo
     Championship Points: Puntos de Campeonato

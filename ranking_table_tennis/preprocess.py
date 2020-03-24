@@ -45,8 +45,8 @@ for tid in tournaments:
         if players.get_pid(name) is None:
             if players_temp.get_pid(name) is None:
                 unknown_player = True
-                association = input("Enter the association of %s: (optional field)\n" % name)
-                city = input("Enter the city of %s: (optional field)\n" % name)
+                association = input("\nEnter the affiliation of %s: (optional field)\n" % name)
+                city = input("\nEnter the city of %s: (optional field)\n" % name)
                 # Assign a pid for the new given player and add it to the list
                 players.add_new_player(name, association, city)
                 # Save a temp player to resume preprocessing, if necessary
@@ -54,7 +54,7 @@ for tid in tournaments:
             else:
                 print(">>>>\tUNCOMPLETE preprocessing detected. Resuming...")
                 players.add_player(players_temp[players_temp.get_pid(name)])
-            print(players[players.get_pid(name)])
+            print("\n", players[players.get_pid(name)], "\n")
 
         pid = players.get_pid(name)
 
@@ -62,7 +62,7 @@ for tid in tournaments:
         if rankings[initial_tid, pid] is None:
             if ranking_temp[initial_tid, pid] is None:
                 unknown_player = True
-                text_to_show = f"Enter the initial rating points for {name} (category will be auto-assigned):\n"
+                text_to_show = f"\nEnter the initial rating points for {name} (category will be auto-assigned):\n"
                 initial_rating = int(input(text_to_show))
                 rankings.add_new_entry(initial_tid, pid, initial_rating)
                 # Save a temp ranking of the player to resume preprocessing, if necessary
@@ -71,10 +71,10 @@ for tid in tournaments:
                 print(">>>>\tUNCOMPLETE preprocessing detected. Resuming...")
                 rankings.add_entry(ranking_temp[initial_tid, pid])
 
-            print(rankings[initial_tid, pid][["tid", "pid", "rating", "category"]], players[pid]["name"], "\n")
+            print("\n", rankings[initial_tid, pid][["tid", "pid", "rating", "category"]], players[pid]["name"], "\n")
 
         if unknown_player:
-            retrieve = input("press Enter to continue or Ctrl+C to forget last player data\n")
+            retrieve = input("press Enter to continue or Kill this process to forget last player data\n")
             utils.save_temp_players_ranking(players_temp, ranking_temp)
 
     # Get the best round for each player in each category

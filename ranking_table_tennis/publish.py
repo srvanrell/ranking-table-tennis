@@ -29,16 +29,17 @@ initial_tid = cfg["aux"]["initial tid"]
 # Will compute all rankings from the beginning by default
 tids = [initial_tid] + [tid for tid in tournaments]
 
+print(f"\nNumber\t->\tTournament ID")
 for tenum, tid in enumerate(tids[1:], 1):
     print(f"{tenum:d}\t->\t{tid}")
 
-t_num = int(input("Enter the tournament id to publish (look above):\n"))
+t_num = int(input("Enter the tournament number to publish (look above):\n"))
 tid = tids[t_num]
 
 # Get the tid of the previous tournament
 prev_tid = tids[tids.index(tid) - 1]
 
-answer = input("\nDo you want to publish to temporal online sheets [Y/n]? (press Enter to continue)\n")
+answer = input("\nDo you want to publish to backend online sheets [Y/n]? (press Enter to continue)\n")
 upload = answer.lower() != "n"
 
 # Publish formated rating of selected tournament
