@@ -6,8 +6,6 @@ from openpyxl.styles import Font, Alignment
 import pandas as pd
 import pickle
 
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
 from df2gspread import df2gspread as d2g
 
 __author__ = 'sebastian'
@@ -98,6 +96,7 @@ def save_players_sheet(players, upload=False):
 def upload_sheet_from_df(spreadsheet_id, sheet_name, df, headers, upload_index=False):
     """ Saves headers and df data into given sheet_name.
         If sheet_name does not exist, it will be created. """
+    print("<<<Saving\t", sheet_name, "\tin\t", spreadsheet_id)
     try:
         credentials = get_credentials()
         ws = d2g.upload(df, spreadsheet_id, sheet_name, row_names=upload_index, df_size=True, credentials=credentials)
@@ -107,8 +106,6 @@ def upload_sheet_from_df(spreadsheet_id, sheet_name, df, headers, upload_index=F
         for i, value in enumerate(headers):
             cell_list[i].value = value
         ws.update_cells(cell_list)
-
-        print("<<<Saving\t", sheet_name, "\tin\t", spreadsheet_id)
 
     except FileNotFoundError:
         print("<<<FAILED to upload\t", sheet_name, "\tin\t", spreadsheet_id)
@@ -472,27 +469,21 @@ def in_colab():
     # Verify if it is running on colab
     try:
         import google.colab
-        IN_COLAB = True
+        _in_colab = True
     except:
-        IN_COLAB = False
+        _in_colab = False
 
-    return IN_COLAB
+    return _in_colab
 
 
 def get_credentials():
-    credentials = None
     if in_colab():
+        from google.colab import auth
+        auth.authenticate_user()
         from oauth2client.client import GoogleCredentials
-        with open("credentials.json", "r") as f:
-            credentials = GoogleCredentials.from_json(f.read())
+        credentials = GoogleCredentials.get_application_default()
     else:
-        scope = ['https://spreadsheets.google.com/feeds',
-                 'https://www.googleapis.com/auth/drive']
-        key_filename = models.user_config_path + "/key-for-gspread.json"
-        try:
-            credentials = ServiceAccountCredentials.from_json_keyfile_name(key_filename, scope)
-        except FileNotFoundError:
-            print("The .json key file has not been configured. Upload will fail.")
+        credentials = d2g.get_credentials()
 
     return credentials
 
@@ -501,9 +492,12 @@ def _get_gc():
     gc = None
     try:
         credentials = get_credentials()
-        gc = gspread.authorize(credentials)
+        gc = d2g.gspread.authorize(credentials)
+    except FileNotFoundError:
+        print("The .json key file has not been configured. Upload will fail.")
     except OSError:
         print("Connection failure. Upload will fail.")
+
     return gc
 
 

@@ -35,7 +35,7 @@ class PostInstallCommand(install):
 
 
 setup(name='ranking_table_tennis',
-      version='2020.3.23.5',
+      version='2020.3.23.7',
       description='A ranking table tennis system',
       long_description=readme(),
       long_description_content_type="text/markdown",
@@ -53,8 +53,8 @@ setup(name='ranking_table_tennis',
           'openpyxl>=2.4.2,<2.6',
           'Unidecode>=1.0.22',
           'pandas>=0.24.0',
-          'xlrd >= 1.0.0',
-          'df2gspread'
+          'xlrd>=1.0.0',
+          'df2gspread>=1.0.4'
       ],
       cmdclass={
         'develop': PostDevelopCommand,
