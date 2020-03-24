@@ -98,13 +98,20 @@ def save_players_sheet(players, upload=False):
 def upload_sheet_from_df(spreadsheet_id, sheet_name, df, headers, upload_index=False):
     """ Saves headers and df data into given sheet_name.
         If sheet_name does not exist, it will be created. """
-    ws = d2g.upload(df, spreadsheet_id, sheet_name, row_names=upload_index, df_size=True)
+    try:
+        credentials = get_credentials()
+        ws = d2g.upload(df, spreadsheet_id, sheet_name, row_names=upload_index, df_size=True, credentials=credentials)
 
-    # Concatenation of header cells values to be updated in batch mode
-    cell_list = ws.range("A1:" + d2g.gspread.utils.rowcol_to_a1(row=1, col=len(headers)))
-    for i, value in enumerate(headers):
-        cell_list[i].value = value
-    ws.update_cells(cell_list)
+        # Concatenation of header cells values to be updated in batch mode
+        cell_list = ws.range("A1:" + d2g.gspread.utils.rowcol_to_a1(row=1, col=len(headers)))
+        for i, value in enumerate(headers):
+            cell_list[i].value = value
+        ws.update_cells(cell_list)
+
+        print("<<<Saving\t", sheet_name, "\tin\t", spreadsheet_id)
+
+    except FileNotFoundError:
+        print("<<<FAILED to upload\t", sheet_name, "\tin\t", spreadsheet_id)
 
 
 def load_players_sheet():
@@ -461,17 +468,40 @@ def publish_championship_sheets(tournaments, rankings, players, tid, prev_tid, u
             load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
 
+def in_colab():
+    # Verify if it is running on colab
+    try:
+        import google.colab
+        IN_COLAB = True
+    except:
+        IN_COLAB = False
+
+    return IN_COLAB
+
+
+def get_credentials():
+    credentials = None
+    if in_colab():
+        from oauth2client.client import GoogleCredentials
+        with open("credentials.json", "r") as f:
+            credentials = GoogleCredentials.from_json(f.read())
+    else:
+        scope = ['https://spreadsheets.google.com/feeds',
+                 'https://www.googleapis.com/auth/drive']
+        key_filename = models.user_config_path + "/key-for-gspread.json"
+        try:
+            credentials = ServiceAccountCredentials.from_json_keyfile_name(key_filename, scope)
+        except FileNotFoundError:
+            print("The .json key file has not been configured. Upload will fail.")
+
+    return credentials
+
+
 def _get_gc():
-    # Drive authorization
-    scope = ['https://spreadsheets.google.com/feeds',
-             'https://www.googleapis.com/auth/drive']
-    key_filename = models.user_config_path + "/key-for-gspread.json"
     gc = None
     try:
-        credentials = ServiceAccountCredentials.from_json_keyfile_name(key_filename, scope)
+        credentials = get_credentials()
         gc = gspread.authorize(credentials)
-    except FileNotFoundError:
-        print("The .json key file has not been configured. Upload will fail.")
     except OSError:
         print("Connection failure. Upload will fail.")
     return gc
@@ -479,8 +509,9 @@ def _get_gc():
 
 def load_and_upload_sheet(filename, sheet_name, spreadsheet_id):
     print("<<<Saving\t", sheet_name, "\tin\t", spreadsheet_id)
+    credentials = get_credentials()
     df = pd.read_excel(filename, sheet_name, index_col=None, header=None, na_filter=False)
-    d2g.upload(df, spreadsheet_id, sheet_name, row_names=False, col_names=False, df_size=True)
+    d2g.upload(df, spreadsheet_id, sheet_name, row_names=False, col_names=False, df_size=True, credentials=credentials)
 
 
 def create_n_tour_sheet(spreadsheet_id, tid):
@@ -512,7 +543,7 @@ def create_n_tour_sheet(spreadsheet_id, tid):
             dup_ws.update_acell('A1', dup_cell_value.replace(first_key, replacement_key))
             print("<<<Creating\t", new_sheetname, "\tfrom\t", sheetname, "\tin\t", spreadsheet_id)
         else:
-            print("FAILED TO DUPLICATE\t", first_key, "\t not exist in\t", spreadsheet_id)
+            print("FAILED TO DUPLICATE\t", first_key, "\t do not exist in\t", spreadsheet_id)
 
 
 def publish_to_web(tid, show_on_web=False):

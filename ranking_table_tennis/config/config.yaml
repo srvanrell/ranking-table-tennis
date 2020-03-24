@@ -1,5 +1,7 @@
 io:
     data_folder: data_rtt/
+    colab_credentials: colab_credentials.json
+    gspread_credentials: key-for-gspread.json
     tournaments_filename: Liga Dos Orillas 2020dev - Carga de partidos.xlsx
     rankings_filename: Liga Dos Orillas 2020dev - Rankings Crudos.xlsx
     publish_filename: Torneo NN para publicar.xlsx
