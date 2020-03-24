@@ -22,7 +22,7 @@ __pycache__/
 env/
 build/
 develop-eggs/
-dist/
+old_dists/
 downloads/
 eggs/
 .eggs/
@@ -67,3 +67,4 @@ docs/_build/
 
 # PyBuilder
 target/
+/data_rtt/

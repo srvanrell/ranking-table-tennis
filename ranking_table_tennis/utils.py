@@ -206,7 +206,7 @@ def _get_writer_mode(xlsx_file_path):
 def _get_writer(xlsx_filename, sheet_name):
     writer = pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode=_get_writer_mode(xlsx_filename))
     if sheet_name in writer.book.sheetnames:
-        writer.book.remove_sheet(writer.book.get_sheet_by_name(sheet_name))
+        writer.book.remove(writer.book[sheet_name])
     print("<<<Saving\t", sheet_name, "\tin\t", xlsx_filename)
 
     return writer
@@ -266,7 +266,7 @@ def publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=F
         sorted_rankings_df.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=columns)
 
         # publish and format tournament metadata
-        ws = writer.book.get_sheet_by_name(sheet_name)
+        ws = writer.book[sheet_name]
         _publish_tournament_metadata(ws, tournaments[tid])
         _bold_and_center(ws, to_bold, to_center)
 
@@ -343,7 +343,7 @@ def publish_rating_details_sheet(tournaments, rankings, players, tid, prev_tid, 
         rating_details.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=columns)
 
         # publish and format tournament metadata
-        ws = writer.book.get_sheet_by_name(sheet_name)
+        ws = writer.book[sheet_name]
         _publish_tournament_metadata(ws, tournaments[tid])
         _bold_and_center(ws, to_bold, to_center)
 
@@ -371,7 +371,7 @@ def publish_championship_details_sheet(tournaments, rankings, players, tid, prev
         championship_details.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=columns)
 
         # publish and format tournament metadata
-        ws = writer.book.get_sheet_by_name(sheet_name)
+        ws = writer.book[sheet_name]
         _publish_tournament_metadata(ws, tournaments[tid])
         _bold_and_center(ws, to_bold, to_center)
 
@@ -390,7 +390,7 @@ def publish_statistics_sheet(tournaments, rankings, players, tid, prev_tid, uplo
     with _get_writer(xlsx_filename, sheet_name) as writer:
         stats.to_excel(writer, sheet_name=sheet_name, index=True, header=headers, index_label=cfg["labels"]["tid"])
 
-        ws = writer.book.get_sheet_by_name(sheet_name)
+        ws = writer.book[sheet_name]
         ws.insert_rows(0, 1)
         ws["B1"] = "Acumulado"  # FIXME this should be read from cfg
         ws.merge_cells('B1:H1')
@@ -453,7 +453,7 @@ def publish_championship_sheets(tournaments, rankings, players, tid, prev_tid, u
             sorted_ranking.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=_columns)
 
             # publish and format tournament metadata
-            ws = writer.book.get_sheet_by_name(sheet_name)
+            ws = writer.book[sheet_name]
             _publish_tournament_metadata(ws, tournaments[tid])
             _bold_and_center(ws, to_bold, to_center)  # FIXME This should be part of publish metadata, to merge the right cells
 
@@ -524,8 +524,8 @@ def publish_to_web(tid, show_on_web=False):
 def load_temp_players_ranking():
     """returns players_temp, ranking_temp"""
     # Loading temp ranking and players. It shuould be deleted after a successful preprocessing
-    players_temp_file = cfg["io"]["players_temp_file"]
-    ranking_temp_file = cfg["io"]["ranking_temp_file"]
+    players_temp_file = os.path.join(cfg["io"]["data_folder"], cfg["io"]["players_temp_file"])
+    ranking_temp_file = os.path.join(cfg["io"]["data_folder"], cfg["io"]["ranking_temp_file"])
 
     if os.path.exists(players_temp_file):
         with open(players_temp_file, 'rb') as f:
@@ -547,9 +547,9 @@ def load_temp_players_ranking():
 def save_temp_players_ranking(players_temp, ranking_temp):
     """returns players_temp, ranking_temp"""
     # Loading temp ranking and players. It shuould be deleted after a successful preprocessing
-    players_temp_file = cfg["io"]["players_temp_file"]
-    ranking_temp_file = cfg["io"]["ranking_temp_file"]
-    print("<Saving\t\tTemps to resume preprocessing (if necessary)", ranking_temp_file, players_temp_file)
+    players_temp_file = os.path.join(cfg["io"]["data_folder"], cfg["io"]["players_temp_file"])
+    ranking_temp_file = os.path.join(cfg["io"]["data_folder"], cfg["io"]["ranking_temp_file"])
+    print("<Saving\t\tTemps to resume preprocessing (if necessary)", ranking_temp_file, players_temp_file, "\n")
     with open(players_temp_file, 'wb') as ptf, open(ranking_temp_file, 'wb') as rtf:
         # Pickle the 'data' dictionary using the highest protocol available.
         pickle.dump(players_temp, ptf, pickle.HIGHEST_PROTOCOL)
@@ -557,8 +557,8 @@ def save_temp_players_ranking(players_temp, ranking_temp):
 
 
 def remove_temp_players_ranking():
-    players_temp_file = cfg["io"]["players_temp_file"]
-    ranking_temp_file = cfg["io"]["ranking_temp_file"]
+    players_temp_file = os.path.join(cfg["io"]["data_folder"], cfg["io"]["players_temp_file"])
+    ranking_temp_file = os.path.join(cfg["io"]["data_folder"], cfg["io"]["ranking_temp_file"])
     print("Removing temp files created to resume preprocessing", players_temp_file, ranking_temp_file)
     if os.path.exists(players_temp_file):
         os.remove(players_temp_file)
@@ -573,13 +573,13 @@ def save_to_pickle(players=None, rankings=None, tournaments=None):
 
     for obj, fn in objects_filenames:
         print(f'<<<Saving\t{fn}\tin\t{cfg["io"]["data_folder"]}')
-        with open(os.path.join(cfg["io"]["data_folder"] + fn), 'wb') as fo:
+        with open(os.path.join(cfg["io"]["data_folder"], fn), 'wb') as fo:
             pickle.dump(obj, fo, pickle.HIGHEST_PROTOCOL)
 
 
 def load_from_pickle(filename):
     print(f'>>>Loading\t{filename}\tfrom\t{cfg["io"]["data_folder"]}')
-    with open(os.path.join(cfg["io"]["data_folder"] + filename), 'rb') as fo:
+    with open(os.path.join(cfg["io"]["data_folder"], filename), 'rb') as fo:
         obj = pickle.load(fo)
 
     return obj

@@ -13,7 +13,7 @@ def readme():
 def copy_config_files():
     import ranking_table_tennis as rtt
     pkg_path = os.path.join(os.path.dirname(rtt.__file__), 'config')
-    user_config_path = os.path.expanduser(os.path.join("~", ".config/ranking_table_tennis"))
+    user_config_path = os.path.join("data_rtt", "config")
     if not os.path.exists(user_config_path):
         os.makedirs(user_config_path)
     for file in os.listdir(pkg_path):
