@@ -1,7 +1,6 @@
 import os
 from ranking_table_tennis import models
 from ranking_table_tennis.models import cfg
-from openpyxl import load_workbook
 from openpyxl.styles import Font, Alignment
 import pandas as pd
 import pickle
@@ -18,28 +17,6 @@ def get_tournament_sheet_names_ordered():
     sheet_names = [s for s in df_tournaments.keys() if filter_key in s]
 
     return sorted(sheet_names)
-
-
-def load_sheet_workbook(filename, sheetname, first_row=1):
-    print(">Reading\t", sheetname, "\tfrom\t", filename)
-    wb = load_workbook(filename, read_only=True)
-    ws = wb.get_sheet_by_name(sheetname)
-
-    ws.calculate_dimension(force=True)
-
-    list_to_return = []
-    for row in ws.rows:
-        aux_row = []
-        empty_row = True
-        for cell in row:
-            if cell.value is None:
-                aux_row.append("")
-            else:
-                empty_row = False
-                aux_row.append(cell.value)
-        if not empty_row:
-            list_to_return.append(aux_row[:ws.max_column])
-    return list_to_return[first_row:]
 
 
 def _bold_and_center(ws, to_bold, to_center):
