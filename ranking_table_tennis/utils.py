@@ -270,8 +270,9 @@ def publish_histories_sheet(tournaments, rankings, players, tid, prev_tid, uploa
     sheet_name = cfg["sheetname"]["histories"]
 
     history_df = players.history_df.copy()
-    # Add name of players to a column
-    history_df.loc[:, "name"] = history_df.loc[:, "pid"].apply(lambda pid: players[pid]["name"])
+
+    # Match pid to get player's metadata into new columns of history_df
+    history_df = pd.merge(history_df, players.players_df, on="pid")
     # Sort histories by name, category and tid
     history_df = history_df.sort_values(["name", "category", "tid"], ascending=[True, False, True])
     # Remove repeated strings to show a cleaner sheet
