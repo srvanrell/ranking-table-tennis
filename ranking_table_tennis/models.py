@@ -334,10 +334,14 @@ class Rankings:
         points_and_tids = ""
         rows = rows[rows[points_cat_col] > 0]
         if not rows.empty:
-            formatted_rows = rows.agg(lambda row: f"{row[points_cat_col]:.0f} ({row['tid']})", axis='columns')
-            points_and_tids = ' + '.join(formatted_rows)
+            formatted_rows = rows[points_cat_col].astype(int).astype(str) + " (" + rows['tid'] + ") + "
+            points_and_tids = formatted_rows.sum()[:-3]  # workaround to eliminate trailing " + "
 
         return points_and_tids
+
+    @staticmethod
+    def merge_preserve_left_index(left, right, on):
+        return left.reset_index().merge(right, how="left", on=on).set_index('index')
 
     def compute_championship_points(self, tid):
         """
@@ -354,13 +358,17 @@ class Rankings:
 
             # Cumulated points of the best n_tournaments
             n_best = rankings.sort_values(by=[points_cat_col], ascending=False).groupby("pid").head(n_tournaments)
-            pid_cum_points_cat = n_best.groupby("pid")[points_cat_col].sum()
-            pid_selected_tids_cat = n_best.groupby("pid").agg(self._format_selected_tids, points_cat_col)[cum_tids_cat_col]
+            cum_points_cat_values = n_best.groupby("pid")[points_cat_col].sum().rename(cum_points_cat_col)
+            reordered_cum_points = self.merge_preserve_left_index(self.ranking_df.loc[tid_indexes, "pid"],
+                                                                  cum_points_cat_values, on="pid")
+            self.ranking_df.loc[tid_indexes, cum_points_cat_col] = reordered_cum_points.loc[:, cum_points_cat_col]
 
-            self.ranking_df.loc[tid_indexes, cum_points_cat_col] = rankings.loc[tid_indexes].apply(
-                lambda re: pid_cum_points_cat.at[re.pid], axis="columns")
-            self.ranking_df.loc[tid_indexes, cum_tids_cat_col] = rankings.loc[tid_indexes].apply(
-                lambda re: pid_selected_tids_cat.at[re.pid], axis="columns")
+            # Details of cumulated points
+            selected_tids_cat_values = n_best.groupby("pid").agg(self._format_selected_tids, points_cat_col)[
+                cum_tids_cat_col]
+            reordered_tids = self.merge_preserve_left_index(self.ranking_df.loc[tid_indexes, "pid"],
+                                                            selected_tids_cat_values, on="pid")
+            self.ranking_df.loc[tid_indexes, cum_tids_cat_col] = reordered_tids.loc[:, cum_tids_cat_col]
 
             # Total number of participations
             pid_participations_cat = rankings.groupby(["pid"])[points_cat_col].agg(lambda col: (col != 0).sum())
