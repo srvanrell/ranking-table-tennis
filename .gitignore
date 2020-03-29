@@ -69,3 +69,5 @@ docs/_build/
 target/
 /data_rtt/
 /dist/
+/Pipfile
+/Pipfile.lock
