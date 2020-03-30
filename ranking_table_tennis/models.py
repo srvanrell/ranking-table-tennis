@@ -330,16 +330,6 @@ class Rankings:
         self.championship_details_df = self.championship_details_df.append(assigned_points)
 
     @staticmethod
-    def _format_selected_tids(rows, points_cat_col):
-        points_and_tids = ""
-        rows = rows[rows[points_cat_col] > 0]
-        if not rows.empty:
-            formatted_rows = rows[points_cat_col].astype(int).astype(str) + " (" + rows['tid'] + ") + "
-            points_and_tids = formatted_rows.sum()[:-3]  # workaround to eliminate trailing " + "
-
-        return points_and_tids
-
-    @staticmethod
     def merge_preserve_left_index(left, right, on):
         return left.reset_index().merge(right, how="left", on=on).set_index('index')
 
@@ -356,18 +346,25 @@ class Rankings:
                 self.points_cat_columns(), self.cum_points_cat_columns(), self.cum_tids_cat_columns(),
                 self.participations_cat_columns()):
 
-            # Cumulated points of the best n_tournaments
+            # Best n_tournaments
             n_best = rankings.sort_values(by=[points_cat_col], ascending=False).groupby("pid").head(n_tournaments)
-            cum_points_cat_values = n_best.groupby("pid")[points_cat_col].sum().rename(cum_points_cat_col)
+            n_best2 = n_best[n_best[points_cat_col] > 0].copy()  # Omit null points data to accelerate processing
+
+            # Cumulated points of the best n_tournaments
+            cum_points_cat_values = n_best2.groupby("pid")[points_cat_col].sum().rename(cum_points_cat_col)
             reordered_cum_points = self.merge_preserve_left_index(self.ranking_df.loc[tid_indexes, "pid"],
                                                                   cum_points_cat_values, on="pid")
+            reordered_cum_points.loc[:, cum_points_cat_col].fillna(0, inplace=True)
             self.ranking_df.loc[tid_indexes, cum_points_cat_col] = reordered_cum_points.loc[:, cum_points_cat_col]
 
-            # Details of cumulated points
-            selected_tids_cat_values = n_best.groupby("pid").agg(self._format_selected_tids, points_cat_col)[
-                cum_tids_cat_col]
+            # Details of cumulated points, formatted as POINTS (TID) + POINTS(TID) + ...
+            n_best2[cum_tids_cat_col] = n_best2[points_cat_col].astype(int).astype(str) + " (" + n_best2['tid'] + ") + "
+            selected_tids_cat_values = n_best2.groupby("pid")[cum_tids_cat_col].sum().apply(lambda x: x[:-3])
+
             reordered_tids = self.merge_preserve_left_index(self.ranking_df.loc[tid_indexes, "pid"],
                                                             selected_tids_cat_values, on="pid")
+            reordered_tids.loc[:, cum_tids_cat_col].fillna("", inplace=True)
+
             self.ranking_df.loc[tid_indexes, cum_tids_cat_col] = reordered_tids.loc[:, cum_tids_cat_col]
 
             # Total number of participations
