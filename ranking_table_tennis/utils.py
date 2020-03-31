@@ -301,11 +301,6 @@ def publish_rating_details_sheet(tournaments, rankings, players, tid, prev_tid, 
 
     rating_details = rankings.get_rating_details(tid)
 
-    rating_details.insert(4, "winner_rating", rating_details.loc[:, "winner_pid"].apply(
-        lambda pid: rankings[prev_tid, pid, "rating"]))
-    rating_details.insert(4, "loser_rating", rating_details.loc[:, "loser_pid"].apply(
-        lambda pid: rankings[prev_tid, pid, "rating"]))
-
     rating_details.insert(4, "winner_name_rating", rating_details.apply(
         lambda row: f"{row['winner']} ({row['winner_rating']:.0f})", axis="columns"))
     rating_details.insert(4, "loser_name_rating", rating_details.apply(

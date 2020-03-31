@@ -213,6 +213,7 @@ class Rankings:
         new_ranking.loc[:, "tid"] = new_tid
         new_ranking.loc[:, self.points_cat_columns() + self.cum_points_cat_columns()] = 0
         new_ranking.loc[:, self.participations_cat_columns()] = 0
+        new_ranking.loc[:, self.cum_tids_cat_columns()] = ""
         self.ranking_df = self.ranking_df.append(new_ranking, ignore_index=True)
 
     @staticmethod
@@ -268,12 +269,10 @@ class Rankings:
 
         return factor
 
-    def _new_ratings_from_match(self, match, old_tid):
-
-        winner, loser = self[old_tid, match["winner_pid"]], self[old_tid, match["loser_pid"]]
-
-        [to_winner, to_loser] = self._points_to_assign(winner.rating, loser.rating)
-        factor = self._get_factor(winner.rating, loser.rating, winner.category, loser.category,
+    def _new_ratings_from_match(self, match):
+        [to_winner, to_loser] = self._points_to_assign(match["winner_rating"], match["loser_rating"])
+        factor = self._get_factor(match["winner_rating"], match["loser_rating"],
+                                  match["winner_category"], match["loser_category"],
                                   match["not_own_category"])
 
         to_winner, to_loser = factor * to_winner, factor * to_loser
@@ -281,33 +280,43 @@ class Rankings:
 
         return match
 
-    def _apply_rating_changes(self, pid_change, new_tid):
-        self[new_tid, pid_change.name, "rating"] += pid_change.rating_change  # pid_change.name == pid
-
-    @staticmethod
-    def _any_not_own_category(match, pid_not_own_category):
-        return (match["winner_pid"] in pid_not_own_category) or (match["loser_pid"] in pid_not_own_category)
-
     def compute_new_ratings(self, new_tid, old_tid, tournaments, pid_not_own_category):
         """Compute ratings(new_tid) based on matches(new_tid) and ratings(old_tid).
         Details of rating changes per match are stored in rating_details_df.
         """
-        matches_to_process = tournaments.get_matches(new_tid).copy()
-        matches_to_process.insert(len(matches_to_process.columns), "rating_to_winner", None)
-        matches_to_process.insert(len(matches_to_process.columns), "rating_to_loser", None)
+        new_tid_indexes = self.ranking_df.tid == new_tid
+        old_tid_indexes = self.ranking_df.tid == old_tid
 
-        matches_to_process["not_own_category"] = matches_to_process.apply(self._any_not_own_category, axis="columns",
-                                                                          args=[pid_not_own_category])
+        # Get tid matches data from tournaments
+        matches = tournaments.get_matches(new_tid).copy()
+        matches.insert(len(matches.columns), "rating_to_winner", None)
+        matches.insert(len(matches.columns), "rating_to_loser", None)
 
-        matches_processed = matches_to_process.apply(self._new_ratings_from_match, axis="columns", args=[old_tid])
+        # Assign ranking data to matches, such as category and rating of players
+        ranking_data = self.ranking_df.loc[old_tid_indexes, ["pid", "category", "rating"]].copy()
+        winner_data = ranking_data.rename(columns={"category": "winner_category", "rating": "winner_rating"})
+        loser_data = ranking_data.rename(columns={"category": "loser_category", "rating": "loser_rating"})
+        matches = self.merge_preserve_left_index(matches, winner_data, left_on="winner_pid", right_on="pid").drop(
+            columns="pid")
+        matches = self.merge_preserve_left_index(matches, loser_data, left_on="loser_pid", right_on="pid").drop(
+            columns="pid")
+        matches["not_own_category"] = matches.loc[:, ["winner_pid", "loser_pid"]].isin(pid_not_own_category).any(axis=1)
 
+        # Compute ratings changes per match
+        matches_processed = matches.apply(self._new_ratings_from_match, axis="columns")
+
+        # Compute overall rating changes per player
         translations = {"rating_to_winner": "rating_change", "rating_to_loser": "rating_change",
                         "winner_pid": "pid", "loser_pid": "pid"}
         winner_changes = matches_processed.loc[:, ["winner_pid", "rating_to_winner"]].rename(columns=translations)
         loser_changes = matches_processed.loc[:, ["loser_pid", "rating_to_loser"]].rename(columns=translations)
         rating_changes = pd.concat([winner_changes, loser_changes], ignore_index=True)
         rating_changes = rating_changes.groupby("pid").sum()
-        rating_changes.apply(self._apply_rating_changes, axis="columns", args=[new_tid])
+
+        # Assign changes to ranking_df and save details
+        reordered_changes = self.merge_preserve_left_index(self.ranking_df.loc[new_tid_indexes, "pid"],
+                                                           rating_changes, on="pid")
+        self.ranking_df.loc[reordered_changes.index, "rating"] += reordered_changes.loc[:, "rating_change"]
 
         self.rating_details_df = self.rating_details_df.append(matches_processed)
         self.update_categories()
@@ -329,8 +338,8 @@ class Rankings:
         self.championship_details_df = self.championship_details_df.append(best_rounds_pointed, ignore_index=True)
 
     @staticmethod
-    def merge_preserve_left_index(left, right, on, how="left"):
-        return left.reset_index().merge(right, how=how, on=on).set_index('index').rename_axis(None)
+    def merge_preserve_left_index(left, right, **kwargs):
+        return left.reset_index().merge(right, **kwargs).set_index('index').rename_axis(None)
 
     def compute_championship_points(self, tid):
         """
