@@ -341,37 +341,34 @@ class Rankings:
         tid_indexes = self.ranking_df.tid == tid
         rankings = self.ranking_df[self.ranking_df.tid != cfg["aux"]["initial tid"]]  # Remove initial tid data
 
-        for points_cat_col, cum_points_cat_col, cum_tids_cat_col, participations_cat_col in zip(
+        for points_cat_col, cum_points_cat_col, cum_tids_cat_col, n_played_cat_col in zip(
                 self.points_cat_columns(), self.cum_points_cat_columns(), self.cum_tids_cat_columns(),
                 self.participations_cat_columns()):
 
             # Best n_tournaments, not consider null points data to accelerate processing
             rankings_not_null = rankings[rankings[points_cat_col] > 0].copy()
-            n_best = rankings_not_null.sort_values(by=[points_cat_col], ascending=False).groupby("pid").head(n_tournaments)
+            n_best = rankings_not_null.sort_values(by=[points_cat_col], ascending=False).groupby("pid").head(
+                n_tournaments)
 
             # Cumulated points of the best n_tournaments
             cum_points_cat_values = n_best.groupby("pid")[points_cat_col].sum().rename(cum_points_cat_col)
-            reordered_cum_points = self.merge_preserve_left_index(self.ranking_df.loc[tid_indexes, "pid"],
-                                                                  cum_points_cat_values, on="pid")
-            reordered_cum_points.loc[:, cum_points_cat_col].fillna(0, inplace=True)
-            self.ranking_df.loc[tid_indexes, cum_points_cat_col] = reordered_cum_points.loc[:, cum_points_cat_col]
+            rows_reordered = self.merge_preserve_left_index(self.ranking_df.loc[tid_indexes, "pid"],
+                                                            cum_points_cat_values, on="pid", how="inner")
+            self.ranking_df.loc[rows_reordered.index, cum_points_cat_col] = rows_reordered.loc[:, cum_points_cat_col]
 
             # Details of cumulated points, formatted as POINTS (TID) + POINTS(TID) + ...
             n_best[cum_tids_cat_col] = n_best[points_cat_col].astype(int).astype(str) + " (" + n_best['tid'] + ") + "
             selected_tids_cat_values = n_best.groupby("pid")[cum_tids_cat_col].sum().apply(lambda x: x[:-3])
-
-            reordered_tids = self.merge_preserve_left_index(self.ranking_df.loc[tid_indexes, "pid"],
-                                                            selected_tids_cat_values, on="pid")
-            reordered_tids.loc[:, cum_tids_cat_col].fillna("", inplace=True)
-            self.ranking_df.loc[tid_indexes, cum_tids_cat_col] = reordered_tids.loc[:, cum_tids_cat_col]
+            rows_reordered = self.merge_preserve_left_index(self.ranking_df.loc[tid_indexes, "pid"],
+                                                            selected_tids_cat_values, on="pid", how="inner")
+            self.ranking_df.loc[rows_reordered.index, cum_tids_cat_col] = rows_reordered.loc[:, cum_tids_cat_col]
 
             # Total number of participations
-            participations_cat_values = rankings_not_null.groupby(["pid"])[points_cat_col].count()
-            participations_cat_values.rename(participations_cat_col, inplace=True)
-            reordered_participations = self.merge_preserve_left_index(self.ranking_df.loc[tid_indexes, "pid"],
-                                                                      participations_cat_values, on="pid")
-            reordered_participations.loc[:, participations_cat_col].fillna(0, inplace=True)
-            self.ranking_df.loc[tid_indexes, participations_cat_col] = reordered_participations.loc[:, participations_cat_col]
+            n_played_cat_values = rankings_not_null.groupby(["pid"])[points_cat_col].count()
+            n_played_cat_values.rename(n_played_cat_col, inplace=True)
+            rows_reordered = self.merge_preserve_left_index(self.ranking_df.loc[tid_indexes, "pid"],
+                                                            n_played_cat_values, on="pid", how="inner")
+            self.ranking_df.loc[rows_reordered.index, n_played_cat_col] = rows_reordered.loc[:, n_played_cat_col]
 
     @staticmethod
     def _activate_or_inactivate_player(ranking_entry, tids_list, active_window_tids, inactive_window_tids,
