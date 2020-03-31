@@ -313,25 +313,24 @@ class Rankings:
         self.update_categories()
 
     def compute_category_points(self, tid, best_rounds):
-        point_cat_columns = self.points_cat_columns()
+        col_translations = {"round_reached": "best_round", "level_1": "category", 0: "points"}
+        points_assignation_table = best_rounds_points.stack().reset_index().rename(columns=col_translations)
 
-        for row_id, row in best_rounds.iterrows():
-            points = best_rounds_points[row.category][row.best_round]
-            cat_col = point_cat_columns[categories.index(row.category)]
-            self[tid, row.pid, cat_col] = points
+        best_rounds_pointed = best_rounds.merge(points_assignation_table, on=["category", "best_round"])
+        best_rounds_pointed.insert(0, "tid", tid)
+
+        for cat, points_cat_col in zip(categories, self.points_cat_columns()):
+            rows_reordered = self.merge_preserve_left_index(self.ranking_df.loc[self.ranking_df.tid == tid, "pid"],
+                                                            best_rounds_pointed[best_rounds_pointed.category == cat],
+                                                            on="pid", how="inner")
+            self.ranking_df.loc[rows_reordered.index, points_cat_col] = rows_reordered.loc[:, "points"]
 
         # Save details of assigned points
-        assigned_points = best_rounds.copy()
-        assigned_points.insert(0, "tid", tid)
-        assigned_points.insert(len(assigned_points.columns), "points",
-                               assigned_points.apply(lambda br_row: best_rounds_points[br_row.category][br_row.best_round],
-                                                     axis="columns"))
-
-        self.championship_details_df = self.championship_details_df.append(assigned_points)
+        self.championship_details_df = self.championship_details_df.append(best_rounds_pointed, ignore_index=True)
 
     @staticmethod
-    def merge_preserve_left_index(left, right, on):
-        return left.reset_index().merge(right, how="left", on=on).set_index('index')
+    def merge_preserve_left_index(left, right, on, how="left"):
+        return left.reset_index().merge(right, how=how, on=on).set_index('index').rename_axis(None)
 
     def compute_championship_points(self, tid):
         """

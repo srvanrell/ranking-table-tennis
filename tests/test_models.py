@@ -2,6 +2,7 @@ from unittest import TestCase
 
 from ranking_table_tennis import models
 import pandas as pd
+import numpy as np
 
 
 # class TestPlayers(TestCase):
@@ -45,3 +46,26 @@ class TestTournaments(TestCase):
         output = {('segunda', 'Star, Ringo'): 'octavos', ('segunda', 'Lennon, John'): 'octavos'}
 
         self.assertDictEqual(best_rounds, output)
+
+
+class TestRankings(TestCase):
+    def test_merge_preserve_left_index(self):
+        df1 = pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6]}, index=[0, 1, 2])
+        df2 = pd.DataFrame({"C": [7, 8, 9], "B": [5, 6, 22]}, index=[10, 11, 12])
+
+        df3 = pd.DataFrame({"A": [2, 3], "B": [5, 6], "C": [7, 8]}, index=[1, 2])
+        df_inner = models.Rankings.merge_preserve_left_index(df1, df2, on="B", how="inner")
+        assert df3.equals(df_inner)
+
+        df4 = pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6], "C": [np.nan, 7, 8]}, index=[0, 1, 2])
+        df_left = models.Rankings.merge_preserve_left_index(df1, df2, on="B", how="left")
+        assert df4.equals(df_left)
+
+    def test_merge_preserve_left_none_name_index(self):
+        df1 = pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6]}, index=[0, 1, 2])
+        df2 = pd.DataFrame({"C": [7, 8, 9], "B": [5, 6, 22]}, index=[10, 11, 12])
+
+        df_inner = models.Rankings.merge_preserve_left_index(df1, df2, on="B", how="left")
+
+        assert df1.index.equals(df_inner.index)
+        assert df1.index.name == df_inner.index.name
