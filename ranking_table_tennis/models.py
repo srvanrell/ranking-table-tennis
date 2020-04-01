@@ -619,28 +619,22 @@ class Tournaments:
         """
         Return a DataFramey with the best round for each player and category. pid is assigned from players
         """
-        best_rounds = pd.DataFrame(columns=["name", "category", "best_round"])
+        matches = self.get_matches(tid, exclude_fan_category=False, to_exclude=("sanction", "promote"))
 
-        for match_id, match_row in self.tournaments_df[self.tournaments_df.tid == tid].iterrows():
-            # workaround to avoid promotion entries being considered as matches
-            if match_row.promote or match_row.sanction:
-                continue
+        # Filter matches to process so best rounds can be computed
+        translations = {"winner": "name", "loser": "name", "winner_pid": "pid", "loser_pid": "pid",
+                        "winner_round": "best_round", "loser_round": "best_round"}
+        winner_data = matches.loc[:, ["winner", "winner_pid", "category", "winner_round"]].rename(columns=translations)
+        loser_data = matches.loc[:, ["loser", "loser_pid", "category", "loser_round"]].rename(columns=translations)
+        rounds_data = pd.concat([winner_data, loser_data], ignore_index=True)
 
-            # finding best round per category of each player
-            for name, played_round in [(match_row.winner, match_row.winner_round),
-                                       (match_row.loser, match_row.loser_round)]:
+        # Assign priority to matches
+        rounds_data["round_priority"] = rounds_data.loc[:, "best_round"].map(best_rounds_priority.to_dict())
 
-                index_cat_name = (best_rounds.category == match_row.category) & (best_rounds.name == name)
-
-                if not best_rounds.loc[index_cat_name].empty:
-                    temp_best_round = best_rounds.loc[index_cat_name, "best_round"].iloc[0]
-                    if best_rounds_priority[temp_best_round] < best_rounds_priority[played_round]:
-                        best_rounds.loc[index_cat_name, "best_round"] = played_round
-                else:
-                    best_rounds = best_rounds.append({"name": name,
-                                                      "pid": players.get_pid(name),
-                                                      "category": match_row.category,
-                                                      "best_round": played_round}, ignore_index=True)
+        # Get best one for each player and category
+        rounds_data.sort_values(by="round_priority", ascending=False, inplace=True)
+        best_rounds = rounds_data.groupby(by=["category", "pid"]).head(1).drop(columns="round_priority")
+        best_rounds = best_rounds.sort_values(by=["category", "pid"]).reset_index(drop=True)
 
         return best_rounds
 
