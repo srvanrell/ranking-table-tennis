@@ -77,12 +77,12 @@ for tid in tournaments:
             retrieve = input("press Enter to continue or Kill this process to forget last player data\n")
             utils.save_temp_players_ranking(players_temp, ranking_temp)
 
-    # Get the best round for each player in each category
-    tournaments.assign_pid_from_players(players)
-    best_rounds = tournaments.compute_best_rounds(tid, players)
+# Get the best round for each player in each category
+tournaments.assign_pid_from_players(players)
 
-    # Log current tournament as the last played tournament
-    # Also, best rounds reached in each category are saved into corresponding history
+for tid in tournaments:
+    best_rounds = tournaments.compute_best_rounds(tid, players)
+    # Best rounds reached in each category are saved into corresponding history
     players.update_histories(tid, best_rounds)
 
 # Update the online version

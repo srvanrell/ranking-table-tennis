@@ -77,5 +77,3 @@ Upload to PyPI
 Upload to TestPyPI
 
     twine upload --repository-url https://test.pypi.org/legacy/ dist/*
-
-
