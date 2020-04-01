@@ -1,7 +1,6 @@
 import os
 from ranking_table_tennis import models
 from ranking_table_tennis.models import cfg
-from openpyxl import load_workbook
 from openpyxl.styles import Font, Alignment
 import pandas as pd
 import pickle
@@ -18,28 +17,6 @@ def get_tournament_sheet_names_ordered():
     sheet_names = [s for s in df_tournaments.keys() if filter_key in s]
 
     return sorted(sheet_names)
-
-
-def load_sheet_workbook(filename, sheetname, first_row=1):
-    print(">Reading\t", sheetname, "\tfrom\t", filename)
-    wb = load_workbook(filename, read_only=True)
-    ws = wb.get_sheet_by_name(sheetname)
-
-    ws.calculate_dimension(force=True)
-
-    list_to_return = []
-    for row in ws.rows:
-        aux_row = []
-        empty_row = True
-        for cell in row:
-            if cell.value is None:
-                aux_row.append("")
-            else:
-                empty_row = False
-                aux_row.append(cell.value)
-        if not empty_row:
-            list_to_return.append(aux_row[:ws.max_column])
-    return list_to_return[first_row:]
 
 
 def _bold_and_center(ws, to_bold, to_center):
@@ -293,8 +270,9 @@ def publish_histories_sheet(tournaments, rankings, players, tid, prev_tid, uploa
     sheet_name = cfg["sheetname"]["histories"]
 
     history_df = players.history_df.copy()
-    # Add name of players to a column
-    history_df.loc[:, "name"] = history_df.loc[:, "pid"].apply(lambda pid: players[pid]["name"])
+
+    # Match pid to get player's metadata into new columns of history_df
+    history_df = pd.merge(history_df, players.players_df, on="pid")
     # Sort histories by name, category and tid
     history_df = history_df.sort_values(["name", "category", "tid"], ascending=[True, False, True])
     # Remove repeated strings to show a cleaner sheet
@@ -322,11 +300,6 @@ def publish_rating_details_sheet(tournaments, rankings, players, tid, prev_tid, 
     xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"].replace("NN", tid)
 
     rating_details = rankings.get_rating_details(tid)
-
-    rating_details.insert(4, "winner_rating", rating_details.loc[:, "winner_pid"].apply(
-        lambda pid: rankings[prev_tid, pid, "rating"]))
-    rating_details.insert(4, "loser_rating", rating_details.loc[:, "loser_pid"].apply(
-        lambda pid: rankings[prev_tid, pid, "rating"]))
 
     rating_details.insert(4, "winner_name_rating", rating_details.apply(
         lambda row: f"{row['winner']} ({row['winner_rating']:.0f})", axis="columns"))

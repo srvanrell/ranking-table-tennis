@@ -68,4 +68,7 @@ docs/_build/
 # PyBuilder
 target/
 /data_rtt/
+/tests/data_rtt/config
 /dist/
+/Pipfile
+/Pipfile.lock
