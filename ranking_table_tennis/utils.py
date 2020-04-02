@@ -278,14 +278,11 @@ def publish_rating_details_sheet(tournaments, rankings, players, tid, prev_tid, 
 
     xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"].replace("NN", tid)
 
-    rating_details = rankings.get_rating_details(tid)
+    details = rankings.get_rating_details(tid)
 
-    rating_details.insert(4, "winner_name_rating", rating_details.apply(
-        lambda row: f"{row['winner']} ({row['winner_rating']:.0f})", axis="columns"))
-    rating_details.insert(4, "loser_name_rating", rating_details.apply(
-        lambda row: f"{row['loser']} ({row['loser_rating']:.0f})", axis="columns"))
-    rating_details.insert(4, "diff_rating", rating_details.apply(
-        lambda row: f"{row['winner_rating'] - row['loser_rating']:.0f}", axis="columns"))
+    details["winner_name_rating"] = details['winner'] + " (" + details['winner_rating'].astype(int).astype(str) + ")"
+    details["loser_name_rating"] = details['loser'] + " (" + details['loser_rating'].astype(int).astype(str) + ")"
+    details["diff_rating"] = (details['winner_rating'] - details['loser_rating']).astype(int).astype(str)
 
     to_bold = ["A1", "A2", "A3",
                "A4", "B4", "C4", "D4", "E4", "F4", "G4"]
@@ -296,7 +293,7 @@ def publish_rating_details_sheet(tournaments, rankings, players, tid, prev_tid, 
                                                   "Round", "Category"]]
         columns = ["winner_name_rating", "loser_name_rating", "diff_rating", "rating_to_winner", "rating_to_loser",
                    "round", "category"]
-        rating_details.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=columns)
+        details.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=columns)
 
         # publish and format tournament metadata
         ws = writer.book[sheet_name]
