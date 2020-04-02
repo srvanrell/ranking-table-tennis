@@ -507,16 +507,14 @@ def load_temp_players_ranking():
     ranking_temp_file = os.path.join(cfg["io"]["data_folder"], cfg["io"]["ranking_temp_file"])
 
     if os.path.exists(players_temp_file):
-        with open(players_temp_file, 'rb') as f:
-            print(">Reading\t Temp player list\tResume preprocessing from", players_temp_file)
-            players_temp = pickle.load(f)
+        players_temp = load_from_pickle(players_temp_file)
+        print("Resume preprocessing...")
     else:
         players_temp = models.Players()
 
     if os.path.exists(ranking_temp_file):
-        with open(ranking_temp_file, 'rb') as f:
-            print(">Reading\t Temp ranking list\tResume preprocessing from", ranking_temp_file)
-            ranking_temp = pickle.load(f)
+        ranking_temp = load_from_pickle(ranking_temp_file)
+        print("Resume preprocessing...")
     else:
         ranking_temp = models.Rankings()
 
