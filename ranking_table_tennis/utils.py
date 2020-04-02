@@ -193,14 +193,6 @@ def _get_writer(xlsx_filename, sheet_name):
     return writer
 
 
-def _add_players_metadata_columns(this_ranking, players):
-    """Adds name, city, and affiliation columns to this_ranking. Info is taken from players"""
-    # Format data and columns to write into the file
-    this_ranking.insert(3, "name", this_ranking.loc[:, "pid"].apply(lambda pid: players[pid]["name"]))
-    this_ranking.insert(4, "city", this_ranking.loc[:, "pid"].apply(lambda pid: players[pid]["city"]))
-    this_ranking.insert(5, "affiliation", this_ranking.loc[:, "pid"].apply(lambda pid: players[pid]["affiliation"]))
-
-
 def publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=False):
     """ Format a ranking to be published into a rating sheet
     """
@@ -210,32 +202,19 @@ def publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=F
     xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"].replace("NN", tid)
 
     # Rankings sorted by rating
-    sorted_rankings_df = rankings[tid].sort_values("rating", ascending=False)
-    prev_ranking = rankings[prev_tid]
+    this_ranking_df = rankings[tid].sort_values("rating", ascending=False)
+    prev_ranking_df = rankings[prev_tid]
 
     # Filter inactive players or players that didn't played any tournament
-    nonzero_points = sorted_rankings_df.loc[:, rankings.cum_points_cat_columns()].any(axis="columns")
-    sorted_rankings_df = sorted_rankings_df.loc[sorted_rankings_df.active | nonzero_points]
-    # TODO filter players that didn't played for a long time, can I use inactive players for that?
+    nonzero_points = this_ranking_df.loc[:, rankings.cum_points_cat_columns()].any(axis="columns")
+    this_ranking_df = this_ranking_df.loc[this_ranking_df.active | nonzero_points]
+    # FIXME there must be a special treatment for fan category
 
     # Format data and columns to write into the file
-    _add_players_metadata_columns(sorted_rankings_df, players)
-
-    sorted_rankings_df.insert(4, "prev rating", sorted_rankings_df.loc[:, "pid"].apply(
-        lambda pid: prev_ranking.loc[prev_ranking.pid == pid, "rating"].iat[0]))
-    sorted_rankings_df.insert(6, "formatted rating", sorted_rankings_df.apply(
-        lambda row: _format_diff(row['rating'], row['prev rating']), axis="columns"))
-
-    # FIXME there must be a special treatment for fan category
-    # for row in sorted(list_to_save, key=lambda l: l[1][0], reverse=True):
-    #     if row[1][0] < 0:
-    #         row[1] = "NA"  # FIXME should read the value from config
-
-    # for row in list_to_save:
-    #     # Do not publish ratings of fans category
-    #     if row[0] == models.categories[-1]:
-    #         # Bonus points are used for fans. Negative values keep fans category at the end
-    #         row[1] = (row[1][2]-100000, -1)
+    this_ranking_df = this_ranking_df.merge(players.players_df.loc[:, ["name", "city", "affiliation"]], on="pid")
+    this_ranking_df = this_ranking_df.merge(prev_ranking_df.loc[:, ["pid", "rating"]], on="pid", suffixes=("", "_prev"))
+    this_ranking_df.insert(6, "formatted rating", this_ranking_df.apply(
+        lambda row: _format_diff(row['rating'], row['rating_prev']), axis="columns"))
 
     to_bold = ["A1", "A2", "A3",
                "A4", "B4", "C4", "D4", "E4"]
@@ -244,7 +223,7 @@ def publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=F
     with _get_writer(xlsx_filename, sheet_name) as writer:
         headers = [cfg["labels"][key] for key in ["Category", "Rating", "Player", "City", "Association"]]
         columns = ["category", "formatted rating", "name", "city", "affiliation"]
-        sorted_rankings_df.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=columns)
+        this_ranking_df.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=columns)
 
         # publish and format tournament metadata
         ws = writer.book[sheet_name]
@@ -387,7 +366,7 @@ def publish_championship_sheets(tournaments, rankings, players, tid, prev_tid, u
     prev_ranking = rankings[prev_tid]
 
     # Format data and columns to write into the file
-    _add_players_metadata_columns(this_ranking, players)
+    this_ranking = this_ranking.merge(players.players_df.loc[:, ["name", "city", "affiliation"]], on="pid")
 
     to_bold = ["A1", "A2", "A3",
                "A4", "B4", "C4", "D4", "E4"]
