@@ -45,6 +45,8 @@ for tid in tournaments:
 
     # Get the best round for each player in each category
     best_rounds = tournaments.compute_best_rounds(tid, players)
+    # Best rounds reached in each category are saved into corresponding history
+    players.update_histories(tid, best_rounds)
 
     # List of players that didn't play its own category but plyed the higher one
     # Fans category is not considered in this list
