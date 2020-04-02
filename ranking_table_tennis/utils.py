@@ -399,10 +399,9 @@ def publish_championship_sheets(tournaments, rankings, players, tid, prev_tid, u
         criteria &= sorted_ranking[participations_col] == sorted_ranking[participations_col].shift(1)
         sorted_ranking.loc[criteria, "position"] = None  # Equivalent positions will be deleted to avoid misleading
 
-        sorted_ranking.insert(4, "prev " + point_col, sorted_ranking.loc[:, "pid"].apply(
-            lambda pid: prev_ranking.loc[prev_ranking.pid == pid, point_col].iat[0]))
+        sorted_ranking = sorted_ranking.merge(prev_ranking.loc[:, ["pid", point_col]], on="pid", suffixes=("", "_prev"))
         sorted_ranking.insert(6, "formatted points", sorted_ranking.apply(
-            lambda row: _format_diff(row[point_col], row["prev " + point_col]), axis="columns"))
+            lambda row: _format_diff(row[point_col], row[point_col + "_prev"]), axis="columns"))
         sorted_ranking.loc[:, selected_tids_col] = sorted_ranking.loc[:, selected_tids_col].str.replace(tid[:-3], "")
 
         replacements = {"participations": participations_col, "selected_tids": selected_tids_col}
