@@ -57,6 +57,8 @@ labels:
     Position: Posición
     Difference: Diferencia
     Selected Tournaments: Puntos sumados
+    Cumulated: Acumulado
+    By Tournament: Por Torneo
     Points CAT:
       - Puntos Primera
       - Puntos Segunda

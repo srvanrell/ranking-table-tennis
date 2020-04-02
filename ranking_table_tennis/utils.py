@@ -2,6 +2,7 @@ import os
 from ranking_table_tennis import models
 from ranking_table_tennis.models import cfg
 from openpyxl.styles import Font, Alignment
+from gspread.utils import rowcol_to_a1
 import pandas as pd
 import pickle
 
@@ -79,7 +80,7 @@ def upload_sheet_from_df(spreadsheet_id, sheet_name, df, headers, upload_index=F
         ws = d2g.upload(df, spreadsheet_id, sheet_name, row_names=upload_index, df_size=True, credentials=credentials)
 
         # Concatenation of header cells values to be updated in batch mode
-        cell_list = ws.range("A1:" + d2g.gspread.utils.rowcol_to_a1(row=1, col=len(headers)))
+        cell_list = ws.range("A1:" + rowcol_to_a1(row=1, col=len(headers)))
         for i, value in enumerate(headers):
             cell_list[i].value = value
         ws.update_cells(cell_list)
@@ -345,10 +346,15 @@ def publish_statistics_sheet(tournaments, rankings, players, tid, prev_tid, uplo
 
         ws = writer.book[sheet_name]
         ws.insert_rows(0, 1)
-        ws["B1"] = "Acumulado"  # FIXME this should be read from cfg
-        ws.merge_cells('B1:H1')
-        ws["I1"] = "Por torneo"  # FIXME this should be read from cfg
-        ws.merge_cells('I1:O1')
+
+        n_headers = len(headers)
+        starting_cell, ending_cell = rowcol_to_a1(row=1, col=2), rowcol_to_a1(row=1, col=n_headers / 2 + 1)
+        ws[starting_cell] = cfg["labels"]["Cumulated"]
+        ws.merge_cells(f'{starting_cell}:{ending_cell}')
+
+        starting_cell, ending_cell = rowcol_to_a1(row=1, col=n_headers / 2 + 2), rowcol_to_a1(row=1, col=n_headers + 1)
+        ws[starting_cell] = cfg["labels"]["By Tournament"]
+        ws.merge_cells(f'{starting_cell}:{ending_cell}')
 
     if upload:
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
