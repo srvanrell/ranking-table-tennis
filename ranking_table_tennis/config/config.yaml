@@ -35,7 +35,7 @@ labels:
     tid: ID Torneo
     pid: ID Jugador
     Player: Jugador
-    Association: Asociación
+    Association: Afiliación
     City: Ciudad
     Last Tournament: Último Torneo
     Championship Points: Puntos de Campeonato
@@ -59,6 +59,7 @@ labels:
     Selected Tournaments: Puntos sumados
     Cumulated: Acumulado
     By Tournament: Por Torneo
+    Factor: Factor
     Points CAT:
       - Puntos Primera
       - Puntos Segunda
