@@ -45,6 +45,8 @@ for tid in tournaments:
 
     # Get the best round for each player in each category
     best_rounds = tournaments.compute_best_rounds(tid, players)
+    # Best rounds reached in each category are saved into corresponding history
+    players.update_histories(tid, best_rounds)
 
     # List of players that didn't play its own category but plyed the higher one
     # Fans category is not considered in this list
@@ -56,17 +58,17 @@ for tid in tournaments:
                             and rankings[tid, pid, "category"] != models.categories[-1]]
 
     rankings.compute_new_ratings(tid, prev_tid, tournaments, pid_not_own_category)
-    assigned_points_per_best_round = rankings.compute_category_points(tid, best_rounds)
+    rankings.compute_category_points(tid, best_rounds)
 
     rankings.update_active_players(tid, players, initial_tid)
 
     # Promote those players indicated in the matches list of the tournament
+    # TODO I guess this has no effect because update categories is based on ratings
     rankings.promote_players(tid, tournaments)
 
     # Substract championship points
     rankings.apply_sanction(tid, tournaments)
 
-    # TODO verify if it is necessary
     rankings.update_categories()
     rankings.compute_championship_points(tid)
 

@@ -276,7 +276,7 @@ class Rankings:
                                   match["not_own_category"])
 
         to_winner, to_loser = factor * to_winner, factor * to_loser
-        match["rating_to_winner"], match["rating_to_loser"] = to_winner, -to_loser
+        match["rating_to_winner"], match["rating_to_loser"], match["factor"] = to_winner, -to_loser, factor
 
         return match
 
@@ -430,12 +430,12 @@ class Rankings:
             self[tid, match.winner_pid, "category"] = match.category
             print(match.winner, "promoted to", match.category)
 
-    def apply_sanction(self, new_tid, tournaments):
-        tournament_df = tournaments[new_tid]
+    def apply_sanction(self, tid, tournaments):
+        tournament_df = tournaments[tid]
         for match_index, match in tournament_df[tournament_df.sanction].iterrows():
             for cat_col in self.points_cat_columns():
-                self[new_tid, match.loser_pid, cat_col] *= cfg["aux"]["sanction factor"]
-            print("Apply sanction on:\n", self[new_tid, match.loser_pid].pid)
+                self[tid, match.loser_pid, cat_col] *= cfg["aux"]["sanction factor"]
+            print("Apply sanction factor", cfg["aux"]["sanction factor"], "on:", match.winner)
 
     def get_rating_details(self, tid):
         return self.rating_details_df.loc[self.rating_details_df.tid == tid].copy()

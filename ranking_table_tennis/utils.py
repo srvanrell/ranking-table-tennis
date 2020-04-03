@@ -2,6 +2,7 @@ import os
 from ranking_table_tennis import models
 from ranking_table_tennis.models import cfg
 from openpyxl.styles import Font, Alignment
+from gspread.utils import rowcol_to_a1
 import pandas as pd
 import pickle
 
@@ -79,7 +80,7 @@ def upload_sheet_from_df(spreadsheet_id, sheet_name, df, headers, upload_index=F
         ws = d2g.upload(df, spreadsheet_id, sheet_name, row_names=upload_index, df_size=True, credentials=credentials)
 
         # Concatenation of header cells values to be updated in batch mode
-        cell_list = ws.range("A1:" + d2g.gspread.utils.rowcol_to_a1(row=1, col=len(headers)))
+        cell_list = ws.range("A1:" + rowcol_to_a1(row=1, col=len(headers)))
         for i, value in enumerate(headers):
             cell_list[i].value = value
         ws.update_cells(cell_list)
@@ -193,14 +194,6 @@ def _get_writer(xlsx_filename, sheet_name):
     return writer
 
 
-def _add_players_metadata_columns(this_ranking, players):
-    """Adds name, city, and affiliation columns to this_ranking. Info is taken from players"""
-    # Format data and columns to write into the file
-    this_ranking.insert(3, "name", this_ranking.loc[:, "pid"].apply(lambda pid: players[pid]["name"]))
-    this_ranking.insert(4, "city", this_ranking.loc[:, "pid"].apply(lambda pid: players[pid]["city"]))
-    this_ranking.insert(5, "affiliation", this_ranking.loc[:, "pid"].apply(lambda pid: players[pid]["affiliation"]))
-
-
 def publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=False):
     """ Format a ranking to be published into a rating sheet
     """
@@ -210,32 +203,19 @@ def publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=F
     xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"].replace("NN", tid)
 
     # Rankings sorted by rating
-    sorted_rankings_df = rankings[tid].sort_values("rating", ascending=False)
-    prev_ranking = rankings[prev_tid]
+    this_ranking_df = rankings[tid].sort_values("rating", ascending=False)
+    prev_ranking_df = rankings[prev_tid]
 
     # Filter inactive players or players that didn't played any tournament
-    nonzero_points = sorted_rankings_df.loc[:, rankings.cum_points_cat_columns()].any(axis="columns")
-    sorted_rankings_df = sorted_rankings_df.loc[sorted_rankings_df.active | nonzero_points]
-    # TODO filter players that didn't played for a long time, can I use inactive players for that?
+    nonzero_points = this_ranking_df.loc[:, rankings.cum_points_cat_columns()].any(axis="columns")
+    this_ranking_df = this_ranking_df.loc[this_ranking_df.active | nonzero_points]
+    # FIXME there must be a special treatment for fan category
 
     # Format data and columns to write into the file
-    _add_players_metadata_columns(sorted_rankings_df, players)
-
-    sorted_rankings_df.insert(4, "prev rating", sorted_rankings_df.loc[:, "pid"].apply(
-        lambda pid: prev_ranking.loc[prev_ranking.pid == pid, "rating"].iat[0]))
-    sorted_rankings_df.insert(6, "formatted rating", sorted_rankings_df.apply(
-        lambda row: _format_diff(row['rating'], row['prev rating']), axis="columns"))
-
-    # FIXME there must be a special treatment for fan category
-    # for row in sorted(list_to_save, key=lambda l: l[1][0], reverse=True):
-    #     if row[1][0] < 0:
-    #         row[1] = "NA"  # FIXME should read the value from config
-
-    # for row in list_to_save:
-    #     # Do not publish ratings of fans category
-    #     if row[0] == models.categories[-1]:
-    #         # Bonus points are used for fans. Negative values keep fans category at the end
-    #         row[1] = (row[1][2]-100000, -1)
+    this_ranking_df = this_ranking_df.merge(players.players_df.loc[:, ["name", "city", "affiliation"]], on="pid")
+    this_ranking_df = this_ranking_df.merge(prev_ranking_df.loc[:, ["pid", "rating"]], on="pid", suffixes=("", "_prev"))
+    this_ranking_df.insert(6, "formatted rating", this_ranking_df.apply(
+        lambda row: _format_diff(row['rating'], row['rating_prev']), axis="columns"))
 
     to_bold = ["A1", "A2", "A3",
                "A4", "B4", "C4", "D4", "E4"]
@@ -244,7 +224,7 @@ def publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=F
     with _get_writer(xlsx_filename, sheet_name) as writer:
         headers = [cfg["labels"][key] for key in ["Category", "Rating", "Player", "City", "Association"]]
         columns = ["category", "formatted rating", "name", "city", "affiliation"]
-        sorted_rankings_df.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=columns)
+        this_ranking_df.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=columns)
 
         # publish and format tournament metadata
         ws = writer.book[sheet_name]
@@ -299,14 +279,12 @@ def publish_rating_details_sheet(tournaments, rankings, players, tid, prev_tid, 
 
     xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"].replace("NN", tid)
 
-    rating_details = rankings.get_rating_details(tid)
+    details = rankings.get_rating_details(tid)
 
-    rating_details.insert(4, "winner_name_rating", rating_details.apply(
-        lambda row: f"{row['winner']} ({row['winner_rating']:.0f})", axis="columns"))
-    rating_details.insert(4, "loser_name_rating", rating_details.apply(
-        lambda row: f"{row['loser']} ({row['loser_rating']:.0f})", axis="columns"))
-    rating_details.insert(4, "diff_rating", rating_details.apply(
-        lambda row: f"{row['winner_rating'] - row['loser_rating']:.0f}", axis="columns"))
+    details["winner_name_rating"] = details['winner'] + " (" + details['winner_rating'].astype(int).astype(str) + ")"
+    details["loser_name_rating"] = details['loser'] + " (" + details['loser_rating'].astype(int).astype(str) + ")"
+    details["diff_rating"] = (details['winner_rating'] - details['loser_rating']).astype(int).astype(str)
+    details["factor"] /= cfg["aux"]["rating factor"]
 
     to_bold = ["A1", "A2", "A3",
                "A4", "B4", "C4", "D4", "E4", "F4", "G4"]
@@ -314,10 +292,10 @@ def publish_rating_details_sheet(tournaments, rankings, players, tid, prev_tid, 
 
     with _get_writer(xlsx_filename, sheet_name) as writer:
         headers = [cfg["labels"][key] for key in ["Winner", "Loser", "Difference", "Winner Points", "Loser Points",
-                                                  "Round", "Category"]]
+                                                  "Round", "Category", "Factor"]]
         columns = ["winner_name_rating", "loser_name_rating", "diff_rating", "rating_to_winner", "rating_to_loser",
-                   "round", "category"]
-        rating_details.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=columns)
+                   "round", "category", "factor"]
+        details.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=columns)
 
         # publish and format tournament metadata
         ws = writer.book[sheet_name]
@@ -369,10 +347,15 @@ def publish_statistics_sheet(tournaments, rankings, players, tid, prev_tid, uplo
 
         ws = writer.book[sheet_name]
         ws.insert_rows(0, 1)
-        ws["B1"] = "Acumulado"  # FIXME this should be read from cfg
-        ws.merge_cells('B1:H1')
-        ws["I1"] = "Por torneo"  # FIXME this should be read from cfg
-        ws.merge_cells('I1:O1')
+
+        n_headers = len(headers)
+        starting_cell, ending_cell = rowcol_to_a1(row=1, col=2), rowcol_to_a1(row=1, col=n_headers / 2 + 1)
+        ws[starting_cell] = cfg["labels"]["Cumulated"]
+        ws.merge_cells(f'{starting_cell}:{ending_cell}')
+
+        starting_cell, ending_cell = rowcol_to_a1(row=1, col=n_headers / 2 + 2), rowcol_to_a1(row=1, col=n_headers + 1)
+        ws[starting_cell] = cfg["labels"]["By Tournament"]
+        ws.merge_cells(f'{starting_cell}:{ending_cell}')
 
     if upload:
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
@@ -387,7 +370,7 @@ def publish_championship_sheets(tournaments, rankings, players, tid, prev_tid, u
     prev_ranking = rankings[prev_tid]
 
     # Format data and columns to write into the file
-    _add_players_metadata_columns(this_ranking, players)
+    this_ranking = this_ranking.merge(players.players_df.loc[:, ["name", "city", "affiliation"]], on="pid")
 
     to_bold = ["A1", "A2", "A3",
                "A4", "B4", "C4", "D4", "E4"]
@@ -417,10 +400,9 @@ def publish_championship_sheets(tournaments, rankings, players, tid, prev_tid, u
         criteria &= sorted_ranking[participations_col] == sorted_ranking[participations_col].shift(1)
         sorted_ranking.loc[criteria, "position"] = None  # Equivalent positions will be deleted to avoid misleading
 
-        sorted_ranking.insert(4, "prev " + point_col, sorted_ranking.loc[:, "pid"].apply(
-            lambda pid: prev_ranking.loc[prev_ranking.pid == pid, point_col].iat[0]))
+        sorted_ranking = sorted_ranking.merge(prev_ranking.loc[:, ["pid", point_col]], on="pid", suffixes=("", "_prev"))
         sorted_ranking.insert(6, "formatted points", sorted_ranking.apply(
-            lambda row: _format_diff(row[point_col], row["prev " + point_col]), axis="columns"))
+            lambda row: _format_diff(row[point_col], row[point_col + "_prev"]), axis="columns"))
         sorted_ranking.loc[:, selected_tids_col] = sorted_ranking.loc[:, selected_tids_col].str.replace(tid[:-3], "")
 
         replacements = {"participations": participations_col, "selected_tids": selected_tids_col}
@@ -526,16 +508,14 @@ def load_temp_players_ranking():
     ranking_temp_file = os.path.join(cfg["io"]["data_folder"], cfg["io"]["ranking_temp_file"])
 
     if os.path.exists(players_temp_file):
-        with open(players_temp_file, 'rb') as f:
-            print(">Reading\t Temp player list\tResume preprocessing from", players_temp_file)
-            players_temp = pickle.load(f)
+        players_temp = load_from_pickle(players_temp_file)
+        print("Resume preprocessing...")
     else:
         players_temp = models.Players()
 
     if os.path.exists(ranking_temp_file):
-        with open(ranking_temp_file, 'rb') as f:
-            print(">Reading\t Temp ranking list\tResume preprocessing from", ranking_temp_file)
-            ranking_temp = pickle.load(f)
+        ranking_temp = load_from_pickle(ranking_temp_file)
+        print("Resume preprocessing...")
     else:
         ranking_temp = models.Rankings()
 
