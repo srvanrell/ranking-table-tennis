@@ -284,6 +284,7 @@ def publish_rating_details_sheet(tournaments, rankings, players, tid, prev_tid, 
     details["winner_name_rating"] = details['winner'] + " (" + details['winner_rating'].astype(int).astype(str) + ")"
     details["loser_name_rating"] = details['loser'] + " (" + details['loser_rating'].astype(int).astype(str) + ")"
     details["diff_rating"] = (details['winner_rating'] - details['loser_rating']).astype(int).astype(str)
+    details["factor"] /= 2  # FIXME this should be corrected on the tables
 
     to_bold = ["A1", "A2", "A3",
                "A4", "B4", "C4", "D4", "E4", "F4", "G4"]
@@ -291,9 +292,9 @@ def publish_rating_details_sheet(tournaments, rankings, players, tid, prev_tid, 
 
     with _get_writer(xlsx_filename, sheet_name) as writer:
         headers = [cfg["labels"][key] for key in ["Winner", "Loser", "Difference", "Winner Points", "Loser Points",
-                                                  "Round", "Category"]]
+                                                  "Round", "Category"]] + ["Factor"]
         columns = ["winner_name_rating", "loser_name_rating", "diff_rating", "rating_to_winner", "rating_to_loser",
-                   "round", "category"]
+                   "round", "category", "factor"]
         details.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=columns)
 
         # publish and format tournament metadata

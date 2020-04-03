@@ -276,7 +276,7 @@ class Rankings:
                                   match["not_own_category"])
 
         to_winner, to_loser = factor * to_winner, factor * to_loser
-        match["rating_to_winner"], match["rating_to_loser"] = to_winner, -to_loser
+        match["rating_to_winner"], match["rating_to_loser"], match["factor"] = to_winner, -to_loser, factor
 
         return match
 
