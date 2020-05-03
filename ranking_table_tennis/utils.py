@@ -74,7 +74,7 @@ def save_players_sheet(players, upload=False):
 def upload_sheet_from_df(spreadsheet_id, sheet_name, df, headers, upload_index=False):
     """ Saves headers and df data into given sheet_name.
         If sheet_name does not exist, it will be created. """
-    print("<<<Saving\t", sheet_name, "\tin\t", spreadsheet_id)
+    print("<<<Saving", sheet_name, "in", spreadsheet_id, sep="\t")
     try:
         credentials = get_credentials()
         ws = d2g.upload(df, spreadsheet_id, sheet_name, row_names=upload_index, df_size=True, credentials=credentials)
@@ -86,13 +86,13 @@ def upload_sheet_from_df(spreadsheet_id, sheet_name, df, headers, upload_index=F
         ws.update_cells(cell_list)
 
     except FileNotFoundError:
-        print("<<<FAILED to upload\t", sheet_name, "\tin\t", spreadsheet_id)
+        print("<<<FAILED to upload", sheet_name, "in", spreadsheet_id, sep="\t")
 
 
 def load_players_sheet():
     tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
     players_df = pd.read_excel(tournaments_xlsx, sheet_name=cfg["sheetname"]["players"], header=0)
-    print(">Reading\t", cfg["sheetname"]["players"], "\tfrom\t", tournaments_xlsx)
+    print("> Reading", cfg["sheetname"]["players"], "from", tournaments_xlsx, sep="\t")
 
     players_df.rename(columns={cfg["labels"]["pid"]: "pid",
                                cfg["labels"]["Player"]: "name",
@@ -108,7 +108,7 @@ def load_players_sheet():
 def load_initial_ranking_sheet():
     tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
     initial_ranking_df = pd.read_excel(tournaments_xlsx, sheet_name=cfg["sheetname"]["initial_ranking"], header=0)
-    print(">Reading\t", cfg["sheetname"]["initial_ranking"], "\tfrom\t", tournaments_xlsx)
+    print("> Reading", cfg["sheetname"]["initial_ranking"], "from", tournaments_xlsx, sep="\t")
 
     columns_translations = {cfg["labels"]["tid"]: "tid", cfg["labels"]["Tournament name"]: "tournament_name",
                             cfg["labels"]["Date"]: "date", cfg["labels"]["Location"]: "location",
@@ -132,7 +132,7 @@ def load_tournaments_sheets():
 
     to_concat = []
     for sheet_name in sheet_names:
-        print(">Reading\t", sheet_name, "\tfrom\t", tournaments_xlsx)
+        print("> Reading", sheet_name, "from", tournaments_xlsx, sep="\t")
         raw_tournament = raw_tournaments[sheet_name]
 
         tournament_df = raw_tournament.iloc[5:].copy()
@@ -189,7 +189,7 @@ def _get_writer(xlsx_filename, sheet_name):
     writer = pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode=_get_writer_mode(xlsx_filename))
     if sheet_name in writer.book.sheetnames:
         writer.book.remove(writer.book[sheet_name])
-    print("<<<Saving\t", sheet_name, "\tin\t", xlsx_filename)
+    print("<<<Saving", sheet_name, "in", xlsx_filename, sep="\t")
 
     return writer
 
@@ -457,7 +457,7 @@ def _get_gc():
 
 
 def load_and_upload_sheet(filename, sheet_name, spreadsheet_id):
-    print("<<<Saving\t", sheet_name, "\tin\t", spreadsheet_id)
+    print("<<<Saving", sheet_name, "in", spreadsheet_id, sep="\t")
     credentials = get_credentials()
     df = pd.read_excel(filename, sheet_name, index_col=None, header=None, na_filter=False)
     d2g.upload(df, spreadsheet_id, sheet_name, row_names=False, col_names=False, df_size=True, credentials=credentials)
@@ -490,9 +490,9 @@ def create_n_tour_sheet(spreadsheet_id, tid):
             dup_ws = wb.duplicate_sheet(ws.id, new_sheet_name=new_sheetname)
             dup_cell_value = dup_ws.acell('A1', value_render_option='FORMULA').value
             dup_ws.update_acell('A1', dup_cell_value.replace(first_key, replacement_key))
-            print("<<<Creating\t", new_sheetname, "\tfrom\t", sheetname, "\tin\t", spreadsheet_id)
+            print("<<<Creating", new_sheetname, "from", sheetname, "in", spreadsheet_id, sep="\t")
         else:
-            print("FAILED TO DUPLICATE\t", first_key, "\t do not exist in\t", spreadsheet_id)
+            print("FAILED TO DUPLICATE", first_key, "do not exist in", spreadsheet_id, sep="\t")
 
 
 def publish_to_web(tid, show_on_web=False):
@@ -550,13 +550,13 @@ def save_to_pickle(players=None, rankings=None, tournaments=None):
     objects_filenames = [(obj, fn) for obj, fn in zip(objects, filenames) if obj]
 
     for obj, fn in objects_filenames:
-        print(f'<<<Saving\t{fn}\tin\t{cfg["io"]["data_folder"]}')
+        print('<<<Saving', fn, 'in', cfg["io"]["data_folder"], sep="\t")
         with open(os.path.join(cfg["io"]["data_folder"], fn), 'wb') as fo:
             pickle.dump(obj, fo, pickle.HIGHEST_PROTOCOL)
 
 
 def load_from_pickle(filename):
-    print(f'>>>Loading\t{filename}\tfrom\t{cfg["io"]["data_folder"]}')
+    print('>>>Loading', filename, 'from', cfg["io"]["data_folder"], sep="\t")
     with open(os.path.join(cfg["io"]["data_folder"], filename), 'rb') as fo:
         obj = pickle.load(fo)
 
