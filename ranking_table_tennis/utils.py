@@ -2,6 +2,7 @@ import os
 from ranking_table_tennis import models
 from ranking_table_tennis.models import cfg
 from openpyxl.styles import Font, Alignment
+import gspread
 from gspread.utils import rowcol_to_a1
 import pandas as pd
 import pickle
@@ -447,7 +448,7 @@ def _get_gc():
     gc = None
     try:
         credentials = get_credentials()
-        gc = d2g.gspread.authorize(credentials)
+        gc = gspread.authorize(credentials)
     except FileNotFoundError:
         print("The .json key file has not been configured. Upload will fail.")
     except OSError:
