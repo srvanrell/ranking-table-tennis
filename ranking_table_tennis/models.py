@@ -1,5 +1,5 @@
 import os
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Iterator
 
 import yaml
 from unidecode import unidecode  # type: ignore
@@ -39,7 +39,7 @@ categories = list(best_rounds_points.columns)
 
 
 class Players:
-    def __init__(self, players_df: pd.DataFrame = None, history_df: pd.DataFrame = None):
+    def __init__(self, players_df: pd.DataFrame = None, history_df: pd.DataFrame = None) -> None:
         """
         Create a players database from given players DataFrame
         :param players_df: DataFrame with columns: pid, name, affiliation, city, and history
@@ -51,16 +51,16 @@ class Players:
 
         self.verify_and_normalize()
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.players_df)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.players_df)
 
-    def __getitem__(self, pid: int):
+    def __getitem__(self, pid: int) -> pd.Series:
         return self.players_df.loc[pid]
 
-    def verify_and_normalize(self):
+    def verify_and_normalize(self) -> None:
         duplicated = self.players_df.index.duplicated(keep=False)
         if duplicated.any():
             print("Players entries duplicated")
@@ -76,7 +76,7 @@ class Players:
         self.players_df.loc[:, cols_to_title] = self.players_df.loc[:, cols_to_title].applymap(
             lambda cell: unidecode(cell).strip().title())
 
-    def get_pid(self, name: str):
+    def get_pid(self, name: str) -> int:
         uname = unidecode(name).title()
         pid = self.players_df[self.players_df.name == uname].first_valid_index()
         if pid is None:
@@ -84,23 +84,23 @@ class Players:
 
         return pid
 
-    def get_name2pid(self):
+    def get_name2pid(self) -> pd.Series:
         name2pid = self.players_df.loc[:, 'name'].copy()
         name2pid = name2pid.reset_index()
         name2pid.set_index("name", inplace=True)
 
         return name2pid.loc[:, "pid"]
 
-    def add_player(self, player):
+    def add_player(self, player: pd.Series) -> None:
         self.players_df = self.players_df.append(player)
         self.verify_and_normalize()
 
-    def add_new_player(self, name: str, affiliation: str = "", city: str = ""):
+    def add_new_player(self, name: str, affiliation: str = "", city: str = "") -> None:
         pid = self.players_df.index.max() + 1
         self.players_df.loc[pid] = {"name": name, "affiliation": affiliation, "city": city}
         self.verify_and_normalize()
 
-    def update_histories(self, tid: str, best_rounds: pd.DataFrame):
+    def update_histories(self, tid: str, best_rounds: pd.DataFrame) -> None:
         """ Save player's best rounds into their histories.
 
         Each history is a string that can be read as a dict with (category, tournament_id) as key.
@@ -109,7 +109,7 @@ class Players:
                      for row_id, row in best_rounds.iterrows()]
         self.history_df = self.history_df.append(to_update, ignore_index=True)
 
-    def played_tournaments(self, pid: int):
+    def played_tournaments(self, pid: int) -> List[str]:
         """ Return sorted list of played tournaments. Empty history will result in an empty list. """
         tids = self.history_df.loc[self.history_df.pid == float(pid), "tid"]
         if not tids.empty:
@@ -127,10 +127,10 @@ class Rankings:
         self.championship_details_df = pd.DataFrame()
         self.verify_and_normalize()
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.ranking_df)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.ranking_df)
 
     def __getitem__(self, tidpidcol):
@@ -161,7 +161,7 @@ class Rankings:
     def participations_cat_columns() -> List[str]:
         return ["participations_cat_%d" % d for d, _ in enumerate(categories, 1)]
 
-    def get_entries(self, tid: str, pid: int = None, col=None):
+    def get_entries(self, tid: str, pid: int = None, col: str = None):
         entries_indexes = self.ranking_df.tid == tid
 
         if pid:
@@ -177,7 +177,7 @@ class Rankings:
         if entries_indexes.any():
             return self.ranking_df.loc[entries_indexes]
 
-    def add_entry(self, ranking_entry):
+    def add_entry(self, ranking_entry: pd.Series) -> None:
         self.ranking_df = self.ranking_df.append(ranking_entry)
         self.verify_and_normalize()
 
@@ -483,7 +483,7 @@ class Rankings:
 
 
 class Tournaments:
-    def __init__(self, tournaments_df: pd.DataFrame = None):
+    def __init__(self, tournaments_df: pd.DataFrame = None) -> None:
         """
         Create a tournaments database from given tournaments DataFrame.
         Verification and normalization is performed on loading.
@@ -509,22 +509,22 @@ class Tournaments:
 
         self.verify_and_normalize()
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.tournaments_df)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.tournaments_df)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[str]:
         grouped = self.tournaments_df.groupby("tid").groups.keys()
         return iter(grouped)
 
-    def __getitem__(self, tid: str):
+    def __getitem__(self, tid: str) -> pd.DataFrame:
         criteria = self.tournaments_df.tid == tid
         return self.tournaments_df.loc[criteria].copy()
 
     @staticmethod
-    def _process_match(match_row):
+    def _process_match(match_row: pd.Series) -> pd.Series:
         # workaround to add extra bonus points from match list
         match_row["winner"] = match_row["player_b"]
         match_row["loser"] = match_row["player_b"]
@@ -557,7 +557,7 @@ class Tournaments:
 
         return match_row
 
-    def _assign_tid(self):
+    def _assign_tid(self) -> None:
         def tid_str(grp):
             dates_ordered = sorted(grp["date"].unique())
             numbered = {pd.Timestamp(date): num for num, date in enumerate(dates_ordered, 1)}
@@ -568,7 +568,7 @@ class Tournaments:
         tid = self.tournaments_df.groupby("year", as_index=False, group_keys=False).apply(tid_str)
         self.tournaments_df["tid"] = tid.transpose()
 
-    def verify_and_normalize(self):
+    def verify_and_normalize(self) -> None:
         cols_to_lower = ["round", "category"]
         self.tournaments_df.loc[:, cols_to_lower] = self.tournaments_df.loc[:, cols_to_lower].applymap(
             lambda cell: cell.strip().lower())
@@ -585,7 +585,7 @@ class Tournaments:
         self._assign_tid()
         self.tournaments_df = self.tournaments_df.apply(self._process_match, axis="columns")
 
-    def get_players_names(self, tid: str, category: str = ''):
+    def get_players_names(self, tid: str, category: str = '') -> List[str]:
         """
         Return a sorted list of players that played the tournament
 
@@ -601,7 +601,7 @@ class Tournaments:
 
         return sorted(list(all_players))
 
-    def get_players_pids(self, tid: str, category: str = ''):
+    def get_players_pids(self, tid: str, category: str = '') -> List[int]:
         """
         Return a list of pid players that played the tournament
 
@@ -617,7 +617,7 @@ class Tournaments:
 
         return sorted(list(all_players))
 
-    def compute_best_rounds(self, tid: str, players):
+    def compute_best_rounds(self, tid: str, players: Players) -> pd.DataFrame:
         """
         Return a DataFramey with the best round for each player and category. pid is assigned from players
         """
@@ -640,12 +640,12 @@ class Tournaments:
 
         return best_rounds
 
-    def assign_pid_from_players(self, players):
+    def assign_pid_from_players(self, players: Players) -> None:
         name2pid = players.get_name2pid()
         self.tournaments_df["winner_pid"] = self.tournaments_df["winner"].apply(lambda name: name2pid[name])
         self.tournaments_df["loser_pid"] = self.tournaments_df["loser"].apply(lambda name: name2pid[name])
 
-    def get_matches(self, tid: str, exclude_fan_category: bool = True, to_exclude: List[str] = None):
+    def get_matches(self, tid: str, exclude_fan_category: bool = True, to_exclude: List[str] = None) -> pd.DataFrame:
         if to_exclude is None:
             to_exclude = ["sanction", "promote", "bonus"]
         entries_indexes = (self.tournaments_df.loc[:, "tid"] == tid)
