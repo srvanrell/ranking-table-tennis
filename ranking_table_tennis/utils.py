@@ -1,13 +1,13 @@
 import os
 from ranking_table_tennis import models
 from ranking_table_tennis.models import cfg
-from openpyxl.styles import Font, Alignment
-import gspread
-from gspread.utils import rowcol_to_a1
-import pandas as pd
+from openpyxl.styles import Font, Alignment  # type: ignore
+import gspread  # type: ignore
+from gspread.utils import rowcol_to_a1  # type: ignore
+import pandas as pd  # type: ignore
 import pickle
 
-from df2gspread import df2gspread as d2g
+from df2gspread import df2gspread as d2g  # type: ignore
 
 __author__ = 'sebastian'
 
@@ -31,7 +31,7 @@ def _bold_and_center(ws, to_bold, to_center):
         cell.alignment = Alignment(horizontal='center')
 
 
-def save_ranking_sheet(tid, tournaments, rankings, players, upload=False):
+def save_ranking_sheet(tid: str, tournaments, rankings, players, upload=False):
     if tid == cfg["aux"]["initial tid"]:
         sheet_name = cfg["sheetname"]["initial_ranking"]
         xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
@@ -195,7 +195,7 @@ def _get_writer(xlsx_filename, sheet_name):
     return writer
 
 
-def publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=False):
+def publish_rating_sheet(tournaments, rankings, players, tid: str, prev_tid: str, upload=False):
     """ Format a ranking to be published into a rating sheet
     """
     sheet_name = tournaments[tid]["sheet_name"].iloc[0]
@@ -245,7 +245,7 @@ def _keep_name_new_row(df):
     return pd.concat([empty_row, df])
 
 
-def publish_histories_sheet(tournaments, rankings, players, tid, prev_tid, upload=False):
+def publish_histories_sheet(tournaments, rankings, players, tid: str, prev_tid: str, upload=False):
     """ Format histories to be published into a sheet"""
     xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"].replace("NN", tid)
     sheet_name = cfg["sheetname"]["histories"]
@@ -272,7 +272,7 @@ def publish_histories_sheet(tournaments, rankings, players, tid, prev_tid, uploa
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
 
-def publish_rating_details_sheet(tournaments, rankings, players, tid, prev_tid, upload):
+def publish_rating_details_sheet(tournaments, rankings, players, tid: str, prev_tid: str, upload):
     """Format and publish rating details of given tournament into a sheet"""
 
     sheet_name = tournaments[tid]["sheet_name"].iloc[0]
@@ -307,7 +307,7 @@ def publish_rating_details_sheet(tournaments, rankings, players, tid, prev_tid, 
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
 
-def publish_championship_details_sheet(tournaments, rankings, players, tid, prev_tid, upload):
+def publish_championship_details_sheet(tournaments, rankings, players, tid: str, prev_tid: str, upload):
     """Format and publish championship details of given tournament into sheets"""
 
     sheet_name = tournaments[tid]["sheet_name"].iloc[0]
@@ -335,7 +335,7 @@ def publish_championship_details_sheet(tournaments, rankings, players, tid, prev
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
 
-def publish_statistics_sheet(tournaments, rankings, players, tid, prev_tid, upload=False):
+def publish_statistics_sheet(tournaments, rankings, players, tid: str, prev_tid: str, upload=False):
     """ Copy details from log and output details of given tournament"""
     xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"].replace("NN", tid)
     sheet_name = cfg["sheetname"]["statistics_key"]
@@ -362,7 +362,7 @@ def publish_statistics_sheet(tournaments, rankings, players, tid, prev_tid, uplo
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
 
-def publish_championship_sheets(tournaments, rankings, players, tid, prev_tid, upload=False):
+def publish_championship_sheets(tournaments, rankings, players, tid: str, prev_tid: str, upload=False):
     """Publish championship sheets, per category"""
     xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"].replace("NN", tid)
 
@@ -424,7 +424,7 @@ def publish_championship_sheets(tournaments, rankings, players, tid, prev_tid, u
 def in_colab():
     # Verify if it is running on colab
     try:
-        import google.colab
+        import google.colab  # type: ignore
         _in_colab = True
     except:
         _in_colab = False
@@ -434,9 +434,9 @@ def in_colab():
 
 def get_credentials():
     if in_colab():
-        from google.colab import auth
+        from google.colab import auth  # type: ignore
         auth.authenticate_user()
-        from oauth2client.client import GoogleCredentials
+        from oauth2client.client import GoogleCredentials  # type: ignore
         credentials = GoogleCredentials.get_application_default()
     else:
         credentials = d2g.get_credentials()
@@ -464,7 +464,7 @@ def load_and_upload_sheet(filename, sheet_name, spreadsheet_id):
     d2g.upload(df, spreadsheet_id, sheet_name, row_names=False, col_names=False, df_size=True, credentials=credentials)
 
 
-def create_n_tour_sheet(spreadsheet_id, tid):
+def create_n_tour_sheet(spreadsheet_id, tid: str):
     """
     Create sheet corresponding to n_tour tournament by duplication of the first-tournament sheet.
     A new sheeet is created in given spreadsheet_id as follows:
@@ -496,7 +496,7 @@ def create_n_tour_sheet(spreadsheet_id, tid):
             print("FAILED TO DUPLICATE", first_key, "do not exist in", spreadsheet_id, sep="\t")
 
 
-def publish_to_web(tid, show_on_web=False):
+def publish_to_web(tid: str, show_on_web=False):
     if show_on_web:
         for spreadsheet_id in cfg["io"]["published_on_web_spreadsheets_id"]:
             create_n_tour_sheet(spreadsheet_id, tid)
