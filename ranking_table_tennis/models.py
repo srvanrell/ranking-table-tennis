@@ -2,9 +2,9 @@ import os
 from typing import List, Tuple, Dict, Iterator
 
 import yaml
-from unidecode import unidecode  # type: ignore
+from unidecode import unidecode
 import shutil
-import pandas as pd  # type: ignore
+import pandas as pd
 
 
 # Loads some names from config.yaml
