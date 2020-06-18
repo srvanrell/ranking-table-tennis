@@ -118,7 +118,7 @@ class Players:
 
 
 class Rankings:
-    def __init__(self, ranking_df: pd.DataFrame = None):
+    def __init__(self, ranking_df: pd.DataFrame = None) -> None:
         all_columns = ["tid", "tournament_name", "date", "location", "pid", "rating", "category", "active"]
         all_columns += self.points_cat_columns() + self.cum_points_cat_columns() + self.participations_cat_columns()
         all_columns += self.cum_tids_cat_columns()
@@ -139,7 +139,7 @@ class Rankings:
         else:
             return self.get_entries(*tidpidcol)
 
-    def __setitem__(self, tidpidcol, value):
+    def __setitem__(self, tidpidcol: Tuple[str, int, str], value):
         tid, pid, col = tidpidcol
         entries_indexes = (self.ranking_df.tid == tid) & (self.ranking_df.pid == pid)
         self.ranking_df.loc[entries_indexes, col] = value
@@ -181,13 +181,14 @@ class Rankings:
         self.ranking_df = self.ranking_df.append(ranking_entry)
         self.verify_and_normalize()
 
-    def add_new_entry(self, tid: str, pid: int, initial_rating: float = -1000, active: bool = False, initial_category: str = ""):
+    def add_new_entry(self, tid: str, pid: int, initial_rating: float = -1000, active: bool = False,
+                      initial_category: str = "") -> None:
         self.ranking_df = self.ranking_df.append({"tid": tid, "pid": pid,  "rating": initial_rating, "active": active,
                                                   "category": initial_category}, ignore_index=True)
         self.verify_and_normalize()
         self.update_categories()
 
-    def verify_and_normalize(self):
+    def verify_and_normalize(self) -> None:
         duplicated = self.ranking_df.duplicated(["tid", "pid"], keep=False)
         if duplicated.any():
             print("Ranking entries duplicated")
@@ -209,7 +210,7 @@ class Rankings:
         self.ranking_df.fillna(value=default_values, inplace=True)
         self.ranking_df.date = pd.to_datetime(self.ranking_df.date)
 
-    def initialize_new_ranking(self, new_tid: str, prev_tid: str):
+    def initialize_new_ranking(self, new_tid: str, prev_tid: str) -> None:
         entries_indexes = self.ranking_df.tid == prev_tid
         new_ranking = self.ranking_df.loc[entries_indexes].copy()
         new_ranking.loc[:, "tid"] = new_tid
@@ -219,7 +220,7 @@ class Rankings:
         self.ranking_df = self.ranking_df.append(new_ranking, ignore_index=True)
 
     @staticmethod
-    def _rating_to_category(rating: float):
+    def _rating_to_category(rating: float) -> str:
         thresholds = cfg["aux"]["categories thresholds"]
         category = categories[-2]  # Last category that it's not fan
         for j, th in enumerate(thresholds):
@@ -228,7 +229,7 @@ class Rankings:
                 break
         return category
 
-    def update_categories(self):
+    def update_categories(self) -> None:
         """ Players are ranked based on rating and given thresholds.
 
         Players are ordered by rating and then assigned to a category
@@ -242,7 +243,7 @@ class Rankings:
         self.ranking_df.loc[:, "category"] = self.ranking_df.loc[:, "rating"].apply(self._rating_to_category)
 
     @staticmethod
-    def _points_to_assign(rating_winner: float, rating_loser: float):
+    def _points_to_assign(rating_winner: float, rating_loser: float) -> Tuple[float, float]:
         """Returns points to add to winner and to deduce from loser, given ratings of winner and loser."""
         rating_diff = rating_winner - rating_loser
 
@@ -254,10 +255,11 @@ class Rankings:
         # Select first row that is appropiate for given rating_diff
         diff_threshold, points_to_winner, points_to_loser = assignation_table[assignation_table[:, 0] > rating_diff][0]
 
-        return [points_to_winner, points_to_loser]
+        return points_to_winner, points_to_loser
 
     @staticmethod
-    def _get_factor(rating_winner: float, rating_loser: float, category_winner: str, category_loser: str, not_own_category):
+    def _get_factor(rating_winner: float, rating_loser: float, category_winner: str, category_loser: str,
+                    not_own_category: bool) -> float:
         """Returns factor for rating computation. It considers given winner and loser category.
         Players must play their own category """
         rating_diff = rating_winner - rating_loser
@@ -282,7 +284,8 @@ class Rankings:
 
         return match
 
-    def compute_new_ratings(self, new_tid: str, old_tid: str, tournaments, pid_not_own_category):
+    def compute_new_ratings(self, new_tid: str, old_tid: str, tournaments: Tournaments,
+                            pid_not_own_category: List[int]):
         """Compute ratings(new_tid) based on matches(new_tid) and ratings(old_tid).
         Details of rating changes per match are stored in rating_details_df.
         """
@@ -405,7 +408,7 @@ class Rankings:
 
         return active
 
-    def update_active_players(self, tid: str, players, initial_tid):
+    def update_active_players(self, tid: str, players, initial_tid: str):
         # Avoid activate or inactivate players after the first tournament.
         activate_window = cfg["aux"]["tournament window to activate"]
         inactivate_window = cfg["aux"]["tournament window to inactivate"]
@@ -423,26 +426,26 @@ class Rankings:
             self._activate_or_inactivate_player, axis="columns",
             args=(tids_list, active_window_tids, inactive_window_tids, players, initial_active_players))
 
-    def _get_tids_list(self):
+    def _get_tids_list(self) -> List[str]:
         return sorted(list(self.ranking_df.tid.unique()))
 
-    def promote_players(self, tid: str, tournaments):
+    def promote_players(self, tid: str, tournaments: Tournaments) -> None:
         tournament_df = tournaments[tid]
         for match_index, match in tournament_df[tournament_df.promote].iterrows():
             self[tid, match.winner_pid, "category"] = match.category
             print(match.winner, "promoted to", match.category)
 
-    def apply_sanction(self, tid: str, tournaments):
+    def apply_sanction(self, tid: str, tournaments: Tournaments) -> None:
         tournament_df = tournaments[tid]
         for match_index, match in tournament_df[tournament_df.sanction].iterrows():
             for cat_col in self.points_cat_columns():
                 self[tid, match.loser_pid, cat_col] *= cfg["aux"]["sanction factor"]
             print("Apply sanction factor", cfg["aux"]["sanction factor"], "on:", match.winner)
 
-    def get_rating_details(self, tid: str):
+    def get_rating_details(self, tid: str) -> pd.DataFrame:
         return self.rating_details_df.loc[self.rating_details_df.tid == tid].copy()
 
-    def get_championship_details(self, tid: str):
+    def get_championship_details(self, tid: str) -> pd.DataFrame:
         return self.championship_details_df.loc[self.championship_details_df.tid == tid].copy()
 
     @staticmethod
@@ -452,7 +455,7 @@ class Rankings:
 
         return pid_count
 
-    def get_statistics(self):
+    def get_statistics(self) -> pd.DataFrame:
         """
         Return a DataFrame that summarizes total and in each category participations:
         - the number of players that have participated up to tournament(tid)
