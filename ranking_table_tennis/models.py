@@ -284,7 +284,7 @@ class Rankings:
 
         return match
 
-    def compute_new_ratings(self, new_tid: str, old_tid: str, tournaments: Tournaments,
+    def compute_new_ratings(self, new_tid: str, old_tid: str, tournaments: "Tournaments",
                             pid_not_own_category: List[int]):
         """Compute ratings(new_tid) based on matches(new_tid) and ratings(old_tid).
         Details of rating changes per match are stored in rating_details_df.
@@ -429,13 +429,13 @@ class Rankings:
     def _get_tids_list(self) -> List[str]:
         return sorted(list(self.ranking_df.tid.unique()))
 
-    def promote_players(self, tid: str, tournaments: Tournaments) -> None:
+    def promote_players(self, tid: str, tournaments: "Tournaments") -> None:
         tournament_df = tournaments[tid]
         for match_index, match in tournament_df[tournament_df.promote].iterrows():
             self[tid, match.winner_pid, "category"] = match.category
             print(match.winner, "promoted to", match.category)
 
-    def apply_sanction(self, tid: str, tournaments: Tournaments) -> None:
+    def apply_sanction(self, tid: str, tournaments: "Tournaments") -> None:
         tournament_df = tournaments[tid]
         for match_index, match in tournament_df[tournament_df.sanction].iterrows():
             for cat_col in self.points_cat_columns():
