@@ -1,17 +1,20 @@
 import os
+from typing import List, Tuple, Any
+
 from ranking_table_tennis import models
 from ranking_table_tennis.models import cfg
 from openpyxl.styles import Font, Alignment
+import gspread
 from gspread.utils import rowcol_to_a1
 import pandas as pd
 import pickle
 
-from df2gspread import df2gspread as d2g
+from gspread_dataframe import set_with_dataframe
 
 __author__ = 'sebastian'
 
 
-def get_tournament_sheet_names_ordered():
+def get_tournament_sheet_names_ordered() -> List[str]:
     tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
     filter_key = cfg["sheetname"]["tournaments_key"]
     df_tournaments = pd.read_excel(tournaments_xlsx, sheet_name=None, header=None)
@@ -20,7 +23,7 @@ def get_tournament_sheet_names_ordered():
     return sorted(sheet_names)
 
 
-def _bold_and_center(ws, to_bold, to_center):
+def _bold_and_center(ws, to_bold: List[str], to_center: List[str]) -> None:
     """Bold and center cells in given worksheet (ws)"""
     for colrow in to_bold:
         cell = ws[colrow]
@@ -30,7 +33,8 @@ def _bold_and_center(ws, to_bold, to_center):
         cell.alignment = Alignment(horizontal='center')
 
 
-def save_ranking_sheet(tid, tournaments, rankings, players, upload=False):
+def save_ranking_sheet(tid: str, tournaments: models.Tournaments, rankings: models.Rankings, players: models.Players,
+                       upload: bool = False) -> None:
     if tid == cfg["aux"]["initial tid"]:
         sheet_name = cfg["sheetname"]["initial_ranking"]
         xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
@@ -56,7 +60,7 @@ def save_ranking_sheet(tid, tournaments, rankings, players, upload=False):
                              sorted_rankings_df.loc[:, columns], headers)
 
 
-def save_players_sheet(players, upload=False):
+def save_players_sheet(players: models.Players, upload=False) -> None:
     sorted_players_df = players.players_df.sort_values("name")
     xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
     sheet_name = cfg["sheetname"]["players"]
@@ -68,31 +72,52 @@ def save_players_sheet(players, upload=False):
     if upload:
         headers_df = [cfg["labels"]["pid"]] + headers
         upload_sheet_from_df(cfg["io"]["tournaments_spreadsheet_id"], cfg["sheetname"]["players"],
-                             sorted_players_df, headers_df, upload_index=True)  # index is pid
+                             sorted_players_df, headers_df, include_index=True)  # index is pid
 
 
-def upload_sheet_from_df(spreadsheet_id, sheet_name, df, headers, upload_index=False):
-    """ Saves headers and df data into given sheet_name.
-        If sheet_name does not exist, it will be created. """
-    print("<<<Saving\t", sheet_name, "\tin\t", spreadsheet_id)
+def _get_ws_from_spreadsheet(sheet_name: str, spreadsheet_id: str):
+    gc = _get_gc()
+    wb = gc.open_by_key(spreadsheet_id)
+    if sheet_name not in [ws.title for ws in wb.worksheets()]:
+        wb.add_worksheet(sheet_name, rows=1, cols=1)
+    ws = wb.worksheet(sheet_name)
+
+    return ws
+
+
+def upload_sheet_from_df(spreadsheet_id: str, sheet_name: str, df: pd.DataFrame, headers: List[str] = None,
+                         include_index: bool = False, include_df_headers: bool = True) -> None:
+    """
+    Saves headers and df data into given sheet_name in spreadsheet_id.
+    If sheet_name does not exist, it will be created.
+
+    :param include_index: will upload DataFrame index as the first column. It is False by default.
+    :param include_df_headers: will upload DataFrame column names as the first row. It is True by default.
+    :param headers: This list will replace df column names and must have the same length.
+    If headers are given, include_df_headers is turn to True.
+    """
+    print("<<<Saving", sheet_name, "in", spreadsheet_id, sep="\t")
     try:
-        credentials = get_credentials()
-        ws = d2g.upload(df, spreadsheet_id, sheet_name, row_names=upload_index, df_size=True, credentials=credentials)
+        worksheet = _get_ws_from_spreadsheet(sheet_name, spreadsheet_id)
 
-        # Concatenation of header cells values to be updated in batch mode
-        cell_list = ws.range("A1:" + rowcol_to_a1(row=1, col=len(headers)))
-        for i, value in enumerate(headers):
-            cell_list[i].value = value
-        ws.update_cells(cell_list)
+        df_headers = df.copy()
+        if include_index:
+            df_headers.reset_index(inplace=True)
+        if headers:
+            df_headers.columns = headers
+            include_df_headers = True
 
-    except FileNotFoundError:
-        print("<<<FAILED to upload\t", sheet_name, "\tin\t", spreadsheet_id)
+        set_with_dataframe(worksheet, df_headers, resize=True, #include_index=include_index,
+                           include_column_header=include_df_headers)
+
+    except ConnectionError:
+        print("<<<FAILED to upload", sheet_name, "in", spreadsheet_id, sep="\t")
 
 
-def load_players_sheet():
+def load_players_sheet() -> models.Players:
     tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
     players_df = pd.read_excel(tournaments_xlsx, sheet_name=cfg["sheetname"]["players"], header=0)
-    print(">Reading\t", cfg["sheetname"]["players"], "\tfrom\t", tournaments_xlsx)
+    print("> Reading", cfg["sheetname"]["players"], "from", tournaments_xlsx, sep="\t")
 
     players_df.rename(columns={cfg["labels"]["pid"]: "pid",
                                cfg["labels"]["Player"]: "name",
@@ -105,10 +130,10 @@ def load_players_sheet():
     return players
 
 
-def load_initial_ranking_sheet():
+def load_initial_ranking_sheet() -> models.Rankings:
     tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
     initial_ranking_df = pd.read_excel(tournaments_xlsx, sheet_name=cfg["sheetname"]["initial_ranking"], header=0)
-    print(">Reading\t", cfg["sheetname"]["initial_ranking"], "\tfrom\t", tournaments_xlsx)
+    print("> Reading", cfg["sheetname"]["initial_ranking"], "from", tournaments_xlsx, sep="\t")
 
     columns_translations = {cfg["labels"]["tid"]: "tid", cfg["labels"]["Tournament name"]: "tournament_name",
                             cfg["labels"]["Date"]: "date", cfg["labels"]["Location"]: "location",
@@ -124,7 +149,7 @@ def load_initial_ranking_sheet():
     return initial_ranking
 
 
-def load_tournaments_sheets():
+def load_tournaments_sheets() -> models.Tournaments:
     tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
     filter_key = cfg["sheetname"]["tournaments_key"]
     raw_tournaments = pd.read_excel(tournaments_xlsx, sheet_name=None, header=None)
@@ -132,7 +157,7 @@ def load_tournaments_sheets():
 
     to_concat = []
     for sheet_name in sheet_names:
-        print(">Reading\t", sheet_name, "\tfrom\t", tournaments_xlsx)
+        print("> Reading", sheet_name, "from", tournaments_xlsx, sep="\t")
         raw_tournament = raw_tournaments[sheet_name]
 
         tournament_df = raw_tournament.iloc[5:].copy()
@@ -151,7 +176,7 @@ def load_tournaments_sheets():
     return tournaments
 
 
-def _format_diff(new_value, prev_value):
+def _format_diff(new_value: float, prev_value: float) -> str:
     """Return a formated str that indicates +##, -## or ="""
     diff = new_value - prev_value
     diff_str = f"{diff:.0f}"
@@ -164,7 +189,7 @@ def _format_diff(new_value, prev_value):
     return formatted_str
 
 
-def _publish_tournament_metadata(ws, tournament_tid):
+def _publish_tournament_metadata(ws, tournament_tid: pd.DataFrame) -> None:
     ws.insert_rows(0, 3)
     ws["A1"] = cfg["labels"]["Tournament name"]
     ws["B1"] = tournament_tid["tournament_name"].iloc[0]
@@ -177,7 +202,7 @@ def _publish_tournament_metadata(ws, tournament_tid):
     ws.merge_cells('B3:E3')
 
 
-def _get_writer_mode(xlsx_file_path):
+def _get_writer_mode(xlsx_file_path: str) -> str:
     mode = 'a'
     if not os.path.exists(xlsx_file_path):
         mode = 'w'
@@ -185,16 +210,17 @@ def _get_writer_mode(xlsx_file_path):
     return mode
 
 
-def _get_writer(xlsx_filename, sheet_name):
+def _get_writer(xlsx_filename: str, sheet_name: str) -> pd.ExcelWriter:
     writer = pd.ExcelWriter(xlsx_filename, engine='openpyxl', mode=_get_writer_mode(xlsx_filename))
     if sheet_name in writer.book.sheetnames:
         writer.book.remove(writer.book[sheet_name])
-    print("<<<Saving\t", sheet_name, "\tin\t", xlsx_filename)
+    print("<<<Saving", sheet_name, "in", xlsx_filename, sep="\t")
 
     return writer
 
 
-def publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=False):
+def publish_rating_sheet(tournaments: models.Tournaments, rankings: models.Rankings, players: models.Players,
+                         tid: str, prev_tid: str, upload=False) -> None:
     """ Format a ranking to be published into a rating sheet
     """
     sheet_name = tournaments[tid]["sheet_name"].iloc[0]
@@ -235,7 +261,7 @@ def publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=F
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
 
-def _keep_name_new_row(df):
+def _keep_name_new_row(df: pd.DataFrame) -> pd.DataFrame:
     """Function to insert row in the dataframe"""
     empty_row = pd.DataFrame({'tid': '', 'pid': '', 'category': '', 'best_round': '',
                               'name': df.loc[df.first_valid_index(), 'name']}, index=[-1])
@@ -244,7 +270,8 @@ def _keep_name_new_row(df):
     return pd.concat([empty_row, df])
 
 
-def publish_histories_sheet(tournaments, rankings, players, tid, prev_tid, upload=False):
+def publish_histories_sheet(tournaments: models.Tournaments, rankings: models.Rankings, players: models.Players,
+                            tid: str, prev_tid: str, upload=False) -> None:
     """ Format histories to be published into a sheet"""
     xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"].replace("NN", tid)
     sheet_name = cfg["sheetname"]["histories"]
@@ -271,7 +298,8 @@ def publish_histories_sheet(tournaments, rankings, players, tid, prev_tid, uploa
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
 
-def publish_rating_details_sheet(tournaments, rankings, players, tid, prev_tid, upload):
+def publish_rating_details_sheet(tournaments: models.Tournaments, rankings: models.Rankings, players: models.Players,
+                                 tid: str, prev_tid: str, upload) -> None:
     """Format and publish rating details of given tournament into a sheet"""
 
     sheet_name = tournaments[tid]["sheet_name"].iloc[0]
@@ -306,7 +334,8 @@ def publish_rating_details_sheet(tournaments, rankings, players, tid, prev_tid, 
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
 
-def publish_championship_details_sheet(tournaments, rankings, players, tid, prev_tid, upload):
+def publish_championship_details_sheet(tournaments: models.Tournaments, rankings: models.Rankings,
+                                       players: models.Players, tid: str, prev_tid: str, upload: bool) -> None:
     """Format and publish championship details of given tournament into sheets"""
 
     sheet_name = tournaments[tid]["sheet_name"].iloc[0]
@@ -334,7 +363,8 @@ def publish_championship_details_sheet(tournaments, rankings, players, tid, prev
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
 
-def publish_statistics_sheet(tournaments, rankings, players, tid, prev_tid, upload=False):
+def publish_statistics_sheet(tournaments: models.Tournaments, rankings: models.Rankings, players: models.Players,
+                             tid: str, prev_tid: str, upload: bool = False) -> None:
     """ Copy details from log and output details of given tournament"""
     xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"].replace("NN", tid)
     sheet_name = cfg["sheetname"]["statistics_key"]
@@ -361,7 +391,8 @@ def publish_statistics_sheet(tournaments, rankings, players, tid, prev_tid, uplo
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
 
-def publish_championship_sheets(tournaments, rankings, players, tid, prev_tid, upload=False):
+def publish_championship_sheets(tournaments: models.Tournaments, rankings: models.Rankings, players: models.Players,
+                                tid: str, prev_tid: str, upload: bool = False) -> None:
     """Publish championship sheets, per category"""
     xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"].replace("NN", tid)
 
@@ -420,7 +451,7 @@ def publish_championship_sheets(tournaments, rankings, players, tid, prev_tid, u
             load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
 
-def in_colab():
+def in_colab() -> bool:
     # Verify if it is running on colab
     try:
         import google.colab
@@ -431,39 +462,30 @@ def in_colab():
     return _in_colab
 
 
-def get_credentials():
-    if in_colab():
-        from google.colab import auth
-        auth.authenticate_user()
-        from oauth2client.client import GoogleCredentials
-        credentials = GoogleCredentials.get_application_default()
-    else:
-        credentials = d2g.get_credentials()
-
-    return credentials
-
-
-def _get_gc():
-    gc = None
+def _get_gc() -> gspread.Client:
     try:
-        credentials = get_credentials()
-        gc = d2g.gspread.authorize(credentials)
+        if in_colab():
+            from google.colab import auth
+            auth.authenticate_user()
+            from oauth2client.client import GoogleCredentials  # type: ignore
+            gc = gspread.authorize(GoogleCredentials.get_application_default())
+        else:
+            gc = gspread.oauth()
     except FileNotFoundError:
         print("The .json key file has not been configured. Upload will fail.")
-    except OSError:
-        print("Connection failure. Upload will fail.")
+        raise ConnectionError
+    # except OSError:
+    #     print("Connection failure. Upload will fail.")
 
     return gc
 
 
-def load_and_upload_sheet(filename, sheet_name, spreadsheet_id):
-    print("<<<Saving\t", sheet_name, "\tin\t", spreadsheet_id)
-    credentials = get_credentials()
+def load_and_upload_sheet(filename: str, sheet_name: str, spreadsheet_id: str) -> None:
     df = pd.read_excel(filename, sheet_name, index_col=None, header=None, na_filter=False)
-    d2g.upload(df, spreadsheet_id, sheet_name, row_names=False, col_names=False, df_size=True, credentials=credentials)
+    upload_sheet_from_df(spreadsheet_id, sheet_name, df, include_df_headers=False)  # index is pid
 
 
-def create_n_tour_sheet(spreadsheet_id, tid):
+def create_n_tour_sheet(spreadsheet_id: str, tid: str) -> None:
     """
     Create sheet corresponding to n_tour tournament by duplication of the first-tournament sheet.
     A new sheeet is created in given spreadsheet_id as follows:
@@ -476,8 +498,9 @@ def create_n_tour_sheet(spreadsheet_id, tid):
     """
     first_key = f'{cfg["labels"]["Tournament"]} 01'
     replacement_key = f'{cfg["labels"]["Tournament"]} {tid[-2:]}'
-    gc = _get_gc()
-    if gc:
+
+    try:
+        gc = _get_gc()
         wb = gc.open_by_key(spreadsheet_id)
         sheetname_listed = [ws.title for ws in wb.worksheets() if first_key in ws.title]
         if sheetname_listed:
@@ -490,18 +513,21 @@ def create_n_tour_sheet(spreadsheet_id, tid):
             dup_ws = wb.duplicate_sheet(ws.id, new_sheet_name=new_sheetname)
             dup_cell_value = dup_ws.acell('A1', value_render_option='FORMULA').value
             dup_ws.update_acell('A1', dup_cell_value.replace(first_key, replacement_key))
-            print("<<<Creating\t", new_sheetname, "\tfrom\t", sheetname, "\tin\t", spreadsheet_id)
+            print("<<<Creating", new_sheetname, "from", sheetname, "in", spreadsheet_id, sep="\t")
         else:
-            print("FAILED TO DUPLICATE\t", first_key, "\t do not exist in\t", spreadsheet_id)
+            print("FAILED TO DUPLICATE", first_key, "do not exist in", spreadsheet_id, sep="\t")
+
+    except ConnectionError:
+        print("<<<Connection Error. FAILED TO DUPLICATE", first_key, "in", spreadsheet_id, sep="\t")
 
 
-def publish_to_web(tid, show_on_web=False):
+def publish_to_web(tid: str, show_on_web=False) -> None:
     if show_on_web:
         for spreadsheet_id in cfg["io"]["published_on_web_spreadsheets_id"]:
             create_n_tour_sheet(spreadsheet_id, tid)
 
 
-def load_temp_players_ranking():
+def load_temp_players_ranking() -> Tuple[models.Players, models.Rankings]:
     """returns players_temp, ranking_temp"""
     # Loading temp ranking and players. It shuould be deleted after a successful preprocessing
     players_temp_file = os.path.join(cfg["io"]["data_folder"], cfg["io"]["players_temp_file"])
@@ -522,7 +548,7 @@ def load_temp_players_ranking():
     return players_temp, ranking_temp
 
 
-def save_temp_players_ranking(players_temp, ranking_temp):
+def save_temp_players_ranking(players_temp: models.Players, ranking_temp: models.Rankings) -> None:
     """returns players_temp, ranking_temp"""
     # Loading temp ranking and players. It shuould be deleted after a successful preprocessing
     players_temp_file = os.path.join(cfg["io"]["data_folder"], cfg["io"]["players_temp_file"])
@@ -534,7 +560,7 @@ def save_temp_players_ranking(players_temp, ranking_temp):
         pickle.dump(ranking_temp, rtf, pickle.HIGHEST_PROTOCOL)
 
 
-def remove_temp_players_ranking():
+def remove_temp_players_ranking() -> None:
     players_temp_file = os.path.join(cfg["io"]["data_folder"], cfg["io"]["players_temp_file"])
     ranking_temp_file = os.path.join(cfg["io"]["data_folder"], cfg["io"]["ranking_temp_file"])
     print("Removing temp files created to resume preprocessing", players_temp_file, ranking_temp_file)
@@ -544,19 +570,20 @@ def remove_temp_players_ranking():
         os.remove(ranking_temp_file)
 
 
-def save_to_pickle(players=None, rankings=None, tournaments=None):
+def save_to_pickle(players: models.Players = None, rankings: models.Rankings = None,
+                   tournaments: models.Tournaments = None) -> None:
     objects = [players, rankings, tournaments]
     filenames = [cfg["io"]["players_pickle"], cfg["io"]["rankings_pickle"], cfg["io"]["tournaments_pickle"]]
     objects_filenames = [(obj, fn) for obj, fn in zip(objects, filenames) if obj]
 
     for obj, fn in objects_filenames:
-        print(f'<<<Saving\t{fn}\tin\t{cfg["io"]["data_folder"]}')
+        print('<<<Saving', fn, 'in', cfg["io"]["data_folder"], sep="\t")
         with open(os.path.join(cfg["io"]["data_folder"], fn), 'wb') as fo:
             pickle.dump(obj, fo, pickle.HIGHEST_PROTOCOL)
 
 
-def load_from_pickle(filename):
-    print(f'>>>Loading\t{filename}\tfrom\t{cfg["io"]["data_folder"]}')
+def load_from_pickle(filename: str) -> Any:
+    print('>>>Loading', filename, 'from', cfg["io"]["data_folder"], sep="\t")
     with open(os.path.join(cfg["io"]["data_folder"], filename), 'rb') as fo:
         obj = pickle.load(fo)
 

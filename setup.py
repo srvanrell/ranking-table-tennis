@@ -35,7 +35,7 @@ class PostInstallCommand(install):
 
 
 setup(name='ranking_table_tennis',
-      version='2020.4.3',
+      version='2020.7.21',
       description='A ranking table tennis system',
       long_description=readme(),
       long_description_content_type="text/markdown",
@@ -46,15 +46,15 @@ setup(name='ranking_table_tennis',
       scripts=['bin/rtt'],
       include_package_data=True,
       install_requires=[
-          'gspread>=3.1.0',
+          'gspread>=3.6.0',
           'oauth2client>=4.1.2',
           'PyYAML>=3.12',
           'urllib3>=1.23',
-          'openpyxl>=2.6',
+          'openpyxl>=3.0.4',
           'Unidecode>=1.0.22',
-          'pandas>=0.24.0',
+          'pandas>=1.0.5',
           'xlrd>=1.0.0',
-          'df2gspread>=1.0.4'
+          'gspread-dataframe>=1.0.4'
       ],
       cmdclass={
         'develop': PostDevelopCommand,
