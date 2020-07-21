@@ -9,7 +9,7 @@ from gspread.utils import rowcol_to_a1
 import pandas as pd
 import pickle
 
-from df2gspread import df2gspread as d2g
+from gspread_dataframe import get_as_dataframe, set_with_dataframe
 
 __author__ = 'sebastian'
 
@@ -75,22 +75,32 @@ def save_players_sheet(players: models.Players, upload=False) -> None:
                              sorted_players_df, headers_df, upload_index=True)  # index is pid
 
 
+def _get_ws_from_spreadsheet(sheet_name: str, spreadsheet_id: str):
+    gc = _get_gc()
+    wb = gc.open_by_key(spreadsheet_id)
+    if sheet_name not in [ws.title for ws in wb.worksheets()]:
+        wb.add_worksheet(sheet_name, rows=1, cols=1)
+    ws = wb.worksheet(sheet_name)
+
+    return ws
+
+
 def upload_sheet_from_df(spreadsheet_id: str, sheet_name: str, df: pd.DataFrame, headers: List[str],
                          upload_index: bool = False) -> None:
     """ Saves headers and df data into given sheet_name.
         If sheet_name does not exist, it will be created. """
     print("<<<Saving", sheet_name, "in", spreadsheet_id, sep="\t")
     try:
-        credentials = get_credentials()
-        ws = d2g.upload(df, spreadsheet_id, sheet_name, row_names=upload_index, df_size=True, credentials=credentials)
+        worksheet = _get_ws_from_spreadsheet(sheet_name, spreadsheet_id)
+        set_with_dataframe(worksheet, df, include_index=upload_index, resize=True)
 
         # Concatenation of header cells values to be updated in batch mode
-        cell_list = ws.range("A1:" + rowcol_to_a1(row=1, col=len(headers)))
+        cell_list = worksheet.range("A1:" + rowcol_to_a1(row=1, col=len(headers)))
         for i, value in enumerate(headers):
             cell_list[i].value = value
-        ws.update_cells(cell_list)
+        worksheet.update_cells(cell_list)
 
-    except FileNotFoundError:
+    except ConnectionError:
         print("<<<FAILED to upload", sheet_name, "in", spreadsheet_id, sep="\t")
 
 
@@ -442,27 +452,20 @@ def in_colab() -> bool:
     return _in_colab
 
 
-def get_credentials():
-    if in_colab():
-        from google.colab import auth
-        auth.authenticate_user()
-        from oauth2client.client import GoogleCredentials  # type: ignore
-        credentials = GoogleCredentials.get_application_default()
-    else:
-        credentials = d2g.get_credentials()
-
-    return credentials
-
-
 def _get_gc() -> gspread.Client:
-    gc = None
     try:
-        credentials = get_credentials()
-        gc = gspread.authorize(credentials)
+        if in_colab():
+            from google.colab import auth
+            auth.authenticate_user()
+            from oauth2client.client import GoogleCredentials  # type: ignore
+            gc = gspread.authorize(GoogleCredentials.get_application_default())
+        else:
+            gc = gspread.oauth()
     except FileNotFoundError:
         print("The .json key file has not been configured. Upload will fail.")
-    except OSError:
-        print("Connection failure. Upload will fail.")
+        raise ConnectionError
+    # except OSError:
+    #     print("Connection failure. Upload will fail.")
 
     return gc
 
@@ -487,8 +490,9 @@ def create_n_tour_sheet(spreadsheet_id: str, tid: str) -> None:
     """
     first_key = f'{cfg["labels"]["Tournament"]} 01'
     replacement_key = f'{cfg["labels"]["Tournament"]} {tid[-2:]}'
-    gc = _get_gc()
-    if gc:
+
+    try:
+        gc = _get_gc()
         wb = gc.open_by_key(spreadsheet_id)
         sheetname_listed = [ws.title for ws in wb.worksheets() if first_key in ws.title]
         if sheetname_listed:
@@ -504,6 +508,9 @@ def create_n_tour_sheet(spreadsheet_id: str, tid: str) -> None:
             print("<<<Creating", new_sheetname, "from", sheetname, "in", spreadsheet_id, sep="\t")
         else:
             print("FAILED TO DUPLICATE", first_key, "do not exist in", spreadsheet_id, sep="\t")
+
+    except ConnectionError:
+        print("<<<Connection Error. FAILED TO DUPLICATE", first_key, "in", spreadsheet_id, sep="\t")
 
 
 def publish_to_web(tid: str, show_on_web=False) -> None:
