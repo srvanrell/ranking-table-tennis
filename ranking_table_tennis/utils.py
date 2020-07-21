@@ -9,7 +9,7 @@ from gspread.utils import rowcol_to_a1
 import pandas as pd
 import pickle
 
-from gspread_dataframe import get_as_dataframe, set_with_dataframe
+from gspread_dataframe import set_with_dataframe
 
 __author__ = 'sebastian'
 
@@ -72,7 +72,7 @@ def save_players_sheet(players: models.Players, upload=False) -> None:
     if upload:
         headers_df = [cfg["labels"]["pid"]] + headers
         upload_sheet_from_df(cfg["io"]["tournaments_spreadsheet_id"], cfg["sheetname"]["players"],
-                             sorted_players_df, headers_df, upload_index=True)  # index is pid
+                             sorted_players_df, headers_df, include_index=True)  # index is pid
 
 
 def _get_ws_from_spreadsheet(sheet_name: str, spreadsheet_id: str):
@@ -85,20 +85,30 @@ def _get_ws_from_spreadsheet(sheet_name: str, spreadsheet_id: str):
     return ws
 
 
-def upload_sheet_from_df(spreadsheet_id: str, sheet_name: str, df: pd.DataFrame, headers: List[str],
-                         upload_index: bool = False) -> None:
-    """ Saves headers and df data into given sheet_name.
-        If sheet_name does not exist, it will be created. """
+def upload_sheet_from_df(spreadsheet_id: str, sheet_name: str, df: pd.DataFrame, headers: List[str] = None,
+                         include_index: bool = False, include_df_headers: bool = True) -> None:
+    """
+    Saves headers and df data into given sheet_name in spreadsheet_id.
+    If sheet_name does not exist, it will be created.
+
+    :param include_index: will upload DataFrame index as the first column. It is False by default.
+    :param include_df_headers: will upload DataFrame column names as the first row. It is True by default.
+    :param headers: This list will replace df column names and must have the same length.
+    If headers are given, include_df_headers is turn to True.
+    """
     print("<<<Saving", sheet_name, "in", spreadsheet_id, sep="\t")
     try:
         worksheet = _get_ws_from_spreadsheet(sheet_name, spreadsheet_id)
-        set_with_dataframe(worksheet, df, include_index=upload_index, resize=True)
 
-        # Concatenation of header cells values to be updated in batch mode
-        cell_list = worksheet.range("A1:" + rowcol_to_a1(row=1, col=len(headers)))
-        for i, value in enumerate(headers):
-            cell_list[i].value = value
-        worksheet.update_cells(cell_list)
+        df_headers = df.copy()
+        if include_index:
+            df_headers.reset_index(inplace=True)
+        if headers:
+            df_headers.columns = headers
+            include_df_headers = True
+
+        set_with_dataframe(worksheet, df_headers, resize=True, #include_index=include_index,
+                           include_column_header=include_df_headers)
 
     except ConnectionError:
         print("<<<FAILED to upload", sheet_name, "in", spreadsheet_id, sep="\t")
@@ -179,7 +189,7 @@ def _format_diff(new_value: float, prev_value: float) -> str:
     return formatted_str
 
 
-def _publish_tournament_metadata(ws, tournament_tid: models.Tournaments) -> None:
+def _publish_tournament_metadata(ws, tournament_tid: pd.DataFrame) -> None:
     ws.insert_rows(0, 3)
     ws["A1"] = cfg["labels"]["Tournament name"]
     ws["B1"] = tournament_tid["tournament_name"].iloc[0]
@@ -471,10 +481,8 @@ def _get_gc() -> gspread.Client:
 
 
 def load_and_upload_sheet(filename: str, sheet_name: str, spreadsheet_id: str) -> None:
-    print("<<<Saving", sheet_name, "in", spreadsheet_id, sep="\t")
-    credentials = get_credentials()
     df = pd.read_excel(filename, sheet_name, index_col=None, header=None, na_filter=False)
-    d2g.upload(df, spreadsheet_id, sheet_name, row_names=False, col_names=False, df_size=True, credentials=credentials)
+    upload_sheet_from_df(spreadsheet_id, sheet_name, df, include_df_headers=False)  # index is pid
 
 
 def create_n_tour_sheet(spreadsheet_id: str, tid: str) -> None:
