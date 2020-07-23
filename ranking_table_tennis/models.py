@@ -221,12 +221,10 @@ class Rankings:
 
     @staticmethod
     def _rating_to_category(rating: float) -> str:
-        thresholds = cfg["aux"]["categories thresholds"]
-        category = categories[-2]  # Last category that it's not fan
-        for j, th in enumerate(thresholds):
-            if rating >= th:
-                category = categories[j]
-                break
+        thresholds_list = cfg["aux"]["categories thresholds"]
+        thresholds = pd.Series(thresholds_list, index=categories)
+        category = thresholds[rating >= thresholds].first_valid_index()
+
         return category
 
     def update_categories(self) -> None:
@@ -239,7 +237,6 @@ class Rankings:
         - 500 > rating >= 250  -> second category
         - 250 > rating         -> third category
         """
-        # FIXME it is not working for players of the fan category
         self.ranking_df.loc[:, "category"] = self.ranking_df.loc[:, "rating"].apply(self._rating_to_category)
 
     @staticmethod

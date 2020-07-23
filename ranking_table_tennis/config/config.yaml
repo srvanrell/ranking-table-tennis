@@ -92,6 +92,8 @@ aux:
       - 1100  # minimo de segunda
       - 800   # minimo de tercera
       - 600   # minimo de cuarta
+      - 0     # minimo de quinta
+      - -999  # minimo de sexta (categoria aficionados, se omite calculo rating)
     masters N tournaments to consider: 8
     masters N classified to list: 10000
     initial tid: S2019T00
