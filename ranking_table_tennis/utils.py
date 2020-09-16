@@ -534,13 +534,13 @@ def load_temp_players_ranking() -> Tuple[models.Players, models.Rankings]:
     ranking_temp_file = os.path.join(cfg["io"]["data_folder"], cfg["io"]["ranking_temp_file"])
 
     if os.path.exists(players_temp_file):
-        players_temp = load_from_pickle(players_temp_file)
+        players_temp = load_from_pickle(cfg["io"]["players_temp_file"])
         print("Resume preprocessing...")
     else:
         players_temp = models.Players()
 
     if os.path.exists(ranking_temp_file):
-        ranking_temp = load_from_pickle(ranking_temp_file)
+        ranking_temp = load_from_pickle(cfg["io"]["ranking_temp_file"])
         print("Resume preprocessing...")
     else:
         ranking_temp = models.Rankings()
