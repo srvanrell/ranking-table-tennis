@@ -35,7 +35,7 @@ class PostInstallCommand(install):
 
 
 setup(name='ranking_table_tennis',
-      version='2020.9.15',
+      version='2021.2.23',
       description='A ranking table tennis system',
       long_description=readme(),
       long_description_content_type="text/markdown",
@@ -50,10 +50,10 @@ setup(name='ranking_table_tennis',
           'oauth2client>=4.1.2',
           'PyYAML>=3.12',
           'urllib3>=1.23',
-          'openpyxl>=3.0.4',
+          'openpyxl>=3.0.4,<3.0.6',
           'Unidecode>=1.0.22',
           'pandas>=1.0.5',
-          'xlrd>=1.0.0',
+          'xlrd>=1.0.0,<2.0',
           'gspread-dataframe>=1.0.4'
       ],
       cmdclass={
