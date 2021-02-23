@@ -68,3 +68,5 @@ answer = input("\nDo you want to publish to the web [Y/n]? (press Enter to conti
 show_on_web = (answer.lower() != "n") and (t_num > 1)
 
 utils.publish_to_web(tid, show_on_web)
+
+utils.save_raw_ranking(rankings, players, tid)

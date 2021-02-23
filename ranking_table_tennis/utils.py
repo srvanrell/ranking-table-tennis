@@ -261,6 +261,20 @@ def publish_rating_sheet(tournaments: models.Tournaments, rankings: models.Ranki
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
 
+def save_raw_ranking(rankings: models.Rankings, players: models.Players,
+                     tid: str) -> None:
+    """Add players name to raw ranking to be save into a spreadsheet."""
+    xlsx_filename = cfg["io"]["data_folder"] + f"raw_ranking_{tid}.xlsx"
+    print("<<<Saving raw ranking in", xlsx_filename, sep="\t")
+
+    # Rankings sorted by rating
+    this_ranking_df = rankings[tid].sort_values("rating", ascending=False)
+
+    # Format data and columns to write into the file
+    this_ranking_df = this_ranking_df.merge(players.players_df.loc[:, ["name"]], on="pid")
+    this_ranking_df.to_excel(xlsx_filename)
+
+
 def _keep_name_new_row(df: pd.DataFrame) -> pd.DataFrame:
     """Function to insert row in the dataframe"""
     empty_row = pd.DataFrame({'tid': '', 'pid': '', 'category': '', 'best_round': '',
