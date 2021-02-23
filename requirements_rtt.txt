@@ -6,7 +6,7 @@ google-auth==1.19.2
 google-auth-oauthlib==0.4.1
 gspread==3.6.0
 gspread-dataframe==3.0.7
-httplib2==0.18.1
+httplib2==0.19.0
 idna==2.10
 jdcal==1.4.1
 numpy==1.19.0
