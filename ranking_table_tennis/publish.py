@@ -57,9 +57,8 @@ utils.publish_championship_details_sheet(tournaments, rankings, players, tid, pr
 # Saving complete histories of players
 utils.publish_histories_sheet(tournaments, rankings, players, tid, prev_tid, upload=upload)
 
-# # Testing publshing initial_ranking
-# TODO it's not working
-# utils.publish_rating_sheet(tournament_sheetname, initial_ranking, players, initial_ranking, upload=upload)
+# Publshing initial_ranking
+utils.publish_initial_rating_sheet(tournaments, rankings, players, tid, upload=upload)
 
 # Publish statistics
 utils.publish_statistics_sheet(tournaments, rankings, players, tid, prev_tid, upload=upload)

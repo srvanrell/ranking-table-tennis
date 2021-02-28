@@ -261,6 +261,38 @@ def publish_rating_sheet(tournaments: models.Tournaments, rankings: models.Ranki
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
 
+def publish_initial_rating_sheet(tournaments: models.Tournaments, rankings: models.Rankings, players: models.Players,
+                                 tid: str, upload=False) -> None:
+    """ Format a ranking to be published into a rating sheet
+    """
+    sheet_name = cfg["sheetname"]["initial_ranking"]
+    sheet_name = sheet_name.replace(cfg["sheetname"]["rankings_key"], cfg["labels"]["Rating"])
+
+    xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"].replace("NN", tid)
+
+    # Rankings sorted by rating
+    initial_tid = cfg["aux"]["initial tid"]
+    this_ranking_df = rankings[initial_tid].sort_values("rating", ascending=False)
+
+    # Format data and columns to write into the file
+    this_ranking_df = this_ranking_df.merge(players.players_df.loc[:, ["name", "city", "affiliation"]], on="pid")
+
+    to_bold = ["A1", "B1", "C1", "D1"]
+    to_center = to_bold
+
+    with _get_writer(xlsx_filename, sheet_name) as writer:
+        headers = [cfg["labels"][key] for key in ["Rating", "Player", "City", "Association"]]
+        columns = ["rating", "name", "city", "affiliation"]
+        this_ranking_df.to_excel(writer, sheet_name=sheet_name, index=False, header=headers, columns=columns)
+
+        # publish and format tournament metadata
+        ws = writer.book[sheet_name]
+        _bold_and_center(ws, to_bold, to_center)
+
+    if upload:
+        load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
+
+
 def save_raw_ranking(rankings: models.Rankings, players: models.Players,
                      tid: str) -> None:
     """Add players name to raw ranking to be save into a spreadsheet."""
@@ -543,7 +575,7 @@ def publish_to_web(tid: str, show_on_web=False) -> None:
 
 def load_temp_players_ranking() -> Tuple[models.Players, models.Rankings]:
     """returns players_temp, ranking_temp"""
-    # Loading temp ranking and players. It shuould be deleted after a successful preprocessing
+    # Loading temp ranking and players. It should be deleted after a successful preprocessing
     players_temp_file = os.path.join(cfg["io"]["data_folder"], cfg["io"]["players_temp_file"])
     ranking_temp_file = os.path.join(cfg["io"]["data_folder"], cfg["io"]["ranking_temp_file"])
 
