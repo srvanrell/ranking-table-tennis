@@ -35,7 +35,7 @@ class PostInstallCommand(install):
 
 
 setup(name='ranking_table_tennis',
-      version='2021.2.23',
+      version='2021.2.28',
       description='A ranking table tennis system',
       long_description=readme(),
       long_description_content_type="text/markdown",
