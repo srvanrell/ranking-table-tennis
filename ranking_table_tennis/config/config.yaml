@@ -1,33 +1,33 @@
 io:
     data_folder: data_rtt/
-    tournaments_filename: Liga Dos Orillas 2021 - Carga de partidos.xlsx
-    rankings_filename: Liga Dos Orillas 2021 - Rankings Crudos.xlsx
+    tournaments_filename: Liga Dos Orillas 2022 - Carga de partidos.xlsx
+    rankings_filename: Liga Dos Orillas 2022 - Rankings Crudos.xlsx
     publish_filename: Torneo NN para publicar.xlsx
-    tournaments_gdrive: https://docs.google.com/spreadsheets/d/e/2PACX-1vRGtdIhhS1sVzLL07lnYHO05wwmo-J7E8gRRjQbM6EOr3YA-d0xYKXne5LjZDuVXx_NpDREZCYNM34H/pub?output=xlsx
-    tournaments_spreadsheet_id: 16HAz4rQ_llavYjobJicD5mhJg1m16E2uRBkv7Jdc9aQ
-    temporal_spreadsheet_id: 1qM8DxABfcCCU5_LZjg1794JJUBgqX7XXSH25XZieeLA
+    tournaments_gdrive: https://docs.google.com/spreadsheets/d/e/2PACX-1vSH_0kpkIS6Ipv70zCX0talCHgAFEiF_ZxMfM1XTdsfgvhbWwh-M8sACHciF7X3WAWDxYN3BYvQK6S9/pub?output=xlsx
+    tournaments_spreadsheet_id: 1BYpbmmRBXe-Shgi4PJHqQpGqdstQqqSwpBDZfgzjrF0
+    temporal_spreadsheet_id: 1xxhIopTNrYaGrT4gL5VsrHGt10yisXmSZg_wiWym2QY
     players_temp_file: temp_players.pickle
     ranking_temp_file: temp_ranking.pickle
     players_pickle: players.pk
     tournaments_pickle: tournaments.pk
     rankings_pickle: rankings.pk
     published_on_web_spreadsheets_id:
-      - 1niDg_mLqoFOCSnkykiYppWImP4Ef_tZcrJwjgeYJKA4  # partidos
-      - 1TE8JayF7Q8SCUd4G10B8Y_1_lV_4tzvLzTN1zRifMEg  # nivel de juego
-      - 1FMygcBXuHxMsL-zPutgKKj-hGlhTDZmnpwcc2ehiezA  # detalles nivel de juego
-      - 1Pu3ciRKIN4p3tPD4kDhXYn1Z8hRQNzBLiCjFivyubjQ  # campeonato primera
-      - 1YVjg2iP6TXdJS26Qi0FknnaEXDaT4BdrO3f1dDJAtuU  # campeonato segunda
-      - 1h4CU2kyLQsjwIO8VdtpbxS7cs0a0A0BI11luqYglXxo  # campeonato tercera
-      - 1r6_FwoM_6Zfp-uOEEpI5sg-IREEos8fNVe3r6WfkhyY  # detalles campeonato
+      - 1sN1I0BSBzVdzRRVkpxHn57KX68p5OZ710bYhOjc-TZI  # partidos
+      - 1amTCwUTYT2Gb2kCvKrfCQlheizCnt20ceAGxUiQRwZM  # nivel de juego
+     - 1fPjP2CdkLN7rGBY8IW1O5t8mwlDL8wxIGLFVrFn48j8  # detalles nivel de juego
+    #  - 1Pu3ciRKIN4p3tPD4kDhXYn1Z8hRQNzBLiCjFivyubjQ  # campeonato primera
+    #  - 1YVjg2iP6TXdJS26Qi0FknnaEXDaT4BdrO3f1dDJAtuU  # campeonato segunda
+    #  - 1h4CU2kyLQsjwIO8VdtpbxS7cs0a0A0BI11luqYglXxo  # campeonato tercera
+    #  - 1r6_FwoM_6Zfp-uOEEpI5sg-IREEos8fNVe3r6WfkhyY  # detalles campeonato
 
 sheetname:
     players: Jugadores
-    initial_ranking: Ranking Torneo 00 2021
+    initial_ranking: Ranking Torneo 00 2022
     tournaments_key: Partidos
     championship_details_key: Log Campeonato
     rating_details_key: Log Rating
     rankings_key: Ranking
-    histories: Historiales 2021
+    histories: Historiales 2022
     championship_key: Campeonato
     statistics_key: Estadisticas
 
@@ -90,10 +90,10 @@ aux:
       - 950  # minimo de segunda
     masters N tournaments to consider: 8
     masters N classified to list: 10000
-    initial tid: S2021T00
+    initial tid: S2022T00
 
 default:
-    tournament_name: Inicial 2021 - Liga Dos Orillas
-    date: 2021 01 01
+    tournament_name: Inicial 2022 - Liga Dos Orillas
+    date: 2022 01 01
     location: No aplica
     category:
