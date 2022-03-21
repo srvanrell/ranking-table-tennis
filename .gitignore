@@ -3,6 +3,7 @@ config/gspreadids.yaml
 
 # Data folder
 data/
+old_data/
 
 # Gedit backups
 *~
