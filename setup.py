@@ -52,7 +52,7 @@ setup(name='ranking_table_tennis',
           'urllib3>=1.23',
           'openpyxl>=3.0.4,<3.0.6',
           'Unidecode>=1.0.22',
-          'pandas>=1.0.5',
+          'pandas>=1.0.5,<1.3',
           'xlrd>=1.0.0,<2.0',
           'gspread-dataframe>=1.0.4'
       ],
