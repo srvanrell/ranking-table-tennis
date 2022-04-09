@@ -35,7 +35,7 @@ class PostInstallCommand(install):
 
 
 setup(name='ranking_table_tennis',
-      version='2022.3.20',
+      version='2022.4.9',
       description='A ranking table tennis system',
       long_description=readme(),
       long_description_content_type="text/markdown",
@@ -59,6 +59,11 @@ setup(name='ranking_table_tennis',
       cmdclass={
         'develop': PostDevelopCommand,
         'install': PostInstallCommand,
+      },
+      extras_require={
+        'dev': [
+            'pre-commit==2.18.*'
+            ]
       },
       classifiers=[
           "Programming Language :: Python :: 3",
