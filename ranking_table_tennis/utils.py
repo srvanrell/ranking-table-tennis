@@ -340,11 +340,12 @@ def publish_rating_sheet(
     to_bold = ["A1", "A2", "A3", "A4", "B4", "C4", "D4", "E4"]
     to_center = to_bold + ["B1", "B2", "B3"]
 
+    headers = [
+        cfg["labels"][key] for key in ["Category", "Rating", "Player", "City", "Association"]
+    ]
+    columns = ["category", "formatted rating", "name", "city", "affiliation"]
+
     with _get_writer(xlsx_filename, sheet_name) as writer:
-        headers = [
-            cfg["labels"][key] for key in ["Category", "Rating", "Player", "City", "Association"]
-        ]
-        columns = ["category", "formatted rating", "name", "city", "affiliation"]
         this_ranking_df.to_excel(
             writer, sheet_name=sheet_name, index=False, header=headers, columns=columns
         )
@@ -356,6 +357,9 @@ def publish_rating_sheet(
 
     if upload:
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
+
+    markdown_filename = cfg["io"]["data_folder"] + f"{sheet_name.replace(' ', '_')}.md"
+    this_ranking_df[columns].to_markdown(markdown_filename, index=False, headers=headers)
 
 
 def publish_initial_rating_sheet(

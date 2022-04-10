@@ -59,6 +59,7 @@ setup(
         "pandas>=1.0.5,<1.3",
         "xlrd>=1.0.0,<2.0",
         "gspread-dataframe>=1.0.4",
+        "tabulate>=0.8.7",
     ],
     cmdclass={
         "develop": PostDevelopCommand,
