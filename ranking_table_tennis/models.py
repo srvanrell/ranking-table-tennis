@@ -1,5 +1,5 @@
 import os
-from typing import List, Tuple, Dict, Iterator
+from typing import List, Tuple, Iterator
 
 import yaml
 from unidecode import unidecode
@@ -13,7 +13,7 @@ user_config_path = os.path.join("data_rtt", "config")
 if not os.path.exists(user_config_path):
     shutil.copytree(os.path.dirname(__file__) + "/config", user_config_path)
 
-with open(user_config_path + "/config.yaml", 'r') as cfgyaml:
+with open(user_config_path + "/config.yaml", "r") as cfgyaml:
     try:
         cfg = yaml.safe_load(cfgyaml)
     except yaml.YAMLError as exc:
@@ -32,7 +32,9 @@ unexpected_result_table = pd.read_csv(user_config_path + "/unexpected_result.csv
 
 # points to be assigned by round and by participation
 raw_points_per_round_table = pd.read_csv(user_config_path + "/points_per_round.csv")
-best_rounds_priority = raw_points_per_round_table.loc[:, ["priority", "round_reached"]].set_index("round_reached")
+best_rounds_priority = raw_points_per_round_table.loc[:, ["priority", "round_reached"]].set_index(
+    "round_reached"
+)
 best_rounds_priority = best_rounds_priority.squeeze()
 best_rounds_points = raw_points_per_round_table.drop(columns="priority").set_index("round_reached")
 categories = list(best_rounds_points.columns)
@@ -74,7 +76,8 @@ class Players:
 
         cols_to_title = ["name", "city"]
         self.players_df.loc[:, cols_to_title] = self.players_df.loc[:, cols_to_title].applymap(
-            lambda cell: unidecode(cell).strip().title())
+            lambda cell: unidecode(cell).strip().title()
+        )
 
     def get_pid(self, name: str) -> int:
         uname = unidecode(name).title()
@@ -85,7 +88,7 @@ class Players:
         return pid
 
     def get_name2pid(self) -> pd.Series:
-        name2pid = self.players_df.loc[:, 'name'].copy()
+        name2pid = self.players_df.loc[:, "name"].copy()
         name2pid = name2pid.reset_index()
         name2pid.set_index("name", inplace=True)
 
@@ -101,16 +104,18 @@ class Players:
         self.verify_and_normalize()
 
     def update_histories(self, tid: str, best_rounds: pd.DataFrame) -> None:
-        """ Save player's best rounds into their histories.
+        """Save player's best rounds into their histories.
 
         Each history is a string that can be read as a dict with (category, tournament_id) as key.
         """
-        to_update = [{"tid": tid, "pid": row.pid, "category": row.category, "best_round": row.best_round}
-                     for row_id, row in best_rounds.iterrows()]
+        to_update = [
+            {"tid": tid, "pid": row.pid, "category": row.category, "best_round": row.best_round}
+            for row_id, row in best_rounds.iterrows()
+        ]
         self.history_df = self.history_df.append(to_update, ignore_index=True)
 
     def played_tournaments(self, pid: int) -> List[str]:
-        """ Return sorted list of played tournaments. Empty history will result in an empty list. """
+        """Return sorted list of played tournaments. Empty history will result in an empty list."""
         tids = self.history_df.loc[self.history_df.pid == float(pid), "tid"]
         if not tids.empty:
             return sorted(set(tids))
@@ -119,8 +124,21 @@ class Players:
 
 class Rankings:
     def __init__(self, ranking_df: pd.DataFrame = None) -> None:
-        all_columns = ["tid", "tournament_name", "date", "location", "pid", "rating", "category", "active"]
-        all_columns += self.points_cat_columns() + self.cum_points_cat_columns() + self.participations_cat_columns()
+        all_columns = [
+            "tid",
+            "tournament_name",
+            "date",
+            "location",
+            "pid",
+            "rating",
+            "category",
+            "active",
+        ]
+        all_columns += (
+            self.points_cat_columns()
+            + self.cum_points_cat_columns()
+            + self.participations_cat_columns()
+        )
         all_columns += self.cum_tids_cat_columns()
         self.ranking_df = pd.DataFrame(ranking_df, columns=all_columns)
         self.rating_details_df = pd.DataFrame()
@@ -181,10 +199,24 @@ class Rankings:
         self.ranking_df = self.ranking_df.append(ranking_entry)
         self.verify_and_normalize()
 
-    def add_new_entry(self, tid: str, pid: int, initial_rating: float = -1000, active: bool = False,
-                      initial_category: str = "") -> None:
-        self.ranking_df = self.ranking_df.append({"tid": tid, "pid": pid,  "rating": initial_rating, "active": active,
-                                                  "category": initial_category}, ignore_index=True)
+    def add_new_entry(
+        self,
+        tid: str,
+        pid: int,
+        initial_rating: float = -1000,
+        active: bool = False,
+        initial_category: str = "",
+    ) -> None:
+        self.ranking_df = self.ranking_df.append(
+            {
+                "tid": tid,
+                "pid": pid,
+                "rating": initial_rating,
+                "active": active,
+                "category": initial_category,
+            },
+            ignore_index=True,
+        )
         self.verify_and_normalize()
         self.update_categories()
 
@@ -200,13 +232,25 @@ class Rankings:
         default_cat_value = 0
         default_cum_tid_value = ""
 
-        cat_columns = self.points_cat_columns() + self.cum_points_cat_columns() + self.participations_cat_columns()
-        cum_tid_values = {cum_tid_col: default_cum_tid_value for cum_tid_col in self.cum_tids_cat_columns()}
+        cat_columns = (
+            self.points_cat_columns()
+            + self.cum_points_cat_columns()
+            + self.participations_cat_columns()
+        )
+        cum_tid_values = {
+            cum_tid_col: default_cum_tid_value for cum_tid_col in self.cum_tids_cat_columns()
+        }
         cat_col_values = {cat_col: default_cat_value for cat_col in cat_columns}
-        default_values = {"rating": default_rating, "category": default_category, "active": default_active,
-                          "tournament_name": cfg["default"]["tournament_name"], "date": cfg["default"]["date"],
-                          "location": cfg["default"]["location"],
-                          **cat_col_values, **cum_tid_values}
+        default_values = {
+            "rating": default_rating,
+            "category": default_category,
+            "active": default_active,
+            "tournament_name": cfg["default"]["tournament_name"],
+            "date": cfg["default"]["date"],
+            "location": cfg["default"]["location"],
+            **cat_col_values,
+            **cum_tid_values,
+        }
         self.ranking_df.fillna(value=default_values, inplace=True)
         self.ranking_df.date = pd.to_datetime(self.ranking_df.date)
 
@@ -230,7 +274,7 @@ class Rankings:
         return category
 
     def update_categories(self) -> None:
-        """ Players are ranked based on rating and given thresholds.
+        """Players are ranked based on rating and given thresholds.
 
         Players are ordered by rating and then assigned to a category
 
@@ -240,11 +284,13 @@ class Rankings:
         - 250 > rating         -> third category
         """
         # FIXME it is not working for players of the fan category
-        self.ranking_df.loc[:, "category"] = self.ranking_df.loc[:, "rating"].apply(self._rating_to_category)
+        self.ranking_df.loc[:, "category"] = self.ranking_df.loc[:, "rating"].apply(
+            self._rating_to_category
+        )
 
     @staticmethod
     def _points_to_assign(rating_winner: float, rating_loser: float) -> Tuple[float, float]:
-        """Returns points to add to winner and to deduce from loser, given ratings of winner and loser."""
+        """Points to add to winner and to deduce from loser given ratings of winner and loser."""
         rating_diff = rating_winner - rating_loser
 
         assignation_table = expected_result_table
@@ -253,15 +299,22 @@ class Rankings:
             assignation_table = unexpected_result_table
 
         # Select first row that is appropiate for given rating_diff
-        diff_threshold, points_to_winner, points_to_loser = assignation_table[assignation_table[:, 0] > rating_diff][0]
+        diff_threshold, points_to_winner, points_to_loser = assignation_table[
+            assignation_table[:, 0] > rating_diff
+        ][0]
 
         return points_to_winner, points_to_loser
 
     @staticmethod
-    def _get_factor(rating_winner: float, rating_loser: float, category_winner: str, category_loser: str,
-                    not_own_category: bool) -> float:
+    def _get_factor(
+        rating_winner: float,
+        rating_loser: float,
+        category_winner: str,
+        category_loser: str,
+        not_own_category: bool,
+    ) -> float:
         """Returns factor for rating computation. It considers given winner and loser category.
-        Players must play their own category """
+        Players must play their own category"""
         rating_diff = rating_winner - rating_loser
         category_factor = 1.0
         if category_winner != category_loser and not not_own_category:
@@ -274,18 +327,33 @@ class Rankings:
         return factor
 
     def _new_ratings_from_match(self, match):
-        [to_winner, to_loser] = self._points_to_assign(match["winner_rating"], match["loser_rating"])
-        factor = self._get_factor(match["winner_rating"], match["loser_rating"],
-                                  match["winner_category"], match["loser_category"],
-                                  match["not_own_category"])
+        [to_winner, to_loser] = self._points_to_assign(
+            match["winner_rating"], match["loser_rating"]
+        )
+        factor = self._get_factor(
+            match["winner_rating"],
+            match["loser_rating"],
+            match["winner_category"],
+            match["loser_category"],
+            match["not_own_category"],
+        )
 
         to_winner, to_loser = factor * to_winner, factor * to_loser
-        match["rating_to_winner"], match["rating_to_loser"], match["factor"] = to_winner, -to_loser, factor
+        match["rating_to_winner"], match["rating_to_loser"], match["factor"] = (
+            to_winner,
+            -to_loser,
+            factor,
+        )
 
         return match
 
-    def compute_new_ratings(self, new_tid: str, old_tid: str, tournaments: "Tournaments",
-                            pid_not_own_category: List[int]):
+    def compute_new_ratings(
+        self,
+        new_tid: str,
+        old_tid: str,
+        tournaments: "Tournaments",
+        pid_not_own_category: List[int],
+    ):
         """Compute ratings(new_tid) based on matches(new_tid) and ratings(old_tid).
         Details of rating changes per match are stored in rating_details_df.
         """
@@ -299,52 +367,82 @@ class Rankings:
 
         # Assign ranking data to matches, such as category and rating of players
         ranking_data = self.ranking_df.loc[old_tid_indexes, ["pid", "category", "rating"]].copy()
-        winner_data = ranking_data.rename(columns={"category": "winner_category", "rating": "winner_rating"})
-        loser_data = ranking_data.rename(columns={"category": "loser_category", "rating": "loser_rating"})
-        matches = self.merge_preserve_left_index(matches, winner_data, left_on="winner_pid", right_on="pid").drop(
-            columns="pid")
-        matches = self.merge_preserve_left_index(matches, loser_data, left_on="loser_pid", right_on="pid").drop(
-            columns="pid")
-        matches["not_own_category"] = matches.loc[:, ["winner_pid", "loser_pid"]].isin(pid_not_own_category).any(axis=1)
+        winner_data = ranking_data.rename(
+            columns={"category": "winner_category", "rating": "winner_rating"}
+        )
+        loser_data = ranking_data.rename(
+            columns={"category": "loser_category", "rating": "loser_rating"}
+        )
+        matches = self.merge_preserve_left_index(
+            matches, winner_data, left_on="winner_pid", right_on="pid"
+        ).drop(columns="pid")
+        matches = self.merge_preserve_left_index(
+            matches, loser_data, left_on="loser_pid", right_on="pid"
+        ).drop(columns="pid")
+        matches["not_own_category"] = (
+            matches.loc[:, ["winner_pid", "loser_pid"]].isin(pid_not_own_category).any(axis=1)
+        )
 
         # Compute ratings changes per match
         matches_processed = matches.apply(self._new_ratings_from_match, axis="columns")
 
         # Compute overall rating changes per player
-        translations = {"rating_to_winner": "rating_change", "rating_to_loser": "rating_change",
-                        "winner_pid": "pid", "loser_pid": "pid"}
-        winner_changes = matches_processed.loc[:, ["winner_pid", "rating_to_winner"]].rename(columns=translations)
-        loser_changes = matches_processed.loc[:, ["loser_pid", "rating_to_loser"]].rename(columns=translations)
+        translations = {
+            "rating_to_winner": "rating_change",
+            "rating_to_loser": "rating_change",
+            "winner_pid": "pid",
+            "loser_pid": "pid",
+        }
+        winner_changes = matches_processed.loc[:, ["winner_pid", "rating_to_winner"]].rename(
+            columns=translations
+        )
+        loser_changes = matches_processed.loc[:, ["loser_pid", "rating_to_loser"]].rename(
+            columns=translations
+        )
         rating_changes = pd.concat([winner_changes, loser_changes], ignore_index=True)
         rating_changes = rating_changes.groupby("pid").sum()
 
         # Assign changes to ranking_df and save details
-        reordered_changes = self.merge_preserve_left_index(self.ranking_df.loc[new_tid_indexes, "pid"],
-                                                           rating_changes, on="pid")
-        self.ranking_df.loc[reordered_changes.index, "rating"] += reordered_changes.loc[:, "rating_change"]
+        reordered_changes = self.merge_preserve_left_index(
+            self.ranking_df.loc[new_tid_indexes, "pid"], rating_changes, on="pid"
+        )
+        self.ranking_df.loc[reordered_changes.index, "rating"] += reordered_changes.loc[
+            :, "rating_change"
+        ]
 
         self.rating_details_df = self.rating_details_df.append(matches_processed)
         self.update_categories()
 
     def compute_category_points(self, tid: str, best_rounds: pd.DataFrame):
         col_translations = {"round_reached": "best_round", "level_1": "category", 0: "points"}
-        points_assignation_table = best_rounds_points.stack().reset_index().rename(columns=col_translations)
+        points_assignation_table = (
+            best_rounds_points.stack().reset_index().rename(columns=col_translations)
+        )
 
-        best_rounds_pointed = best_rounds.merge(points_assignation_table, on=["category", "best_round"])
+        best_rounds_pointed = best_rounds.merge(
+            points_assignation_table, on=["category", "best_round"]
+        )
         best_rounds_pointed.insert(0, "tid", tid)
 
         for cat, points_cat_col in zip(categories, self.points_cat_columns()):
-            rows_reordered = self.merge_preserve_left_index(self.ranking_df.loc[self.ranking_df.tid == tid, "pid"],
-                                                            best_rounds_pointed[best_rounds_pointed.category == cat],
-                                                            on="pid", how="inner")
-            self.ranking_df.loc[rows_reordered.index, points_cat_col] = rows_reordered.loc[:, "points"]
+            rows_reordered = self.merge_preserve_left_index(
+                self.ranking_df.loc[self.ranking_df.tid == tid, "pid"],
+                best_rounds_pointed[best_rounds_pointed.category == cat],
+                on="pid",
+                how="inner",
+            )
+            self.ranking_df.loc[rows_reordered.index, points_cat_col] = rows_reordered.loc[
+                :, "points"
+            ]
 
         # Save details of assigned points
-        self.championship_details_df = self.championship_details_df.append(best_rounds_pointed, ignore_index=True)
+        self.championship_details_df = self.championship_details_df.append(
+            best_rounds_pointed, ignore_index=True
+        )
 
     @staticmethod
     def merge_preserve_left_index(left: pd.DataFrame, right: pd.DataFrame, **kwargs):
-        return left.reset_index().merge(right, **kwargs).set_index('index').rename_axis(None)
+        return left.reset_index().merge(right, **kwargs).set_index("index").rename_axis(None)
 
     def compute_championship_points(self, tid: str):
         """
@@ -353,42 +451,77 @@ class Rankings:
         """
         n_tournaments = cfg["aux"]["masters N tournaments to consider"]
         tid_indexes = self.ranking_df.tid == tid
-        rankings = self.ranking_df[self.ranking_df.tid != cfg["aux"]["initial tid"]]  # Remove initial tid data
+        rankings = self.ranking_df[
+            self.ranking_df.tid != cfg["aux"]["initial tid"]
+        ]  # Remove initial tid data
 
         for points_cat_col, cum_points_cat_col, cum_tids_cat_col, n_played_cat_col in zip(
-                self.points_cat_columns(), self.cum_points_cat_columns(), self.cum_tids_cat_columns(),
-                self.participations_cat_columns()):
+            self.points_cat_columns(),
+            self.cum_points_cat_columns(),
+            self.cum_tids_cat_columns(),
+            self.participations_cat_columns(),
+        ):
 
             # Best n_tournaments, not consider null points data to accelerate processing
             rankings_not_null = rankings[rankings[points_cat_col] > 0].copy()
-            n_best = rankings_not_null.sort_values(by=[points_cat_col], ascending=False).groupby("pid").head(
-                n_tournaments)
+            n_best = (
+                rankings_not_null.sort_values(by=[points_cat_col], ascending=False)
+                .groupby("pid")
+                .head(n_tournaments)
+            )
 
             # Cumulated points of the best n_tournaments
-            cum_points_cat_values = n_best.groupby("pid")[points_cat_col].sum().rename(cum_points_cat_col)
-            rows_reordered = self.merge_preserve_left_index(self.ranking_df.loc[tid_indexes, "pid"],
-                                                            cum_points_cat_values, on="pid", how="inner")
-            self.ranking_df.loc[rows_reordered.index, cum_points_cat_col] = rows_reordered.loc[:, cum_points_cat_col]
+            cum_points_cat_values = (
+                n_best.groupby("pid")[points_cat_col].sum().rename(cum_points_cat_col)
+            )
+            rows_reordered = self.merge_preserve_left_index(
+                self.ranking_df.loc[tid_indexes, "pid"],
+                cum_points_cat_values,
+                on="pid",
+                how="inner",
+            )
+            self.ranking_df.loc[rows_reordered.index, cum_points_cat_col] = rows_reordered.loc[
+                :, cum_points_cat_col
+            ]
 
             # Details of cumulated points, formatted as POINTS (TID) + POINTS(TID) + ...
-            n_best[cum_tids_cat_col] = n_best[points_cat_col].astype(int).astype(str) + " (" + n_best['tid'] + ") + "
-            selected_tids_cat_values = n_best.groupby("pid")[cum_tids_cat_col].sum().apply(lambda x: x[:-3])
-            rows_reordered = self.merge_preserve_left_index(self.ranking_df.loc[tid_indexes, "pid"],
-                                                            selected_tids_cat_values, on="pid", how="inner")
-            self.ranking_df.loc[rows_reordered.index, cum_tids_cat_col] = rows_reordered.loc[:, cum_tids_cat_col]
+            n_best[cum_tids_cat_col] = (
+                n_best[points_cat_col].astype(int).astype(str) + " (" + n_best["tid"] + ") + "
+            )
+            selected_tids_cat_values = (
+                n_best.groupby("pid")[cum_tids_cat_col].sum().apply(lambda x: x[:-3])
+            )
+            rows_reordered = self.merge_preserve_left_index(
+                self.ranking_df.loc[tid_indexes, "pid"],
+                selected_tids_cat_values,
+                on="pid",
+                how="inner",
+            )
+            self.ranking_df.loc[rows_reordered.index, cum_tids_cat_col] = rows_reordered.loc[
+                :, cum_tids_cat_col
+            ]
 
             # Total number of participations
             n_played_cat_values = rankings_not_null.groupby(["pid"])[points_cat_col].count()
             n_played_cat_values.rename(n_played_cat_col, inplace=True)
-            rows_reordered = self.merge_preserve_left_index(self.ranking_df.loc[tid_indexes, "pid"],
-                                                            n_played_cat_values, on="pid", how="inner")
-            self.ranking_df.loc[rows_reordered.index, n_played_cat_col] = rows_reordered.loc[:, n_played_cat_col]
+            rows_reordered = self.merge_preserve_left_index(
+                self.ranking_df.loc[tid_indexes, "pid"], n_played_cat_values, on="pid", how="inner"
+            )
+            self.ranking_df.loc[rows_reordered.index, n_played_cat_col] = rows_reordered.loc[
+                :, n_played_cat_col
+            ]
 
     @staticmethod
-    def _activate_or_inactivate_player(ranking_entry, tids_list, active_window_tids, inactive_window_tids,
-                                       players, initial_active_pids):
+    def _activate_or_inactivate_player(
+        ranking_entry,
+        tids_list,
+        active_window_tids,
+        inactive_window_tids,
+        players,
+        initial_active_pids,
+    ):
         # Avoid activate or inactivate players after the first tournament.
-        activate_window = cfg["aux"]["tournament window to activate"]
+        # activate_window = cfg["aux"]["tournament window to activate"]
         tourns_to_activate = cfg["aux"]["tournaments to activate"]
         inactivate_window = cfg["aux"]["tournament window to inactivate"]
 
@@ -401,7 +534,10 @@ class Rankings:
         else:
             last_tourns = [p_tid for p_tid in played_tids if p_tid in inactive_window_tids]
             # don't inactivate during tournaments window if it is an initial active player
-            if tids_list.index(ranking_entry.tid) + 1 < inactivate_window and ranking_entry.pid in initial_active_pids:
+            if (
+                tids_list.index(ranking_entry.tid) + 1 < inactivate_window
+                and ranking_entry.pid in initial_active_pids
+            ):
                 active = True
             else:
                 active = len(last_tourns) > 0
@@ -417,14 +553,26 @@ class Rankings:
         initial_active_players = list(self.ranking_df.loc[indexes, "pid"].unique())
 
         tids_list = self._get_tids_list()
-        active_window_tids = tids_list[max(0, tids_list.index(tid) - activate_window + 1):tids_list.index(tid) + 1]
-        inactive_window_tids = tids_list[max(0, tids_list.index(tid) - inactivate_window + 1):tids_list.index(tid) + 1]
+        active_window_tids = tids_list[
+            max(0, tids_list.index(tid) - activate_window + 1) : tids_list.index(tid) + 1  # noqa
+        ]
+        inactive_window_tids = tids_list[
+            max(0, tids_list.index(tid) - inactivate_window + 1) : tids_list.index(tid) + 1  # noqa
+        ]
 
         tid_criteria = self.ranking_df.tid == tid
 
         self.ranking_df.loc[tid_criteria, "active"] = self.ranking_df[tid_criteria].apply(
-            self._activate_or_inactivate_player, axis="columns",
-            args=(tids_list, active_window_tids, inactive_window_tids, players, initial_active_players))
+            self._activate_or_inactivate_player,
+            axis="columns",
+            args=(
+                tids_list,
+                active_window_tids,
+                inactive_window_tids,
+                players,
+                initial_active_players,
+            ),
+        )
 
     def _get_tids_list(self) -> List[str]:
         return sorted(list(self.ranking_df.tid.unique()))
@@ -463,23 +611,35 @@ class Rankings:
         """
         # stats by category
         columns = ["tid"] + self.cum_points_cat_columns() + self.points_cat_columns()
-        stats_cat = self.ranking_df.loc[:, columns].groupby("tid").apply(lambda df: (df > 0).sum(axis=0))
-        stats_cat.rename(lambda col: col.replace("points", "participation"), axis="columns", inplace=True)
+        stats_cat = (
+            self.ranking_df.loc[:, columns].groupby("tid").apply(lambda df: (df > 0).sum(axis=0))
+        )
+        stats_cat.rename(
+            lambda col: col.replace("points", "participation"), axis="columns", inplace=True
+        )
 
         # total stats cumulated. multi category players on a tournament are counted once
         columns = ["tid", "pid"] + self.cum_points_cat_columns()
-        cum_participation_total = self.ranking_df.loc[:, columns].groupby("tid").apply(
-            self._count_unique_pids, self.cum_points_cat_columns())
+        cum_participation_total = (
+            self.ranking_df.loc[:, columns]
+            .groupby("tid")
+            .apply(self._count_unique_pids, self.cum_points_cat_columns())
+        )
         cum_participation_total.rename("cum_participation_total", inplace=True)
 
         # total stats. multi category players on a tournament are counted once
         columns = ["tid", "pid"] + self.points_cat_columns()
-        participation_total = self.ranking_df.loc[:, columns].groupby("tid").apply(
-            self._count_unique_pids, self.points_cat_columns())
+        participation_total = (
+            self.ranking_df.loc[:, columns]
+            .groupby("tid")
+            .apply(self._count_unique_pids, self.points_cat_columns())
+        )
         participation_total.rename("participation_total", inplace=True)
 
         # Join results in a single table
-        stats = stats_cat.join([participation_total, cum_participation_total]).sort_index(axis="columns")
+        stats = stats_cat.join([participation_total, cum_participation_total]).sort_index(
+            axis="columns"
+        )
         stats.drop(cfg["aux"]["initial tid"], inplace=True)
 
         return stats
@@ -496,9 +656,22 @@ class Tournaments:
         :param tournaments_df: DataFrame with columns: tournament_name, date, location,
                player_a, player_b, sets_a, sets_b, round, category
         """
-        self.tournaments_df = pd.DataFrame(tournaments_df,
-                                           columns=["tid", "sheet_name", "tournament_name", "date", "location",
-                                                    "player_a", "player_b", "sets_a", "sets_b", "round", "category"])
+        self.tournaments_df = pd.DataFrame(
+            tournaments_df,
+            columns=[
+                "tid",
+                "sheet_name",
+                "tournament_name",
+                "date",
+                "location",
+                "player_a",
+                "player_b",
+                "sets_a",
+                "sets_b",
+                "round",
+                "category",
+            ],
+        )
         self.tournaments_df.insert(4, "year", None)
         self.tournaments_df.insert(len(self.tournaments_df.columns), "winner", None)
         self.tournaments_df.insert(len(self.tournaments_df.columns), "winner_round", None)
@@ -567,28 +740,39 @@ class Tournaments:
             tids = grp["date"].transform(lambda row: "S%sT%02d" % (row.year, numbered[row]))
 
             return tids
+
         # TODO verify, groupby gives an unexpected result and need to be transposed
         tid = self.tournaments_df.groupby("year", as_index=False, group_keys=False).apply(tid_str)
         self.tournaments_df["tid"] = tid.transpose()
 
     def verify_and_normalize(self) -> None:
         cols_to_lower = ["round", "category"]
-        self.tournaments_df.loc[:, cols_to_lower] = self.tournaments_df.loc[:, cols_to_lower].applymap(
-            lambda cell: cell.strip().lower())
+        self.tournaments_df.loc[:, cols_to_lower] = self.tournaments_df.loc[
+            :, cols_to_lower
+        ].applymap(lambda cell: cell.strip().lower())
 
         cols_to_title = ["tournament_name", "date", "location", "player_a", "player_b"]
-        self.tournaments_df.loc[:, cols_to_title] = self.tournaments_df.loc[:, cols_to_title].applymap(
-            lambda cell: unidecode(cell).strip().title())
+        self.tournaments_df.loc[:, cols_to_title] = self.tournaments_df.loc[
+            :, cols_to_title
+        ].applymap(lambda cell: unidecode(cell).strip().title())
 
-        self.tournaments_df = self.tournaments_df.astype({"round": "category", "category": "category",
-                                                          "location": "category", "tournament_name": "category"})
+        self.tournaments_df = self.tournaments_df.astype(
+            {
+                "round": "category",
+                "category": "category",
+                "location": "category",
+                "tournament_name": "category",
+            }
+        )
 
         self.tournaments_df.date = pd.to_datetime(self.tournaments_df.date)
-        self.tournaments_df["year"] = self.tournaments_df.apply(lambda row: row["date"].year, axis="columns")
+        self.tournaments_df["year"] = self.tournaments_df.apply(
+            lambda row: row["date"].year, axis="columns"
+        )
         self._assign_tid()
         self.tournaments_df = self.tournaments_df.apply(self._process_match, axis="columns")
 
-    def get_players_names(self, tid: str, category: str = '') -> List[str]:
+    def get_players_names(self, tid: str, category: str = "") -> List[str]:
         """
         Return a sorted list of players that played the tournament
 
@@ -604,7 +788,7 @@ class Tournaments:
 
         return sorted(list(all_players))
 
-    def get_players_pids(self, tid: str, category: str = '') -> List[int]:
+    def get_players_pids(self, tid: str, category: str = "") -> List[int]:
         """
         Return a list of pid players that played the tournament
 
@@ -622,36 +806,60 @@ class Tournaments:
 
     def compute_best_rounds(self, tid: str, players: Players) -> pd.DataFrame:
         """
-        Return a DataFramey with the best round for each player and category. pid is assigned from players
+        Return a DataFrame with the best round for each player and category.
+
+        pid is assigned from players
         """
-        matches = self.get_matches(tid, exclude_fan_category=False, to_exclude=["sanction", "promote"])
+        matches = self.get_matches(
+            tid, exclude_fan_category=False, to_exclude=["sanction", "promote"]
+        )
 
         # Filter matches to process so best rounds can be computed
-        translations = {"winner": "name", "loser": "name", "winner_pid": "pid", "loser_pid": "pid",
-                        "winner_round": "best_round", "loser_round": "best_round"}
-        winner_data = matches.loc[:, ["winner", "winner_pid", "category", "winner_round"]].rename(columns=translations)
-        loser_data = matches.loc[:, ["loser", "loser_pid", "category", "loser_round"]].rename(columns=translations)
+        translations = {
+            "winner": "name",
+            "loser": "name",
+            "winner_pid": "pid",
+            "loser_pid": "pid",
+            "winner_round": "best_round",
+            "loser_round": "best_round",
+        }
+        winner_data = matches.loc[:, ["winner", "winner_pid", "category", "winner_round"]].rename(
+            columns=translations
+        )
+        loser_data = matches.loc[:, ["loser", "loser_pid", "category", "loser_round"]].rename(
+            columns=translations
+        )
         rounds_data = pd.concat([winner_data, loser_data], ignore_index=True)
 
         # Assign priority to matches
-        rounds_data["round_priority"] = rounds_data.loc[:, "best_round"].map(best_rounds_priority.to_dict())
+        rounds_data["round_priority"] = rounds_data.loc[:, "best_round"].map(
+            best_rounds_priority.to_dict()
+        )
 
         # Get best one for each player and category
         rounds_data.sort_values(by="round_priority", ascending=False, inplace=True)
-        best_rounds = rounds_data.groupby(by=["category", "pid"]).head(1).drop(columns="round_priority")
+        best_rounds = (
+            rounds_data.groupby(by=["category", "pid"]).head(1).drop(columns="round_priority")
+        )
         best_rounds = best_rounds.sort_values(by=["category", "pid"]).reset_index(drop=True)
 
         return best_rounds
 
     def assign_pid_from_players(self, players: Players) -> None:
         name2pid = players.get_name2pid()
-        self.tournaments_df["winner_pid"] = self.tournaments_df["winner"].apply(lambda name: name2pid[name])
-        self.tournaments_df["loser_pid"] = self.tournaments_df["loser"].apply(lambda name: name2pid[name])
+        self.tournaments_df["winner_pid"] = self.tournaments_df["winner"].apply(
+            lambda name: name2pid[name]
+        )
+        self.tournaments_df["loser_pid"] = self.tournaments_df["loser"].apply(
+            lambda name: name2pid[name]
+        )
 
-    def get_matches(self, tid: str, exclude_fan_category: bool = True, to_exclude: List[str] = None) -> pd.DataFrame:
+    def get_matches(
+        self, tid: str, exclude_fan_category: bool = True, to_exclude: List[str] = None
+    ) -> pd.DataFrame:
         if to_exclude is None:
             to_exclude = ["sanction", "promote", "bonus"]
-        entries_indexes = (self.tournaments_df.loc[:, "tid"] == tid)
+        entries_indexes = self.tournaments_df.loc[:, "tid"] == tid
         if exclude_fan_category:
             entries_indexes &= ~(self.tournaments_df.loc[:, "category"] == categories[-1])
         entries_indexes &= ~self.tournaments_df.loc[:, to_exclude].any(axis="columns")

@@ -4,7 +4,7 @@ from ranking_table_tennis import utils
 from ranking_table_tennis.models import cfg
 from urllib import request
 
-__author__ = 'sebastian'
+__author__ = "sebastian"
 
 ##########################################
 # Script to run before compute_rankings.py
@@ -13,7 +13,7 @@ __author__ = 'sebastian'
 # Output: xlsx tournaments database
 #
 # It looks for unknown or unrated players.
-# It will ask for information not given 
+# It will ask for information not given
 # and saves the result into the same xlsx
 ##########################################
 
@@ -62,7 +62,8 @@ for tid in tournaments:
         if rankings[initial_tid, pid] is None:
             if ranking_temp[initial_tid, pid] is None:
                 unknown_player = True
-                text_to_show = f"\nEnter the initial rating points for {name} (category will be auto-assigned):\n"
+                text_to_show = f"\nEnter the initial rating points for {name}"
+                text_to_show += " (category will be auto-assigned):\n"
                 initial_rating = int(input(text_to_show))
                 rankings.add_new_entry(initial_tid, pid, initial_rating)
                 # Save a temp ranking of the player to resume preprocessing, if necessary
@@ -71,10 +72,17 @@ for tid in tournaments:
                 print(">>>>\tUNCOMPLETE preprocessing detected. Resuming...")
                 rankings.add_entry(ranking_temp[initial_tid, pid])
 
-            print("\n", rankings[initial_tid, pid][["tid", "pid", "rating", "category"]], players[pid]["name"], "\n")
+            print(
+                "\n",
+                rankings[initial_tid, pid][["tid", "pid", "rating", "category"]],
+                players[pid]["name"],
+                "\n",
+            )
 
         if unknown_player:
-            retrieve = input("press Enter to continue or Kill this process to forget last player data\n")
+            retrieve = input(
+                "press Enter to continue or Kill this process to forget last player data\n"
+            )
             utils.save_temp_players_ranking(players_temp, ranking_temp)
 
 # Update the online version
