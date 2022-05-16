@@ -358,8 +358,15 @@ def publish_rating_sheet(
     if upload:
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
-    markdown_filename = cfg["io"]["data_folder"] + f"{sheet_name.replace(' ', '_')}.md"
-    this_ranking_df[columns].to_markdown(markdown_filename, index=False, headers=headers)
+    publish_sheet_as_markdown(this_ranking_df, columns, headers, sheet_name, tid)
+
+
+def publish_sheet_as_markdown(df, columns, headers, sheet_name, tid):
+    # Create folder to publish markdowns
+    os.makedirs(f"{cfg['io']['data_folder']}{tid}", exist_ok=True)
+    markdown_filename = f"{cfg['io']['data_folder']}{tid}/{sheet_name.replace(' ', '_')}.md"
+    print("<<<Saving", sheet_name, "in", f"{cfg['io']['data_folder']}{tid}", sep="\t")
+    df[columns].to_markdown(markdown_filename, index=False, headers=headers)
 
 
 def publish_initial_rating_sheet(
@@ -387,9 +394,10 @@ def publish_initial_rating_sheet(
     to_bold = ["A1", "B1", "C1", "D1"]
     to_center = to_bold
 
+    headers = [cfg["labels"][key] for key in ["Rating", "Player", "City", "Association"]]
+    columns = ["rating", "name", "city", "affiliation"]
+
     with _get_writer(xlsx_filename, sheet_name) as writer:
-        headers = [cfg["labels"][key] for key in ["Rating", "Player", "City", "Association"]]
-        columns = ["rating", "name", "city", "affiliation"]
         this_ranking_df.to_excel(
             writer, sheet_name=sheet_name, index=False, header=headers, columns=columns
         )
@@ -400,6 +408,8 @@ def publish_initial_rating_sheet(
 
     if upload:
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
+
+    publish_sheet_as_markdown(this_ranking_df, columns, headers, sheet_name, tid)
 
 
 def save_raw_ranking(rankings: models.Rankings, players: models.Players, tid: str) -> None:
@@ -457,15 +467,18 @@ def publish_histories_sheet(
     # Remove repeated strings to show a cleaner sheet
     history_df.loc[history_df["category"] == history_df["category"].shift(1), "category"] = ""
 
+    headers = [cfg["labels"][key] for key in ["Player", "Category", "Best Round", "Tournament"]]
+    columns = ["name", "category", "best_round", "tid"]
+
     with _get_writer(xlsx_filename, sheet_name) as writer:
-        headers = [cfg["labels"][key] for key in ["Player", "Category", "Best Round", "Tournament"]]
-        columns = ["name", "category", "best_round", "tid"]
         history_df.to_excel(
             writer, sheet_name=sheet_name, index=False, header=headers, columns=columns
         )
 
     if upload:
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
+
+    publish_sheet_as_markdown(history_df, columns, headers, sheet_name, tid)
 
 
 def publish_rating_details_sheet(
@@ -501,30 +514,31 @@ def publish_rating_details_sheet(
     to_bold = ["A1", "A2", "A3", "A4", "B4", "C4", "D4", "E4", "F4", "G4"]
     to_center = to_bold + ["B1", "B2", "B3"]
 
+    headers = [
+        cfg["labels"][key]
+        for key in [
+            "Winner",
+            "Loser",
+            "Difference",
+            "Winner Points",
+            "Loser Points",
+            "Round",
+            "Category",
+            "Factor",
+        ]
+    ]
+    columns = [
+        "winner_name_rating",
+        "loser_name_rating",
+        "diff_rating",
+        "rating_to_winner",
+        "rating_to_loser",
+        "round",
+        "category",
+        "factor",
+    ]
+
     with _get_writer(xlsx_filename, sheet_name) as writer:
-        headers = [
-            cfg["labels"][key]
-            for key in [
-                "Winner",
-                "Loser",
-                "Difference",
-                "Winner Points",
-                "Loser Points",
-                "Round",
-                "Category",
-                "Factor",
-            ]
-        ]
-        columns = [
-            "winner_name_rating",
-            "loser_name_rating",
-            "diff_rating",
-            "rating_to_winner",
-            "rating_to_loser",
-            "round",
-            "category",
-            "factor",
-        ]
         details.to_excel(
             writer, sheet_name=sheet_name, index=False, header=headers, columns=columns
         )
@@ -536,6 +550,8 @@ def publish_rating_details_sheet(
 
     if upload:
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
+
+    publish_sheet_as_markdown(details, columns, headers, sheet_name, tid)
 
 
 def publish_championship_details_sheet(
@@ -560,12 +576,11 @@ def publish_championship_details_sheet(
     to_bold = ["A1", "A2", "A3", "A4", "B4", "C4", "D4"]
     to_center = to_bold + ["B1", "B2", "B3"]
 
+    headers = [
+        cfg["labels"][key] for key in ["Player", "Category", "Best Round", "Championship Points"]
+    ]
+    columns = ["name", "category", "best_round", "points"]
     with _get_writer(xlsx_filename, sheet_name) as writer:
-        headers = [
-            cfg["labels"][key]
-            for key in ["Player", "Category", "Best Round", "Championship Points"]
-        ]
-        columns = ["name", "category", "best_round", "points"]
         championship_details.to_excel(
             writer, sheet_name=sheet_name, index=False, header=headers, columns=columns
         )
@@ -577,6 +592,8 @@ def publish_championship_details_sheet(
 
     if upload:
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
+
+    publish_sheet_as_markdown(championship_details, columns, headers, sheet_name, tid)
 
 
 def publish_statistics_sheet(
@@ -727,6 +744,8 @@ def publish_championship_sheets(
 
         if upload:
             load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
+
+        publish_sheet_as_markdown(sorted_ranking, _columns, headers, sheet_name, tid)
 
 
 def in_colab() -> bool:
