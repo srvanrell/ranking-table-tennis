@@ -365,8 +365,10 @@ def publish_sheet_as_markdown(df, columns, headers, sheet_name, tid):
     # Create folder to publish markdowns
     os.makedirs(f"{cfg['io']['data_folder']}{tid}", exist_ok=True)
     markdown_filename = f"{cfg['io']['data_folder']}{tid}/{sheet_name.replace(' ', '_')}.md"
-    print("<<<Saving", sheet_name, "in", f"{cfg['io']['data_folder']}{tid}", sep="\t")
-    df[columns].to_markdown(markdown_filename, index=False, headers=headers)
+    print("<<<Saving", sheet_name, "in", markdown_filename, sep="\t")
+    df[columns].to_markdown(
+        markdown_filename, index=False, headers=headers, stralign="center", numalign="center"
+    )
 
 
 def publish_initial_rating_sheet(
