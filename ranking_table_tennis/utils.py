@@ -358,7 +358,8 @@ def publish_rating_sheet(
     if upload:
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
-    publish_sheet_as_markdown(this_ranking_df, columns, headers, sheet_name, tid)
+    sheet_name_for_md = cfg["labels"]["Rating"]
+    publish_sheet_as_markdown(this_ranking_df, columns, headers, sheet_name_for_md, tid)
 
 
 def publish_sheet_as_markdown(df, columns, headers, sheet_name, tid):
@@ -411,7 +412,9 @@ def publish_initial_rating_sheet(
     if upload:
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
-    publish_sheet_as_markdown(this_ranking_df, columns, headers, sheet_name, tid)
+    # Adds a label for initial rating so it does not overwrite current rating file
+    sheet_name_for_md = f'{cfg["labels"]["Rating"]}_{cfg["default"]["tournament_name"].split()[0]}'
+    publish_sheet_as_markdown(this_ranking_df, columns, headers, sheet_name_for_md, tid)
 
 
 def save_raw_ranking(rankings: models.Rankings, players: models.Players, tid: str) -> None:
@@ -480,7 +483,8 @@ def publish_histories_sheet(
     if upload:
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
-    publish_sheet_as_markdown(history_df, columns, headers, sheet_name, tid)
+    sheet_name_for_md = cfg["sheetname"]["histories"]
+    publish_sheet_as_markdown(history_df, columns, headers, sheet_name_for_md, tid)
 
 
 def publish_rating_details_sheet(
@@ -553,7 +557,8 @@ def publish_rating_details_sheet(
     if upload:
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
-    publish_sheet_as_markdown(details, columns, headers, sheet_name, tid)
+    sheet_name_for_md = cfg["sheetname"]["rating_details_key"]
+    publish_sheet_as_markdown(details, columns, headers, sheet_name_for_md, tid)
 
 
 def publish_championship_details_sheet(
@@ -595,7 +600,8 @@ def publish_championship_details_sheet(
     if upload:
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
-    publish_sheet_as_markdown(championship_details, columns, headers, sheet_name, tid)
+    sheet_name_for_md = cfg["sheetname"]["championship_details_key"]
+    publish_sheet_as_markdown(championship_details, columns, headers, sheet_name_for_md, tid)
 
 
 def publish_statistics_sheet(
@@ -747,7 +753,8 @@ def publish_championship_sheets(
         if upload:
             load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
-        publish_sheet_as_markdown(sorted_ranking, _columns, headers, sheet_name, tid)
+        sheet_name_for_md = cat.title()
+        publish_sheet_as_markdown(sorted_ranking, _columns, headers, sheet_name_for_md, tid)
 
 
 def in_colab() -> bool:
