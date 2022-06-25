@@ -753,8 +753,14 @@ def publish_championship_sheets(
         if upload:
             load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
 
+        # Workaround to remove nans before converting to as markdown
+        sorted_rankind_md = (
+            sorted_ranking.fillna({_columns[0]: "0"})
+            .astype({_columns[0]: "int"})
+            .replace({_columns[0]: 0}, "")
+        )
         sheet_name_for_md = cat.title()
-        publish_sheet_as_markdown(sorted_ranking, _columns, headers, sheet_name_for_md, tid)
+        publish_sheet_as_markdown(sorted_rankind_md, _columns, headers, sheet_name_for_md, tid)
 
 
 def in_colab() -> bool:
