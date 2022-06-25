@@ -360,6 +360,24 @@ def publish_rating_sheet(
 
     sheet_name_for_md = cfg["labels"]["Rating"]
     publish_sheet_as_markdown(this_ranking_df, columns, headers, sheet_name_for_md, tid)
+    publish_tournament_metadata_as_markdown(tid, tournaments[tid])
+
+
+def publish_tournament_metadata_as_markdown(tid, tournament_tid: pd.DataFrame) -> None:
+    df_metadata = pd.DataFrame(
+        {
+            cfg["labels"]["Tournament name"]: [tournament_tid["tournament_name"].iloc[0]],
+            cfg["labels"]["Date"]: [tournament_tid["date"].iloc[0].strftime("%Y %m %d")],
+            cfg["labels"]["Location"]: [tournament_tid["location"].iloc[0]],
+        }
+    )
+    publish_sheet_as_markdown(
+        df_metadata,
+        df_metadata.columns,
+        df_metadata.columns,
+        cfg["io"]["tournament_metadata_md"],
+        tid,
+    )
 
 
 def publish_sheet_as_markdown(df, columns, headers, sheet_name, tid):
