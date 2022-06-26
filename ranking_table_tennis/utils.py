@@ -8,6 +8,7 @@ import gspread
 from gspread.utils import rowcol_to_a1
 import pandas as pd
 import pickle
+import matplotlib.pyplot as plt
 
 from gspread_dataframe import set_with_dataframe
 
@@ -379,13 +380,13 @@ def publish_tournament_metadata_as_markdown(tid, tournament_tid: pd.DataFrame) -
     )
 
 
-def publish_sheet_as_markdown(df, headers, sheet_name, tid):
+def publish_sheet_as_markdown(df, headers, sheet_name, tid, index=False):
     # Create folder to publish markdowns
     os.makedirs(f"{cfg['io']['data_folder']}{tid}", exist_ok=True)
     markdown_filename = f"{cfg['io']['data_folder']}{tid}/{sheet_name.replace(' ', '_')}.md"
     print("<<<Saving", sheet_name, "in", markdown_filename, sep="\t")
     df.to_markdown(
-        markdown_filename, index=False, headers=headers, stralign="center", numalign="center"
+        markdown_filename, index=index, headers=headers, stralign="center", numalign="center"
     )
 
 
@@ -663,6 +664,46 @@ def publish_statistics_sheet(
 
     if upload:
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
+
+    sheet_name_for_md = f'{cfg["sheetname"]["statistics_key"]} {cfg["labels"]["Cumulated"]}'
+    publish_sheet_as_markdown(
+        stats.iloc[:, : stats.shape[1] // 2], headers, sheet_name_for_md, tid, index=True
+    )
+    publish_stat_plot(
+        stats.iloc[:, : stats.shape[1] // 2 - 2],
+        headers[: stats.shape[1] // 2 - 2],
+        tid,
+        sheet_name_for_md,
+    )
+
+    sheet_name_for_md = f'{cfg["sheetname"]["statistics_key"]} {cfg["labels"]["By Tournament"]}'
+    publish_sheet_as_markdown(
+        stats.iloc[:, stats.shape[1] // 2 :], headers, sheet_name_for_md, tid, index=True
+    )
+    publish_stat_plot(
+        stats.iloc[:, stats.shape[1] // 2 : -2],
+        headers[stats.shape[1] // 2 : -2],
+        tid,
+        sheet_name_for_md,
+    )
+
+
+def publish_stat_plot(stats_df, headers, tid, fig_filename):
+    stats_df.columns = headers
+    stats_plot = stats_df.plot(
+        title=fig_filename.replace(cfg["sheetname"]["statistics_key"], ""),
+        kind="bar",
+        xlabel=cfg["labels"]["tid"],
+        ylabel=cfg["sheetname"]["players"],
+        stacked=True,
+        rot=0,
+    )
+    for container in stats_plot.containers:
+        stats_plot.bar_label(container, label_type="center")
+    plt.tight_layout()
+    stats_plot.get_figure().savefig(
+        f"{cfg['io']['data_folder']}{tid}/{fig_filename.replace(' ', '_')}.png"
+    )
 
 
 def publish_championship_sheets(
