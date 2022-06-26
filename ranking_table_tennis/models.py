@@ -1,10 +1,10 @@
 import os
 from typing import List, Tuple, Iterator
 
-import yaml
 from unidecode import unidecode
 import shutil
 import pandas as pd
+from omegaconf import OmegaConf
 
 
 # Loads some names from config.yaml
@@ -13,11 +13,7 @@ user_config_path = os.path.join("data_rtt", "config")
 if not os.path.exists(user_config_path):
     shutil.copytree(os.path.dirname(__file__) + "/config", user_config_path)
 
-with open(user_config_path + "/config.yaml", "r") as cfgyaml:
-    try:
-        cfg = yaml.safe_load(cfgyaml)
-    except yaml.YAMLError as exc:
-        print(exc)
+cfg = OmegaConf.load(user_config_path + "/config.yaml")
 
 if not os.path.exists(cfg["io"]["data_folder"]):
     os.mkdir(cfg["io"]["data_folder"])
