@@ -16,8 +16,8 @@ __author__ = "sebastian"
 
 
 def get_tournament_sheet_names_ordered() -> List[str]:
-    tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
-    filter_key = cfg["sheetname"]["tournaments_key"]
+    tournaments_xlsx = cfg.io.data_folder + cfg.io.tournaments_filename
+    filter_key = cfg.sheetname.tournaments_key
     df_tournaments = pd.read_excel(tournaments_xlsx, sheet_name=None, header=None)
     sheet_names = [s for s in df_tournaments.keys() if filter_key in s]
 
@@ -41,19 +41,17 @@ def save_ranking_sheet(
     players: models.Players,
     upload: bool = False,
 ) -> None:
-    if tid == cfg["aux"]["initial tid"]:
-        sheet_name = cfg["sheetname"]["initial_ranking"]
-        xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
+    if tid == cfg.aux.initial_tid:
+        sheet_name = cfg.sheetname.initial_ranking
+        xlsx_filename = cfg.io.data_folder + cfg.io.tournaments_filename
     else:
-        xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["rankings_filename"]
+        xlsx_filename = cfg.io.data_folder + cfg.io.rankings_filename
         sheet_name = tournaments[tid].iloc[0].sheet_name
-        sheet_name = sheet_name.replace(
-            cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["rankings_key"]
-        )
+        sheet_name = sheet_name.replace(cfg.sheetname.tournaments_key, cfg.sheetname.rankings_key)
 
     sorted_rankings_df = rankings.ranking_df.sort_values("rating", ascending=False)
     sorted_rankings_df.loc[:, "active"] = sorted_rankings_df.loc[:, "active"].apply(
-        lambda x: cfg["activeplayer"][x]
+        lambda x: cfg.activeplayer[x]
     )
     sorted_rankings_df.insert(
         2, "name", sorted_rankings_df.loc[:, "pid"].apply(lambda pid: players[pid]["name"])
@@ -64,17 +62,17 @@ def save_ranking_sheet(
 
     with _get_writer(xlsx_filename, sheet_name) as writer:
         headers = [
-            cfg["labels"][key]
+            cfg.labels[key]
             for key in [
                 "tid",
-                "Tournament name",
+                "Tournament_name",
                 "Date",
                 "Location",
                 "pid",
                 "Player",
                 "Rating",
                 "Category",
-                "Active Player",
+                "Active_Player",
             ]
         ]
         columns = [
@@ -94,8 +92,8 @@ def save_ranking_sheet(
 
     if upload:
         upload_sheet_from_df(
-            cfg["io"]["tournaments_spreadsheet_id"],
-            cfg["sheetname"]["initial_ranking"],
+            cfg.io.tournaments_spreadsheet_id,
+            cfg.sheetname.initial_ranking,
             sorted_rankings_df.loc[:, columns],
             headers,
         )
@@ -103,20 +101,20 @@ def save_ranking_sheet(
 
 def save_players_sheet(players: models.Players, upload=False) -> None:
     sorted_players_df = players.players_df.sort_values("name")
-    xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
-    sheet_name = cfg["sheetname"]["players"]
+    xlsx_filename = cfg.io.data_folder + cfg.io.tournaments_filename
+    sheet_name = cfg.sheetname.players
 
     with _get_writer(xlsx_filename, sheet_name) as writer:
-        headers = [cfg["labels"][key] for key in ["Player", "Association", "City"]]
+        headers = [cfg.labels[key] for key in ["Player", "Association", "City"]]
         sorted_players_df.to_excel(
-            writer, sheet_name=sheet_name, index_label=cfg["labels"]["pid"], header=headers
+            writer, sheet_name=sheet_name, index_label=cfg.labels.pid, header=headers
         )
 
     if upload:
-        headers_df = [cfg["labels"]["pid"]] + headers
+        headers_df = [cfg.labels.pid] + headers
         upload_sheet_from_df(
-            cfg["io"]["tournaments_spreadsheet_id"],
-            cfg["sheetname"]["players"],
+            cfg.io.tournaments_spreadsheet_id,
+            cfg.sheetname.players,
             sorted_players_df,
             headers_df,
             include_index=True,
@@ -174,16 +172,16 @@ def upload_sheet_from_df(
 
 
 def load_players_sheet() -> models.Players:
-    tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
-    players_df = pd.read_excel(tournaments_xlsx, sheet_name=cfg["sheetname"]["players"], header=0)
-    print("> Reading", cfg["sheetname"]["players"], "from", tournaments_xlsx, sep="\t")
+    tournaments_xlsx = cfg.io.data_folder + cfg.io.tournaments_filename
+    players_df = pd.read_excel(tournaments_xlsx, sheet_name=cfg.sheetname.players, header=0)
+    print("> Reading", cfg.sheetname.players, "from", tournaments_xlsx, sep="\t")
 
     players_df.rename(
         columns={
-            cfg["labels"]["pid"]: "pid",
-            cfg["labels"]["Player"]: "name",
-            cfg["labels"]["Association"]: "affiliation",
-            cfg["labels"]["City"]: "city",
+            cfg.labels.pid: "pid",
+            cfg.labels.Player: "name",
+            cfg.labels.Association: "affiliation",
+            cfg.labels.City: "city",
         },
         inplace=True,
     )
@@ -194,27 +192,27 @@ def load_players_sheet() -> models.Players:
 
 
 def load_initial_ranking_sheet() -> models.Rankings:
-    tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
+    tournaments_xlsx = cfg.io.data_folder + cfg.io.tournaments_filename
     initial_ranking_df = pd.read_excel(
-        tournaments_xlsx, sheet_name=cfg["sheetname"]["initial_ranking"], header=0
+        tournaments_xlsx, sheet_name=cfg.sheetname.initial_ranking, header=0
     )
-    print("> Reading", cfg["sheetname"]["initial_ranking"], "from", tournaments_xlsx, sep="\t")
+    print("> Reading", cfg.sheetname.initial_ranking, "from", tournaments_xlsx, sep="\t")
 
     columns_translations = {
-        cfg["labels"]["tid"]: "tid",
-        cfg["labels"]["Tournament name"]: "tournament_name",
-        cfg["labels"]["Date"]: "date",
-        cfg["labels"]["Location"]: "location",
-        cfg["labels"]["pid"]: "pid",
-        cfg["labels"]["Player"]: "name",
-        cfg["labels"]["Rating"]: "rating",
-        cfg["labels"]["Category"]: "category",
-        cfg["labels"]["Active Player"]: "active",
+        cfg.labels.tid: "tid",
+        cfg.labels.Tournament_name: "tournament_name",
+        cfg.labels.Date: "date",
+        cfg.labels.Location: "location",
+        cfg.labels.pid: "pid",
+        cfg.labels.Player: "name",
+        cfg.labels.Rating: "rating",
+        cfg.labels.Category: "category",
+        cfg.labels.Active_Player: "active",
     }
 
     initial_ranking_df.rename(columns=columns_translations, inplace=True)
     initial_ranking_df.loc[:, "active"] = initial_ranking_df.loc[:, "active"].apply(
-        lambda x: x == cfg["activeplayer"][True]
+        lambda x: x == cfg.activeplayer[True]
     )
     initial_ranking = models.Rankings(initial_ranking_df)
 
@@ -222,8 +220,8 @@ def load_initial_ranking_sheet() -> models.Rankings:
 
 
 def load_tournaments_sheets() -> models.Tournaments:
-    tournaments_xlsx = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
-    filter_key = cfg["sheetname"]["tournaments_key"]
+    tournaments_xlsx = cfg.io.data_folder + cfg.io.tournaments_filename
+    filter_key = cfg.sheetname.tournaments_key
     raw_tournaments = pd.read_excel(tournaments_xlsx, sheet_name=None, header=None)
     sheet_names = sorted([s for s in raw_tournaments.keys() if filter_key in s])
 
@@ -272,13 +270,13 @@ def _format_diff(new_value: float, prev_value: float) -> str:
 
 def _publish_tournament_metadata(ws, tournament_tid: pd.DataFrame) -> None:
     ws.insert_rows(0, 3)
-    ws["A1"] = cfg["labels"]["Tournament name"]
+    ws["A1"] = cfg.labels.Tournament_name
     ws["B1"] = tournament_tid["tournament_name"].iloc[0]
     ws.merge_cells("B1:E1")
-    ws["A2"] = cfg["labels"]["Date"]
+    ws["A2"] = cfg.labels.Date
     ws["B2"] = tournament_tid["date"].iloc[0].strftime("%Y %m %d")
     ws.merge_cells("B2:E2")
-    ws["A3"] = cfg["labels"]["Location"]
+    ws["A3"] = cfg.labels.Location
     ws["B3"] = tournament_tid["location"].iloc[0]
     ws.merge_cells("B3:E3")
 
@@ -310,9 +308,9 @@ def publish_rating_sheet(
 ) -> None:
     """Format a ranking to be published into a rating sheet"""
     sheet_name = tournaments[tid]["sheet_name"].iloc[0]
-    sheet_name = sheet_name.replace(cfg["sheetname"]["tournaments_key"], cfg["labels"]["Rating"])
+    sheet_name = sheet_name.replace(cfg.sheetname.tournaments_key, cfg.labels.Rating)
 
-    xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"].replace("NN", tid)
+    xlsx_filename = cfg.io.data_folder + cfg.io.publish_filename.replace("NN", tid)
 
     # Rankings sorted by rating
     this_ranking_df = rankings[tid].sort_values("rating", ascending=False)
@@ -341,9 +339,7 @@ def publish_rating_sheet(
     to_bold = ["A1", "A2", "A3", "A4", "B4", "C4", "D4", "E4"]
     to_center = to_bold + ["B1", "B2", "B3"]
 
-    headers = [
-        cfg["labels"][key] for key in ["Category", "Rating", "Player", "City", "Association"]
-    ]
+    headers = [cfg.labels[key] for key in ["Category", "Rating", "Player", "City", "Association"]]
     columns = ["category", "formatted rating", "name", "city", "affiliation"]
 
     with _get_writer(xlsx_filename, sheet_name) as writer:
@@ -357,9 +353,9 @@ def publish_rating_sheet(
         _bold_and_center(ws, to_bold, to_center)
 
     if upload:
-        load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
+        load_and_upload_sheet(xlsx_filename, sheet_name, cfg.io.temporal_spreadsheet_id)
 
-    sheet_name_for_md = cfg["labels"]["Rating"]
+    sheet_name_for_md = cfg.labels.Rating
     publish_sheet_as_markdown(this_ranking_df[columns], headers, sheet_name_for_md, tid)
     publish_tournament_metadata_as_markdown(tid, tournaments[tid])
 
@@ -367,23 +363,23 @@ def publish_rating_sheet(
 def publish_tournament_metadata_as_markdown(tid, tournament_tid: pd.DataFrame) -> None:
     df_metadata = pd.DataFrame(
         {
-            cfg["labels"]["Tournament name"]: [tournament_tid["tournament_name"].iloc[0]],
-            cfg["labels"]["Date"]: [tournament_tid["date"].iloc[0].strftime("%Y %m %d")],
-            cfg["labels"]["Location"]: [tournament_tid["location"].iloc[0]],
+            cfg.labels.Tournament_name: [tournament_tid["tournament_name"].iloc[0]],
+            cfg.labels.Date: [tournament_tid["date"].iloc[0].strftime("%Y %m %d")],
+            cfg.labels.Location: [tournament_tid["location"].iloc[0]],
         }
     )
     publish_sheet_as_markdown(
         df_metadata,
         df_metadata.columns,
-        cfg["io"]["tournament_metadata_md"],
+        cfg.io.tournament_metadata_md,
         tid,
     )
 
 
 def publish_sheet_as_markdown(df, headers, sheet_name, tid, index=False):
     # Create folder to publish markdowns
-    os.makedirs(f"{cfg['io']['data_folder']}{tid}", exist_ok=True)
-    markdown_filename = f"{cfg['io']['data_folder']}{tid}/{sheet_name.replace(' ', '_')}.md"
+    os.makedirs(f"{cfg.io.data_folder}{tid}", exist_ok=True)
+    markdown_filename = f"{cfg.io.data_folder}{tid}/{sheet_name.replace(' ', '_')}.md"
     print("<<<Saving", sheet_name, "in", markdown_filename, sep="\t")
     df.to_markdown(
         markdown_filename, index=index, headers=headers, stralign="center", numalign="center"
@@ -398,13 +394,13 @@ def publish_initial_rating_sheet(
     upload=False,
 ) -> None:
     """Format a ranking to be published into a rating sheet"""
-    sheet_name = cfg["sheetname"]["initial_ranking"]
-    sheet_name = sheet_name.replace(cfg["sheetname"]["rankings_key"], cfg["labels"]["Rating"])
+    sheet_name = cfg.sheetname.initial_ranking
+    sheet_name = sheet_name.replace(cfg.sheetname.rankings_key, cfg.labels.Rating)
 
-    xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"].replace("NN", tid)
+    xlsx_filename = cfg.io.data_folder + cfg.io.publish_filename.replace("NN", tid)
 
     # Rankings sorted by rating
-    initial_tid = cfg["aux"]["initial tid"]
+    initial_tid = cfg.aux.initial_tid
     this_ranking_df = rankings[initial_tid].sort_values("rating", ascending=False)
 
     # Format data and columns to write into the file
@@ -415,7 +411,7 @@ def publish_initial_rating_sheet(
     to_bold = ["A1", "B1", "C1", "D1"]
     to_center = to_bold
 
-    headers = [cfg["labels"][key] for key in ["Rating", "Player", "City", "Association"]]
+    headers = [cfg.labels[key] for key in ["Rating", "Player", "City", "Association"]]
     columns = ["rating", "name", "city", "affiliation"]
 
     with _get_writer(xlsx_filename, sheet_name) as writer:
@@ -428,16 +424,16 @@ def publish_initial_rating_sheet(
         _bold_and_center(ws, to_bold, to_center)
 
     if upload:
-        load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
+        load_and_upload_sheet(xlsx_filename, sheet_name, cfg.io.temporal_spreadsheet_id)
 
     # Adds a label for initial rating so it does not overwrite current rating file
-    sheet_name_for_md = f'{cfg["labels"]["Rating"]}_{cfg["default"]["tournament_name"].split()[0]}'
+    sheet_name_for_md = f"{cfg.labels.Rating}_{cfg.default.tournament_name.split()[0]}"
     publish_sheet_as_markdown(this_ranking_df[columns], headers, sheet_name_for_md, tid)
 
 
 def save_raw_ranking(rankings: models.Rankings, players: models.Players, tid: str) -> None:
     """Add players name to raw ranking to be save into a spreadsheet."""
-    xlsx_filename = cfg["io"]["data_folder"] + f"raw_ranking_{tid}.xlsx"
+    xlsx_filename = cfg.io.data_folder + f"raw_ranking_{tid}.xlsx"
     print("<<<Saving raw ranking in", xlsx_filename, sep="\t")
 
     # Rankings sorted by rating
@@ -474,8 +470,8 @@ def publish_histories_sheet(
     upload=False,
 ) -> None:
     """Format histories to be published into a sheet"""
-    xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"].replace("NN", tid)
-    sheet_name = cfg["sheetname"]["histories"]
+    xlsx_filename = cfg.io.data_folder + cfg.io.publish_filename.replace("NN", tid)
+    sheet_name = cfg.sheetname.histories
 
     history_df = players.history_df.copy()
 
@@ -490,7 +486,7 @@ def publish_histories_sheet(
     # Remove repeated strings to show a cleaner sheet
     history_df.loc[history_df["category"] == history_df["category"].shift(1), "category"] = ""
 
-    headers = [cfg["labels"][key] for key in ["Player", "Category", "Best Round", "Tournament"]]
+    headers = [cfg.labels[key] for key in ["Player", "Category", "Best_Round", "Tournament"]]
     columns = ["name", "category", "best_round", "tid"]
 
     with _get_writer(xlsx_filename, sheet_name) as writer:
@@ -499,9 +495,9 @@ def publish_histories_sheet(
         )
 
     if upload:
-        load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
+        load_and_upload_sheet(xlsx_filename, sheet_name, cfg.io.temporal_spreadsheet_id)
 
-    sheet_name_for_md = cfg["sheetname"]["histories"]
+    sheet_name_for_md = cfg.sheetname.histories
     publish_sheet_as_markdown(history_df[columns], headers, sheet_name_for_md, tid)
 
 
@@ -516,11 +512,9 @@ def publish_rating_details_sheet(
     """Format and publish rating details of given tournament into a sheet"""
 
     sheet_name = tournaments[tid]["sheet_name"].iloc[0]
-    sheet_name = sheet_name.replace(
-        cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["rating_details_key"]
-    )
+    sheet_name = sheet_name.replace(cfg.sheetname.tournaments_key, cfg.sheetname.rating_details_key)
 
-    xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"].replace("NN", tid)
+    xlsx_filename = cfg.io.data_folder + cfg.io.publish_filename.replace("NN", tid)
 
     details = rankings.get_rating_details(tid)
 
@@ -533,19 +527,19 @@ def publish_rating_details_sheet(
     details["diff_rating"] = (
         (details["winner_rating"] - details["loser_rating"]).astype(int).astype(str)
     )
-    details["factor"] /= cfg["aux"]["rating factor"]
+    details["factor"] /= cfg.aux.rating_factor
 
     to_bold = ["A1", "A2", "A3", "A4", "B4", "C4", "D4", "E4", "F4", "G4"]
     to_center = to_bold + ["B1", "B2", "B3"]
 
     headers = [
-        cfg["labels"][key]
+        cfg.labels[key]
         for key in [
             "Winner",
             "Loser",
             "Difference",
-            "Winner Points",
-            "Loser Points",
+            "Winner_Points",
+            "Loser_Points",
             "Round",
             "Category",
             "Factor",
@@ -573,9 +567,9 @@ def publish_rating_details_sheet(
         _bold_and_center(ws, to_bold, to_center)
 
     if upload:
-        load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
+        load_and_upload_sheet(xlsx_filename, sheet_name, cfg.io.temporal_spreadsheet_id)
 
-    sheet_name_for_md = cfg["sheetname"]["rating_details_key"]
+    sheet_name_for_md = cfg.sheetname.rating_details_key
     publish_sheet_as_markdown(details[columns], headers, sheet_name_for_md, tid)
 
 
@@ -591,10 +585,10 @@ def publish_championship_details_sheet(
 
     sheet_name = tournaments[tid]["sheet_name"].iloc[0]
     sheet_name = sheet_name.replace(
-        cfg["sheetname"]["tournaments_key"], cfg["sheetname"]["championship_details_key"]
+        cfg.sheetname.tournaments_key, cfg.sheetname.championship_details_key
     )
 
-    xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"].replace("NN", tid)
+    xlsx_filename = cfg.io.data_folder + cfg.io.publish_filename.replace("NN", tid)
 
     championship_details = rankings.get_championship_details(tid)
 
@@ -602,7 +596,7 @@ def publish_championship_details_sheet(
     to_center = to_bold + ["B1", "B2", "B3"]
 
     headers = [
-        cfg["labels"][key] for key in ["Player", "Category", "Best Round", "Championship Points"]
+        cfg.labels[key] for key in ["Player", "Category", "Best_Round", "Championship_Points"]
     ]
     columns = ["name", "category", "best_round", "points"]
     with _get_writer(xlsx_filename, sheet_name) as writer:
@@ -616,9 +610,9 @@ def publish_championship_details_sheet(
         _bold_and_center(ws, to_bold, to_center)
 
     if upload:
-        load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
+        load_and_upload_sheet(xlsx_filename, sheet_name, cfg.io.temporal_spreadsheet_id)
 
-    sheet_name_for_md = cfg["sheetname"]["championship_details_key"]
+    sheet_name_for_md = cfg.sheetname.championship_details_key
     publish_sheet_as_markdown(championship_details[columns], headers, sheet_name_for_md, tid)
 
 
@@ -631,8 +625,8 @@ def publish_statistics_sheet(
     upload: bool = False,
 ) -> None:
     """Copy details from log and output details of given tournament"""
-    xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"].replace("NN", tid)
-    sheet_name = cfg["sheetname"]["statistics_key"]
+    xlsx_filename = cfg.io.data_folder + cfg.io.publish_filename.replace("NN", tid)
+    sheet_name = cfg.sheetname.statistics_key
 
     stats = rankings.get_statistics()
     headers = models.categories + ["total"] + models.categories + ["total"]
@@ -643,7 +637,7 @@ def publish_statistics_sheet(
             sheet_name=sheet_name,
             index=True,
             header=headers,
-            index_label=cfg["labels"]["tid"],
+            index_label=cfg.labels.tid,
         )
 
         ws = writer.book[sheet_name]
@@ -653,19 +647,19 @@ def publish_statistics_sheet(
         starting_cell, ending_cell = rowcol_to_a1(row=1, col=2), rowcol_to_a1(
             row=1, col=n_headers / 2 + 1
         )
-        ws[starting_cell] = cfg["labels"]["Cumulated"]
+        ws[starting_cell] = cfg.labels.Cumulated
         ws.merge_cells(f"{starting_cell}:{ending_cell}")
 
         starting_cell, ending_cell = rowcol_to_a1(row=1, col=n_headers / 2 + 2), rowcol_to_a1(
             row=1, col=n_headers + 1
         )
-        ws[starting_cell] = cfg["labels"]["By Tournament"]
+        ws[starting_cell] = cfg.labels.By_Tournament
         ws.merge_cells(f"{starting_cell}:{ending_cell}")
 
     if upload:
-        load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
+        load_and_upload_sheet(xlsx_filename, sheet_name, cfg.io.temporal_spreadsheet_id)
 
-    sheet_name_for_md = f'{cfg["sheetname"]["statistics_key"]} {cfg["labels"]["Cumulated"]}'
+    sheet_name_for_md = f"{cfg.sheetname.statistics_key} {cfg.labels.Cumulated}"
     publish_sheet_as_markdown(
         stats.iloc[:, : stats.shape[1] // 2], headers, sheet_name_for_md, tid, index=True
     )
@@ -676,7 +670,7 @@ def publish_statistics_sheet(
         sheet_name_for_md,
     )
 
-    sheet_name_for_md = f'{cfg["sheetname"]["statistics_key"]} {cfg["labels"]["By Tournament"]}'
+    sheet_name_for_md = f"{cfg.sheetname.statistics_key} {cfg.labels.By_Tournament}"
     publish_sheet_as_markdown(
         stats.iloc[:, stats.shape[1] // 2 :], headers, sheet_name_for_md, tid, index=True
     )
@@ -691,10 +685,10 @@ def publish_statistics_sheet(
 def publish_stat_plot(stats_df, headers, tid, fig_filename):
     stats_df.columns = headers
     stats_plot = stats_df.plot(
-        title=fig_filename.replace(cfg["sheetname"]["statistics_key"], ""),
+        title=fig_filename.replace(cfg.sheetname.statistics_key, ""),
         kind="bar",
-        xlabel=cfg["labels"]["tid"],
-        ylabel=cfg["sheetname"]["players"],
+        xlabel=cfg.labels.tid,
+        ylabel=cfg.sheetname.players,
         stacked=True,
         rot=0,
     )
@@ -702,7 +696,7 @@ def publish_stat_plot(stats_df, headers, tid, fig_filename):
         stats_plot.bar_label(container, label_type="center")
     plt.tight_layout()
     stats_plot.get_figure().savefig(
-        f"{cfg['io']['data_folder']}{tid}/{fig_filename.replace(' ', '_')}.png"
+        f"{cfg.io.data_folder}{tid}/{fig_filename.replace(' ', '_')}.png"
     )
 
 
@@ -715,7 +709,7 @@ def publish_championship_sheets(
     upload: bool = False,
 ) -> None:
     """Publish championship sheets, per category"""
-    xlsx_filename = cfg["io"]["data_folder"] + cfg["io"]["publish_filename"].replace("NN", tid)
+    xlsx_filename = cfg.io.data_folder + cfg.io.publish_filename.replace("NN", tid)
 
     # Rankings to be sorted by cum_points
     this_ranking = rankings[tid]
@@ -730,15 +724,15 @@ def publish_championship_sheets(
     to_center = to_bold + ["B1", "B2", "B3"]
 
     headers = [
-        cfg["labels"][key]
+        cfg.labels[key]
         for key in [
             "Position",
-            "Championship Points",
+            "Championship_Points",
             "Participations",
             "Player",
             "City",
             "Association",
-            "Selected Tournaments",
+            "Selected_Tournaments",
         ]
     ]
     columns = [
@@ -758,7 +752,7 @@ def publish_championship_sheets(
         rankings.participations_cat_columns(),
     ):
         sheet_name = tournaments[tid]["sheet_name"].iloc[0]
-        sheet_name = sheet_name.replace(cfg["sheetname"]["tournaments_key"], cat.title())
+        sheet_name = sheet_name.replace(cfg.sheetname.tournaments_key, cat.title())
 
         # Filter inactive players or players that didn't played any tournament
         unsorted_ranking = this_ranking.loc[this_ranking.loc[:, point_col] > 0].copy()
@@ -809,7 +803,7 @@ def publish_championship_sheets(
             )  # FIXME This should be part of publish metadata, to merge the right cells
 
         if upload:
-            load_and_upload_sheet(xlsx_filename, sheet_name, cfg["io"]["temporal_spreadsheet_id"])
+            load_and_upload_sheet(xlsx_filename, sheet_name, cfg.io.temporal_spreadsheet_id)
 
         # Workaround to remove nans before converting to as markdown
         sorted_rankind_md = (
@@ -870,8 +864,8 @@ def create_n_tour_sheet(spreadsheet_id: str, tid: str) -> None:
     :param tid: tournament to create
     :return: None
     """
-    first_key = f'{cfg["labels"]["Tournament"]} 01'
-    replacement_key = f'{cfg["labels"]["Tournament"]} {tid[-2:]}'
+    first_key = f"{cfg.labels.Tournament} 01"
+    replacement_key = f"{cfg.labels.Tournament} {tid[-2:]}"
 
     try:
         gc = _get_gc()
@@ -897,24 +891,24 @@ def create_n_tour_sheet(spreadsheet_id: str, tid: str) -> None:
 
 def publish_to_web(tid: str, show_on_web=False) -> None:
     if show_on_web:
-        for spreadsheet_id in cfg["io"]["published_on_web_spreadsheets_id"]:
+        for spreadsheet_id in cfg.io.published_on_web_spreadsheets_id:
             create_n_tour_sheet(spreadsheet_id, tid)
 
 
 def load_temp_players_ranking() -> Tuple[models.Players, models.Rankings]:
     """returns players_temp, ranking_temp"""
     # Loading temp ranking and players. It should be deleted after a successful preprocessing
-    players_temp_file = os.path.join(cfg["io"]["data_folder"], cfg["io"]["players_temp_file"])
-    ranking_temp_file = os.path.join(cfg["io"]["data_folder"], cfg["io"]["ranking_temp_file"])
+    players_temp_file = os.path.join(cfg.io.data_folder, cfg.io.players_temp_file)
+    ranking_temp_file = os.path.join(cfg.io.data_folder, cfg.io.ranking_temp_file)
 
     if os.path.exists(players_temp_file):
-        players_temp = load_from_pickle(cfg["io"]["players_temp_file"])
+        players_temp = load_from_pickle(cfg.io.players_temp_file)
         print("Resume preprocessing...")
     else:
         players_temp = models.Players()
 
     if os.path.exists(ranking_temp_file):
-        ranking_temp = load_from_pickle(cfg["io"]["ranking_temp_file"])
+        ranking_temp = load_from_pickle(cfg.io.ranking_temp_file)
         print("Resume preprocessing...")
     else:
         ranking_temp = models.Rankings()
@@ -925,8 +919,8 @@ def load_temp_players_ranking() -> Tuple[models.Players, models.Rankings]:
 def save_temp_players_ranking(players_temp: models.Players, ranking_temp: models.Rankings) -> None:
     """returns players_temp, ranking_temp"""
     # Loading temp ranking and players. It shuould be deleted after a successful preprocessing
-    players_temp_file = os.path.join(cfg["io"]["data_folder"], cfg["io"]["players_temp_file"])
-    ranking_temp_file = os.path.join(cfg["io"]["data_folder"], cfg["io"]["ranking_temp_file"])
+    players_temp_file = os.path.join(cfg.io.data_folder, cfg.io.players_temp_file)
+    ranking_temp_file = os.path.join(cfg.io.data_folder, cfg.io.ranking_temp_file)
     print(
         "<Saving\t\tTemps to resume preprocessing (if necessary)",
         ranking_temp_file,
@@ -940,8 +934,8 @@ def save_temp_players_ranking(players_temp: models.Players, ranking_temp: models
 
 
 def remove_temp_players_ranking() -> None:
-    players_temp_file = os.path.join(cfg["io"]["data_folder"], cfg["io"]["players_temp_file"])
-    ranking_temp_file = os.path.join(cfg["io"]["data_folder"], cfg["io"]["ranking_temp_file"])
+    players_temp_file = os.path.join(cfg.io.data_folder, cfg.io.players_temp_file)
+    ranking_temp_file = os.path.join(cfg.io.data_folder, cfg.io.ranking_temp_file)
     print(
         "Removing temp files created to resume preprocessing", players_temp_file, ranking_temp_file
     )
@@ -958,21 +952,21 @@ def save_to_pickle(
 ) -> None:
     objects = [players, rankings, tournaments]
     filenames = [
-        cfg["io"]["players_pickle"],
-        cfg["io"]["rankings_pickle"],
-        cfg["io"]["tournaments_pickle"],
+        cfg.io.players_pickle,
+        cfg.io.rankings_pickle,
+        cfg.io.tournaments_pickle,
     ]
     objects_filenames = [(obj, fn) for obj, fn in zip(objects, filenames) if obj]
 
     for obj, fn in objects_filenames:
-        print("<<<Saving", fn, "in", cfg["io"]["data_folder"], sep="\t")
-        with open(os.path.join(cfg["io"]["data_folder"], fn), "wb") as fo:
+        print("<<<Saving", fn, "in", cfg.io.data_folder, sep="\t")
+        with open(os.path.join(cfg.io.data_folder, fn), "wb") as fo:
             pickle.dump(obj, fo, pickle.HIGHEST_PROTOCOL)
 
 
 def load_from_pickle(filename: str) -> Any:
-    print(">>>Loading", filename, "from", cfg["io"]["data_folder"], sep="\t")
-    with open(os.path.join(cfg["io"]["data_folder"], filename), "rb") as fo:
+    print(">>>Loading", filename, "from", cfg.io.data_folder, sep="\t")
+    with open(os.path.join(cfg.io.data_folder, filename), "rb") as fo:
         obj = pickle.load(fo)
 
     return obj

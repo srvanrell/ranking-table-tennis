@@ -15,8 +15,8 @@ if not os.path.exists(user_config_path):
 
 cfg = OmegaConf.load(user_config_path + "/config.yaml")
 
-if not os.path.exists(cfg["io"]["data_folder"]):
-    os.mkdir(cfg["io"]["data_folder"])
+if not os.path.exists(cfg.io.data_folder):
+    os.mkdir(cfg.io.data_folder)
 
 # Tables to assign points
 
@@ -241,9 +241,9 @@ class Rankings:
             "rating": default_rating,
             "category": default_category,
             "active": default_active,
-            "tournament_name": cfg["default"]["tournament_name"],
-            "date": cfg["default"]["date"],
-            "location": cfg["default"]["location"],
+            "tournament_name": cfg.default.tournament_name,
+            "date": cfg.default.date,
+            "location": cfg.default.location,
             **cat_col_values,
             **cum_tid_values,
         }
@@ -261,7 +261,7 @@ class Rankings:
 
     @staticmethod
     def _rating_to_category(rating: float) -> str:
-        thresholds = cfg["aux"]["categories thresholds"]
+        thresholds = cfg.aux.categories_thresholds
         category = categories[-2]  # Last category that it's not fan
         for j, th in enumerate(thresholds):
             if rating >= th:
@@ -314,11 +314,11 @@ class Rankings:
         rating_diff = rating_winner - rating_loser
         category_factor = 1.0
         if category_winner != category_loser and not not_own_category:
-            category_factor = cfg["aux"]["category expected factor"]
+            category_factor = cfg.aux.category_expected_factor
             if rating_diff < 0:
-                category_factor = cfg["aux"]["category unexpected factor"]
+                category_factor = cfg.aux.category_unexpected_factor
 
-        factor = cfg["aux"]["rating factor"] * category_factor
+        factor = cfg.aux.rating_factor * category_factor
 
         return factor
 
@@ -445,10 +445,10 @@ class Rankings:
         Compute and save championship points, selected tids, and participations per category
         :return: None
         """
-        n_tournaments = cfg["aux"]["masters N tournaments to consider"]
+        n_tournaments = cfg.aux.masters_N_tournaments_to_consider
         tid_indexes = self.ranking_df.tid == tid
         rankings = self.ranking_df[
-            self.ranking_df.tid != cfg["aux"]["initial tid"]
+            self.ranking_df.tid != cfg.aux.initial_tid
         ]  # Remove initial tid data
 
         for points_cat_col, cum_points_cat_col, cum_tids_cat_col, n_played_cat_col in zip(
@@ -517,9 +517,9 @@ class Rankings:
         initial_active_pids,
     ):
         # Avoid activate or inactivate players after the first tournament.
-        # activate_window = cfg["aux"]["tournament window to activate"]
-        tourns_to_activate = cfg["aux"]["tournaments to activate"]
-        inactivate_window = cfg["aux"]["tournament window to inactivate"]
+        # activate_window = cfg.aux.tournament window to activate"]
+        tourns_to_activate = cfg.aux.tournaments_to_activate
+        inactivate_window = cfg.aux.tournament_window_to_inactivate
 
         played_tids = players.played_tournaments(ranking_entry.pid)
 
@@ -542,8 +542,8 @@ class Rankings:
 
     def update_active_players(self, tid: str, players, initial_tid: str):
         # Avoid activate or inactivate players after the first tournament.
-        activate_window = cfg["aux"]["tournament window to activate"]
-        inactivate_window = cfg["aux"]["tournament window to inactivate"]
+        activate_window = cfg.aux.tournament_window_to_activate
+        inactivate_window = cfg.aux.tournament_window_to_inactivate
 
         indexes = (self.ranking_df.tid == initial_tid) & self.ranking_df.active
         initial_active_players = list(self.ranking_df.loc[indexes, "pid"].unique())
@@ -583,8 +583,8 @@ class Rankings:
         tournament_df = tournaments[tid]
         for match_index, match in tournament_df[tournament_df.sanction].iterrows():
             for cat_col in self.points_cat_columns():
-                self[tid, match.loser_pid, cat_col] *= cfg["aux"]["sanction factor"]
-            print("Apply sanction factor", cfg["aux"]["sanction factor"], "on:", match.winner)
+                self[tid, match.loser_pid, cat_col] *= cfg.aux.sanction_factor
+            print("Apply sanction factor", cfg.aux.sanction_factor, "on:", match.winner)
 
     def get_rating_details(self, tid: str) -> pd.DataFrame:
         return self.rating_details_df.loc[self.rating_details_df.tid == tid].copy()
@@ -636,7 +636,7 @@ class Rankings:
         stats = stats_cat.join([participation_total, cum_participation_total]).sort_index(
             axis="columns"
         )
-        stats.drop(cfg["aux"]["initial tid"], inplace=True)
+        stats.drop(cfg.aux.initial_tid, inplace=True)
 
         return stats
 
@@ -717,12 +717,12 @@ class Tournaments:
             raise ImportError
 
         # changing labels of finals round match
-        if match_row["round"] == cfg["roundnames"]["final"]:
-            match_row["winner_round"] = cfg["roundnames"]["champion"]
-            match_row["loser_round"] = cfg["roundnames"]["second"]
-        elif match_row["round"] == cfg["roundnames"]["third place playoff"]:
-            match_row["winner_round"] = cfg["roundnames"]["third"]
-            match_row["loser_round"] = cfg["roundnames"]["fourth"]
+        if match_row["round"] == cfg.roundnames.final:
+            match_row["winner_round"] = cfg.roundnames.champion
+            match_row["loser_round"] = cfg.roundnames.second
+        elif match_row["round"] == cfg.roundnames.third_place_playoff:
+            match_row["winner_round"] = cfg.roundnames.third
+            match_row["loser_round"] = cfg.roundnames.fourth
         else:
             match_row["winner_round"] = match_row["round"]
             match_row["loser_round"] = match_row["round"]

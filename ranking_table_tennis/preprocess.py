@@ -17,12 +17,12 @@ __author__ = "sebastian"
 # and saves the result into the same xlsx
 ##########################################
 
-xlsx_file = cfg["io"]["data_folder"] + cfg["io"]["tournaments_filename"]
+xlsx_file = cfg.io.data_folder + cfg.io.tournaments_filename
 
 retrieve = input("Do you want to retrieve online sheet [Y/n]? (press Enter to continue)\n")
 if retrieve.lower() != "n":
     print("Downloading and saving %s\n" % xlsx_file)
-    request.urlretrieve(cfg["io"]["tournaments_gdrive"], xlsx_file)
+    request.urlretrieve(cfg.io.tournaments_gdrive, xlsx_file)
 
 # Loading all tournament data
 tournaments = utils.load_tournaments_sheets()
@@ -32,7 +32,7 @@ players = utils.load_players_sheet()
 
 # Loading initial ranking
 rankings = utils.load_initial_ranking_sheet()
-initial_tid = cfg["aux"]["initial tid"]
+initial_tid = cfg.aux.initial_tid
 
 # Loading temp ranking and players. It will be deleted after a successful preprocessing
 players_temp, ranking_temp = utils.load_temp_players_ranking()

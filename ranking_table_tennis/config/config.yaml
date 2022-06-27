@@ -38,30 +38,30 @@ labels:
     Player: Jugador
     Association: Afiliación
     City: Ciudad
-    Last Tournament: Último Torneo
-    Championship Points: Puntos de Campeonato
+    Last_Tournament: Último Torneo
+    Championship_Points: Puntos de Campeonato
     Rating: Nivel de Juego
-    Best Round: Mejor Ronda
+    Best_Round: Mejor Ronda
     Round: Instancia
     Winner: Ganador
     Loser: Perdedor
-    Winner Points: Puntos Ganador
-    Loser Points: Puntos Perdedor
+    Winner_Points: Puntos Ganador
+    Loser_Points: Puntos Perdedor
     Category: Categoría
-    Total Points: Total puntos
-    Active Player: Jugador Activo
+    Total_Points: Total puntos
+    Active_Player: Jugador Activo
     Date: Fecha
     Location: Lugar
-    Tournament name: Nombre del torneo
+    Tournament_name: Nombre del torneo
     Tournament: Torneo
     Participations: Torneos Jugados
     Position: Posición
     Difference: Diferencia
-    Selected Tournaments: Puntos sumados
+    Selected_Tournaments: Puntos sumados
     Cumulated: Acumulado
-    By Tournament: Por Torneo
+    By_Tournament: Por Torneo
     Factor: Factor
-    Points CAT:
+    Points_CAT:
       - Puntos Primera
       - Puntos Segunda
       - Puntos Tercera
@@ -76,22 +76,22 @@ roundnames:
     second: segundo
     third: tercero
     fourth: cuarto
-    third place playoff: tercer puesto
+    third_place_playoff: tercer puesto
 
 aux:
-    sanction factor: 0.5
-    rating factor: 2.0
-    category expected factor: 0.5
-    category unexpected factor: 1.5
-    tournament window to activate: 4
-    tournaments to activate: 2
-    tournament window to inactivate: 4
-    categories thresholds:
+    sanction_factor: 0.5
+    rating_factor: 2.0
+    category_expected_factor: 0.5
+    category_unexpected_factor: 1.5
+    tournament_window_to_activate: 4
+    tournaments_to_activate: 2
+    tournament_window_to_inactivate: 4
+    categories_thresholds:
       - 1400  # minimo de primera
       - 950  # minimo de segunda
-    masters N tournaments to consider: 8
-    masters N classified to list: 10000
-    initial tid: S2022T00
+    masters_N_tournaments_to_consider: 8
+    masters_N_classified_to_list: 10000
+    initial_tid: S2022T00
 
 default:
     tournament_name: Inicial 2022 - Liga Dos Orillas

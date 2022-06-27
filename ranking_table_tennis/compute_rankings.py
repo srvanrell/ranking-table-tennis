@@ -18,15 +18,15 @@ __author__ = "sebastian"
 ##########################################
 
 # Loading all tournament data
-tournaments = utils.load_from_pickle(cfg["io"]["tournaments_pickle"])
+tournaments = utils.load_from_pickle(cfg.io.tournaments_pickle)
 
 # Loading players list
-players = utils.load_from_pickle(cfg["io"]["players_pickle"])
+players = utils.load_from_pickle(cfg.io.players_pickle)
 tournaments.assign_pid_from_players(players)
 
 # Loading initial ranking
 rankings = utils.load_initial_ranking_sheet()
-initial_tid = cfg["aux"]["initial tid"]
+initial_tid = cfg.aux.initial_tid
 
 # Will compute all rankings from the beginning by default
 tids = [initial_tid] + [tid for tid in tournaments]
