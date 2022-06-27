@@ -399,6 +399,7 @@ def publish_initial_rating_sheet(
     sheet_name_for_md = f"{cfg.labels.Rating}_{cfg.default.tournament_name.split()[0]}"
     publish_sheet_as_markdown(this_ranking_df[columns], headers, sheet_name_for_md, tid)
 
+
 def publish_histories_sheet(
     tournaments: models.Tournaments,
     rankings: models.Rankings,
@@ -532,6 +533,7 @@ def _format_diff(new_value: float, prev_value: float) -> str:
     formatted_str = f"{new_value:.0f} ({diff_str})"
 
     return formatted_str
+
 
 def _keep_name_new_row(df: pd.DataFrame) -> pd.DataFrame:
     """Function to insert row in the dataframe"""
