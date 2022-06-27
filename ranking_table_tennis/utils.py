@@ -1,16 +1,16 @@
 import os
 from typing import List, Tuple, Any
 
-from ranking_table_tennis import models
-from ranking_table_tennis.models import cfg
 from openpyxl.styles import Font, Alignment
 import gspread
 from gspread.utils import rowcol_to_a1
+from gspread_dataframe import set_with_dataframe
 import pandas as pd
 import pickle
 import matplotlib.pyplot as plt
 
-from gspread_dataframe import set_with_dataframe
+from ranking_table_tennis import models
+from ranking_table_tennis.configs import cfg
 
 __author__ = "sebastian"
 
@@ -629,7 +629,7 @@ def publish_statistics_sheet(
     sheet_name = cfg.sheetname.statistics_key
 
     stats = rankings.get_statistics()
-    headers = models.categories + ["total"] + models.categories + ["total"]
+    headers = cfg.categories + ["total"] + cfg.categories + ["total"]
 
     with _get_writer(xlsx_filename, sheet_name) as writer:
         stats.to_excel(
@@ -746,7 +746,7 @@ def publish_championship_sheets(
     ]
 
     for cat, point_col, selected_tids_col, participations_col in zip(
-        models.categories,
+        cfg.categories,
         rankings.cum_points_cat_columns(),
         rankings.cum_tids_cat_columns(),
         rankings.participations_cat_columns(),

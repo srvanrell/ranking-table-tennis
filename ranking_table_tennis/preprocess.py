@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from ranking_table_tennis import utils
-from ranking_table_tennis.models import cfg
+from ranking_table_tennis.configs import cfg
 from urllib import request
 
 __author__ = "sebastian"

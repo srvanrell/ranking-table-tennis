@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
 from ranking_table_tennis import utils
-from ranking_table_tennis import models
-from ranking_table_tennis.models import cfg
+from ranking_table_tennis.configs import cfg
 
 
 __author__ = "sebastian"
@@ -58,7 +57,7 @@ for tid in tournaments:
         if best_rounds[
             (best_rounds.pid == pid) & (best_rounds.category == rankings[tid, pid, "category"])
         ].empty
-        and rankings[tid, pid, "category"] != models.categories[-1]
+        and rankings[tid, pid, "category"] != cfg.categories[-1]
     ]
 
     rankings.compute_new_ratings(tid, prev_tid, tournaments, pid_not_own_category)
