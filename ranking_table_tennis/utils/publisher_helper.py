@@ -1,28 +1,18 @@
-import os
 from typing import List
 
 from gspread.utils import rowcol_to_a1
 from openpyxl.styles import Font, Alignment
 import pandas as pd
-import matplotlib.pyplot as plt
 
 from ranking_table_tennis.configs import cfg
 from ranking_table_tennis import models
 from ranking_table_tennis.utils.excel_helper import _get_writer
 from ranking_table_tennis.utils.gspread_helper import load_and_upload_sheet
-
-
-def _publish_tournament_metadata(ws, tournament_tid: pd.DataFrame) -> None:
-    ws.insert_rows(0, 3)
-    ws["A1"] = cfg.labels.Tournament_name
-    ws["B1"] = tournament_tid["tournament_name"].iloc[0]
-    ws.merge_cells("B1:E1")
-    ws["A2"] = cfg.labels.Date
-    ws["B2"] = tournament_tid["date"].iloc[0].strftime("%Y %m %d")
-    ws.merge_cells("B2:E2")
-    ws["A3"] = cfg.labels.Location
-    ws["B3"] = tournament_tid["location"].iloc[0]
-    ws.merge_cells("B3:E3")
+from ranking_table_tennis.utils.markdown_helper import (
+    publish_sheet_as_markdown,
+    publish_stat_plot,
+    publish_tournament_metadata_as_markdown,
+)
 
 
 def publish_championship_details_sheet(
@@ -131,24 +121,6 @@ def publish_statistics_sheet(
         headers[stats.shape[1] // 2 : -2],
         tid,
         sheet_name_for_md,
-    )
-
-
-def publish_stat_plot(stats_df, headers, tid, fig_filename):
-    stats_df.columns = headers
-    stats_plot = stats_df.plot(
-        title=fig_filename.replace(cfg.sheetname.statistics_key, ""),
-        kind="bar",
-        xlabel=cfg.labels.tid,
-        ylabel=cfg.sheetname.players,
-        stacked=True,
-        rot=0,
-    )
-    for container in stats_plot.containers:
-        stats_plot.bar_label(container, label_type="center")
-    plt.tight_layout()
-    stats_plot.get_figure().savefig(
-        f"{cfg.io.data_folder}{tid}/{fig_filename.replace(' ', '_')}.png"
     )
 
 
@@ -329,32 +301,6 @@ def publish_rating_sheet(
     publish_tournament_metadata_as_markdown(tid, tournaments[tid])
 
 
-def publish_tournament_metadata_as_markdown(tid, tournament_tid: pd.DataFrame) -> None:
-    df_metadata = pd.DataFrame(
-        {
-            cfg.labels.Tournament_name: [tournament_tid["tournament_name"].iloc[0]],
-            cfg.labels.Date: [tournament_tid["date"].iloc[0].strftime("%Y %m %d")],
-            cfg.labels.Location: [tournament_tid["location"].iloc[0]],
-        }
-    )
-    publish_sheet_as_markdown(
-        df_metadata,
-        df_metadata.columns,
-        cfg.io.tournament_metadata_md,
-        tid,
-    )
-
-
-def publish_sheet_as_markdown(df, headers, sheet_name, tid, index=False):
-    # Create folder to publish markdowns
-    os.makedirs(f"{cfg.io.data_folder}{tid}", exist_ok=True)
-    markdown_filename = f"{cfg.io.data_folder}{tid}/{sheet_name.replace(' ', '_')}.md"
-    print("<<<Saving", sheet_name, "in", markdown_filename, sep="\t")
-    df.to_markdown(
-        markdown_filename, index=index, headers=headers, stralign="center", numalign="center"
-    )
-
-
 def publish_initial_rating_sheet(
     tournaments: models.Tournaments,
     rankings: models.Rankings,
@@ -510,6 +456,19 @@ def publish_rating_details_sheet(
 
     sheet_name_for_md = cfg.sheetname.rating_details_key
     publish_sheet_as_markdown(details[columns], headers, sheet_name_for_md, tid)
+
+
+def _publish_tournament_metadata(ws, tournament_tid: pd.DataFrame) -> None:
+    ws.insert_rows(0, 3)
+    ws["A1"] = cfg.labels.Tournament_name
+    ws["B1"] = tournament_tid["tournament_name"].iloc[0]
+    ws.merge_cells("B1:E1")
+    ws["A2"] = cfg.labels.Date
+    ws["B2"] = tournament_tid["date"].iloc[0].strftime("%Y %m %d")
+    ws.merge_cells("B2:E2")
+    ws["A3"] = cfg.labels.Location
+    ws["B3"] = tournament_tid["location"].iloc[0]
+    ws.merge_cells("B3:E3")
 
 
 def _bold_and_center(ws, to_bold: List[str], to_center: List[str]) -> None:
