@@ -50,6 +50,9 @@ utils.publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload
 # Publish points assigned in each match
 utils.publish_rating_details_sheet(tournaments, rankings, players, tid, prev_tid, upload=upload)
 
+# Publish matches as they were loaded
+utils.publish_matches_sheet(tournaments, rankings, players, tid, upload=upload)
+
 # Publish formated masters championship of selected tournament
 utils.publish_championship_sheets(tournaments, rankings, players, tid, prev_tid, upload=upload)
 
