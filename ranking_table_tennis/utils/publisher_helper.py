@@ -414,6 +414,10 @@ def publish_rating_details_sheet(
     )
     details["factor"] /= cfg.aux.rating_factor
 
+    details = details.sort_values(
+        ["category", "round", "winner_name_rating"], ascending=[True, True, True]
+    )
+
     to_bold = ["A1", "A2", "A3", "A4", "B4", "C4", "D4", "E4", "F4", "G4"]
     to_center = to_bold + ["B1", "B2", "B3"]
 
