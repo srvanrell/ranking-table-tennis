@@ -5,7 +5,7 @@ from ranking_table_tennis import models
 from ranking_table_tennis.models import cfg
 
 
-__author__ = 'sebastian'
+__author__ = "sebastian"
 
 ##########################################
 # Script to run after preprocess.py
@@ -52,10 +52,14 @@ for tid in tournaments:
     # Fans category is not considered in this list
     # Old ranking need to be updated so known old players are not misclassified
     rankings.update_categories()
-    pid_not_own_category = [pid for pid in pid_participation_list
-                            if best_rounds[(best_rounds.pid == pid) &
-                                           (best_rounds.category == rankings[tid, pid, "category"])].empty
-                            and rankings[tid, pid, "category"] != models.categories[-1]]
+    pid_not_own_category = [
+        pid
+        for pid in pid_participation_list
+        if best_rounds[
+            (best_rounds.pid == pid) & (best_rounds.category == rankings[tid, pid, "category"])
+        ].empty
+        and rankings[tid, pid, "category"] != models.categories[-1]
+    ]
 
     rankings.compute_new_ratings(tid, prev_tid, tournaments, pid_not_own_category)
     rankings.compute_category_points(tid, best_rounds)
