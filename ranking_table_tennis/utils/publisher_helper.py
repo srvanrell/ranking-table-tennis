@@ -475,11 +475,9 @@ def publish_matches_sheet(
 
     xlsx_filename = cfg.io.data_folder + cfg.io.publish_filename.replace("NN", tid)
 
-    matches_details = rankings.get_rating_details(tid)
+    matches = tournaments.get_matches(tid, False, [])
 
-    matches_details = matches_details.sort_values(
-        ["category", "round", "player_a"], ascending=[True, True, True]
-    )
+    matches = matches.sort_values(["category", "round", "player_a"], ascending=[True, True, True])
 
     to_bold = ["A1", "A2", "A3", "A4", "B4", "C4", "D4", "E4", "F4"]
     to_center = to_bold + ["B1", "B2", "B3"]
@@ -502,7 +500,7 @@ def publish_matches_sheet(
     ]
 
     with _get_writer(xlsx_filename, sheet_name) as writer:
-        matches_details.to_excel(
+        matches.to_excel(
             writer, sheet_name=sheet_name, index=False, header=headers, columns=columns
         )
 
@@ -511,11 +509,8 @@ def publish_matches_sheet(
         _publish_tournament_metadata(ws, tournaments[tid])
         _bold_and_center(ws, to_bold, to_center)
 
-    # if upload:
-    #     load_and_upload_sheet(xlsx_filename, sheet_name, cfg.io.temporal_spreadsheet_id)
-
     sheet_name_for_md = cfg.sheetname.tournaments_key
-    publish_sheet_as_markdown(matches_details[columns], headers, sheet_name_for_md, tid)
+    publish_sheet_as_markdown(matches[columns], headers, sheet_name_for_md, tid)
 
 
 def _publish_tournament_metadata(ws, tournament_tid: pd.DataFrame) -> None:
