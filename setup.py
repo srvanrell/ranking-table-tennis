@@ -61,6 +61,7 @@ setup(
         "gspread-dataframe>=1.0.4",
         "tabulate>=0.8.7",
         "matplotlib>=3.1.0",
+        "omegaconf",
     ],
     cmdclass={
         "develop": PostDevelopCommand,
