@@ -22,5 +22,6 @@ from ranking_table_tennis.utils.publisher_helper import (
     publish_rating_details_sheet,
     publish_rating_sheet,
     publish_statistics_sheet,
+    publish_matches_sheet,
 )
 from ranking_table_tennis.utils.gspread_helper import publish_to_web

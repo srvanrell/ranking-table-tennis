@@ -414,6 +414,10 @@ def publish_rating_details_sheet(
     )
     details["factor"] /= cfg.aux.rating_factor
 
+    details = details.sort_values(
+        ["category", "round", "winner_name_rating"], ascending=[True, True, True]
+    )
+
     to_bold = ["A1", "A2", "A3", "A4", "B4", "C4", "D4", "E4", "F4", "G4"]
     to_center = to_bold + ["B1", "B2", "B3"]
 
@@ -456,6 +460,57 @@ def publish_rating_details_sheet(
 
     sheet_name_for_md = cfg.sheetname.rating_details_key
     publish_sheet_as_markdown(details[columns], headers, sheet_name_for_md, tid)
+
+
+def publish_matches_sheet(
+    tournaments: models.Tournaments,
+    rankings: models.Rankings,
+    players: models.Players,
+    tid: str,
+    upload,
+) -> None:
+    """Format and publish rating details of given tournament into a sheet"""
+
+    sheet_name = tournaments[tid]["sheet_name"].iloc[0]
+
+    xlsx_filename = cfg.io.data_folder + cfg.io.publish_filename.replace("NN", tid)
+
+    matches = tournaments.get_matches(tid, False, [])
+
+    matches = matches.sort_values(["category", "round", "player_a"], ascending=[True, True, True])
+
+    to_bold = ["A1", "A2", "A3", "A4", "B4", "C4", "D4", "E4", "F4"]
+    to_center = to_bold + ["B1", "B2", "B3"]
+
+    headers = [
+        cfg.labels.Player + " A",
+        cfg.labels.Player + " B",
+        "Sets A",
+        "Sets B",
+        cfg.labels.Round,
+        cfg.labels.Category,
+    ]
+    columns = [
+        "player_a",
+        "player_b",
+        "sets_a",
+        "sets_b",
+        "round",
+        "category",
+    ]
+
+    with _get_writer(xlsx_filename, sheet_name) as writer:
+        matches.to_excel(
+            writer, sheet_name=sheet_name, index=False, header=headers, columns=columns
+        )
+
+        # publish and format tournament metadata
+        ws = writer.book[sheet_name]
+        _publish_tournament_metadata(ws, tournaments[tid])
+        _bold_and_center(ws, to_bold, to_center)
+
+    sheet_name_for_md = cfg.sheetname.tournaments_key
+    publish_sheet_as_markdown(matches[columns], headers, sheet_name_for_md, tid)
 
 
 def _publish_tournament_metadata(ws, tournament_tid: pd.DataFrame) -> None:
