@@ -11,6 +11,7 @@ io:
     players_pickle: players.pk
     tournaments_pickle: tournaments.pk
     rankings_pickle: rankings.pk
+    tournament_metadata_md: Metadata
     published_on_web_spreadsheets_id:
       - 1sN1I0BSBzVdzRRVkpxHn57KX68p5OZ710bYhOjc-TZI  # partidos
       - 1amTCwUTYT2Gb2kCvKrfCQlheizCnt20ceAGxUiQRwZM  # nivel de juego
