@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 from setuptools.command.develop import develop
 from setuptools.command.install import install
 import os
@@ -46,8 +46,10 @@ setup(
     url="http://github.com/srvanrell/ranking-table-tennis",
     author="Sebastian Vanrell",
     author_email="srvanrell@gmail.com",
-    packages=["ranking_table_tennis"],
-    scripts=["bin/rtt"],
+    packages=find_packages(),
+    entry_points={
+        "console_scripts": ["rtt2=ranking_table_tennis.command_line:main"],
+    },
     include_package_data=True,
     install_requires=[
         "gspread>=3.6.0",
