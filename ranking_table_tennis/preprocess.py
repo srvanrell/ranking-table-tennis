@@ -94,7 +94,7 @@ def main(offline=True):
     # Saving complete list of players, including new ones
     utils.save_players_sheet(players, upload=upload)
 
-    # # Saving initial rankings for all known players
+    # Saving initial rankings for all known players
     rankings.update_categories()
     utils.save_ranking_sheet(initial_tid, tournaments, rankings, players, upload=upload)
 
