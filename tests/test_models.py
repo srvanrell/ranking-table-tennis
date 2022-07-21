@@ -19,22 +19,22 @@ class TestRankingOLD(TestCase):
         output_points = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
         for diff, points in zip(diff_to_test, output_points):
             rating_winner, rating_loser = 1000 + diff, 1000
-            output = [points, points]
+            output = (points, points)
             points_to_winner_and_loser = models.Rankings._points_to_assign(
                 rating_winner, rating_loser
             )
-            self.assertListEqual(points_to_winner_and_loser, output)
+            self.assertEqual(points_to_winner_and_loser, output)
 
     def test__points_to_assign_unexpected_result(self):
         diff_to_test = [0, 25, 50, 100, 150, 200, 300, 400, 500, 1000]
         output_points = [9, 11, 13, 15, 18, 21, 24, 28, 32, 40]
         for diff, points in zip(diff_to_test, output_points):
             rating_winner, rating_loser = 1000, 1000 + diff
-            output = [points, points]
+            output = (points, points)
             points_to_winner_and_loser = models.Rankings._points_to_assign(
                 rating_winner, rating_loser
             )
-            self.assertListEqual(points_to_winner_and_loser, output)
+            self.assertEqual(points_to_winner_and_loser, output)
 
 
 class TestTournaments(TestCase):
@@ -55,7 +55,7 @@ class TestTournaments(TestCase):
         tour_df = pd.DataFrame(dict_tour_entry, index=[0])
         tournaments = models.Tournaments(tour_df)
 
-        best_rounds = tournaments.compute_best_rounds(tid)
+        best_rounds = tournaments.compute_best_rounds(tid, players=None)
         output = {("segunda", "Star, Ringo"): "octavos", ("segunda", "Lennon, John"): "octavos"}
 
         self.assertDictEqual(best_rounds, output)
