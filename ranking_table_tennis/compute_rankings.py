@@ -1,23 +1,15 @@
-#!/usr/bin/env python3
-
 from ranking_table_tennis import utils
 from ranking_table_tennis.configs import cfg
 
 
-__author__ = "sebastian"
-
-##########################################
-# Script to run after preprocess.py
-# It computes rating and points of
-# the selected tournament
-# Input: xlsx tournaments database
-#        config.yaml
-# Output: xlsx rankings database
-#         xlsx log file
-##########################################
-
-
 def main():
+    """Compute rating and championship points of loaded tournaments.
+
+    Function to run after preprocess.main().
+
+    It will read players, tournaments in pickles.
+    It will save players, tournaments and rankings in pickles.
+    """
     # Loading all tournament data
     tournaments = utils.load_from_pickle(cfg.io.tournaments_pickle)
 

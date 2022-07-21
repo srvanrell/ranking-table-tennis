@@ -1,21 +1,18 @@
-#!/usr/bin/env python3
-
 from ranking_table_tennis import utils
 from ranking_table_tennis.configs import cfg
 
-__author__ = "sebastian"
 
-###################################################
-# Script to run after compute_rankings.py
-# Input: xlsx tournaments database
-#        xlsx rankings database
-#        xlsx log file
-#        config.yaml
-# Output: temp xlsx to publish a single ranking
-###################################################
+def main(offline=True, last=True):
+    """Publish the results to anew spreadsheet and upload it.
 
+    Function to run after compute_rankings.main().
+    It will read players, tournaments and rankings in pickles, and config.yaml.
+    It will output an xlsx to publish a single ranking (the tournament indicated).
+    It will output a raw ranking xlsx corresponding to the one indicated.
 
-def main():
+    If offline=True it will publish locally (not uploading results).
+    If last=True it will publish results of the last tournament.
+    """
     # Loading all tournament data
     tournaments = utils.load_from_pickle(cfg.io.tournaments_pickle)
 
@@ -27,23 +24,27 @@ def main():
     rankings = utils.load_from_pickle(cfg.io.rankings_pickle)
     initial_tid = cfg.aux.initial_tid
 
-    # Will compute all rankings from the beginning by default
+    # Will publish rankings of last tournament by default
     tids = [initial_tid] + [tid for tid in tournaments]
 
-    print("\nNumber\t->\tTournament ID")
-    for tenum, tid in enumerate(tids[1:], 1):
-        print(f"{tenum:d}\t->\t{tid}")
+    tid = tids[-1]
+    if not last:
+        print("\nNumber\t->\tTournament ID")
+        for tenum, tid in enumerate(tids[1:], 1):
+            print(f"{tenum:d}\t->\t{tid}")
 
-    t_num = int(input("Enter the tournament number to publish (look above):\n"))
-    tid = tids[t_num]
+        t_num = int(input("Enter the tournament number to publish (look above):\n"))
+        tid = tids[t_num]
 
     # Get the tid of the previous tournament
     prev_tid = tids[tids.index(tid) - 1]
 
-    answer = input(
-        "\nDo you want to publish to backend online sheets [Y/n]? (press Enter to continue)\n"
-    )
-    upload = answer.lower() != "n"
+    upload = False
+    if not offline:
+        answer = input(
+            "\nDo you want to publish to backend online sheets [Y/n]? (press Enter to continue)\n"
+        )
+        upload = answer.lower() != "n"
 
     # Publish formated rating of selected tournament
     utils.publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=upload)
@@ -71,13 +72,10 @@ def main():
     # Publish statistics
     utils.publish_statistics_sheet(tournaments, rankings, players, tid, prev_tid, upload=upload)
 
-    answer = input("\nDo you want to publish to the web [Y/n]? (press Enter to continue)\n")
-    show_on_web = (answer.lower() != "n") and (t_num > 1)
+    if not offline:
+        answer = input("\nDo you want to publish to the web [Y/n]? (press Enter to continue)\n")
+        show_on_web = (answer.lower() != "n") and (t_num > 1)
 
-    utils.publish_to_web(tid, show_on_web)
+        utils.publish_to_web(tid, show_on_web)
 
     utils.save_raw_ranking(rankings, players, tid)
-
-
-if __name__ == "__main__":
-    main()
