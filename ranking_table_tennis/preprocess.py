@@ -1,30 +1,28 @@
-#!/usr/bin/env python3
-
 from ranking_table_tennis import utils
 from ranking_table_tennis.configs import cfg
 from urllib import request
 
-__author__ = "sebastian"
 
-##########################################
-# Script to run before compute_rankings.py
-# Input: xlsx tournaments database
-#        config.yaml
-# Output: xlsx tournaments database
-#
-# It looks for unknown or unrated players.
-# It will ask for information not given
-# and saves the result into the same xlsx
-##########################################
+def main(offline=True):
+    """Preprocess matches on xlsx tournaments database.
 
+    Function to run before compute_rankings.main().
+    It will use xlsx tournaments database and config.yaml.
+    It will output xlsx tournaments database updated.
+    It will save players and tournaments in pickles.
 
-def main():
+    It looks for unknown or unrated players.
+    It will ask for information not given and saves the result into the same xlsx
+
+    If offline=True it will execute preprocessing locally (not retrieving or uploading updates).
+    """
     xlsx_file = cfg.io.data_folder + cfg.io.tournaments_filename
 
-    retrieve = input("Do you want to retrieve online sheet [Y/n]? (press Enter to continue)\n")
-    if retrieve.lower() != "n":
-        print("Downloading and saving %s\n" % xlsx_file)
-        request.urlretrieve(cfg.io.tournaments_gdrive, xlsx_file)
+    if not offline:
+        retrieve = input("Do you want to retrieve online sheet [Y/n]? (press Enter to continue)\n")
+        if retrieve.lower() != "n":
+            print("Downloading and saving %s\n" % xlsx_file)
+            request.urlretrieve(cfg.io.tournaments_gdrive, xlsx_file)
 
     # Loading all tournament data
     tournaments = utils.load_tournaments_sheets()
@@ -88,8 +86,10 @@ def main():
                 utils.save_temp_players_ranking(players_temp, ranking_temp)
 
     # Update the online version
-    answer = input("\nDo you want to update online sheets [Y/n]? (press Enter to continue)\n")
-    upload = answer.lower() != "n"
+    upload = False
+    if not offline:
+        answer = input("\nDo you want to update online sheets [Y/n]? (press Enter to continue)\n")
+        upload = answer.lower() != "n"
 
     # Saving complete list of players, including new ones
     utils.save_players_sheet(players, upload=upload)
@@ -102,7 +102,3 @@ def main():
     utils.remove_temp_players_ranking()
 
     utils.save_to_pickle(players=players, tournaments=tournaments)
-
-
-if __name__ == "__main__":
-    main()
