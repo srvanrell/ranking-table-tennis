@@ -54,11 +54,21 @@ class TestTournaments(TestCase):
         }
         tour_df = pd.DataFrame(dict_tour_entry, index=[0])
         tournaments = models.Tournaments(tour_df)
+        # Hack to fix this test
+        tournaments.tournaments_df.winner_pid = 100
+        tournaments.tournaments_df.loser_pid = 200
 
         best_rounds = tournaments.compute_best_rounds(tid, players=None)
-        output = {("segunda", "Star, Ringo"): "octavos", ("segunda", "Lennon, John"): "octavos"}
+        expected_output = pd.DataFrame(
+            {
+                "name": ["Star, Ringo", "Lennon, John"],
+                "pid": [100, 200],
+                "category": ["segunda", "segunda"],
+                "best_round": ["octavos", "octavos"],
+            }
+        )
 
-        self.assertDictEqual(best_rounds, output)
+        assert best_rounds.equals(expected_output)
 
 
 class TestRankings(TestCase):
