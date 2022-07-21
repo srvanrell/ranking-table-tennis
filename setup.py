@@ -48,7 +48,7 @@ setup(
     author_email="srvanrell@gmail.com",
     packages=find_packages(),
     entry_points={
-        "console_scripts": ["rtt2=ranking_table_tennis.command_line:main"],
+        "console_scripts": ["rtt=ranking_table_tennis.command_line:main"],
     },
     include_package_data=True,
     install_requires=[
