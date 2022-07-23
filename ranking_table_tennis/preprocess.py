@@ -1,6 +1,7 @@
+from urllib import request
+
 from ranking_table_tennis import utils
 from ranking_table_tennis.configs import cfg
-from urllib import request
 
 
 def main(offline=True):

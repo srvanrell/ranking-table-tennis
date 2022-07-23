@@ -2,8 +2,8 @@ import os
 import pickle
 from typing import Any
 
-from ranking_table_tennis.configs import cfg
 from ranking_table_tennis import models
+from ranking_table_tennis.configs import cfg
 
 
 def save_to_pickle(

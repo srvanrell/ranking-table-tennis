@@ -1,11 +1,12 @@
-import pytest
-import shutil
 import os
-from ranking_table_tennis import preprocess, compute_rankings
-from ranking_table_tennis.configs import cfg
-from ranking_table_tennis import utils
-from pandas.testing import assert_frame_equal
+import shutil
+
+import pytest
 from conftest import get_expected_folder_path
+from pandas.testing import assert_frame_equal
+
+from ranking_table_tennis import compute_rankings, preprocess, utils
+from ranking_table_tennis.configs import cfg
 
 
 @pytest.fixture(scope="module", autouse=True)

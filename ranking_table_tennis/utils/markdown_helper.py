@@ -1,7 +1,8 @@
 import os
 
-import pandas as pd
 import matplotlib.pyplot as plt
+import pandas as pd
+
 from ranking_table_tennis.configs import cfg
 
 

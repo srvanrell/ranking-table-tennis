@@ -2,13 +2,13 @@ from typing import List, Tuple
 
 import pandas as pd
 
-from ranking_table_tennis.models.tournaments import Tournaments
 from ranking_table_tennis.configs import (
+    best_rounds_points,
     cfg,
     expected_result_table,
     unexpected_result_table,
-    best_rounds_points,
 )
+from ranking_table_tennis.models.tournaments import Tournaments
 
 
 class Rankings:

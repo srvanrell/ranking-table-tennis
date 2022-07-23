@@ -2,8 +2,8 @@ import os
 import pickle
 from typing import Tuple
 
-from ranking_table_tennis.configs import cfg
 from ranking_table_tennis import models
+from ranking_table_tennis.configs import cfg
 from ranking_table_tennis.utils.pickle_helper import load_from_pickle
 
 

@@ -3,8 +3,8 @@ from typing import List
 
 import pandas as pd
 
-from ranking_table_tennis.configs import cfg
 from ranking_table_tennis import models
+from ranking_table_tennis.configs import cfg
 from ranking_table_tennis.utils.gspread_helper import upload_sheet_from_df
 
 

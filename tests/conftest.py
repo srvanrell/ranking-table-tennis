@@ -1,8 +1,9 @@
-import shutil
-import pytest
-import os
-import pandas as pd
 import glob
+import os
+import shutil
+
+import pandas as pd
+import pytest
 
 
 def pytest_sessionstart(session):

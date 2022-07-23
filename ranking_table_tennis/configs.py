@@ -1,9 +1,8 @@
 import os
-
 import shutil
+
 import pandas as pd
 from omegaconf import OmegaConf
-
 
 # Loads some names from config.yaml
 user_config_path = os.path.join("data_rtt", "config")

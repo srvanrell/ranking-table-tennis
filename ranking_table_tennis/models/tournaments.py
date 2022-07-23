@@ -1,9 +1,9 @@
-from typing import List, Iterator
+from typing import Iterator, List
 
 import pandas as pd
 from unidecode import unidecode
 
-from ranking_table_tennis.configs import cfg, best_rounds_priority
+from ranking_table_tennis.configs import best_rounds_priority, cfg
 from ranking_table_tennis.models import Players
 
 
