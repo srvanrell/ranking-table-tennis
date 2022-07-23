@@ -146,7 +146,7 @@ class Tournaments:
 
         winner = self.tournaments_df.loc[criteria, "winner"]
         loser = self.tournaments_df.loc[criteria, "loser"]
-        all_players = winner.append(loser, ignore_index=True).unique()
+        all_players = pd.concat([winner, loser], ignore_index=True).unique()
 
         return sorted(list(all_players))
 
@@ -162,7 +162,7 @@ class Tournaments:
 
         winner = self.tournaments_df.loc[criteria, "winner_pid"]
         loser = self.tournaments_df.loc[criteria, "loser_pid"]
-        all_players = winner.append(loser, ignore_index=True).unique()
+        all_players = pd.concat([winner, loser], ignore_index=True).unique()
 
         return sorted(list(all_players))
 
