@@ -56,7 +56,7 @@ setup(
         "oauth2client>=4.1.2",
         "PyYAML>=5.4.1",
         "urllib3>=1.23",
-        "openpyxl>=3.0.4,<3.0.6",
+        "openpyxl>=3.0.6,<3.1.0",
         "Unidecode>=1.0.22",
         "pandas>=1.0.5,<1.3",
         "xlrd>=1.2.0,<2.0",
