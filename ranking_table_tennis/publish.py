@@ -15,6 +15,8 @@ def main(offline=True, last=True, tournament_num=None):
 
     tournament_num (int): enter the number of a valid tournament
     """
+    print("\nStarting publish\n")
+
     # Loading all tournament data
     tournaments = utils.load_from_pickle(cfg.io.tournaments_pickle)
 

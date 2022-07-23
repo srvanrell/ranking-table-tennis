@@ -10,6 +10,8 @@ def main():
     It will read players, tournaments in pickles.
     It will save players, tournaments and rankings in pickles.
     """
+    print("\nStarting compute rankings\n")
+
     # Loading all tournament data
     tournaments = utils.load_from_pickle(cfg.io.tournaments_pickle)
 
