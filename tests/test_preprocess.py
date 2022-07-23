@@ -2,8 +2,6 @@ import pytest
 from ranking_table_tennis import preprocess
 from ranking_table_tennis.configs import cfg
 from ranking_table_tennis import utils
-import pickle
-import os
 from pandas.testing import assert_frame_equal
 
 
@@ -15,8 +13,7 @@ def my_fixture():
 
 def test_preprocess_outputs_players_and_histories(players_df):
     # Load output from preprocess
-    output_filename = os.path.join(cfg.io.data_folder, "players.pk")
-    players_output = pickle.load(open(output_filename, "rb"))
+    players_output = utils.load_from_pickle(cfg.io.players_pickle)
 
     assert_frame_equal(players_output.players_df, players_df)
     assert players_output.history_df.empty
