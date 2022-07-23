@@ -1,8 +1,9 @@
-from setuptools import setup, find_packages
-from setuptools.command.develop import develop
-from setuptools.command.install import install
 import os
 import shutil
+
+from setuptools import find_packages, setup
+from setuptools.command.develop import develop
+from setuptools.command.install import install
 
 
 def readme():
@@ -56,10 +57,9 @@ setup(
         "oauth2client>=4.1.2",
         "PyYAML>=5.4.1",
         "urllib3>=1.23",
-        "openpyxl>=3.0.4,<3.0.6",
+        "openpyxl>=3.0.6,<3.1.0",
         "Unidecode>=1.0.22",
-        "pandas>=1.0.5,<1.3",
-        "xlrd>=1.2.0,<2.0",
+        "pandas>=1.3",
         "gspread-dataframe>=1.0.4",
         "tabulate>=0.8.7",
         "matplotlib>=3.1.0",

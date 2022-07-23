@@ -1,6 +1,7 @@
 import argparse
 import textwrap
-from ranking_table_tennis import preprocess, compute_rankings, publish
+
+from ranking_table_tennis import compute_rankings, preprocess, publish
 
 
 def main():

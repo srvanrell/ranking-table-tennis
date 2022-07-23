@@ -1,6 +1,7 @@
-from ranking_table_tennis import utils
-from ranking_table_tennis.configs import cfg
 from urllib import request
+
+from ranking_table_tennis import helpers
+from ranking_table_tennis.configs import cfg
 
 
 def main(offline=True):
@@ -27,17 +28,17 @@ def main(offline=True):
             request.urlretrieve(cfg.io.tournaments_gdrive, xlsx_file)
 
     # Loading all tournament data
-    tournaments = utils.load_tournaments_sheets()
+    tournaments = helpers.load_tournaments_sheets()
 
     # Loading players list
-    players = utils.load_players_sheet()
+    players = helpers.load_players_sheet()
 
     # Loading initial ranking
-    rankings = utils.load_initial_ranking_sheet()
+    rankings = helpers.load_initial_ranking_sheet()
     initial_tid = cfg.aux.initial_tid
 
     # Loading temp ranking and players. It will be deleted after a successful preprocessing
-    players_temp, ranking_temp = utils.load_temp_players_ranking()
+    players_temp, ranking_temp = helpers.load_temp_players_ranking()
 
     for tid in tournaments:
         print("==", tid, "==")
@@ -85,7 +86,7 @@ def main(offline=True):
                 retrieve = input(
                     "press Enter to continue or Kill this process to forget last player data\n"
                 )
-                utils.save_temp_players_ranking(players_temp, ranking_temp)
+                helpers.save_temp_players_ranking(players_temp, ranking_temp)
 
     # Update the online version
     upload = False
@@ -94,13 +95,13 @@ def main(offline=True):
         upload = answer.lower() != "n"
 
     # Saving complete list of players, including new ones
-    utils.save_players_sheet(players, upload=upload)
+    helpers.save_players_sheet(players, upload=upload)
 
     # Saving initial rankings for all known players
     rankings.update_categories()
-    utils.save_ranking_sheet(initial_tid, tournaments, rankings, players, upload=upload)
+    helpers.save_ranking_sheet(initial_tid, tournaments, rankings, players, upload=upload)
 
     # Remove temp files after a successful preprocessing
-    utils.remove_temp_players_ranking()
+    helpers.remove_temp_players_ranking()
 
-    utils.save_to_pickle(players=players, tournaments=tournaments)
+    helpers.save_to_pickle(players=players, tournaments=tournaments)

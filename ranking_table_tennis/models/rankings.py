@@ -2,13 +2,13 @@ from typing import List, Tuple
 
 import pandas as pd
 
-from ranking_table_tennis.models.tournaments import Tournaments
 from ranking_table_tennis.configs import (
+    best_rounds_points,
     cfg,
     expected_result_table,
     unexpected_result_table,
-    best_rounds_points,
 )
+from ranking_table_tennis.models.tournaments import Tournaments
 
 
 class Rankings:
@@ -142,6 +142,7 @@ class Rankings:
         }
         self.ranking_df.fillna(value=default_values, inplace=True)
         self.ranking_df.date = pd.to_datetime(self.ranking_df.date)
+        self.ranking_df = self.ranking_df.astype({"rating": "float"})  # Force rating to be float
 
     def initialize_new_ranking(self, new_tid: str, prev_tid: str) -> None:
         entries_indexes = self.ranking_df.tid == prev_tid
@@ -150,7 +151,7 @@ class Rankings:
         new_ranking.loc[:, self.points_cat_columns() + self.cum_points_cat_columns()] = 0
         new_ranking.loc[:, self.participations_cat_columns()] = 0
         new_ranking.loc[:, self.cum_tids_cat_columns()] = ""
-        self.ranking_df = self.ranking_df.append(new_ranking, ignore_index=True)
+        self.ranking_df = pd.concat([self.ranking_df, new_ranking], ignore_index=True)
 
     @staticmethod
     def _rating_to_category(rating: float) -> str:
@@ -299,7 +300,7 @@ class Rankings:
             :, "rating_change"
         ]
 
-        self.rating_details_df = self.rating_details_df.append(matches_processed)
+        self.rating_details_df = pd.concat([self.rating_details_df, matches_processed])
         self.update_categories()
 
     def compute_category_points(self, tid: str, best_rounds: pd.DataFrame):
@@ -325,8 +326,8 @@ class Rankings:
             ]
 
         # Save details of assigned points
-        self.championship_details_df = self.championship_details_df.append(
-            best_rounds_pointed, ignore_index=True
+        self.championship_details_df = pd.concat(
+            [self.championship_details_df, best_rounds_pointed], ignore_index=True
         )
 
     @staticmethod

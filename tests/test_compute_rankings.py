@@ -1,18 +1,18 @@
-import pytest
-import shutil
 import os
-from ranking_table_tennis import preprocess, compute_rankings
-from ranking_table_tennis.configs import cfg
-from ranking_table_tennis import utils
+import shutil
+
+import pytest
+from conftest import get_expected_folder_path
 from pandas.testing import assert_frame_equal
+
+from ranking_table_tennis import compute_rankings, helpers, preprocess
+from ranking_table_tennis.configs import cfg
 
 
 @pytest.fixture(scope="module", autouse=True)
 def run_before_tests():
     """To be run once before all tests"""
-    example_data = os.path.join(
-        os.path.dirname(__file__), "data_up_to_S2022T04", cfg.io.tournaments_filename
-    )
+    example_data = os.path.join(get_expected_folder_path(), cfg.io.tournaments_filename)
     shutil.copy2(example_data, cfg.io.data_folder)
     preprocess.main()
     compute_rankings.main()
@@ -20,7 +20,7 @@ def run_before_tests():
 
 def test_compute_rankings_outputs_players_and_histories(players_df, history_df):
     # Load output
-    players_output = utils.load_from_pickle(cfg.io.players_pickle)
+    players_output = helpers.load_from_pickle(cfg.io.players_pickle)
 
     assert_frame_equal(players_output.players_df, players_df)
     assert_frame_equal(players_output.history_df, history_df)
@@ -28,14 +28,14 @@ def test_compute_rankings_outputs_players_and_histories(players_df, history_df):
 
 def test_compute_rankings_outputs_tournaments(tournaments_df):
     # Load output
-    tournaments_output = utils.load_from_pickle(cfg.io.tournaments_pickle)
+    tournaments_output = helpers.load_from_pickle(cfg.io.tournaments_pickle)
 
     assert_frame_equal(tournaments_output.tournaments_df, tournaments_df)
 
 
 def test_compute_rankings_outputs_rankings(ranking_df, rating_details_df, championship_details_df):
     # Load output
-    rankings_output = utils.load_from_pickle(cfg.io.rankings_pickle)
+    rankings_output = helpers.load_from_pickle(cfg.io.rankings_pickle)
 
     assert_frame_equal(rankings_output.ranking_df, ranking_df)
     assert_frame_equal(rankings_output.rating_details_df, rating_details_df)

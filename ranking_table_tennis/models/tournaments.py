@@ -1,9 +1,9 @@
-from typing import List, Iterator
+from typing import Iterator, List
 
 import pandas as pd
 from unidecode import unidecode
 
-from ranking_table_tennis.configs import cfg, best_rounds_priority
+from ranking_table_tennis.configs import best_rounds_priority, cfg
 from ranking_table_tennis.models import Players
 
 
@@ -146,7 +146,7 @@ class Tournaments:
 
         winner = self.tournaments_df.loc[criteria, "winner"]
         loser = self.tournaments_df.loc[criteria, "loser"]
-        all_players = winner.append(loser, ignore_index=True).unique()
+        all_players = pd.concat([winner, loser], ignore_index=True).unique()
 
         return sorted(list(all_players))
 
@@ -162,7 +162,7 @@ class Tournaments:
 
         winner = self.tournaments_df.loc[criteria, "winner_pid"]
         loser = self.tournaments_df.loc[criteria, "loser_pid"]
-        all_players = winner.append(loser, ignore_index=True).unique()
+        all_players = pd.concat([winner, loser], ignore_index=True).unique()
 
         return sorted(list(all_players))
 

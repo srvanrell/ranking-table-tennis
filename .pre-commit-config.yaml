@@ -23,3 +23,11 @@ repos:
         args: # arguments to configure flake8
         -   "--max-line-length=100"
         -   "--extend-ignore=E203"
+-   repo: https://github.com/pycqa/isort
+    rev: 5.10.1
+    hooks:
+      - id: isort
+        name: isort (python)
+        args:
+        -   "--line-length=100"
+        -   "--profile=black"

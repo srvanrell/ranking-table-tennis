@@ -1,16 +1,9 @@
 from unittest import TestCase
 
-from ranking_table_tennis import models
-import pandas as pd
 import numpy as np
+import pandas as pd
 
-
-# class TestPlayers(TestCase):
-#     def test_get_pid(self):
-#         players = models.Players()
-#         players.add_new_player("Roberto, Carlos")
-#         print(players)
-#         self.fail()
+from ranking_table_tennis import models
 
 
 class TestRankingOLD(TestCase):

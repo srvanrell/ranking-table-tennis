@@ -1,7 +1,9 @@
-import shutil
-import pytest
+import glob
 import os
+import shutil
+
 import pandas as pd
+import pytest
 
 
 def pytest_sessionstart(session):
@@ -24,8 +26,27 @@ def pytest_sessionfinish(session, exitstatus):
     shutil.rmtree(cfg.io.data_folder)
 
 
+def assert_equals_xlsx(reference_folder, output_folder, name_pattern):
+    expected_folder_path = os.path.relpath(reference_folder)
+    filenames = glob.glob(os.path.join(expected_folder_path, name_pattern))
+    filenames = [fn.replace(expected_folder_path + "/", "") for fn in filenames]
+
+    for fn in filenames:
+        dfs_expected = pd.read_excel(os.path.join(expected_folder_path, fn), sheet_name=None)
+        dfs_output = pd.read_excel(os.path.join(output_folder, fn), sheet_name=None)
+
+        assert sorted(dfs_expected.keys()) == sorted(dfs_output.keys()), "Sheetname differences"
+
+        for name, df in dfs_expected.items():
+            assert df.equals(dfs_output[name]), f"Mismatch on {name} sheet"
+
+
+def get_expected_folder_path():
+    return os.path.join(os.path.dirname(__file__), "data_up_to_S2022T04")
+
+
 def load_expected_output(csv_filename, parse_dates=False):
-    expected_path = os.path.join(os.path.dirname(__file__), "data_up_to_S2022T04")
+    expected_path = get_expected_folder_path()
     expected_filepath = os.path.join(expected_path, csv_filename)
     if parse_dates:
         return pd.read_csv(

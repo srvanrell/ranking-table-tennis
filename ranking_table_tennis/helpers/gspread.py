@@ -1,7 +1,7 @@
 from typing import List
 
-import pandas as pd
 import gspread
+import pandas as pd
 from gspread_dataframe import set_with_dataframe
 
 from ranking_table_tennis.configs import cfg

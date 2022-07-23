@@ -1,19 +1,20 @@
-import glob
-import shutil
-import pytest
-from ranking_table_tennis import preprocess, compute_rankings, publish
-from ranking_table_tennis.configs import cfg
-import filecmp
 import difflib
+import filecmp
+import glob
 import os
+import shutil
+
+import pytest
+from conftest import assert_equals_xlsx, get_expected_folder_path
+
+from ranking_table_tennis import compute_rankings, preprocess, publish
+from ranking_table_tennis.configs import cfg
 
 
 @pytest.fixture(scope="module", autouse=True)
 def run_before_tests():
     """To be run once before all tests"""
-    example_data = os.path.join(
-        os.path.dirname(__file__), "data_up_to_S2022T04", cfg.io.tournaments_filename
-    )
+    example_data = os.path.join(get_expected_folder_path(), cfg.io.tournaments_filename)
     shutil.copy2(example_data, cfg.io.data_folder)
     preprocess.main()
     compute_rankings.main()
@@ -21,17 +22,14 @@ def run_before_tests():
         publish.main(tournament_num=tn)
 
 
-def get_expected_folder_path():
-    return os.path.join(os.path.dirname(__file__), "data_up_to_S2022T04")
-
-
 def test_publish_xlsx_to_publish_outputs():
     """Compare all xlsx to publish between folders"""
-    pass
+    assert_equals_xlsx(get_expected_folder_path(), cfg.io.data_folder, "*publicar.xlsx")
 
 
 def test_publish_xlsx_raw_rankings_outputs():
-    pass
+    # Creates the list of xlsx files to compare
+    assert_equals_xlsx(get_expected_folder_path(), cfg.io.data_folder, "raw_ranking*.xlsx")
 
 
 def test_publish_markdown_outputs():
