@@ -5,7 +5,7 @@ import pandas as pd
 
 from ranking_table_tennis import models
 from ranking_table_tennis.configs import cfg
-from ranking_table_tennis.utils.gspread_helper import upload_sheet_from_df
+from ranking_table_tennis.helpers.gspread import upload_sheet_from_df
 
 
 def get_tournament_sheet_names_ordered() -> List[str]:

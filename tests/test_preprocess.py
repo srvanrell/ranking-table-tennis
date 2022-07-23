@@ -5,7 +5,7 @@ import pytest
 from conftest import assert_equals_xlsx, get_expected_folder_path
 from pandas.testing import assert_frame_equal
 
-from ranking_table_tennis import preprocess, utils
+from ranking_table_tennis import helpers, preprocess
 from ranking_table_tennis.configs import cfg
 
 
@@ -24,7 +24,7 @@ def test_preprocess_xlsx_output():
 
 def test_preprocess_outputs_players_and_histories(players_df):
     # Load output from preprocess
-    players_output = utils.load_from_pickle(cfg.io.players_pickle)
+    players_output = helpers.load_from_pickle(cfg.io.players_pickle)
 
     assert_frame_equal(players_output.players_df, players_df)
     assert players_output.history_df.empty
@@ -32,7 +32,7 @@ def test_preprocess_outputs_players_and_histories(players_df):
 
 def test_preprocess_outputs_tournaments(tournaments_df):
     # Load output from preprocess
-    tournaments_output = utils.load_from_pickle(cfg.io.tournaments_pickle)
+    tournaments_output = helpers.load_from_pickle(cfg.io.tournaments_pickle)
 
     # winner and loser Players ID are not assignated during preprocessing
     tournaments_df = tournaments_df.copy()

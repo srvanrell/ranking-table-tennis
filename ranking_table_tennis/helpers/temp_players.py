@@ -4,7 +4,7 @@ from typing import Tuple
 
 from ranking_table_tennis import models
 from ranking_table_tennis.configs import cfg
-from ranking_table_tennis.utils.pickle_helper import load_from_pickle
+from ranking_table_tennis.helpers.pickle import load_from_pickle
 
 
 def load_temp_players_ranking() -> Tuple[models.Players, models.Rankings]:
