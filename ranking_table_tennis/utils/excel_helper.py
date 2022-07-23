@@ -202,10 +202,14 @@ def save_raw_ranking(rankings: models.Rankings, players: models.Players, tid: st
 
 
 def _get_writer(xlsx_filename: str, sheet_name: str) -> pd.ExcelWriter:
-    writer = pd.ExcelWriter(xlsx_filename, engine="openpyxl", mode=_get_writer_mode(xlsx_filename))
-    if sheet_name in writer.book.sheetnames:
-        writer.book.remove(writer.book[sheet_name])
+    writer_mode = _get_writer_mode(xlsx_filename)
     print("<<<Saving", sheet_name, "in", xlsx_filename, sep="\t")
+    if writer_mode == "a":
+        writer = pd.ExcelWriter(
+            xlsx_filename, engine="openpyxl", mode=writer_mode, if_sheet_exists="replace"
+        )
+    else:
+        writer = pd.ExcelWriter(xlsx_filename, engine="openpyxl", mode=writer_mode)
 
     return writer
 

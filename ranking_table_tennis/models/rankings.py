@@ -142,6 +142,7 @@ class Rankings:
         }
         self.ranking_df.fillna(value=default_values, inplace=True)
         self.ranking_df.date = pd.to_datetime(self.ranking_df.date)
+        self.ranking_df = self.ranking_df.astype({"rating": "float"})  # Force rating to be float
 
     def initialize_new_ranking(self, new_tid: str, prev_tid: str) -> None:
         entries_indexes = self.ranking_df.tid == prev_tid
