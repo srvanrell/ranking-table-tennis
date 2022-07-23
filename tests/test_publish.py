@@ -26,18 +26,6 @@ def test_publish_xlsx_to_publish_outputs():
 
 
 def test_publish_xlsx_raw_rankings_outputs():
-    filenames = glob.glob(
-        os.path.join(os.path.dirname(__file__), "data_up_to_S2022T04", "S2022T0*", "*.md")
-    )
-    for fn in filenames:
-        with open(fn, "r+") as fileo:
-            lines = fileo.readlines()
-            print("...", fn)
-            print(lines[-1:])
-            lines[-1] = lines[-1][:-1]
-            print(lines[-1:])
-            print("---")
-            fileo.writelines(lines)
     pass
 
 
