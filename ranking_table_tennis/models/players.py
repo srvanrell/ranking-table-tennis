@@ -72,11 +72,13 @@ class Players:
 
         Each history is a string that can be read as a dict with (category, tournament_id) as key.
         """
-        to_update = [
-            {"tid": tid, "pid": row.pid, "category": row.category, "best_round": row.best_round}
-            for row_id, row in best_rounds.iterrows()
-        ]
-        self.history_df = self.history_df.append(to_update, ignore_index=True)
+        to_update = best_rounds.loc[:, ["pid", "category", "best_round"]]
+        to_update.insert(0, "tid", tid)
+        self.history_df = (
+            pd.concat([self.history_df, to_update])
+            .drop_duplicates(ignore_index=True)
+            .infer_objects()
+        )
 
     def played_tournaments(self, pid: int) -> List[str]:
         """Return sorted list of played tournaments. Empty history will result in an empty list."""

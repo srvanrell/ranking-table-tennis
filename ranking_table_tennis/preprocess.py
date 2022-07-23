@@ -16,6 +16,8 @@ def main(offline=True):
 
     If offline=True it will execute preprocessing locally (not retrieving or uploading updates).
     """
+    print("\nStarting preprocess\n")
+
     xlsx_file = cfg.io.data_folder + cfg.io.tournaments_filename
 
     if not offline:
@@ -94,7 +96,7 @@ def main(offline=True):
     # Saving complete list of players, including new ones
     utils.save_players_sheet(players, upload=upload)
 
-    # # Saving initial rankings for all known players
+    # Saving initial rankings for all known players
     rankings.update_categories()
     utils.save_ranking_sheet(initial_tid, tournaments, rankings, players, upload=upload)
 

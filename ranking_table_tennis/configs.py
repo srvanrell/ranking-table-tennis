@@ -7,6 +7,8 @@ from omegaconf import OmegaConf
 
 # Loads some names from config.yaml
 user_config_path = os.path.join("data_rtt", "config")
+print(f"Working directory: {os.path.abspath(os.path.curdir)}")
+print(f"Config directory: {os.path.abspath(user_config_path)}")
 
 if not os.path.exists(user_config_path):
     shutil.copytree(os.path.dirname(__file__) + "/config", user_config_path)

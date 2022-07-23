@@ -8,6 +8,9 @@ old_data/
 # Gedit backups
 *~
 
+# VSCode
+.vscode
+
 # PyCharm project
 .idea
 
