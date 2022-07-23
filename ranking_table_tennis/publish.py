@@ -2,7 +2,7 @@ from ranking_table_tennis import utils
 from ranking_table_tennis.configs import cfg
 
 
-def main(offline=True, last=True):
+def main(offline=True, last=True, tournament_num=None):
     """Publish the results to anew spreadsheet and upload it.
 
     Function to run after compute_rankings.main().
@@ -12,6 +12,8 @@ def main(offline=True, last=True):
 
     If offline=True it will publish locally (not uploading results).
     If last=True it will publish results of the last tournament.
+
+    tournament_num (int): enter the number of a valid tournament
     """
     # Loading all tournament data
     tournaments = utils.load_from_pickle(cfg.io.tournaments_pickle)
@@ -28,13 +30,16 @@ def main(offline=True, last=True):
     tids = [initial_tid] + [tid for tid in tournaments]
 
     tid = tids[-1]
-    if not last:
+    if not last and not tournament_num:
         print("\nNumber\t->\tTournament ID")
         for tenum, tid in enumerate(tids[1:], 1):
             print(f"{tenum:d}\t->\t{tid}")
 
         t_num = int(input("Enter the tournament number to publish (look above):\n"))
         tid = tids[t_num]
+    # An explicit tournament num will overwrite other options
+    if tournament_num:
+        tid = tids[tournament_num]
 
     # Get the tid of the previous tournament
     prev_tid = tids[tids.index(tid) - 1]
