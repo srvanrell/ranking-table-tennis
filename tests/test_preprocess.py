@@ -5,16 +5,20 @@ from ranking_table_tennis import preprocess
 from ranking_table_tennis.configs import cfg
 from ranking_table_tennis import utils
 from pandas.testing import assert_frame_equal
+from conftest import assert_equals_xlsx, get_expected_folder_path
 
 
 @pytest.fixture(scope="module", autouse=True)
 def run_before_tests():
     """To be run once before all tests"""
-    example_data = os.path.join(
-        os.path.dirname(__file__), "data_up_to_S2022T04", cfg.io.tournaments_filename
-    )
+    example_data = os.path.join(get_expected_folder_path(), cfg.io.tournaments_filename)
     shutil.copy2(example_data, cfg.io.data_folder)
     preprocess.main()
+
+
+def test_preprocess_xlsx_output():
+    """Compare xlsx preprocessed between expected and output folder"""
+    assert_equals_xlsx(get_expected_folder_path(), cfg.io.data_folder, cfg.io.tournaments_filename)
 
 
 def test_preprocess_outputs_players_and_histories(players_df):
