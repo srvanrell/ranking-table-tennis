@@ -1,3 +1,4 @@
+import shutil
 import pytest
 import os
 import pandas as pd
@@ -8,7 +9,8 @@ def pytest_sessionstart(session):
     Called after the Session object has been created and
     before performing collection and entering the run test loop.
     """
-    pass
+    print("\nBefore starting tests\n")
+    print("Nothing to do...")
 
 
 def pytest_sessionfinish(session, exitstatus):
@@ -16,7 +18,10 @@ def pytest_sessionfinish(session, exitstatus):
     Called after whole test run finished, right before
     returning the exit status to the system.
     """
-    pass
+    from ranking_table_tennis.configs import cfg
+
+    print(f"\nRemoving data folder after test: remove {cfg.io.data_folder}")
+    shutil.rmtree(cfg.io.data_folder)
 
 
 def load_expected_output(csv_filename, parse_dates=False):

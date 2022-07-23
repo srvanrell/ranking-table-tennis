@@ -1,4 +1,5 @@
 import glob
+import shutil
 import pytest
 from ranking_table_tennis import preprocess, compute_rankings, publish
 from ranking_table_tennis.configs import cfg
@@ -10,6 +11,10 @@ import os
 @pytest.fixture(scope="module", autouse=True)
 def run_before_tests():
     """To be run once before all tests"""
+    example_data = os.path.join(
+        os.path.dirname(__file__), "data_up_to_S2022T04", cfg.io.tournaments_filename
+    )
+    shutil.copy2(example_data, cfg.io.data_folder)
     preprocess.main()
     compute_rankings.main()
     for tn in range(1, 5):

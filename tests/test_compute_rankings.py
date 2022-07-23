@@ -1,4 +1,6 @@
 import pytest
+import shutil
+import os
 from ranking_table_tennis import preprocess, compute_rankings
 from ranking_table_tennis.configs import cfg
 from ranking_table_tennis import utils
@@ -8,6 +10,10 @@ from pandas.testing import assert_frame_equal
 @pytest.fixture(scope="module", autouse=True)
 def run_before_tests():
     """To be run once before all tests"""
+    example_data = os.path.join(
+        os.path.dirname(__file__), "data_up_to_S2022T04", cfg.io.tournaments_filename
+    )
+    shutil.copy2(example_data, cfg.io.data_folder)
     preprocess.main()
     compute_rankings.main()
 
