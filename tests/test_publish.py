@@ -6,6 +6,7 @@ from ranking_table_tennis.configs import cfg
 import filecmp
 import difflib
 import os
+import pandas as pd
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -21,17 +22,33 @@ def run_before_tests():
         publish.main(tournament_num=tn)
 
 
+def assert_equals_xlsx(reference_folder, output_folder, name_pattern):
+    expected_folder_path = os.path.relpath(reference_folder)
+    filenames = glob.glob(os.path.join(expected_folder_path, name_pattern))
+    filenames = [fn.replace(expected_folder_path + "/", "") for fn in filenames]
+
+    for fn in filenames:
+        dfs_expected = pd.read_excel(os.path.join(expected_folder_path, fn), sheet_name=None)
+        dfs_output = pd.read_excel(os.path.join(output_folder, fn), sheet_name=None)
+
+        assert sorted(dfs_expected.keys()) == sorted(dfs_output.keys()), "Sheetname differences"
+
+        for name, df in dfs_expected.items():
+            assert df.equals(dfs_output[name]), f"Mismatch on {name} sheet"
+
+
 def get_expected_folder_path():
     return os.path.join(os.path.dirname(__file__), "data_up_to_S2022T04")
 
 
 def test_publish_xlsx_to_publish_outputs():
     """Compare all xlsx to publish between folders"""
-    pass
+    assert_equals_xlsx(get_expected_folder_path(), cfg.io.data_folder, "*publicar.xlsx")
 
 
 def test_publish_xlsx_raw_rankings_outputs():
-    pass
+    # Creates the list of xlsx files to compare
+    assert_equals_xlsx(get_expected_folder_path(), cfg.io.data_folder, "raw_ranking*.xlsx")
 
 
 def test_publish_markdown_outputs():
