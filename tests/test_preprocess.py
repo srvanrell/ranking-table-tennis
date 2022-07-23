@@ -6,7 +6,7 @@ from pandas.testing import assert_frame_equal
 
 
 @pytest.fixture(scope="module", autouse=True)
-def my_fixture():
+def run_before_tests():
     """To be run once before all tests"""
     preprocess.main()
 
