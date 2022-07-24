@@ -210,10 +210,10 @@ class Tournaments:
     def assign_pid_from_players(self, players: Players) -> None:
         name2pid = players.get_name2pid()
         self.tournaments_df["winner_pid"] = self.tournaments_df["winner"].apply(
-            lambda name: name2pid[name]
+            lambda name: name2pid.get(name)
         )
         self.tournaments_df["loser_pid"] = self.tournaments_df["loser"].apply(
-            lambda name: name2pid[name]
+            lambda name: name2pid.get(name)
         )
 
     def get_matches(

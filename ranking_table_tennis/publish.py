@@ -85,7 +85,7 @@ def main(offline=True, last=True, tournament_num=None):
 
     if not offline:
         answer = input("\nDo you want to publish to the web [Y/n]? (press Enter to continue)\n")
-        show_on_web = (answer.lower() != "n") and (t_num > 1)
+        show_on_web = (answer.lower() != "n") and (tid != tids[1])
 
         helpers.publish_to_web(tid, show_on_web)
 
