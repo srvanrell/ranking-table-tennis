@@ -3,7 +3,7 @@ from typing import List, Tuple
 import pandas as pd
 from omegaconf import OmegaConf
 
-from ranking_table_tennis.configs import cfg, expected_result_table, unexpected_result_table
+from ranking_table_tennis.configs import cfg
 from ranking_table_tennis.models.tournaments import Tournaments
 
 
@@ -179,10 +179,14 @@ class Rankings:
         """Points to add to winner and to deduce from loser given ratings of winner and loser."""
         rating_diff = rating_winner - rating_loser
 
-        assignation_table = expected_result_table
+        assignation_table = cfg.expected_result_table
         if rating_diff < 0:
             rating_diff *= -1.0
-            assignation_table = unexpected_result_table
+            assignation_table = cfg.unexpected_result_table
+
+        assignation_table = pd.DataFrame(
+            OmegaConf.to_container(assignation_table, resolve=True)
+        ).to_numpy()
 
         # Select first row that is appropiate for given rating_diff
         diff_threshold, points_to_winner, points_to_loser = assignation_table[
