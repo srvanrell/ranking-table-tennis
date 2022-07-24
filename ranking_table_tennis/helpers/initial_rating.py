@@ -1,7 +1,9 @@
 import pandas as pd
 
 from ranking_table_tennis import helpers, models
-from ranking_table_tennis.configs import cfg
+from ranking_table_tennis.configs import get_cfg
+
+cfg = get_cfg()
 
 
 def print_rating_context(

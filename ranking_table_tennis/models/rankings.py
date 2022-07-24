@@ -3,8 +3,10 @@ from typing import List, Tuple
 import pandas as pd
 from omegaconf import OmegaConf
 
-from ranking_table_tennis.configs import cfg
+from ranking_table_tennis.configs import get_cfg
 from ranking_table_tennis.models.tournaments import Tournaments
+
+cfg = get_cfg()
 
 
 class Rankings:

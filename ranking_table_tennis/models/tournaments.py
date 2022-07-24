@@ -4,8 +4,10 @@ import pandas as pd
 from omegaconf import OmegaConf
 from unidecode import unidecode
 
-from ranking_table_tennis.configs import cfg
+from ranking_table_tennis.configs import get_cfg
 from ranking_table_tennis.models import Players
+
+cfg = get_cfg()
 
 
 class Tournaments:

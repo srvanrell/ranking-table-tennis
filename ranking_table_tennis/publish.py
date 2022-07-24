@@ -1,5 +1,7 @@
 from ranking_table_tennis import helpers
-from ranking_table_tennis.configs import cfg
+from ranking_table_tennis.configs import get_cfg
+
+cfg = get_cfg()
 
 
 def main(offline=True, last=True, tournament_num=None):

@@ -4,46 +4,50 @@ import shutil
 import pandas as pd
 from omegaconf import OmegaConf
 
-# Loads some names from config.yaml
-user_config_path = os.path.join("data_rtt", "config")
-print(f"Working directory: {os.path.abspath(os.path.curdir)}")
-print(f"Config directory: {os.path.abspath(user_config_path)}")
 
-if not os.path.exists(user_config_path):
-    shutil.copytree(os.path.dirname(__file__) + "/config", user_config_path)
+def get_cfg(date=None):
+    """First cfg valid for date"""
 
-base_cfg = OmegaConf.load(user_config_path + "/config.yaml")
+    # Loads some names from config.yaml
+    user_config_path = os.path.join("data_rtt", "config")
+    print(f"Working directory: {os.path.abspath(os.path.curdir)}")
+    print(f"Config directory: {os.path.abspath(user_config_path)}")
 
-if not os.path.exists(base_cfg.io.data_folder):
-    os.mkdir(base_cfg.io.data_folder)
+    if not os.path.exists(user_config_path):
+        shutil.copytree(os.path.dirname(__file__) + "/config", user_config_path)
 
-# Tables to assign points
+    base_cfg = OmegaConf.load(user_config_path + "/config.yaml")
 
-# difference, points to winner, points to loser
-expected_result_table = pd.read_csv(user_config_path + "/expected_result.csv")
+    if not os.path.exists(base_cfg.io.data_folder):
+        os.mkdir(base_cfg.io.data_folder)
 
-# negative difference, points to winner, points to loser
-unexpected_result_table = pd.read_csv(user_config_path + "/unexpected_result.csv")
+    # Tables to assign points
 
-# points to be assigned by round and by participation
-raw_points_per_round_table = pd.read_csv(user_config_path + "/points_per_round.csv")
-best_rounds_points = raw_points_per_round_table.drop(columns="priority")
+    # difference, points to winner, points to loser
+    expected_result_table = pd.read_csv(user_config_path + "/expected_result.csv")
 
-# Priority of rounds in a tournament
-best_rounds_priority = raw_points_per_round_table.set_index("round_reached")["priority"]
+    # negative difference, points to winner, points to loser
+    unexpected_result_table = pd.read_csv(user_config_path + "/unexpected_result.csv")
 
-# List of categories
-categories = raw_points_per_round_table.columns[2:]
+    # points to be assigned by round and by participation
+    raw_points_per_round_table = pd.read_csv(user_config_path + "/points_per_round.csv")
+    best_rounds_points = raw_points_per_round_table.drop(columns="priority")
 
-# Convert to simpler types so they can be configs
-extra_cfg = OmegaConf.create(
-    {
-        "expected_result_table": expected_result_table.to_dict(),
-        "unexpected_result_table": unexpected_result_table.to_dict(),
-        "categories": list(categories),
-        "best_rounds_points": raw_points_per_round_table.drop(columns="priority").to_dict(),
-        "best_rounds_priority": best_rounds_priority.to_dict(),
-    }
-)
+    # Priority of rounds in a tournament
+    best_rounds_priority = raw_points_per_round_table.set_index("round_reached")["priority"]
 
-cfg = OmegaConf.merge(base_cfg, extra_cfg)
+    # List of categories
+    categories = raw_points_per_round_table.columns[2:]
+
+    # Convert to simpler types so they can be configs
+    extra_cfg = OmegaConf.create(
+        {
+            "expected_result_table": expected_result_table.to_dict(),
+            "unexpected_result_table": unexpected_result_table.to_dict(),
+            "categories": list(categories),
+            "best_rounds_points": best_rounds_points.to_dict(),
+            "best_rounds_priority": best_rounds_priority.to_dict(),
+        }
+    )
+
+    return OmegaConf.merge(base_cfg, extra_cfg)

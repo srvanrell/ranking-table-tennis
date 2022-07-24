@@ -4,7 +4,9 @@ import gspread
 import pandas as pd
 from gspread_dataframe import set_with_dataframe
 
-from ranking_table_tennis.configs import cfg
+from ranking_table_tennis.configs import get_cfg
+
+cfg = get_cfg()
 
 
 def upload_sheet_from_df(
