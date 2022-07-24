@@ -34,11 +34,4 @@ def test_preprocess_outputs_tournaments(tournaments_df):
     # Load output from preprocess
     tournaments_output = helpers.load_from_pickle(cfg.io.tournaments_pickle)
 
-    # winner and loser Players ID are not assignated during preprocessing
-    tournaments_df = tournaments_df.copy()
-    tournaments_df.winner_pid = None
-    tournaments_df.loser_pid = None
-
-    print(tournaments_df.head())
-    print(tournaments_output.tournaments_df.head())
     assert_frame_equal(tournaments_output.tournaments_df, tournaments_df)
