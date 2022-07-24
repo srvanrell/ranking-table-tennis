@@ -27,16 +27,14 @@ unexpected_result_table = pd.read_csv(user_config_path + "/unexpected_result.csv
 
 # points to be assigned by round and by participation
 raw_points_per_round_table = pd.read_csv(user_config_path + "/points_per_round.csv")
-best_rounds_priority = raw_points_per_round_table.loc[:, ["priority", "round_reached"]].set_index(
-    "round_reached"
-)
-best_rounds_priority = best_rounds_priority.squeeze()
-best_rounds_points = raw_points_per_round_table.drop(columns="priority")
 
 extra_cfg = OmegaConf.create(
     {
-        "categories": list(best_rounds_points.columns[1:]),
-        "best_rounds_points": best_rounds_points.to_dict(),
+        "categories": list(raw_points_per_round_table.columns[2:]),
+        "best_rounds_points": raw_points_per_round_table.drop(columns="priority").to_dict(),
+        "best_rounds_priority": raw_points_per_round_table.set_index("round_reached")[
+            "priority"
+        ].to_dict(),
     }
 )
 
