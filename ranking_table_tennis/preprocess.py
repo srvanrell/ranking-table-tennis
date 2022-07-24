@@ -33,6 +33,9 @@ def main(offline=True):
     # Loading players list
     players = helpers.load_players_sheet()
 
+    # Assign pid to known players
+    tournaments.assign_pid_from_players(players)
+
     # Loading initial ranking
     rankings = helpers.load_initial_ranking_sheet()
     initial_tid = cfg.aux.initial_tid
@@ -57,14 +60,18 @@ def main(offline=True):
                 else:
                     print(">>>>\tUNCOMPLETE preprocessing detected. Resuming...")
                     players.add_player(players_temp[players_temp.get_pid(name)])
-                print("\n", players[players.get_pid(name)], "\n")
+                print(f"\n{players[players.get_pid(name)]}\n")
 
             pid = players.get_pid(name)
 
-            # Category will be asin
+            # Category will be asigned
             if rankings[initial_tid, pid] is None:
                 if ranking_temp[initial_tid, pid] is None:
                     unknown_player = True
+
+                    # Will print available ratings of known players
+                    helpers.print_rating_context(tournaments, players, name, tid)
+
                     text_to_show = f"\nEnter the initial rating points for {name}"
                     text_to_show += " (category will be auto-assigned):\n"
                     initial_rating = int(input(text_to_show))
@@ -76,10 +83,8 @@ def main(offline=True):
                     rankings.add_entry(ranking_temp[initial_tid, pid])
 
                 print(
-                    "\n",
-                    rankings[initial_tid, pid][["tid", "pid", "rating", "category"]],
-                    players[pid]["name"],
-                    "\n",
+                    f"\n{rankings[initial_tid, pid][['tid', 'pid', 'rating', 'category']]}\n"
+                    f"{players[pid]['name']}"
                 )
 
             if unknown_player:
