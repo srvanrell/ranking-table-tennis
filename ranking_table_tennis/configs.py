@@ -31,12 +31,12 @@ best_rounds_priority = raw_points_per_round_table.loc[:, ["priority", "round_rea
     "round_reached"
 )
 best_rounds_priority = best_rounds_priority.squeeze()
-best_rounds_points = raw_points_per_round_table.drop(columns="priority").set_index("round_reached")
-categories = list(best_rounds_points.columns)
+best_rounds_points = raw_points_per_round_table.drop(columns="priority")
 
 extra_cfg = OmegaConf.create(
     {
-        "categories": categories,
+        "categories": list(best_rounds_points.columns[1:]),
+        "best_rounds_points": best_rounds_points.to_dict(),
     }
 )
 

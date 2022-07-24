@@ -1,13 +1,9 @@
 from typing import List, Tuple
 
 import pandas as pd
+from omegaconf import OmegaConf
 
-from ranking_table_tennis.configs import (
-    best_rounds_points,
-    cfg,
-    expected_result_table,
-    unexpected_result_table,
-)
+from ranking_table_tennis.configs import cfg, expected_result_table, unexpected_result_table
 from ranking_table_tennis.models.tournaments import Tournaments
 
 
@@ -304,9 +300,11 @@ class Rankings:
         self.update_categories()
 
     def compute_category_points(self, tid: str, best_rounds: pd.DataFrame):
+        best_rounds_points_cfg = OmegaConf.to_container(cfg.best_rounds_points, resolve=True)
+        best_rounds_points_df = pd.DataFrame(best_rounds_points_cfg).set_index("round_reached")
         col_translations = {"round_reached": "best_round", "level_1": "category", 0: "points"}
         points_assignation_table = (
-            best_rounds_points.stack().reset_index().rename(columns=col_translations)
+            best_rounds_points_df.stack().reset_index().rename(columns=col_translations)
         )
 
         best_rounds_pointed = best_rounds.merge(
