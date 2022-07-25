@@ -1,25 +1,25 @@
 import os
 import shutil
 
-import pytest
 from conftest import get_expected_folder_path
 from pandas.testing import assert_frame_equal
 
-from ranking_table_tennis import compute_rankings, helpers, preprocess
+from ranking_table_tennis import helpers
 from ranking_table_tennis.configs import get_cfg
 
 cfg = get_cfg()
 
 
-@pytest.fixture(scope="module", autouse=True)
-def run_before_tests():
+def test_cli_aaa_run_before_tests(shell):
     """To be run once before all tests"""
     example_data = os.path.join(get_expected_folder_path(), cfg.io.tournaments_filename)
     shutil.copy2(example_data, cfg.io.data_folder)
-    preprocess.main()
+    ret = shell.run("rtt", "preprocess", "--offline")
+    assert ret.returncode == 0
     # Repeat twice, it should provide consistent results
     for _ in range(2):
-        compute_rankings.main()
+        ret = shell.run("rtt", "compute")
+        assert ret.returncode == 0
 
 
 def test_compute_rankings_outputs_players_and_histories(players_df, history_df):
