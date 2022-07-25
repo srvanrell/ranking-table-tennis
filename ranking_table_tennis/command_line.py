@@ -14,10 +14,10 @@ def main():
         "cmd",
         help=textwrap.dedent(
             """\
-                            (1) preprocess: downloads tournament data and preprocess it
-                            (2) compute: generates rankings from preprocessed data
-                            (3) publish: provides formatted spreadsheets to upload rankings
-                            """
+            (1) preprocess: downloads tournament data and preprocess it
+            (2) compute: generates rankings from preprocessed data
+            (3) publish: provides formatted spreadsheets to upload rankings
+            """
         ),
         choices=["preprocess", "compute", "publish"],
     )

@@ -69,7 +69,9 @@ setup(
         "develop": PostDevelopCommand,
         "install": PostInstallCommand,
     },
-    extras_require={"dev": ["pre-commit==2.18.*", "pytest==7.1.*"]},
+    extras_require={
+        "dev": ["pre-commit==2.18.*", "pytest==7.1.*", "pytest-shell-utilities==1.5.*"]
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
