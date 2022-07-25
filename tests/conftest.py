@@ -11,7 +11,7 @@ def pytest_sessionstart(session):
     Called after the Session object has been created and
     before performing collection and entering the run test loop.
     """
-    print("\nBefore starting tests\n")
+    print("\n## Before starting tests\n")
     print("Nothing to do...")
 
 
@@ -24,6 +24,7 @@ def pytest_sessionfinish(session, exitstatus):
 
     cfg = get_cfg()
 
+    print("\n## After tests have finalized\n")
     print(f"\nRemoving data folder after test: remove {cfg.io.data_folder}")
     shutil.rmtree(cfg.io.data_folder)
 

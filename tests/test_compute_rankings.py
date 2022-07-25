@@ -17,7 +17,9 @@ def run_before_tests():
     example_data = os.path.join(get_expected_folder_path(), cfg.io.tournaments_filename)
     shutil.copy2(example_data, cfg.io.data_folder)
     preprocess.main()
-    compute_rankings.main()
+    # Repeat publish twice, it should provide consistent results
+    for _ in range(2):
+        compute_rankings.main()
 
 
 def test_compute_rankings_outputs_players_and_histories(players_df, history_df):

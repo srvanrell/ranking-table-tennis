@@ -4,9 +4,17 @@ import shutil
 import pandas as pd
 from omegaconf import OmegaConf
 
+_cfg = None
+
 
 def get_cfg(date=None):
     """First cfg valid for date"""
+    global _cfg
+
+    if _cfg:
+        return _cfg
+
+    print("\n## Loading config\n")
 
     # Loads some names from config.yaml
     user_config_path = os.path.join("data_rtt", "config")
@@ -50,4 +58,6 @@ def get_cfg(date=None):
         }
     )
 
-    return OmegaConf.merge(base_cfg, extra_cfg)
+    _cfg = OmegaConf.merge(base_cfg, extra_cfg)
+
+    return _cfg

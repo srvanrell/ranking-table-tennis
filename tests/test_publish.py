@@ -20,8 +20,10 @@ def run_before_tests():
     shutil.copy2(example_data, cfg.io.data_folder)
     preprocess.main()
     compute_rankings.main()
+    # Repeat publish twice, it should provide consistent results
     for tn in range(1, 5):
-        publish.main(tournament_num=tn)
+        for _ in range(2):
+            publish.main(tournament_num=tn)
 
 
 def test_publish_xlsx_to_publish_outputs():

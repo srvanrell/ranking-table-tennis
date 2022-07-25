@@ -19,7 +19,7 @@ def main(offline=True):
 
     If offline=True it will execute preprocessing locally (not retrieving or uploading updates).
     """
-    print("\nStarting preprocess\n")
+    print("\n## Starting preprocess\n")
 
     xlsx_file = cfg.io.data_folder + cfg.io.tournaments_filename
 
