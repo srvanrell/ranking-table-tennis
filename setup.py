@@ -53,24 +53,24 @@ setup(
     },
     include_package_data=True,
     install_requires=[
-        "gspread>=3.6.0",
-        "oauth2client>=4.1.2",
+        "gspread==5.*",
+        "oauth2client==4.*",
         "PyYAML>=5.4.1",
-        "urllib3>=1.23",
+        "urllib3==1.*",
         "openpyxl>=3.0.6,<3.1.0",
-        "Unidecode>=1.0.22",
-        "pandas>=1.3",
-        "gspread-dataframe>=1.0.4",
-        "tabulate>=0.8.7",
-        "matplotlib>=3.1.0",
-        "omegaconf>=2.2.2",
+        "Unidecode==1.*",
+        "pandas==1.3.*",
+        "gspread-dataframe==3.*",
+        "tabulate==0.8.*",
+        "matplotlib==3.*",
+        "omegaconf==2.2.*",
     ],
     cmdclass={
         "develop": PostDevelopCommand,
         "install": PostInstallCommand,
     },
     extras_require={
-        "dev": ["pre-commit==2.18.*", "pytest==7.1.*", "pytest-shell-utilities==1.5.*"]
+        "dev": ["pre-commit==2.18.*", "pytest==7.1.*", "pytest-shell-utilities==1.5.*", "tox==3.*"]
     },
     classifiers=[
         "Programming Language :: Python :: 3",

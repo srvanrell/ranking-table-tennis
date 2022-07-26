@@ -15,7 +15,7 @@ def main(offline=True, last=True, tournament_num=None):
     If offline=True it will publish locally (not uploading results).
     If last=True it will publish results of the last tournament.
 
-    tournament_num (int): enter the number of a valid tournament
+    tournament_num (int): enter the number of a valid tournament. if given, last is ommited
     """
     print("\n## Starting publish\n")
 

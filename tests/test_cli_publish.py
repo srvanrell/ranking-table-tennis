@@ -20,10 +20,11 @@ def test_cli_aaa_run_before_tests(shell):
     ret = shell.run("rtt", "compute")
     assert ret.returncode == 0
     # Repeat twice, it should provide consistent results
-    for tn in range(1, 2):
+    for tn in range(1, 5):
         for _ in range(2):
-            ret = shell.run("rtt", "publish", "--offline", "--last")
+            ret = shell.run("rtt", "publish", "--offline", "--tournament-num", str(tn))
             assert ret.returncode == 0
+            print(ret.stdout)
 
 
 def test_publish_xlsx_to_publish_outputs():
