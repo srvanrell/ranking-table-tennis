@@ -10,7 +10,7 @@ from ranking_table_tennis.configs import get_cfg
 cfg = get_cfg()
 
 
-def test_cli_aaa_run_before_tests(shell):
+def test_cli_preprocess_run_before_tests(shell):
     """To be run once before all tests"""
     example_data = os.path.join(get_expected_folder_path(), cfg.io.tournaments_filename)
     shutil.copy2(example_data, cfg.io.data_folder)
@@ -18,6 +18,7 @@ def test_cli_aaa_run_before_tests(shell):
     for _ in range(2):
         ret = shell.run("rtt", "preprocess", "--offline")
         assert ret.returncode == 0
+        print(ret.stdout)
 
 
 def test_cli_preprocess_xlsx_output():

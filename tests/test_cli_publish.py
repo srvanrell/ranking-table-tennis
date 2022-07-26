@@ -11,14 +11,16 @@ from ranking_table_tennis.configs import get_cfg
 cfg = get_cfg()
 
 
-def test_cli_aaa_run_before_tests(shell):
+def test_cli_publish_run_before_tests(shell):
     """To be run once before all tests"""
     example_data = os.path.join(get_expected_folder_path(), cfg.io.tournaments_filename)
     shutil.copy2(example_data, cfg.io.data_folder)
     ret = shell.run("rtt", "preprocess", "--offline")
     assert ret.returncode == 0
+    print(ret.stdout)
     ret = shell.run("rtt", "compute")
     assert ret.returncode == 0
+    print(ret.stdout)
     # Repeat twice, it should provide consistent results
     for tn in range(1, 5):
         for _ in range(2):
@@ -27,17 +29,17 @@ def test_cli_aaa_run_before_tests(shell):
             print(ret.stdout)
 
 
-def test_publish_xlsx_to_publish_outputs():
+def test_cli_publish_xlsx_to_publish_outputs():
     """Compare all xlsx to publish between folders"""
     assert_equals_xlsx(get_expected_folder_path(), cfg.io.data_folder, "*publicar.xlsx")
 
 
-def test_publish_xlsx_raw_rankings_outputs():
+def test_cli_publish_xlsx_raw_rankings_outputs():
     # Creates the list of xlsx files to compare
     assert_equals_xlsx(get_expected_folder_path(), cfg.io.data_folder, "raw_ranking*.xlsx")
 
 
-def test_publish_markdown_outputs():
+def test_cli_publish_markdown_outputs():
     # Creates the list of markdown files to compare
     expected_folder_path = os.path.relpath(get_expected_folder_path())
     filenames = glob.glob(os.path.join(expected_folder_path, "S2022T0*", "*.md"))
