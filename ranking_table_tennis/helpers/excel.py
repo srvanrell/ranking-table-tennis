@@ -4,8 +4,10 @@ from typing import List
 import pandas as pd
 
 from ranking_table_tennis import models
-from ranking_table_tennis.configs import cfg
+from ranking_table_tennis.configs import get_cfg
 from ranking_table_tennis.helpers.gspread import upload_sheet_from_df
+
+cfg = get_cfg()
 
 
 def get_tournament_sheet_names_ordered() -> List[str]:

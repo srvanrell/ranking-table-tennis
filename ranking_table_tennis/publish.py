@@ -1,5 +1,7 @@
 from ranking_table_tennis import helpers
-from ranking_table_tennis.configs import cfg
+from ranking_table_tennis.configs import get_cfg
+
+cfg = get_cfg()
 
 
 def main(offline=True, last=True, tournament_num=None):
@@ -13,9 +15,9 @@ def main(offline=True, last=True, tournament_num=None):
     If offline=True it will publish locally (not uploading results).
     If last=True it will publish results of the last tournament.
 
-    tournament_num (int): enter the number of a valid tournament
+    tournament_num (int): enter the number of a valid tournament. if given, last is ommited
     """
-    print("\nStarting publish\n")
+    print("\n## Starting publish\n")
 
     # Loading all tournament data
     tournaments = helpers.load_from_pickle(cfg.io.tournaments_pickle)

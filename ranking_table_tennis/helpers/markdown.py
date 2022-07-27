@@ -3,7 +3,9 @@ import os
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from ranking_table_tennis.configs import cfg
+from ranking_table_tennis.configs import get_cfg
+
+cfg = get_cfg()
 
 
 def publish_sheet_as_markdown(df, headers, sheet_name, tid, index=False):

@@ -3,8 +3,10 @@ import pickle
 from typing import Tuple
 
 from ranking_table_tennis import models
-from ranking_table_tennis.configs import cfg
+from ranking_table_tennis.configs import get_cfg
 from ranking_table_tennis.helpers.pickle import load_from_pickle
+
+cfg = get_cfg()
 
 
 def load_temp_players_ranking() -> Tuple[models.Players, models.Rankings]:

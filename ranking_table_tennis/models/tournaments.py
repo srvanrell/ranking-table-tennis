@@ -1,10 +1,13 @@
 from typing import Iterator, List
 
 import pandas as pd
+from omegaconf import OmegaConf
 from unidecode import unidecode
 
-from ranking_table_tennis.configs import best_rounds_priority, cfg
+from ranking_table_tennis.configs import get_cfg
 from ranking_table_tennis.models import Players
+
+cfg = get_cfg()
 
 
 class Tournaments:
@@ -195,7 +198,7 @@ class Tournaments:
 
         # Assign priority to matches
         rounds_data["round_priority"] = rounds_data.loc[:, "best_round"].map(
-            best_rounds_priority.to_dict()
+            OmegaConf.to_container(cfg.best_rounds_priority, resolve=True)
         )
 
         # Get best one for each player and category

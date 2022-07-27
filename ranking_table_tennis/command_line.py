@@ -14,10 +14,10 @@ def main():
         "cmd",
         help=textwrap.dedent(
             """\
-                            (1) preprocess: downloads tournament data and preprocess it
-                            (2) compute: generates rankings from preprocessed data
-                            (3) publish: provides formatted spreadsheets to upload rankings
-                            """
+            (1) preprocess: downloads tournament data and preprocess it
+            (2) compute: generates rankings from preprocessed data
+            (3) publish: provides formatted spreadsheets to upload rankings
+            """
         ),
         choices=["preprocess", "compute", "publish"],
     )
@@ -26,10 +26,17 @@ def main():
         help="Execute the given command locally. Compute is always offline.",
         action="store_true",
     )
-    parser.add_argument(
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument(
         "--last",
         help="Publish the last available tournament. Only valid if publish is given.",
         action="store_true",
+    )
+    group.add_argument(
+        "--tournament-num",
+        help="Publish the tournament number indicated. Only valid if publish is given.",
+        type=int,
+        default=None,
     )
     args = parser.parse_args()
 
@@ -39,7 +46,7 @@ def main():
     elif args.cmd == "compute":
         compute_rankings.main()
     elif args.cmd == "publish":
-        publish.main(args.offline, args.last)
+        publish.main(args.offline, args.last, args.tournament_num)
     else:
         print("you shouldn't see this message")
 

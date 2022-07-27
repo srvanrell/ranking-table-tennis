@@ -1,7 +1,9 @@
 from urllib import request
 
 from ranking_table_tennis import helpers
-from ranking_table_tennis.configs import cfg
+from ranking_table_tennis.configs import get_cfg
+
+cfg = get_cfg()
 
 
 def main(offline=True):
@@ -17,7 +19,7 @@ def main(offline=True):
 
     If offline=True it will execute preprocessing locally (not retrieving or uploading updates).
     """
-    print("\nStarting preprocess\n")
+    print("\n## Starting preprocess\n")
 
     xlsx_file = cfg.io.data_folder + cfg.io.tournaments_filename
 
