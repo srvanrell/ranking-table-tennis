@@ -1,100 +1,17 @@
-io:
-    data_folder: data_rtt/
-    tournaments_filename: Liga Dos Orillas 2022 - Carga de partidos.xlsx
-    rankings_filename: Liga Dos Orillas 2022 - Rankings Crudos.xlsx
-    publish_filename: Torneo NN para publicar.xlsx
-    tournaments_gdrive: https://docs.google.com/spreadsheets/d/e/2PACX-1vSH_0kpkIS6Ipv70zCX0talCHgAFEiF_ZxMfM1XTdsfgvhbWwh-M8sACHciF7X3WAWDxYN3BYvQK6S9/pub?output=xlsx
-    tournaments_spreadsheet_id: 1BYpbmmRBXe-Shgi4PJHqQpGqdstQqqSwpBDZfgzjrF0
-    temporal_spreadsheet_id: 1xxhIopTNrYaGrT4gL5VsrHGt10yisXmSZg_wiWym2QY
-    players_temp_file: temp_players.pickle
-    ranking_temp_file: temp_ranking.pickle
-    players_pickle: players.pk
-    tournaments_pickle: tournaments.pk
-    rankings_pickle: rankings.pk
-    tournament_metadata_md: Metadata
-    published_on_web_spreadsheets_id:
-      - 1sN1I0BSBzVdzRRVkpxHn57KX68p5OZ710bYhOjc-TZI  # partidos
-      - 1amTCwUTYT2Gb2kCvKrfCQlheizCnt20ceAGxUiQRwZM  # nivel de juego
-      - 1fPjP2CdkLN7rGBY8IW1O5t8mwlDL8wxIGLFVrFn48j8  # detalles nivel de juego
-      - 1RFclTiWkaozADeDS1H_vp9901IqQxUu1pqBuBFwOzr4  # campeonato primera
-      - 1A-YYdmGLKufLZYp2TvpEkeO9RvSMtWa1gwRtG_V20qE  # campeonato segunda
-      - 1ZlsvVFXxgubIe1mefjV8vM1MKrR63qf5gWQnhkRxaoM  # campeonato tercera
-      - 16Peb-tWa-FU3kOTRQACuJdU1YENB0EQJPN5QJ7tD46Y  # detalles campeonato
+defaults:
+  - io: io_2022
+  - sheetname: sheetname_2022
+  - labels: labels
+  - roundnames: roundnames
+  - activeplayer: activeplayer
+  - aux: aux_2022
+  - default: default_2022
+  - _self_
 
-sheetname:
-    players: Jugadores
-    initial_ranking: Ranking Torneo 00 2022
-    tournaments_key: Partidos
-    championship_details_key: Log Campeonato
-    rating_details_key: Log Rating
-    rankings_key: Ranking
-    histories: Historiales 2022
-    championship_key: Campeonato
-    statistics_key: Estadisticas
-
-labels:
-    tid: ID Torneo
-    pid: ID Jugador
-    Player: Jugador
-    Association: Afiliación
-    City: Ciudad
-    Last_Tournament: Último Torneo
-    Championship_Points: Puntos de Campeonato
-    Rating: Nivel de Juego
-    Best_Round: Mejor Ronda
-    Round: Instancia
-    Winner: Ganador
-    Loser: Perdedor
-    Winner_Points: Puntos Ganador
-    Loser_Points: Puntos Perdedor
-    Category: Categoría
-    Total_Points: Total puntos
-    Active_Player: Jugador Activo
-    Date: Fecha
-    Location: Lugar
-    Tournament_name: Nombre del torneo
-    Tournament: Torneo
-    Participations: Torneos Jugados
-    Position: Posición
-    Difference: Diferencia
-    Selected_Tournaments: Puntos sumados
-    Cumulated: Acumulado
-    By_Tournament: Por Torneo
-    Factor: Factor
-    Points_CAT:
-      - Puntos Primera
-      - Puntos Segunda
-      - Puntos Tercera
-
-activeplayer:
-    True: activo
-    False: inactivo
-
-roundnames:
-    final: final
-    champion: primero
-    second: segundo
-    third: tercero
-    fourth: cuarto
-    third_place_playoff: tercer puesto
-
-aux:
-    sanction_factor: 0.5
-    rating_factor: 2.0
-    category_expected_factor: 0.5
-    category_unexpected_factor: 1.5
-    tournament_window_to_activate: 4
-    tournaments_to_activate: 2
-    tournament_window_to_inactivate: 4
-    categories_thresholds:
-      - 1400  # minimo de primera
-      - 950  # minimo de segunda
-    masters_N_tournaments_to_consider: 8
-    masters_N_classified_to_list: 10000
-    initial_tid: S2022T00
-
-default:
-    tournament_name: Inicial 2022 - Liga Dos Orillas
-    date: 2022 01 01
-    location: No aplica
-    category:
+# To be defined and completed from csv tables
+category: ???
+expected_result_table: ???
+unexpected_result_table: ???
+categories: ???
+best_rounds_points: ???
+best_rounds_priority: ???

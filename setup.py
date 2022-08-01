@@ -64,6 +64,7 @@ setup(
         "tabulate==0.8.*",
         "matplotlib==3.*",
         "omegaconf==2.2.*",
+        "hydra-core==1.2.*",
     ],
     cmdclass={
         "develop": PostDevelopCommand,
