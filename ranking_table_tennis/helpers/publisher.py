@@ -317,7 +317,7 @@ def publish_initial_rating_sheet(
     xlsx_filename = cfg.io.data_folder + cfg.io.publish_filename.replace("NN", tid)
 
     # Rankings sorted by rating
-    initial_tid = cfg.aux.initial_tid
+    initial_tid = cfg.initial_metadata.initial_tid
     this_ranking_df = rankings[initial_tid].sort_values("rating", ascending=False)
 
     # Format data and columns to write into the file

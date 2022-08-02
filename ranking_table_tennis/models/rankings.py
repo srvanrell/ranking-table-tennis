@@ -346,7 +346,7 @@ class Rankings:
         n_tournaments = cfg.aux.masters_N_tournaments_to_consider
         tid_indexes = self.ranking_df.tid == tid
         rankings = self.ranking_df[
-            self.ranking_df.tid != cfg.aux.initial_tid
+            self.ranking_df.tid != cfg.initial_metadata.initial_tid
         ]  # Remove initial tid data
 
         for points_cat_col, cum_points_cat_col, cum_tids_cat_col, n_played_cat_col in zip(
@@ -534,6 +534,6 @@ class Rankings:
         stats = stats_cat.join([participation_total, cum_participation_total]).sort_index(
             axis="columns"
         )
-        stats.drop(cfg.aux.initial_tid, inplace=True)
+        stats.drop(cfg.initial_metadata.initial_tid, inplace=True)
 
         return stats

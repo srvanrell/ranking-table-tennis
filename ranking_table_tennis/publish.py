@@ -28,7 +28,7 @@ def main(offline=True, last=True, tournament_num=None):
 
     # Loading initial ranking
     rankings = helpers.load_from_pickle(cfg.io.rankings_pickle)
-    initial_tid = cfg.aux.initial_tid
+    initial_tid = cfg.initial_metadata.initial_tid
 
     # Will publish rankings of last tournament by default
     tids = [initial_tid] + [tid for tid in tournaments]

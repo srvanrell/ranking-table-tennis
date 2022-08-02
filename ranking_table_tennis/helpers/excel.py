@@ -132,7 +132,7 @@ def save_ranking_sheet(
     players: models.Players,
     upload: bool = False,
 ) -> None:
-    if tid == cfg.aux.initial_tid:
+    if tid == cfg.initial_metadata.initial_tid:
         sheet_name = cfg.sheetname.initial_ranking
         xlsx_filename = cfg.io.data_folder + cfg.io.tournaments_filename
     else:

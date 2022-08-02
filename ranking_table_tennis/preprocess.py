@@ -40,7 +40,7 @@ def main(offline=True):
 
     # Loading initial ranking
     rankings = helpers.load_initial_ranking_sheet()
-    initial_tid = cfg.aux.initial_tid
+    initial_tid = cfg.initial_metadata.initial_tid
 
     # Loading temp ranking and players. It will be deleted after a successful preprocessing
     players_temp, ranking_temp = helpers.load_temp_players_ranking()
