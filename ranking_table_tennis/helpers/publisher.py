@@ -344,7 +344,7 @@ def publish_initial_rating_sheet(
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg.io.temporal_spreadsheet_id)
 
     # Adds a label for initial rating so it does not overwrite current rating file
-    sheet_name_for_md = f"{cfg.labels.Rating}_{cfg.default.tournament_name.split()[0]}"
+    sheet_name_for_md = f"{cfg.labels.Rating}_{cfg.initial_metadata.tournament_name.split()[0]}"
     publish_sheet_as_markdown(this_ranking_df[columns], headers, sheet_name_for_md, tid)
 
 

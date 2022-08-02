@@ -132,9 +132,9 @@ class Rankings:
             "rating": default_rating,
             "category": default_category,
             "active": default_active,
-            "tournament_name": cfg.default.tournament_name,
-            "date": cfg.default.date,
-            "location": cfg.default.location,
+            "tournament_name": cfg.initial_metadata.tournament_name,
+            "date": cfg.initial_metadata.date,
+            "location": cfg.initial_metadata.location,
             **cat_col_values,
             **cum_tid_values,
         }
