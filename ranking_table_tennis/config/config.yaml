@@ -4,12 +4,12 @@ defaults:
   # Configs that might change with date
   - io: io_2022
   - aux: aux_2022
-  - initial_metadata: initial_metadata
   # Static configurations (might be parametrized)
-  - sheetname: sheetname
+  - activeplayer: activeplayer
+  - initial_metadata: initial_metadata
   - labels: labels
   - roundnames: roundnames
-  - activeplayer: activeplayer
+  - sheetname: sheetname
 
 # Main configs
 year: 2022
