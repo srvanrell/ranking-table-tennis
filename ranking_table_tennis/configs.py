@@ -1,6 +1,6 @@
 import os
-import shutil
 
+import hydra
 import pandas as pd
 from omegaconf import OmegaConf
 
@@ -17,12 +17,9 @@ def get_cfg(date=None):
     print("\n## Loading config\n")
 
     # Loads some names from config.yaml
-    user_config_path = os.path.join("data_rtt", "config")
+    user_config_path = os.path.join(os.path.dirname(__file__), "config")
     print(f"Working directory: {os.path.abspath(os.path.curdir)}")
     print(f"Config directory: {os.path.abspath(user_config_path)}")
-
-    if not os.path.exists(user_config_path):
-        shutil.copytree(os.path.dirname(__file__) + "/config", user_config_path)
 
     _cfg = Configuration(user_config_path).get_config()
 
@@ -49,7 +46,11 @@ class Configuration:
         return self.dict_cfg
 
     def _load_base_config(self):
-        return OmegaConf.load(os.path.join(self._config_path, "config.yaml"))
+        config_dir = os.path.abspath(self._config_path)
+        with hydra.initialize_config_dir(
+            version_base=None, config_dir=config_dir, job_name="rtt_app"
+        ):
+            return hydra.compose(config_name="config")
 
     def _load_tables_config(self):
         """Load dict_cfg with tables to assign championship and rating points"""
