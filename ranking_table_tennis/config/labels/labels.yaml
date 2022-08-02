@@ -26,7 +26,4 @@ Selected_Tournaments: Puntos sumados
 Cumulated: Acumulado
 By_Tournament: Por Torneo
 Factor: Factor
-Points_CAT:
-  - Puntos Primera
-  - Puntos Segunda
-  - Puntos Tercera
+Points: Puntos
