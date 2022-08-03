@@ -153,7 +153,7 @@ class Rankings:
 
     @staticmethod
     def _rating_to_category(rating: float) -> str:
-        thresholds = cfg.aux.categories_thresholds
+        thresholds = cfg.compute.categories_thresholds
         category = cfg.categories[-2]  # Last category that it's not fan
         for j, th in enumerate(thresholds):
             if rating >= th:
@@ -210,11 +210,11 @@ class Rankings:
         rating_diff = rating_winner - rating_loser
         category_factor = 1.0
         if category_winner != category_loser and not not_own_category:
-            category_factor = cfg.aux.category_expected_factor
+            category_factor = cfg.compute.category_expected_factor
             if rating_diff < 0:
-                category_factor = cfg.aux.category_unexpected_factor
+                category_factor = cfg.compute.category_unexpected_factor
 
-        factor = cfg.aux.rating_factor * category_factor
+        factor = cfg.compute.rating_factor * category_factor
 
         return factor
 
@@ -343,7 +343,7 @@ class Rankings:
         Compute and save championship points, selected tids, and participations per category
         :return: None
         """
-        n_tournaments = cfg.aux.masters_N_tournaments_to_consider
+        n_tournaments = cfg.compute.masters_N_tournaments_to_consider
         tid_indexes = self.ranking_df.tid == tid
         rankings = self.ranking_df[
             self.ranking_df.tid != cfg.initial_metadata.initial_tid
@@ -415,9 +415,9 @@ class Rankings:
         initial_active_pids,
     ):
         # Avoid activate or inactivate players after the first tournament.
-        # activate_window = cfg.aux.tournament window to activate"]
-        tourns_to_activate = cfg.aux.tournaments_to_activate
-        inactivate_window = cfg.aux.tournament_window_to_inactivate
+        # activate_window = cfg.compute.tournament window to activate"]
+        tourns_to_activate = cfg.compute.tournaments_to_activate
+        inactivate_window = cfg.compute.tournament_window_to_inactivate
 
         played_tids = players.played_tournaments(ranking_entry.pid)
 
@@ -440,8 +440,8 @@ class Rankings:
 
     def update_active_players(self, tid: str, players, initial_tid: str):
         # Avoid activate or inactivate players after the first tournament.
-        activate_window = cfg.aux.tournament_window_to_activate
-        inactivate_window = cfg.aux.tournament_window_to_inactivate
+        activate_window = cfg.compute.tournament_window_to_activate
+        inactivate_window = cfg.compute.tournament_window_to_inactivate
 
         indexes = (self.ranking_df.tid == initial_tid) & self.ranking_df.active
         initial_active_players = list(self.ranking_df.loc[indexes, "pid"].unique())
@@ -481,8 +481,8 @@ class Rankings:
         tournament_df = tournaments[tid]
         for match_index, match in tournament_df[tournament_df.sanction].iterrows():
             for cat_col in self.points_cat_columns():
-                self[tid, match.loser_pid, cat_col] *= cfg.aux.sanction_factor
-            print("Apply sanction factor", cfg.aux.sanction_factor, "on:", match.winner)
+                self[tid, match.loser_pid, cat_col] *= cfg.compute.sanction_factor
+            print("Apply sanction factor", cfg.compute.sanction_factor, "on:", match.winner)
 
     def get_rating_details(self, tid: str) -> pd.DataFrame:
         return self.rating_details_df.loc[self.rating_details_df.tid == tid].copy()

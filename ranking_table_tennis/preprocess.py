@@ -21,7 +21,7 @@ def main(offline=True):
     """
     print("\n## Starting preprocess\n")
 
-    xlsx_file = cfg.io.data_folder + cfg.io.tournaments_filename
+    xlsx_file = cfg.io.data_folder + cfg.io.xlsx.tournaments_filename
 
     if not offline:
         retrieve = input("Do you want to retrieve online sheet [Y/n]? (press Enter to continue)\n")

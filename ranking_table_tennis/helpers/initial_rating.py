@@ -23,7 +23,7 @@ def print_rating_context(
 
     # Print rating of known players, if available
     try:
-        known_rankings = helpers.load_from_pickle(cfg.io.rankings_pickle)
+        known_rankings = helpers.load_from_pickle(cfg.io.pickle.rankings)
         tids = [cfg.initial_metadata.initial_tid] + [t for t in tournaments]  # to use prev_tid
         pids_selected = (
             pd.concat([matches_selected.winner_pid, matches_selected.loser_pid], ignore_index=True)

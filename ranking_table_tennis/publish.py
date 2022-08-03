@@ -20,14 +20,14 @@ def main(offline=True, last=True, tournament_num=None):
     print("\n## Starting publish\n")
 
     # Loading all tournament data
-    tournaments = helpers.load_from_pickle(cfg.io.tournaments_pickle)
+    tournaments = helpers.load_from_pickle(cfg.io.pickle.tournaments)
 
     # Loading players list
-    players = helpers.load_from_pickle(cfg.io.players_pickle)
+    players = helpers.load_from_pickle(cfg.io.pickle.players)
     tournaments.assign_pid_from_players(players)
 
     # Loading initial ranking
-    rankings = helpers.load_from_pickle(cfg.io.rankings_pickle)
+    rankings = helpers.load_from_pickle(cfg.io.pickle.rankings)
     initial_tid = cfg.initial_metadata.initial_tid
 
     # Will publish rankings of last tournament by default

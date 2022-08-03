@@ -3,7 +3,7 @@ defaults:
   - _self_
   # Configs that might change with date
   - io: io_2022
-  - aux: aux_2022
+  - compute: compute_2022
   # Static configurations (might be parametrized)
   - activeplayer: activeplayer
   - initial_metadata: initial_metadata

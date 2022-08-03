@@ -16,7 +16,7 @@ cfg = get_cfg()
 @pytest.fixture(scope="module", autouse=True)
 def run_before_tests():
     """To be run once before all tests"""
-    example_data = os.path.join(get_expected_folder_path(), cfg.io.tournaments_filename)
+    example_data = os.path.join(get_expected_folder_path(), cfg.io.xlsx.tournaments_filename)
     shutil.copy2(example_data, cfg.io.data_folder)
     preprocess.main()
     compute_rankings.main()
