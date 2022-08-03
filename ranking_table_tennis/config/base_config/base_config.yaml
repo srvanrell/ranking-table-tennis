@@ -1,0 +1,17 @@
+defaults:
+  # Configs in this file
+  - _self_
+  # Static configurations (might be parametrized)
+  - activeplayer
+  - initial_metadata
+  - labels
+  - roundnames
+  - sheetname
+
+# To be defined and completed from csv tables
+category: ???
+expected_result_table: ???
+unexpected_result_table: ???
+categories: ???
+best_rounds_points: ???
+best_rounds_priority: ???

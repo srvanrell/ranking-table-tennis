@@ -5,19 +5,7 @@ defaults:
   - io: io_2022
   - compute: compute_2022
   # Static configurations (might be parametrized)
-  - activeplayer: activeplayer
-  - initial_metadata: initial_metadata
-  - labels: labels
-  - roundnames: roundnames
-  - sheetname: sheetname
+  - base_config/base_config@_here_
 
 # Main configs
 year: 2022
-
-# To be defined and completed from csv tables
-category: ???
-expected_result_table: ???
-unexpected_result_table: ???
-categories: ???
-best_rounds_points: ???
-best_rounds_priority: ???

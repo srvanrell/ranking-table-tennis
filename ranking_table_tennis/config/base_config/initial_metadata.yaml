@@ -1,0 +1,6 @@
+initial_metadata:
+  tournament_name: Inicial ${year} - Liga Dos Orillas
+  date: ${year} 01 01
+  location: No aplica
+  category:
+  initial_tid: S${year}T00

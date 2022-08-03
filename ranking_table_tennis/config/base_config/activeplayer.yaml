@@ -1,0 +1,3 @@
+activeplayer:
+  True: activo
+  False: inactivo
