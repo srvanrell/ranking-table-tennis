@@ -11,7 +11,7 @@ cfg = get_cfg()
 
 
 def get_tournament_sheet_names_ordered() -> List[str]:
-    tournaments_xlsx = cfg.io.data_folder + cfg.io.tournaments_filename
+    tournaments_xlsx = cfg.io.data_folder + cfg.io.xlsx.tournaments_filename
     filter_key = cfg.sheetname.tournaments_key
     df_tournaments = pd.read_excel(tournaments_xlsx, sheet_name=None, header=None)
     sheet_names = [s for s in df_tournaments.keys() if filter_key in s]
@@ -20,7 +20,7 @@ def get_tournament_sheet_names_ordered() -> List[str]:
 
 
 def load_players_sheet() -> models.Players:
-    tournaments_xlsx = cfg.io.data_folder + cfg.io.tournaments_filename
+    tournaments_xlsx = cfg.io.data_folder + cfg.io.xlsx.tournaments_filename
     players_df = pd.read_excel(tournaments_xlsx, sheet_name=cfg.sheetname.players, header=0)
     print("> Reading", cfg.sheetname.players, "from", tournaments_xlsx, sep="\t")
 
@@ -40,7 +40,7 @@ def load_players_sheet() -> models.Players:
 
 
 def load_initial_ranking_sheet() -> models.Rankings:
-    tournaments_xlsx = cfg.io.data_folder + cfg.io.tournaments_filename
+    tournaments_xlsx = cfg.io.data_folder + cfg.io.xlsx.tournaments_filename
     initial_ranking_df = pd.read_excel(
         tournaments_xlsx, sheet_name=cfg.sheetname.initial_ranking, header=0
     )
@@ -68,7 +68,7 @@ def load_initial_ranking_sheet() -> models.Rankings:
 
 
 def load_tournaments_sheets() -> models.Tournaments:
-    tournaments_xlsx = cfg.io.data_folder + cfg.io.tournaments_filename
+    tournaments_xlsx = cfg.io.data_folder + cfg.io.xlsx.tournaments_filename
     filter_key = cfg.sheetname.tournaments_key
     raw_tournaments = pd.read_excel(tournaments_xlsx, sheet_name=None, header=None)
     sheet_names = sorted([s for s in raw_tournaments.keys() if filter_key in s])
@@ -105,7 +105,7 @@ def load_tournaments_sheets() -> models.Tournaments:
 
 def save_players_sheet(players: models.Players, upload=False) -> None:
     sorted_players_df = players.players_df.sort_values("name")
-    xlsx_filename = cfg.io.data_folder + cfg.io.tournaments_filename
+    xlsx_filename = cfg.io.data_folder + cfg.io.xlsx.tournaments_filename
     sheet_name = cfg.sheetname.players
 
     with _get_writer(xlsx_filename, sheet_name) as writer:
@@ -132,11 +132,11 @@ def save_ranking_sheet(
     players: models.Players,
     upload: bool = False,
 ) -> None:
-    if tid == cfg.aux.initial_tid:
+    if tid == cfg.initial_metadata.initial_tid:
         sheet_name = cfg.sheetname.initial_ranking
-        xlsx_filename = cfg.io.data_folder + cfg.io.tournaments_filename
+        xlsx_filename = cfg.io.data_folder + cfg.io.xlsx.tournaments_filename
     else:
-        xlsx_filename = cfg.io.data_folder + cfg.io.rankings_filename
+        xlsx_filename = cfg.io.data_folder + cfg.io.xlsx.rankings_filename
         sheet_name = tournaments[tid].iloc[0].sheet_name
         sheet_name = sheet_name.replace(cfg.sheetname.tournaments_key, cfg.sheetname.rankings_key)
 

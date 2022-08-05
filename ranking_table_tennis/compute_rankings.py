@@ -15,15 +15,15 @@ def main():
     print("\n## Starting to compute rankings\n")
 
     # Loading all tournament data
-    tournaments = helpers.load_from_pickle(cfg.io.tournaments_pickle)
+    tournaments = helpers.load_from_pickle(cfg.io.pickle.tournaments)
 
     # Loading players list
-    players = helpers.load_from_pickle(cfg.io.players_pickle)
+    players = helpers.load_from_pickle(cfg.io.pickle.players)
     tournaments.assign_pid_from_players(players)
 
     # Loading initial ranking
     rankings = helpers.load_initial_ranking_sheet()
-    initial_tid = cfg.aux.initial_tid
+    initial_tid = cfg.initial_metadata.initial_tid
 
     # Will compute all rankings from the beginning by default
     tids = [initial_tid] + [tid for tid in tournaments]

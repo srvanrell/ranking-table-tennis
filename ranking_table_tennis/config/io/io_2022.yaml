@@ -1,0 +1,14 @@
+defaults:
+  - base_io
+
+tournaments_gdrive: https://docs.google.com/spreadsheets/d/e/2PACX-1vSH_0kpkIS6Ipv70zCX0talCHgAFEiF_ZxMfM1XTdsfgvhbWwh-M8sACHciF7X3WAWDxYN3BYvQK6S9/pub?output=xlsx
+tournaments_spreadsheet_id: 1BYpbmmRBXe-Shgi4PJHqQpGqdstQqqSwpBDZfgzjrF0
+temporal_spreadsheet_id: 1xxhIopTNrYaGrT4gL5VsrHGt10yisXmSZg_wiWym2QY
+published_on_web_spreadsheets_id:
+  - 1sN1I0BSBzVdzRRVkpxHn57KX68p5OZ710bYhOjc-TZI  # partidos
+  - 1amTCwUTYT2Gb2kCvKrfCQlheizCnt20ceAGxUiQRwZM  # nivel de juego
+  - 1fPjP2CdkLN7rGBY8IW1O5t8mwlDL8wxIGLFVrFn48j8  # detalles nivel de juego
+  - 1RFclTiWkaozADeDS1H_vp9901IqQxUu1pqBuBFwOzr4  # campeonato primera
+  - 1A-YYdmGLKufLZYp2TvpEkeO9RvSMtWa1gwRtG_V20qE  # campeonato segunda
+  - 1ZlsvVFXxgubIe1mefjV8vM1MKrR63qf5gWQnhkRxaoM  # campeonato tercera
+  - 16Peb-tWa-FU3kOTRQACuJdU1YENB0EQJPN5QJ7tD46Y  # detalles campeonato

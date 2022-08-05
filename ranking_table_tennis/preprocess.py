@@ -21,7 +21,7 @@ def main(offline=True):
     """
     print("\n## Starting preprocess\n")
 
-    xlsx_file = cfg.io.data_folder + cfg.io.tournaments_filename
+    xlsx_file = cfg.io.data_folder + cfg.io.xlsx.tournaments_filename
 
     if not offline:
         retrieve = input("Do you want to retrieve online sheet [Y/n]? (press Enter to continue)\n")
@@ -40,7 +40,7 @@ def main(offline=True):
 
     # Loading initial ranking
     rankings = helpers.load_initial_ranking_sheet()
-    initial_tid = cfg.aux.initial_tid
+    initial_tid = cfg.initial_metadata.initial_tid
 
     # Loading temp ranking and players. It will be deleted after a successful preprocessing
     players_temp, ranking_temp = helpers.load_temp_players_ranking()

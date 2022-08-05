@@ -47,6 +47,6 @@ def publish_tournament_metadata_as_markdown(tid, tournament_tid: pd.DataFrame) -
     publish_sheet_as_markdown(
         df_metadata,
         df_metadata.columns,
-        cfg.io.tournament_metadata_md,
+        cfg.io.md.tournament_metadata,
         tid,
     )

@@ -1,0 +1,13 @@
+data_folder: data_rtt/
+xlsx:
+  tournaments_filename: Liga Dos Orillas ${year} - Carga de partidos.xlsx
+  rankings_filename: Liga Dos Orillas ${year} - Rankings Crudos.xlsx
+  publish_filename: Torneo NN para publicar.xlsx
+pickle:
+  players_temp: temp_players.pk
+  ranking_temp: temp_ranking.pk
+  players: players.pk
+  tournaments: tournaments.pk
+  rankings: rankings.pk
+md:
+  tournament_metadata: Metadata

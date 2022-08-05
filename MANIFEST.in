@@ -1,2 +1,2 @@
-include ranking_table_tennis/config/*
-include README.rst
+recursive-include ranking_table_tennis/config/ *.yaml *.py
+include README.md

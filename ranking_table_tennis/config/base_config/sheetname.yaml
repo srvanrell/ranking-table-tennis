@@ -1,0 +1,10 @@
+sheetname:
+  players: Jugadores
+  initial_ranking: Ranking Torneo 00 ${year}
+  tournaments_key: Partidos
+  championship_details_key: Log Campeonato
+  rating_details_key: Log Rating
+  rankings_key: Ranking
+  histories: Historiales ${year}
+  championship_key: Campeonato
+  statistics_key: Estadisticas

@@ -32,7 +32,7 @@ def publish_championship_details_sheet(
         cfg.sheetname.tournaments_key, cfg.sheetname.championship_details_key
     )
 
-    xlsx_filename = cfg.io.data_folder + cfg.io.publish_filename.replace("NN", tid)
+    xlsx_filename = cfg.io.data_folder + cfg.io.xlsx.publish_filename.replace("NN", tid)
 
     championship_details = rankings.get_championship_details(tid)
 
@@ -69,7 +69,7 @@ def publish_statistics_sheet(
     upload: bool = False,
 ) -> None:
     """Copy details from log and output details of given tournament"""
-    xlsx_filename = cfg.io.data_folder + cfg.io.publish_filename.replace("NN", tid)
+    xlsx_filename = cfg.io.data_folder + cfg.io.xlsx.publish_filename.replace("NN", tid)
     sheet_name = cfg.sheetname.statistics_key
 
     stats = rankings.get_statistics()
@@ -135,7 +135,7 @@ def publish_championship_sheets(
     upload: bool = False,
 ) -> None:
     """Publish championship sheets, per category"""
-    xlsx_filename = cfg.io.data_folder + cfg.io.publish_filename.replace("NN", tid)
+    xlsx_filename = cfg.io.data_folder + cfg.io.xlsx.publish_filename.replace("NN", tid)
 
     # Rankings to be sorted by cum_points
     this_ranking = rankings[tid]
@@ -253,7 +253,7 @@ def publish_rating_sheet(
     sheet_name = tournaments[tid]["sheet_name"].iloc[0]
     sheet_name = sheet_name.replace(cfg.sheetname.tournaments_key, cfg.labels.Rating)
 
-    xlsx_filename = cfg.io.data_folder + cfg.io.publish_filename.replace("NN", tid)
+    xlsx_filename = cfg.io.data_folder + cfg.io.xlsx.publish_filename.replace("NN", tid)
 
     # Rankings sorted by rating
     this_ranking_df = rankings[tid].sort_values("rating", ascending=False)
@@ -314,10 +314,10 @@ def publish_initial_rating_sheet(
     sheet_name = cfg.sheetname.initial_ranking
     sheet_name = sheet_name.replace(cfg.sheetname.rankings_key, cfg.labels.Rating)
 
-    xlsx_filename = cfg.io.data_folder + cfg.io.publish_filename.replace("NN", tid)
+    xlsx_filename = cfg.io.data_folder + cfg.io.xlsx.publish_filename.replace("NN", tid)
 
     # Rankings sorted by rating
-    initial_tid = cfg.aux.initial_tid
+    initial_tid = cfg.initial_metadata.initial_tid
     this_ranking_df = rankings[initial_tid].sort_values("rating", ascending=False)
 
     # Format data and columns to write into the file
@@ -344,7 +344,7 @@ def publish_initial_rating_sheet(
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg.io.temporal_spreadsheet_id)
 
     # Adds a label for initial rating so it does not overwrite current rating file
-    sheet_name_for_md = f"{cfg.labels.Rating}_{cfg.default.tournament_name.split()[0]}"
+    sheet_name_for_md = f"{cfg.labels.Rating}_{cfg.initial_metadata.tournament_name.split()[0]}"
     publish_sheet_as_markdown(this_ranking_df[columns], headers, sheet_name_for_md, tid)
 
 
@@ -357,7 +357,7 @@ def publish_histories_sheet(
     upload=False,
 ) -> None:
     """Format histories to be published into a sheet"""
-    xlsx_filename = cfg.io.data_folder + cfg.io.publish_filename.replace("NN", tid)
+    xlsx_filename = cfg.io.data_folder + cfg.io.xlsx.publish_filename.replace("NN", tid)
     sheet_name = cfg.sheetname.histories
 
     history_df = players.history_df.copy()
@@ -401,7 +401,7 @@ def publish_rating_details_sheet(
     sheet_name = tournaments[tid]["sheet_name"].iloc[0]
     sheet_name = sheet_name.replace(cfg.sheetname.tournaments_key, cfg.sheetname.rating_details_key)
 
-    xlsx_filename = cfg.io.data_folder + cfg.io.publish_filename.replace("NN", tid)
+    xlsx_filename = cfg.io.data_folder + cfg.io.xlsx.publish_filename.replace("NN", tid)
 
     details = rankings.get_rating_details(tid)
 
@@ -414,7 +414,7 @@ def publish_rating_details_sheet(
     details["diff_rating"] = (
         (details["winner_rating"] - details["loser_rating"]).astype(int).astype(str)
     )
-    details["factor"] /= cfg.aux.rating_factor
+    details["factor"] /= cfg.compute.rating_factor
 
     details = details.sort_values(
         ["category", "round", "winner_name_rating"], ascending=[True, True, True]
@@ -475,7 +475,7 @@ def publish_matches_sheet(
 
     sheet_name = tournaments[tid]["sheet_name"].iloc[0]
 
-    xlsx_filename = cfg.io.data_folder + cfg.io.publish_filename.replace("NN", tid)
+    xlsx_filename = cfg.io.data_folder + cfg.io.xlsx.publish_filename.replace("NN", tid)
 
     matches = tournaments.get_matches(tid, False, [])
 

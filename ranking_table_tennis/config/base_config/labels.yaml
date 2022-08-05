@@ -1,0 +1,30 @@
+labels:
+  tid: ID Torneo
+  pid: ID Jugador
+  Player: Jugador
+  Association: Afiliación
+  City: Ciudad
+  Last_Tournament: Último Torneo
+  Championship_Points: Puntos de Campeonato
+  Rating: Nivel de Juego
+  Best_Round: Mejor Ronda
+  Round: Instancia
+  Winner: Ganador
+  Loser: Perdedor
+  Winner_Points: Puntos Ganador
+  Loser_Points: Puntos Perdedor
+  Category: Categoría
+  Total_Points: Total puntos
+  Active_Player: Jugador Activo
+  Date: Fecha
+  Location: Lugar
+  Tournament_name: Nombre del torneo
+  Tournament: Torneo
+  Participations: Torneos Jugados
+  Position: Posición
+  Difference: Diferencia
+  Selected_Tournaments: Puntos sumados
+  Cumulated: Acumulado
+  By_Tournament: Por Torneo
+  Factor: Factor
+  Points: Puntos

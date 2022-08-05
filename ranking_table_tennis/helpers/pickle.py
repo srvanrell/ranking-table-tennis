@@ -15,9 +15,9 @@ def save_to_pickle(
 ) -> None:
     objects = [players, rankings, tournaments]
     filenames = [
-        cfg.io.players_pickle,
-        cfg.io.rankings_pickle,
-        cfg.io.tournaments_pickle,
+        cfg.io.pickle.players,
+        cfg.io.pickle.rankings,
+        cfg.io.pickle.tournaments,
     ]
     objects_filenames = [(obj, fn) for obj, fn in zip(objects, filenames) if obj]
 
