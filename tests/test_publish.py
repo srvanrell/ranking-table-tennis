@@ -8,9 +8,9 @@ import pytest
 from conftest import assert_equals_xlsx, get_expected_folder_path
 
 from ranking_table_tennis import compute_rankings, preprocess, publish
-from ranking_table_tennis.configs import get_cfg
+from ranking_table_tennis.configs import ConfigManager
 
-cfg = get_cfg()
+cfg = ConfigManager().current_config
 
 
 @pytest.fixture(scope="module", autouse=True)

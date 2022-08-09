@@ -24,9 +24,9 @@ def pytest_sessionfinish(session, exitstatus):
     Called after whole test run finished, right before
     returning the exit status to the system.
     """
-    from ranking_table_tennis.configs import get_cfg
+    from ranking_table_tennis.configs import ConfigManager
 
-    cfg = get_cfg()
+    cfg = ConfigManager().current_config
 
     print("\n## After tests have finalized\n")
     print(f"\nRemoving data folder after test: remove {cfg.io.data_folder}")

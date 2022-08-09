@@ -5,7 +5,7 @@ from gspread.utils import rowcol_to_a1
 from openpyxl.styles import Alignment, Font
 
 from ranking_table_tennis import models
-from ranking_table_tennis.configs import get_cfg
+from ranking_table_tennis.configs import ConfigManager
 from ranking_table_tennis.helpers.excel import _get_writer
 from ranking_table_tennis.helpers.gspread import load_and_upload_sheet
 from ranking_table_tennis.helpers.markdown import (
@@ -13,8 +13,6 @@ from ranking_table_tennis.helpers.markdown import (
     publish_stat_plot,
     publish_tournament_metadata_as_markdown,
 )
-
-cfg = get_cfg()
 
 
 def publish_championship_details_sheet(
@@ -26,6 +24,7 @@ def publish_championship_details_sheet(
     upload: bool,
 ) -> None:
     """Format and publish championship details of given tournament into sheets"""
+    cfg = ConfigManager().current_config
 
     sheet_name = tournaments[tid]["sheet_name"].iloc[0]
     sheet_name = sheet_name.replace(
@@ -69,6 +68,7 @@ def publish_statistics_sheet(
     upload: bool = False,
 ) -> None:
     """Copy details from log and output details of given tournament"""
+    cfg = ConfigManager().current_config
     xlsx_filename = cfg.io.data_folder + cfg.io.xlsx.publish_filename.replace("NN", tid)
     sheet_name = cfg.sheetname.statistics_key
 
@@ -135,6 +135,7 @@ def publish_championship_sheets(
     upload: bool = False,
 ) -> None:
     """Publish championship sheets, per category"""
+    cfg = ConfigManager().current_config
     xlsx_filename = cfg.io.data_folder + cfg.io.xlsx.publish_filename.replace("NN", tid)
 
     # Rankings to be sorted by cum_points
@@ -250,6 +251,7 @@ def publish_rating_sheet(
     upload=False,
 ) -> None:
     """Format a ranking to be published into a rating sheet"""
+    cfg = ConfigManager().current_config
     sheet_name = tournaments[tid]["sheet_name"].iloc[0]
     sheet_name = sheet_name.replace(cfg.sheetname.tournaments_key, cfg.labels.Rating)
 
@@ -311,6 +313,7 @@ def publish_initial_rating_sheet(
     upload=False,
 ) -> None:
     """Format a ranking to be published into a rating sheet"""
+    cfg = ConfigManager().current_config
     sheet_name = cfg.sheetname.initial_ranking
     sheet_name = sheet_name.replace(cfg.sheetname.rankings_key, cfg.labels.Rating)
 
@@ -357,6 +360,7 @@ def publish_histories_sheet(
     upload=False,
 ) -> None:
     """Format histories to be published into a sheet"""
+    cfg = ConfigManager().current_config
     xlsx_filename = cfg.io.data_folder + cfg.io.xlsx.publish_filename.replace("NN", tid)
     sheet_name = cfg.sheetname.histories
 
@@ -397,7 +401,7 @@ def publish_rating_details_sheet(
     upload,
 ) -> None:
     """Format and publish rating details of given tournament into a sheet"""
-
+    cfg = ConfigManager().current_config
     sheet_name = tournaments[tid]["sheet_name"].iloc[0]
     sheet_name = sheet_name.replace(cfg.sheetname.tournaments_key, cfg.sheetname.rating_details_key)
 
@@ -472,6 +476,7 @@ def publish_matches_sheet(
     upload,
 ) -> None:
     """Format and publish rating details of given tournament into a sheet"""
+    cfg = ConfigManager().current_config
 
     sheet_name = tournaments[tid]["sheet_name"].iloc[0]
 
@@ -516,6 +521,7 @@ def publish_matches_sheet(
 
 
 def _publish_tournament_metadata(ws, tournament_tid: pd.DataFrame) -> None:
+    cfg = ConfigManager().current_config
     ws.insert_rows(0, 3)
     ws["A1"] = cfg.labels.Tournament_name
     ws["B1"] = tournament_tid["tournament_name"].iloc[0]

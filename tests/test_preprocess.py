@@ -6,9 +6,9 @@ from conftest import assert_equals_xlsx, get_expected_folder_path
 from pandas.testing import assert_frame_equal
 
 from ranking_table_tennis import helpers, preprocess
-from ranking_table_tennis.configs import get_cfg
+from ranking_table_tennis.configs import ConfigManager
 
-cfg = get_cfg()
+cfg = ConfigManager().current_config
 
 
 @pytest.fixture(scope="module", autouse=True)

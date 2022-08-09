@@ -6,9 +6,9 @@ import shutil
 
 from conftest import assert_equals_xlsx, get_expected_folder_path
 
-from ranking_table_tennis.configs import get_cfg
+from ranking_table_tennis.configs import ConfigManager
 
-cfg = get_cfg()
+cfg = ConfigManager().current_config
 
 
 def test_cli_publish_run_before_tests(shell):

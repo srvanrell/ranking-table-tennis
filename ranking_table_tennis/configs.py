@@ -13,7 +13,8 @@ def get_cfg(date="220101"):
     """First cfg valid for date"""
 
     _cfg_manager = ConfigManager()
-    cfg = _cfg_manager.get_valid_config(date)
+    _cfg_manager.set_current_config(date)
+    cfg = _cfg_manager.current_config
 
     if not os.path.exists(cfg.io.data_folder):
         os.mkdir(cfg.io.data_folder)
@@ -21,7 +22,7 @@ def get_cfg(date="220101"):
     return cfg
 
 
-class ConfigManager(list):
+class ConfigManager:
     _current_config = None
     _available_configs = None
 
@@ -41,7 +42,7 @@ class ConfigManager(list):
                 return conf.get_config()
 
     @property
-    def current_config():
+    def current_config(self):
         return ConfigManager._current_config
 
     def set_current_config(self, date):

@@ -1,7 +1,5 @@
 from ranking_table_tennis import helpers
-from ranking_table_tennis.configs import get_cfg
-
-cfg = get_cfg()
+from ranking_table_tennis.configs import ConfigManager
 
 
 def main(offline=True, last=True, tournament_num=None):
@@ -18,6 +16,8 @@ def main(offline=True, last=True, tournament_num=None):
     tournament_num (int): enter the number of a valid tournament. if given, last is ommited
     """
     print("\n## Starting publish\n")
+
+    cfg = ConfigManager().current_config
 
     # Loading all tournament data
     tournaments = helpers.load_from_pickle(cfg.io.pickle.tournaments)

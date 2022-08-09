@@ -3,9 +3,7 @@ import pickle
 from typing import Any
 
 from ranking_table_tennis import models
-from ranking_table_tennis.configs import get_cfg
-
-cfg = get_cfg()
+from ranking_table_tennis.configs import ConfigManager
 
 
 def save_to_pickle(
@@ -13,6 +11,7 @@ def save_to_pickle(
     rankings: models.Rankings = None,
     tournaments: models.Tournaments = None,
 ) -> None:
+    cfg = ConfigManager().current_config
     objects = [players, rankings, tournaments]
     filenames = [
         cfg.io.pickle.players,
@@ -28,6 +27,7 @@ def save_to_pickle(
 
 
 def load_from_pickle(filename: str) -> Any:
+    cfg = ConfigManager().current_config
     print(">>>Loading", filename, "from", cfg.io.data_folder, sep="\t")
     with open(os.path.join(cfg.io.data_folder, filename), "rb") as fo:
         obj = pickle.load(fo)

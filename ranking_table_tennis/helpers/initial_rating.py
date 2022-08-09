@@ -1,9 +1,7 @@
 import pandas as pd
 
 from ranking_table_tennis import helpers, models
-from ranking_table_tennis.configs import get_cfg
-
-cfg = get_cfg()
+from ranking_table_tennis.configs import ConfigManager
 
 
 def print_rating_context(
@@ -15,6 +13,8 @@ def print_rating_context(
     # Helper to assign an initial rating to name
     print("> Information that should help you assign rating")
     print("\n> Matches")
+
+    cfg = ConfigManager().current_config
 
     # Print matches results for the unknown player
     matches = tournaments.get_matches(tid, False, [])
