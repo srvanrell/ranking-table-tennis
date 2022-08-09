@@ -5,21 +5,15 @@ import hydra
 import pandas as pd
 from omegaconf import OmegaConf
 
-_cfg_manager = None
-
 USER_CONFIG_PATH = os.path.join(os.path.dirname(__file__), "config")
 AVAILABLE_CONFIGS = glob.glob(os.path.join(USER_CONFIG_PATH, "config_*_*.yaml"))
 
 
-def get_cfg(date=None):
+def get_cfg(date="220101"):
     """First cfg valid for date"""
-    global _cfg_manager
-
-    if _cfg_manager:
-        return _cfg_manager.get_valid_config("220101")
 
     _cfg_manager = ConfigManager()
-    cfg = _cfg_manager.get_valid_config("220101")
+    cfg = _cfg_manager.get_valid_config(date)
 
     if not os.path.exists(cfg.io.data_folder):
         os.mkdir(cfg.io.data_folder)
@@ -28,15 +22,30 @@ def get_cfg(date=None):
 
 
 class ConfigManager(list):
+    _current_config = None
+    _available_configs = None
+
     def __init__(self) -> None:
+        if ConfigManager._available_configs is None:
+            self.set_available_configs()
+
+    def set_available_configs(self):
+        ConfigManager._available_configs = []
         for path in sorted(AVAILABLE_CONFIGS, reverse=True):
-            self.append(Configuration(path))
-            print(self[-1])
+            ConfigManager._available_configs.append(Configuration(path))
+            print(ConfigManager._available_configs[-1])
 
     def get_valid_config(self, date):
-        for conf in self:
+        for conf in ConfigManager._available_configs:
             if conf.start_valid_date <= date <= conf.end_valid_date:
                 return conf.get_config()
+
+    @property
+    def current_config():
+        return ConfigManager._current_config
+
+    def set_current_config(self, date):
+        ConfigManager._current_config = self.get_valid_config(date)
 
 
 class Configuration:
