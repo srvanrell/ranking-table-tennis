@@ -9,24 +9,15 @@ USER_CONFIG_PATH = os.path.join(os.path.dirname(__file__), "config")
 AVAILABLE_CONFIGS = glob.glob(os.path.join(USER_CONFIG_PATH, "config_*_*.yaml"))
 
 
-def get_cfg(date="220101"):
-    """First cfg valid for date"""
-
-    _cfg_manager = ConfigManager()
-    _cfg_manager.set_current_config(date)
-    cfg = _cfg_manager.current_config
-
-    if not os.path.exists(cfg.io.data_folder):
-        os.mkdir(cfg.io.data_folder)
-
-    return cfg
-
-
 class ConfigManager:
     _current_config = None
     _available_configs = None
 
-    def __init__(self) -> None:
+    def __init__(self, date="220101") -> None:
+        self.initialize()
+        self.set_current_config(date)
+
+    def initialize(self):
         if ConfigManager._available_configs is None:
             self.set_available_configs()
 
@@ -37,6 +28,7 @@ class ConfigManager:
             print(ConfigManager._available_configs[-1])
 
     def get_valid_config(self, date):
+        self.initialize()
         for conf in ConfigManager._available_configs:
             if conf.start_valid_date <= date <= conf.end_valid_date:
                 return conf.get_config()
@@ -47,6 +39,8 @@ class ConfigManager:
 
     def set_current_config(self, date):
         ConfigManager._current_config = self.get_valid_config(date)
+        if not os.path.exists(ConfigManager._current_config.io.data_folder):
+            os.mkdir(ConfigManager._current_config.io.data_folder)
 
 
 class Configuration:

@@ -24,13 +24,12 @@ def pytest_sessionfinish(session, exitstatus):
     Called after whole test run finished, right before
     returning the exit status to the system.
     """
-    from ranking_table_tennis.configs import ConfigManager
-
-    cfg = ConfigManager().current_config
+    data_rtt_folder = os.path.join(os.path.dirname(__file__), "data_rtt")
 
     print("\n## After tests have finalized\n")
-    print(f"\nRemoving data folder after test: remove {cfg.io.data_folder}")
-    shutil.rmtree(cfg.io.data_folder)
+    if os.path.exists(data_rtt_folder):
+        print(f"\nRemoving data folder after test: remove {data_rtt_folder}")
+        shutil.rmtree(data_rtt_folder)
 
 
 def assert_equals_xlsx(reference_folder, output_folder, name_pattern):
