@@ -19,6 +19,7 @@ def main(offline=True):
     """
     print("\n## Starting preprocess\n")
 
+    ConfigManager().set_current_config(date="220101")
     cfg = ConfigManager().current_config
 
     xlsx_file = cfg.io.data_folder + cfg.io.xlsx.tournaments_filename

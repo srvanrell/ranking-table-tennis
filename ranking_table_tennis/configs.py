@@ -13,9 +13,8 @@ class ConfigManager:
     _current_config = None
     _available_configs = None
 
-    def __init__(self, date="220101") -> None:
-        self.initialize()
-        self.set_current_config(date)
+    def __init__(self) -> None:
+        pass
 
     def initialize(self):
         if ConfigManager._available_configs is None:

@@ -51,6 +51,23 @@ def get_expected_folder_path():
     return os.path.join(os.path.dirname(__file__), "data_up_to_S2022T04")
 
 
+def get_tournaments_xlsx():
+    return "Liga Dos Orillas 2022 - Carga de partidos.xlsx"
+
+
+def base_run_before_tests():
+    example_data = os.path.join(get_expected_folder_path(), get_tournaments_xlsx())
+    if not os.path.exists("data_rtt/"):
+        os.mkdir("data_rtt")
+    shutil.copy2(example_data, "data_rtt/")
+
+
+def base_cli_run_after_tests():
+    from ranking_table_tennis.configs import ConfigManager
+
+    ConfigManager().set_current_config(date="220101")
+
+
 def load_expected_output(csv_filename, parse_dates=False):
     expected_path = get_expected_folder_path()
     expected_filepath = os.path.join(expected_path, csv_filename)

@@ -12,7 +12,7 @@ def main():
     """
     print("\n## Starting to compute rankings\n")
 
-    # TODO set date from here?
+    ConfigManager().set_current_config(date="220101")
     cfg = ConfigManager().current_config
 
     # Loading all tournament data

@@ -17,6 +17,7 @@ def main(offline=True, last=True, tournament_num=None):
     """
     print("\n## Starting publish\n")
 
+    ConfigManager().set_current_config(date="220101")
     cfg = ConfigManager().current_config
 
     # Loading all tournament data
