@@ -106,7 +106,7 @@ def main(offline=True):
     helpers.save_players_sheet(players, upload=upload)
 
     # Saving initial rankings for all known players
-    rankings.update_categories()
+    rankings.update_categories(initial_tid)
     helpers.save_ranking_sheet(initial_tid, tournaments, rankings, players, upload=upload)
 
     # Remove temp files after a successful preprocessing

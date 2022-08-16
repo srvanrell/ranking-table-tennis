@@ -49,7 +49,7 @@ def main():
         # List of players that didn't play its own category but plyed the higher one
         # Fans category is not considered in this list
         # Old ranking need to be updated so known old players are not misclassified
-        rankings.update_categories()
+        rankings.update_categories(tid)
         pid_not_own_category = [
             pid
             for pid in pid_participation_list
@@ -71,8 +71,13 @@ def main():
         # Substract championship points
         rankings.apply_sanction(tid, tournaments)
 
-        rankings.update_categories()
+        rankings.update_categories(tid)
         rankings.compute_championship_points(tid)
+
+        # Update categories based on updated config. Computation performed based on old config
+        tournament_date = tournaments[tid].iloc[0].date.strftime("%y%m%d")
+        ConfigManager().set_current_config(date=tournament_date)
+        rankings.update_categories(tid)
 
     helpers.save_to_pickle(players=players, tournaments=tournaments, rankings=rankings)
 

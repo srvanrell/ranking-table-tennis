@@ -107,7 +107,7 @@ class Rankings:
             ignore_index=True,
         )
         self.verify_and_normalize()
-        self.update_categories()
+        self.update_categories(tid)
 
     def verify_and_normalize(self) -> None:
         cfg = ConfigManager().current_config
@@ -165,7 +165,7 @@ class Rankings:
                 break
         return category
 
-    def update_categories(self) -> None:
+    def update_categories(self, tid) -> None:
         """Players are ranked based on rating and given thresholds.
 
         Players are ordered by rating and then assigned to a category
@@ -176,9 +176,10 @@ class Rankings:
         - 250 > rating         -> third category
         """
         # FIXME it is not working for players of the fan category
-        self.ranking_df.loc[:, "category"] = self.ranking_df.loc[:, "rating"].apply(
-            self._rating_to_category
-        )
+        tid_entries = self.ranking_df.tid == tid
+        self.ranking_df.loc[tid_entries, "category"] = self.ranking_df.loc[
+            tid_entries, "rating"
+        ].apply(self._rating_to_category)
 
     @staticmethod
     def _points_to_assign(rating_winner: float, rating_loser: float) -> Tuple[float, float]:
@@ -309,7 +310,7 @@ class Rankings:
         ]
 
         self.rating_details_df = pd.concat([self.rating_details_df, matches_processed])
-        self.update_categories()
+        self.update_categories(new_tid)
 
     def compute_category_points(self, tid: str, best_rounds: pd.DataFrame):
         cfg = ConfigManager().current_config

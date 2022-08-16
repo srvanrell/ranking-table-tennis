@@ -4,6 +4,7 @@ import shutil
 
 import pandas as pd
 import pytest
+from pandas.testing import assert_frame_equal
 
 
 def pytest_sessionstart(session):
@@ -44,7 +45,8 @@ def assert_equals_xlsx(reference_folder, output_folder, name_pattern):
         assert sorted(dfs_expected.keys()) == sorted(dfs_output.keys()), "Sheetname differences"
 
         for name, df in dfs_expected.items():
-            assert df.equals(dfs_output[name]), f"Mismatch on {name} sheet"
+            print(fn, name)
+            assert_frame_equal(df, dfs_output[name])
 
 
 def get_expected_folder_path():
