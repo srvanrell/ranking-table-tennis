@@ -22,6 +22,7 @@ class ConfigManager:
 
     def set_available_configs(self):
         ConfigManager._available_configs = []
+        print("\n## Available configs\n")
         for path in sorted(AVAILABLE_CONFIGS, reverse=True):
             ConfigManager._available_configs.append(Configuration(path))
             print(ConfigManager._available_configs[-1])
@@ -65,7 +66,7 @@ class Configuration:
         """Load config from the config_path."""
         if self.dict_cfg is None:
             print("\n## Loading config\n")
-            print(f"Config directory: {os.path.abspath(self._config_path)}")
+            print(f"Config directory: {os.path.abspath(self._config_path)}\n")
 
             base_cfg = self._load_base_config()
             tables_cfg = self._load_tables_config()
