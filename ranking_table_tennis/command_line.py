@@ -1,7 +1,6 @@
 import argparse
+import os
 import textwrap
-
-from ranking_table_tennis import compute_rankings, preprocess, publish
 
 
 def main():
@@ -40,12 +39,20 @@ def main():
     )
     args = parser.parse_args()
 
+    print(f"Working directory: {os.path.abspath(os.path.curdir)}")
+
     # FIXME calls are not performed in the best way.
     if args.cmd == "preprocess":
+        from ranking_table_tennis import preprocess
+
         preprocess.main(args.offline)
     elif args.cmd == "compute":
+        from ranking_table_tennis import compute_rankings
+
         compute_rankings.main()
     elif args.cmd == "publish":
+        from ranking_table_tennis import publish
+
         publish.main(args.offline, args.last, args.tournament_num)
     else:
         print("you shouldn't see this message")

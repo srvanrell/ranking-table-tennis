@@ -4,10 +4,8 @@ import pandas as pd
 from omegaconf import OmegaConf
 from unidecode import unidecode
 
-from ranking_table_tennis.configs import get_cfg
+from ranking_table_tennis.configs import ConfigManager
 from ranking_table_tennis.models import Players
-
-cfg = get_cfg()
 
 
 class Tournaments:
@@ -84,6 +82,8 @@ class Tournaments:
         else:
             print("Failed to process matches, a tie was found at:\n", match_row)
             raise ImportError
+
+        cfg = ConfigManager().current_config
 
         # changing labels of finals round match
         if match_row["round"] == cfg.roundnames.final:
@@ -197,6 +197,7 @@ class Tournaments:
         rounds_data = pd.concat([winner_data, loser_data], ignore_index=True)
 
         # Assign priority to matches
+        cfg = ConfigManager().current_config
         rounds_data["round_priority"] = rounds_data.loc[:, "best_round"].map(
             OmegaConf.to_container(cfg.best_rounds_priority, resolve=True)
         )
@@ -222,6 +223,7 @@ class Tournaments:
     def get_matches(
         self, tid: str, exclude_fan_category: bool = True, to_exclude: List[str] = None
     ) -> pd.DataFrame:
+        cfg = ConfigManager().current_config
         if to_exclude is None:
             to_exclude = ["sanction", "promote", "bonus"]
         entries_indexes = self.tournaments_df.loc[:, "tid"] == tid

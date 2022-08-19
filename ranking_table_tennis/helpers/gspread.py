@@ -4,9 +4,7 @@ import gspread
 import pandas as pd
 from gspread_dataframe import set_with_dataframe
 
-from ranking_table_tennis.configs import get_cfg
-
-cfg = get_cfg()
+from ranking_table_tennis.configs import ConfigManager
 
 
 def upload_sheet_from_df(
@@ -66,6 +64,7 @@ def create_n_tour_sheet(spreadsheet_id: str, tid: str) -> None:
     :param tid: tournament to create
     :return: None
     """
+    cfg = ConfigManager().current_config
     first_key = f"{cfg.labels.Tournament} 01"
     replacement_key = f"{cfg.labels.Tournament} {tid[-2:]}"
 
@@ -93,6 +92,7 @@ def create_n_tour_sheet(spreadsheet_id: str, tid: str) -> None:
 
 def publish_to_web(tid: str, show_on_web=False) -> None:
     if show_on_web:
+        cfg = ConfigManager().current_config
         for spreadsheet_id in cfg.io.published_on_web_spreadsheets_id:
             create_n_tour_sheet(spreadsheet_id, tid)
 

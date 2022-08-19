@@ -4,6 +4,7 @@ import shutil
 
 import pandas as pd
 import pytest
+from pandas.testing import assert_frame_equal
 
 
 def pytest_sessionstart(session):
@@ -24,13 +25,12 @@ def pytest_sessionfinish(session, exitstatus):
     Called after whole test run finished, right before
     returning the exit status to the system.
     """
-    from ranking_table_tennis.configs import get_cfg
-
-    cfg = get_cfg()
+    data_rtt_folder = os.path.join(os.path.dirname(__file__), "data_rtt")
 
     print("\n## After tests have finalized\n")
-    print(f"\nRemoving data folder after test: remove {cfg.io.data_folder}")
-    shutil.rmtree(cfg.io.data_folder)
+    if os.path.exists(data_rtt_folder):
+        print(f"\nRemoving data folder after test: remove {data_rtt_folder}")
+        shutil.rmtree(data_rtt_folder)
 
 
 def assert_equals_xlsx(reference_folder, output_folder, name_pattern):
@@ -45,11 +45,29 @@ def assert_equals_xlsx(reference_folder, output_folder, name_pattern):
         assert sorted(dfs_expected.keys()) == sorted(dfs_output.keys()), "Sheetname differences"
 
         for name, df in dfs_expected.items():
-            assert df.equals(dfs_output[name]), f"Mismatch on {name} sheet"
+            print(fn, name)
+            assert_frame_equal(df, dfs_output[name])
 
 
 def get_expected_folder_path():
     return os.path.join(os.path.dirname(__file__), "data_up_to_S2022T04")
+
+
+def get_tournaments_xlsx():
+    return "Liga Dos Orillas 2022 - Carga de partidos.xlsx"
+
+
+def base_run_before_tests():
+    example_data = os.path.join(get_expected_folder_path(), get_tournaments_xlsx())
+    if not os.path.exists("data_rtt/"):
+        os.mkdir("data_rtt")
+    shutil.copy2(example_data, "data_rtt/")
+
+
+def base_cli_run_after_tests():
+    from ranking_table_tennis.configs import ConfigManager
+
+    ConfigManager().set_current_config(date="220101")
 
 
 def load_expected_output(csv_filename, parse_dates=False):

@@ -3,12 +3,11 @@ import os
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from ranking_table_tennis.configs import get_cfg
-
-cfg = get_cfg()
+from ranking_table_tennis.configs import ConfigManager
 
 
 def publish_sheet_as_markdown(df, headers, sheet_name, tid, index=False):
+    cfg = ConfigManager().current_config
     # Create folder to publish markdowns
     os.makedirs(f"{cfg.io.data_folder}{tid}", exist_ok=True)
     markdown_filename = f"{cfg.io.data_folder}{tid}/{sheet_name.replace(' ', '_')}.md"
@@ -19,6 +18,7 @@ def publish_sheet_as_markdown(df, headers, sheet_name, tid, index=False):
 
 
 def publish_stat_plot(stats_df, headers, tid, fig_filename):
+    cfg = ConfigManager().current_config
     stats_df.columns = headers
     stats_plot = stats_df.plot(
         title=fig_filename.replace(cfg.sheetname.statistics_key, ""),
@@ -37,6 +37,7 @@ def publish_stat_plot(stats_df, headers, tid, fig_filename):
 
 
 def publish_tournament_metadata_as_markdown(tid, tournament_tid: pd.DataFrame) -> None:
+    cfg = ConfigManager().current_config
     df_metadata = pd.DataFrame(
         {
             cfg.labels.Tournament_name: [tournament_tid["tournament_name"].iloc[0]],

@@ -1,32 +1,46 @@
+import glob
 import os
 
 import hydra
 import pandas as pd
 from omegaconf import OmegaConf
 
-_cfg = None
+USER_CONFIG_PATH = os.path.join(os.path.dirname(__file__), "config")
+AVAILABLE_CONFIGS = glob.glob(os.path.join(USER_CONFIG_PATH, "config_*_*.yaml"))
 
 
-def get_cfg(date=None):
-    """First cfg valid for date"""
-    global _cfg
+class ConfigManager:
+    _current_config = None
+    _available_configs = None
 
-    if _cfg:
-        return _cfg
+    def __init__(self) -> None:
+        pass
 
-    print("\n## Loading config\n")
+    def initialize(self):
+        if ConfigManager._available_configs is None:
+            self.set_available_configs()
 
-    # Loads some names from config.yaml
-    user_config_path = os.path.join(os.path.dirname(__file__), "config")
-    print(f"Working directory: {os.path.abspath(os.path.curdir)}")
-    print(f"Config directory: {os.path.abspath(user_config_path)}")
+    def set_available_configs(self):
+        ConfigManager._available_configs = []
+        print("\n## Available configs\n")
+        for path in sorted(AVAILABLE_CONFIGS, reverse=True):
+            ConfigManager._available_configs.append(Configuration(path))
+            print(ConfigManager._available_configs[-1])
 
-    _cfg = Configuration(user_config_path).get_config()
+    def get_valid_config(self, date):
+        self.initialize()
+        for conf in ConfigManager._available_configs:
+            if conf.start_valid_date <= date <= conf.end_valid_date:
+                return conf.get_config()
 
-    if not os.path.exists(_cfg.io.data_folder):
-        os.mkdir(_cfg.io.data_folder)
+    @property
+    def current_config(self):
+        return ConfigManager._current_config
 
-    return _cfg
+    def set_current_config(self, date):
+        ConfigManager._current_config = self.get_valid_config(date)
+        if not os.path.exists(ConfigManager._current_config.io.data_folder):
+            os.mkdir(ConfigManager._current_config.io.data_folder)
 
 
 class Configuration:
@@ -34,11 +48,26 @@ class Configuration:
         self.dict_cfg = None
         self.start_valid_date = None
         self.end_valid_date = None
-        self._config_path = config_path
+        self._config_path, basename = os.path.split(config_path)
+        self._config_name, _ = os.path.splitext(basename)
+
+        self._set_dates()
+
+    def __str__(self) -> str:
+        return f"Configuration(start={self.start_valid_date}, end={self.end_valid_date})"
+
+    def _set_dates(self):
+        if "_" in self._config_name:
+            _, start_date, end_date = self._config_name.split("_")
+            self.start_valid_date = start_date
+            self.end_valid_date = end_date
 
     def get_config(self):
         """Load config from the config_path."""
         if self.dict_cfg is None:
+            print("\n## Loading config\n")
+            print(f"Config directory: {os.path.abspath(self._config_path)}\n")
+
             base_cfg = self._load_base_config()
             tables_cfg = self._load_tables_config()
             self.dict_cfg = OmegaConf.merge(base_cfg, tables_cfg)
@@ -50,7 +79,7 @@ class Configuration:
         with hydra.initialize_config_dir(
             version_base=None, config_dir=config_dir, job_name="rtt_app"
         ):
-            return hydra.compose(config_name="config")
+            return hydra.compose(config_name=self._config_name)
 
     def _load_tables_config(self):
         """Load dict_cfg with tables to assign championship and rating points"""

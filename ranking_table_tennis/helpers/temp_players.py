@@ -3,14 +3,13 @@ import pickle
 from typing import Tuple
 
 from ranking_table_tennis import models
-from ranking_table_tennis.configs import get_cfg
+from ranking_table_tennis.configs import ConfigManager
 from ranking_table_tennis.helpers.pickle import load_from_pickle
-
-cfg = get_cfg()
 
 
 def load_temp_players_ranking() -> Tuple[models.Players, models.Rankings]:
     """returns players_temp, ranking_temp"""
+    cfg = ConfigManager().current_config
     # Loading temp ranking and players. It should be deleted after a successful preprocessing
     players_temp_file = os.path.join(cfg.io.data_folder, cfg.io.pickle.players_temp)
     ranking_temp_file = os.path.join(cfg.io.data_folder, cfg.io.pickle.ranking_temp)
@@ -32,6 +31,7 @@ def load_temp_players_ranking() -> Tuple[models.Players, models.Rankings]:
 
 def save_temp_players_ranking(players_temp: models.Players, ranking_temp: models.Rankings) -> None:
     """returns players_temp, ranking_temp"""
+    cfg = ConfigManager().current_config
     # Loading temp ranking and players. It shuould be deleted after a successful preprocessing
     players_temp_file = os.path.join(cfg.io.data_folder, cfg.io.pickle.players_temp)
     ranking_temp_file = os.path.join(cfg.io.data_folder, cfg.io.pickle.ranking_temp)
@@ -48,6 +48,7 @@ def save_temp_players_ranking(players_temp: models.Players, ranking_temp: models
 
 
 def remove_temp_players_ranking() -> None:
+    cfg = ConfigManager().current_config
     players_temp_file = os.path.join(cfg.io.data_folder, cfg.io.pickle.players_temp)
     ranking_temp_file = os.path.join(cfg.io.data_folder, cfg.io.pickle.ranking_temp)
     print(
