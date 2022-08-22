@@ -509,29 +509,34 @@ class Rankings:
 
         return pid_count
 
-    def get_statistics(self) -> pd.DataFrame:
+    def get_statistics(self, tid) -> pd.DataFrame:
         """
         Return a DataFrame that summarizes total and in each category participations:
         - the number of players that have participated up to tournament(tid)
         - the number of players that have participated in tournament(tid)
+
+        tid: ID of max tournament to consider
         """
+        # TIDs to consider in statistic computation
+        tids_to_consider = self.ranking_df.tid <= tid
+
         # stats by category
         columns = ["tid"] + self.cum_points_cat_columns() + self.points_cat_columns()
         stats_cat = (
-            self.ranking_df.loc[:, columns].groupby("tid").apply(lambda df: (df > 0).sum(axis=0))
-        )
-        stats_cat.rename(
-            lambda col: col.replace("points", "participation"), axis="columns", inplace=True
+            self.ranking_df.loc[tids_to_consider, columns]
+            .groupby("tid")
+            .apply(lambda df: (df > 0).sum(axis=0))
+            .rename(lambda col: col.replace("points", "participation"), axis="columns")
         )
 
         # total stats cumulated. multi category players on a tournament are counted once
         columns = ["tid", "pid"] + self.cum_points_cat_columns()
         cum_participation_total = (
-            self.ranking_df.loc[:, columns]
+            self.ranking_df.loc[tids_to_consider, columns]
             .groupby("tid")
             .apply(self._count_unique_pids, self.cum_points_cat_columns())
+            .rename("cum_participation_total")
         )
-        cum_participation_total.rename("cum_participation_total", inplace=True)
 
         # total stats. multi category players on a tournament are counted once
         columns = ["tid", "pid"] + self.points_cat_columns()
@@ -539,8 +544,8 @@ class Rankings:
             self.ranking_df.loc[:, columns]
             .groupby("tid")
             .apply(self._count_unique_pids, self.points_cat_columns())
+            .rename("participation_total")
         )
-        participation_total.rename("participation_total", inplace=True)
 
         # Join results in a single table
         stats = stats_cat.join([participation_total, cum_participation_total]).sort_index(
