@@ -72,7 +72,7 @@ def publish_statistics_sheet(
     xlsx_filename = cfg.io.data_folder + cfg.io.xlsx.publish_filename.replace("NN", tid)
     sheet_name = cfg.sheetname.statistics_key
 
-    stats = rankings.get_statistics()
+    stats = rankings.get_statistics(tid)
     headers = cfg.categories + ["total"] + cfg.categories + ["total"]
 
     with _get_writer(xlsx_filename, sheet_name) as writer:
