@@ -364,7 +364,8 @@ def publish_histories_sheet(
     xlsx_filename = cfg.io.data_folder + cfg.io.xlsx.publish_filename.replace("NN", tid)
     sheet_name = cfg.sheetname.histories
 
-    history_df = players.history_df.copy()
+    tids_to_consider = players.history_df.tid <= tid
+    history_df = players.history_df.loc[tids_to_consider].copy()
 
     # Match pid to get player's metadata into new columns of history_df
     history_df = pd.merge(history_df, players.players_df, on="pid")
