@@ -77,6 +77,7 @@ def main():
         # Update categories based on updated config. Computation performed based on old config
         tournament_date = tournaments[tid].iloc[0].date.strftime("%y%m%d")
         ConfigManager().set_current_config(date=tournament_date)
+        rankings.update_config()
         rankings.update_categories(tid)
 
     helpers.save_to_pickle(players=players, tournaments=tournaments, rankings=rankings)
