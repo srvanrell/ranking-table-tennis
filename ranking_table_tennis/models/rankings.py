@@ -9,6 +9,7 @@ from ranking_table_tennis.models.tournaments import Tournaments
 
 class Rankings:
     def __init__(self, ranking_df: pd.DataFrame = None) -> None:
+        self.update_config()
         all_columns = [
             "tid",
             "tournament_name",
@@ -48,25 +49,20 @@ class Rankings:
         self.ranking_df.loc[entries_indexes, col] = value
         self.verify_and_normalize()
 
-    @staticmethod
-    def points_cat_columns() -> List[str]:
-        cfg = ConfigManager().current_config
-        return ["points_cat_%d" % d for d, _ in enumerate(cfg.categories, 1)]
+    def points_cat_columns(self) -> List[str]:
+        return ["points_cat_%d" % d for d, _ in enumerate(self.cfg.categories, 1)]
 
-    @staticmethod
-    def cum_points_cat_columns() -> List[str]:
-        cfg = ConfigManager().current_config
-        return ["cum_points_cat_%d" % d for d, _ in enumerate(cfg.categories, 1)]
+    def cum_points_cat_columns(self) -> List[str]:
+        return ["cum_points_cat_%d" % d for d, _ in enumerate(self.cfg.categories, 1)]
 
-    @staticmethod
-    def cum_tids_cat_columns() -> List[str]:
-        cfg = ConfigManager().current_config
-        return ["cum_tids_cat_%d" % d for d, _ in enumerate(cfg.categories, 1)]
+    def cum_tids_cat_columns(self) -> List[str]:
+        return ["cum_tids_cat_%d" % d for d, _ in enumerate(self.cfg.categories, 1)]
 
-    @staticmethod
-    def participations_cat_columns() -> List[str]:
-        cfg = ConfigManager().current_config
-        return ["participations_cat_%d" % d for d, _ in enumerate(cfg.categories, 1)]
+    def participations_cat_columns(self) -> List[str]:
+        return ["participations_cat_%d" % d for d, _ in enumerate(self.cfg.categories, 1)]
+
+    def update_config(self):
+        self.cfg = ConfigManager().current_config
 
     def get_entries(self, tid: str, pid: int = None, col: str = None):
         entries_indexes = self.ranking_df.tid == tid
@@ -110,7 +106,6 @@ class Rankings:
         self.update_categories(tid)
 
     def verify_and_normalize(self) -> None:
-        cfg = ConfigManager().current_config
         duplicated = self.ranking_df.duplicated(["tid", "pid"], keep=False)
         if duplicated.any():
             print("Ranking entries duplicated")
@@ -135,9 +130,9 @@ class Rankings:
             "rating": default_rating,
             "category": default_category,
             "active": default_active,
-            "tournament_name": cfg.initial_metadata.tournament_name,
-            "date": cfg.initial_metadata.date,
-            "location": cfg.initial_metadata.location,
+            "tournament_name": self.cfg.initial_metadata.tournament_name,
+            "date": self.cfg.initial_metadata.date,
+            "location": self.cfg.initial_metadata.location,
             **cat_col_values,
             **cum_tid_values,
         }
@@ -154,14 +149,12 @@ class Rankings:
         new_ranking.loc[:, self.cum_tids_cat_columns()] = ""
         self.ranking_df = pd.concat([self.ranking_df, new_ranking], ignore_index=True)
 
-    @staticmethod
-    def _rating_to_category(rating: float) -> str:
-        cfg = ConfigManager().current_config
-        thresholds = cfg.compute.categories_thresholds
-        category = cfg.categories[-2]  # Last category that it's not fan
+    def _rating_to_category(self, rating: float) -> str:
+        thresholds = self.cfg.compute.categories_thresholds
+        category = self.cfg.categories[-2]  # Last category that it's not fan
         for j, th in enumerate(thresholds):
             if rating >= th:
-                category = cfg.categories[j]
+                category = self.cfg.categories[j]
                 break
         return category
 
@@ -181,16 +174,14 @@ class Rankings:
             tid_entries, "rating"
         ].apply(self._rating_to_category)
 
-    @staticmethod
-    def _points_to_assign(rating_winner: float, rating_loser: float) -> Tuple[float, float]:
+    def _points_to_assign(self, rating_winner: float, rating_loser: float) -> Tuple[float, float]:
         """Points to add to winner and to deduce from loser given ratings of winner and loser."""
         rating_diff = rating_winner - rating_loser
-        cfg = ConfigManager().current_config
 
-        assignation_table = cfg.expected_result_table
+        assignation_table = self.cfg.expected_result_table
         if rating_diff < 0:
             rating_diff *= -1.0
-            assignation_table = cfg.unexpected_result_table
+            assignation_table = self.cfg.unexpected_result_table
 
         assignation_table = pd.DataFrame(
             OmegaConf.to_container(assignation_table, resolve=True)
@@ -203,8 +194,8 @@ class Rankings:
 
         return points_to_winner, points_to_loser
 
-    @staticmethod
     def _get_factor(
+        self,
         rating_winner: float,
         rating_loser: float,
         category_winner: str,
@@ -215,13 +206,12 @@ class Rankings:
         Players must play their own category"""
         rating_diff = rating_winner - rating_loser
         category_factor = 1.0
-        cfg = ConfigManager().current_config
         if category_winner != category_loser and not not_own_category:
-            category_factor = cfg.compute.category_expected_factor
+            category_factor = self.cfg.compute.category_expected_factor
             if rating_diff < 0:
-                category_factor = cfg.compute.category_unexpected_factor
+                category_factor = self.cfg.compute.category_unexpected_factor
 
-        factor = cfg.compute.rating_factor * category_factor
+        factor = self.cfg.compute.rating_factor * category_factor
 
         return factor
 
@@ -313,8 +303,7 @@ class Rankings:
         self.update_categories(new_tid)
 
     def compute_category_points(self, tid: str, best_rounds: pd.DataFrame):
-        cfg = ConfigManager().current_config
-        best_rounds_points_cfg = OmegaConf.to_container(cfg.best_rounds_points, resolve=True)
+        best_rounds_points_cfg = OmegaConf.to_container(self.cfg.best_rounds_points, resolve=True)
         best_rounds_points_df = pd.DataFrame(best_rounds_points_cfg).set_index("round_reached")
         col_translations = {"round_reached": "best_round", "level_1": "category", 0: "points"}
         points_assignation_table = (
@@ -326,7 +315,7 @@ class Rankings:
         )
         best_rounds_pointed.insert(0, "tid", tid)
 
-        for cat, points_cat_col in zip(cfg.categories, self.points_cat_columns()):
+        for cat, points_cat_col in zip(self.cfg.categories, self.points_cat_columns()):
             rows_reordered = self.merge_preserve_left_index(
                 self.ranking_df.loc[self.ranking_df.tid == tid, "pid"],
                 best_rounds_pointed[best_rounds_pointed.category == cat],
@@ -351,11 +340,10 @@ class Rankings:
         Compute and save championship points, selected tids, and participations per category
         :return: None
         """
-        cfg = ConfigManager().current_config
-        n_tournaments = cfg.compute.masters_N_tournaments_to_consider
+        n_tournaments = self.cfg.compute.masters_N_tournaments_to_consider
         tid_indexes = self.ranking_df.tid == tid
         rankings = self.ranking_df[
-            self.ranking_df.tid != cfg.initial_metadata.initial_tid
+            self.ranking_df.tid != self.cfg.initial_metadata.initial_tid
         ]  # Remove initial tid data
 
         for points_cat_col, cum_points_cat_col, cum_tids_cat_col, n_played_cat_col in zip(
@@ -414,8 +402,8 @@ class Rankings:
                 :, n_played_cat_col
             ]
 
-    @staticmethod
     def _activate_or_inactivate_player(
+        self,
         ranking_entry,
         tids_list,
         active_window_tids,
@@ -423,11 +411,10 @@ class Rankings:
         players,
         initial_active_pids,
     ):
-        cfg = ConfigManager().current_config
         # Avoid activate or inactivate players after the first tournament.
         # activate_window = cfg.compute.tournament window to activate"]
-        tourns_to_activate = cfg.compute.tournaments_to_activate
-        inactivate_window = cfg.compute.tournament_window_to_inactivate
+        tourns_to_activate = self.cfg.compute.tournaments_to_activate
+        inactivate_window = self.cfg.compute.tournament_window_to_inactivate
 
         played_tids = players.played_tournaments(ranking_entry.pid)
 
@@ -449,10 +436,9 @@ class Rankings:
         return active
 
     def update_active_players(self, tid: str, players, initial_tid: str):
-        cfg = ConfigManager().current_config
         # Avoid activate or inactivate players after the first tournament.
-        activate_window = cfg.compute.tournament_window_to_activate
-        inactivate_window = cfg.compute.tournament_window_to_inactivate
+        activate_window = self.cfg.compute.tournament_window_to_activate
+        inactivate_window = self.cfg.compute.tournament_window_to_inactivate
 
         indexes = (self.ranking_df.tid == initial_tid) & self.ranking_df.active
         initial_active_players = list(self.ranking_df.loc[indexes, "pid"].unique())
@@ -489,12 +475,11 @@ class Rankings:
             print(match.winner, "promoted to", match.category)
 
     def apply_sanction(self, tid: str, tournaments: "Tournaments") -> None:
-        cfg = ConfigManager().current_config
         tournament_df = tournaments[tid]
         for match_index, match in tournament_df[tournament_df.sanction].iterrows():
             for cat_col in self.points_cat_columns():
-                self[tid, match.loser_pid, cat_col] *= cfg.compute.sanction_factor
-            print("Apply sanction factor", cfg.compute.sanction_factor, "on:", match.winner)
+                self[tid, match.loser_pid, cat_col] *= self.cfg.compute.sanction_factor
+            print("Apply sanction factor", self.cfg.compute.sanction_factor, "on:", match.winner)
 
     def get_rating_details(self, tid: str) -> pd.DataFrame:
         return self.rating_details_df.loc[self.rating_details_df.tid == tid].copy()
@@ -551,7 +536,6 @@ class Rankings:
         stats = stats_cat.join([participation_total, cum_participation_total]).sort_index(
             axis="columns"
         )
-        cfg = ConfigManager().current_config
-        stats.drop(cfg.initial_metadata.initial_tid, inplace=True)
+        stats.drop(self.cfg.initial_metadata.initial_tid, inplace=True)
 
         return stats

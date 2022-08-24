@@ -46,6 +46,8 @@ class Tournaments:
         self.tournaments_df.insert(len(self.tournaments_df.columns), "winner_pid", None)
         self.tournaments_df.insert(len(self.tournaments_df.columns), "loser_pid", None)
 
+        self.update_config()
+
         self.verify_and_normalize()
 
     def __len__(self) -> int:
@@ -62,8 +64,10 @@ class Tournaments:
         criteria = self.tournaments_df.tid == tid
         return self.tournaments_df.loc[criteria].copy()
 
-    @staticmethod
-    def _process_match(match_row: pd.Series) -> pd.Series:
+    def update_config(self):
+        self.cfg = ConfigManager().current_config
+
+    def _process_match(self, match_row: pd.Series) -> pd.Series:
         # workaround to add extra bonus points from match list
         match_row["winner"] = match_row["player_b"]
         match_row["loser"] = match_row["player_b"]
@@ -83,15 +87,13 @@ class Tournaments:
             print("Failed to process matches, a tie was found at:\n", match_row)
             raise ImportError
 
-        cfg = ConfigManager().current_config
-
         # changing labels of finals round match
-        if match_row["round"] == cfg.roundnames.final:
-            match_row["winner_round"] = cfg.roundnames.champion
-            match_row["loser_round"] = cfg.roundnames.second
-        elif match_row["round"] == cfg.roundnames.third_place_playoff:
-            match_row["winner_round"] = cfg.roundnames.third
-            match_row["loser_round"] = cfg.roundnames.fourth
+        if match_row["round"] == self.cfg.roundnames.final:
+            match_row["winner_round"] = self.cfg.roundnames.champion
+            match_row["loser_round"] = self.cfg.roundnames.second
+        elif match_row["round"] == self.cfg.roundnames.third_place_playoff:
+            match_row["winner_round"] = self.cfg.roundnames.third
+            match_row["loser_round"] = self.cfg.roundnames.fourth
         else:
             match_row["winner_round"] = match_row["round"]
             match_row["loser_round"] = match_row["round"]
@@ -197,9 +199,8 @@ class Tournaments:
         rounds_data = pd.concat([winner_data, loser_data], ignore_index=True)
 
         # Assign priority to matches
-        cfg = ConfigManager().current_config
         rounds_data["round_priority"] = rounds_data.loc[:, "best_round"].map(
-            OmegaConf.to_container(cfg.best_rounds_priority, resolve=True)
+            OmegaConf.to_container(self.cfg.best_rounds_priority, resolve=True)
         )
 
         # Get best one for each player and category
@@ -223,12 +224,11 @@ class Tournaments:
     def get_matches(
         self, tid: str, exclude_fan_category: bool = True, to_exclude: List[str] = None
     ) -> pd.DataFrame:
-        cfg = ConfigManager().current_config
         if to_exclude is None:
             to_exclude = ["sanction", "promote", "bonus"]
         entries_indexes = self.tournaments_df.loc[:, "tid"] == tid
         if exclude_fan_category:
-            entries_indexes &= ~(self.tournaments_df.loc[:, "category"] == cfg.categories[-1])
+            entries_indexes &= ~(self.tournaments_df.loc[:, "category"] == self.cfg.categories[-1])
         entries_indexes &= ~self.tournaments_df.loc[:, to_exclude].any(axis="columns")
 
         return self.tournaments_df[entries_indexes]
