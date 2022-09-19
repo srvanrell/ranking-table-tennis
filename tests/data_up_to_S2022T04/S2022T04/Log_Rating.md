@@ -10,6 +10,7 @@
 |  Perot, Alejandro (1674)  |   Nohara, Andres (1428)   |     246      |        8         |        -8         |    zona     |   primera   |    1     |
 |  Perot, Alejandro (1674)  |   Figueroa, Axel (1240)   |     434      |        2         |        -2         |    zona     |   primera   |   0.5    |
 |  Perot, Alejandro (1674)  |  Fontana, Fausto (1359)   |     315      |        3         |        -3         |    zona     |   primera   |   0.5    |
+|                           |                           |              |                  |                   |             |             |          |
 |  Bonelli, Marcos (1006)   |     Levin, Raul (951)     |      55      |        14        |        -14        |   cuartos   |   segunda   |    1     |
 | Fernandez, Carlos (1386)  |  Vigouroux, Jorge (879)   |     507      |        1         |        -1         |   cuartos   |   segunda   |   0.5    |
 |   Figueroa, Axel (1240)   |  Fontana, Fausto (1359)   |     -119     |        30        |        -30        |   cuartos   |   segunda   |    1     |
@@ -39,6 +40,7 @@
 |    Prettis, Juan (776)    |   Boetti, Genaro (598)    |     178      |        10        |        -10        |    zona     |   segunda   |    1     |
 |    Vetrano, Luca (821)    |   Acosta, Gaston (573)    |     248      |        8         |        -8         |    zona     |   segunda   |    1     |
 |  Vigouroux, Jorge (879)   |  Vigouroux, Manuel (493)  |     386      |        6         |        -6         |    zona     |   segunda   |    1     |
+|                           |                           |              |                  |                   |             |             |          |
 |   Boetti, Genaro (598)    |  Mendieta, Elias (1000)   |     -402     |        56        |        -56        |   cuartos   |   tercera   |    1     |
 |    Prettis, Juan (776)    | Alvarez, Sebastian (924)  |     -148     |        30        |        -30        |   cuartos   |   tercera   |    1     |
 |     Uziel, Yuri (839)     | Dallinger, Humberto (588) |     251      |        8         |        -8         |   cuartos   |   tercera   |    1     |

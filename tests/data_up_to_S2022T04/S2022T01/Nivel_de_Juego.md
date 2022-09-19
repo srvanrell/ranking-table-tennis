@@ -10,6 +10,7 @@
 |   primera   |     1488 (=)     |  Dupertuis, Gaston  |   Parana    |   Aspatem    |
 |   primera   |    1476 (+16)    | Velazquez, Marcelo  |  Santa Fe   |   AteMeLi    |
 |   primera   |     1420 (=)     |   Aguirre, German   |   Parana    |   Aspatem    |
+|             |                  |                     |             |              |
 |   segunda   |     1390 (=)     |    Mendez, Diego    |  Santa Fe   |   Atemeli    |
 |   segunda   |    1375 (+35)    |   Nohara, Andres    |   Parana    |              |
 |   segunda   |     1362 (=)     |     Soto, Luis      |   Parana    | Tiro Federal |
@@ -24,6 +25,7 @@
 |   segunda   |    956 (-107)    |  Escudero, Martin   |  Santa Fe   |   Atemeli    |
 |   segunda   |    954 (+106)    |    Goy, Gerardo     | Reconquista |    ATMAR     |
 |   segunda   |     951 (-8)     |   Bonelli, Marcos   |   Parana    |   Aspatem    |
+|             |                  |                     |             |              |
 |   tercera   |     920 (-8)     | Alvarez, Sebastian  |  Santa Fe   |   Atemeli    |
 |   tercera   |    916 (+16)     |   Godano, Franco    |  Santa Fe   |   ATEMELI    |
 |   tercera   |     912 (=)      |  Depaoli, Luciano   |  Santa Fe   |   Atemeli    |

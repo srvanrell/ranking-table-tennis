@@ -15,8 +15,9 @@
 |  Perot, Alejandro (1646)  |   Nohara, Andres (1420)    |     226      |        8         |        -8         |    zona     |   primera   |    1     |
 |    Perot, David (1986)    | Velazquez, Marcelo (1491)  |     495      |        4         |        -4         |    zona     |   primera   |    1     |
 |    Perot, David (1986)    |  Heredia, Santiago (1573)  |     413      |        4         |        -4         |    zona     |   primera   |    1     |
-|  Schenquer, Diego (2029)  |  Palamedi, Cristian (951)  |     1078     |        0         |        -0         |    zona     |   primera   |   0.5    |
+|  Schenquer, Diego (2029)  |  Palamedi, Cristian (951)  |     1078     |        0         |         0         |    zona     |   primera   |   0.5    |
 |  Schenquer, Diego (2029)  | Lofeudo, Juan Jose (1567)  |     462      |        4         |        -4         |    zona     |   primera   |    1     |
+|                           |                            |              |                  |                   |             |             |          |
 |   Bonelli, Marcos (929)   |  Vigouroux, Jorge (1040)   |     -111     |        45        |        -45        |   cuartos   |   segunda   |   1.5    |
 |  Escudero, Martin (850)   |     Levin, Raul (999)      |     -149     |        54        |        -54        |   cuartos   |   segunda   |   1.5    |
 | Palamedi, Cristian (951)  |    Jaime, Gerardo (749)    |     202      |        8         |        -8         |   cuartos   |   segunda   |    1     |
@@ -40,6 +41,7 @@
 | Palamedi, Cristian (951)  |    Reniero, Gian (700)     |     251      |        4         |        -4         |    zona     |   segunda   |   0.5    |
 |    Vetrano, Luca (800)    |  Vigouroux, Jorge (1040)   |     -240     |        63        |        -63        |    zona     |   segunda   |   1.5    |
 |    Vetrano, Luca (800)    |   Escudero, Martin (850)   |     -50      |        26        |        -26        |    zona     |   segunda   |    1     |
+|                           |                            |              |                  |                   |             |             |          |
 |   Larrosa, Jorge (651)    |  Escalante, Samuel (516)   |     135      |        12        |        -12        |   16avos    |   tercera   |    1     |
 |  Vigouroux, Manuel (527)  |    Palamedi, Uma (386)     |     141      |        12        |        -12        |   16avos    |   tercera   |    1     |
 | Alvarez, Sebastian (886)  |   Escudero, Martin (850)   |      36      |        16        |        -16        |   cuartos   |   tercera   |    1     |

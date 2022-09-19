@@ -5,6 +5,7 @@
 |   Nohara, Andres    |   primera   |    tercero    |          500           |
 |   Figueroa, Axel    |   primera   |    tercero    |          500           |
 |   Fontana, Fausto   |   primera   |    segundo    |          750           |
+|                     |             |               |                        |
 |  Fernandez, Carlos  |   segunda   |   semifinal   |          250           |
 |   Figueroa, Axel    |   segunda   |   semifinal   |          250           |
 |  Gatti, Sebastian   |   segunda   |    cuartos    |          125           |
@@ -20,6 +21,7 @@
 |   Boetti, Genaro    |   segunda   |    octavos    |           75           |
 |    Vetrano, Luca    |   segunda   |    octavos    |           75           |
 |   Bonelli, Marcos   |   segunda   |    segundo    |          375           |
+|                     |             |               |                        |
 |   Benicio, Oscar    |   tercera   |    octavos    |           40           |
 |  Vigouroux, Manuel  |   tercera   |    octavos    |           40           |
 |   Acosta, Gaston    |   tercera   |    octavos    |           40           |

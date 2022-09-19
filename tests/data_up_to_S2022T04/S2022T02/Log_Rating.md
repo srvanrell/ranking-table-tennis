@@ -2,7 +2,7 @@
 |:-------------------------:|:-------------------------:|:------------:|:----------------:|:-----------------:|:-----------:|:-----------:|:--------:|
 |   Nohara, Andres (1375)   |   Mendez, Carlos (1552)   |     -177     |        54        |        -54        |   cuartos   |   primera   |   1.5    |
 |  Perot, Alejandro (1636)  | Palamedi, Cristian (966)  |     670      |        1         |        -1         |   cuartos   |   primera   |   0.5    |
-|    Perot, David (1977)    |    Goy, Gerardo (954)     |     1023     |        0         |        -0         |   cuartos   |   primera   |   0.5    |
+|    Perot, David (1977)    |    Goy, Gerardo (954)     |     1023     |        0         |         0         |   cuartos   |   primera   |   0.5    |
 | Velazquez, Marcelo (1476) |  Migoni, Nicolas (1535)   |     -59      |        26        |        -26        |   cuartos   |   primera   |    1     |
 |    Perot, David (1977)    |  Perot, Alejandro (1636)  |     341      |        6         |        -6         |    final    |   primera   |    1     |
 | Palamedi, Cristian (966)  |   Bonelli, Marcos (951)   |      15      |        18        |        -18        |   octavos   |   primera   |    1     |
@@ -14,9 +14,10 @@
 |   Nohara, Andres (1375)   | Palamedi, Cristian (966)  |     409      |        4         |        -4         |    zona     |   primera   |    1     |
 |  Perot, Alejandro (1636)  |    Goy, Gerardo (954)     |     682      |        1         |        -1         |    zona     |   primera   |   0.5    |
 |  Perot, Alejandro (1636)  | Velazquez, Marcelo (1476) |     160      |        10        |        -10        |    zona     |   primera   |    1     |
-|    Perot, David (1977)    | Palamedi, Cristian (966)  |     1011     |        0         |        -0         |    zona     |   primera   |   0.5    |
+|    Perot, David (1977)    | Palamedi, Cristian (966)  |     1011     |        0         |         0         |    zona     |   primera   |   0.5    |
 |    Perot, David (1977)    |   Nohara, Andres (1375)   |     602      |        1         |        -1         |    zona     |   primera   |   0.5    |
 | Velazquez, Marcelo (1476) |    Goy, Gerardo (954)     |     522      |        1         |        -1         |    zona     |   primera   |   0.5    |
+|                           |                           |              |                  |                   |             |             |          |
 |  Fontana, Fausto (1294)   |    Goy, Gerardo (954)     |     340      |        6         |        -6         |   cuartos   |   segunda   |    1     |
 |     Levin, Raul (994)     |   Bonelli, Marcos (951)   |      43      |        16        |        -16        |   cuartos   |   segunda   |    1     |
 |   Nohara, Andres (1375)   | Palamedi, Cristian (966)  |     409      |        4         |        -4         |   cuartos   |   segunda   |    1     |
@@ -34,6 +35,7 @@
 |   Nohara, Andres (1375)   |  Escudero, Martin (956)   |     419      |        4         |        -4         |    zona     |   segunda   |    1     |
 |     Soto, Luis (1362)     | Palamedi, Cristian (966)  |     396      |        6         |        -6         |    zona     |   segunda   |    1     |
 |     Soto, Luis (1362)     |   Bonelli, Marcos (951)   |     411      |        4         |        -4         |    zona     |   segunda   |    1     |
+|                           |                           |              |                  |                   |             |             |          |
 |   Jaime, Gerardo (693)    |   Savino, Leandro (580)   |     113      |        12        |        -12        |   cuartos   |   tercera   |    1     |
 |   Larrosa, Jorge (525)    | Alvarez, Sebastian (920)  |     -395     |        48        |        -48        |   cuartos   |   tercera   |    1     |
 |    Prettis, Juan (564)    |   Canhoto, Carlos (509)   |      55      |        14        |        -14        |   cuartos   |   tercera   |    1     |

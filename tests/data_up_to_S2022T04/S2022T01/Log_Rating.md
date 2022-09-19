@@ -11,6 +11,7 @@
 |    Perot, David (1934)    | Lofeudo, Juan Jose (1601) |     333      |        6         |        -6         |    zona     |   primera   |    1     |
 |  Schenquer, Diego (2051)  | Velazquez, Marcelo (1460) |     591      |        2         |        -2         |    zona     |   primera   |    1     |
 |  Schenquer, Diego (2051)  |  Perot, Alejandro (1634)  |     417      |        4         |        -4         |    zona     |   primera   |    1     |
+|                           |                           |              |                  |                   |             |             |          |
 | Ferretti, Gustavo (1165)  |    Goy, Gerardo (848)     |     317      |        3         |        -3         |   cuartos   |   segunda   |   0.5    |
 |  Fontana, Fausto (1291)   |    Prettis, Juan (568)    |     723      |        1         |        -1         |   cuartos   |   segunda   |   0.5    |
 |     Levin, Raul (988)     |   Bonelli, Marcos (959)   |      29      |        16        |        -16        |   cuartos   |   segunda   |    1     |
@@ -31,6 +32,7 @@
 |     Levin, Raul (988)     |    Prettis, Juan (568)    |     420      |        2         |        -2         |    zona     |   segunda   |   0.5    |
 |   Nohara, Andres (1340)   |    Prettis, Juan (568)    |     772      |        1         |        -1         |    zona     |   segunda   |   0.5    |
 |   Nohara, Andres (1340)   |     Levin, Raul (988)     |     352      |        6         |        -6         |    zona     |   segunda   |    1     |
+|                           |                           |              |                  |                   |             |             |          |
 | Alvarez, Sebastian (928)  |   Savino, Leandro (624)   |     304      |        6         |        -6         |   cuartos   |   tercera   |    1     |
 |  Colavini, Daniel (840)   |   Larrosa, Jorge (516)    |     324      |        6         |        -6         |   cuartos   |   tercera   |    1     |
 |    Goy, Gerardo (848)     |    Godano, Lucas (612)    |     236      |        8         |        -8         |   cuartos   |   tercera   |    1     |
