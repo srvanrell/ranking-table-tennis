@@ -258,8 +258,8 @@ def publish_rating_sheet(
     xlsx_filename = cfg.io.data_folder + cfg.io.xlsx.publish_filename.replace("NN", tid)
 
     # Rankings sorted by rating
-    this_ranking_df = rankings[tid].sort_values("rating", ascending=False)
-    prev_ranking_df = rankings[prev_tid]
+    this_ranking_df = rankings[tid].sort_values("rating", ascending=False).copy()
+    prev_ranking_df = rankings[prev_tid].copy()
 
     # Filter inactive players or players that didn't played any tournament
     nonzero_points = this_ranking_df.loc[:, rankings.cum_points_cat_columns()].any(axis="columns")
@@ -286,6 +286,9 @@ def publish_rating_sheet(
 
     headers = [cfg.labels[key] for key in ["Category", "Rating", "Player", "City", "Association"]]
     columns = ["category", "formatted rating", "name", "city", "affiliation"]
+
+    this_ranking_df = this_ranking_df.loc[:, columns]
+    this_ranking_df = _insert_empty_row_between_categories(this_ranking_df)
 
     with _get_writer(xlsx_filename, sheet_name) as writer:
         this_ranking_df.to_excel(
@@ -476,16 +479,12 @@ def publish_matches_sheet(
     tid: str,
     upload,
 ) -> None:
-    """Format and publish rating details of given tournament into a sheet"""
+    """Format and publish matches of given tournament into a sheet"""
     cfg = ConfigManager().current_config
 
     sheet_name = tournaments[tid]["sheet_name"].iloc[0]
 
     xlsx_filename = cfg.io.data_folder + cfg.io.xlsx.publish_filename.replace("NN", tid)
-
-    matches = tournaments.get_matches(tid, False, [])
-
-    matches = matches.sort_values(["category", "round", "player_a"], ascending=[True, True, True])
 
     to_bold = ["A1", "A2", "A3", "A4", "B4", "C4", "D4", "E4", "F4"]
     to_center = to_bold + ["B1", "B2", "B3"]
@@ -506,6 +505,11 @@ def publish_matches_sheet(
         "round",
         "category",
     ]
+
+    matches = tournaments.get_matches(tid, False, [])
+    matches = matches.loc[:, columns]
+    matches = matches.sort_values(["category", "round", "player_a"], ascending=[True, True, True])
+    matches = _insert_empty_row_between_categories(matches)
 
     with _get_writer(xlsx_filename, sheet_name) as writer:
         matches.to_excel(
@@ -571,5 +575,19 @@ def _keep_name_new_row(df: pd.DataFrame) -> pd.DataFrame:
         index=[-1],
     )
     df.loc[df.first_valid_index(), "name"] = ""
+
+    return pd.concat([empty_row, df])
+
+
+def _insert_empty_row_between_categories(df: pd.DataFrame) -> pd.DataFrame:
+    """Insert empty row between categories in the dataframe"""
+    # First row is ommited because is an empty row
+    return df.groupby("category", sort=False, group_keys=False).apply(_insert_empty_row).iloc[1:]
+
+
+def _insert_empty_row(df: pd.DataFrame) -> pd.DataFrame:
+    """Function to insert empty row in the dataframe"""
+    empty_row = df.iloc[:1].copy()
+    empty_row.iloc[0] = ""
 
     return pd.concat([empty_row, df])

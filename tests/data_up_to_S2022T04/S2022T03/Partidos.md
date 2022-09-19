@@ -17,6 +17,7 @@
 |   Schenquer, Diego   |  Palamedi, Cristian  |    3     |    0     |    zona     |   primera   |
 |   Schenquer, Diego   |  Lofeudo, Juan Jose  |    3     |    0     |    zona     |   primera   |
 |  Velazquez, Marcelo  |  Heredia, Santiago   |    0     |    3     |    zona     |   primera   |
+|                      |                      |          |          |             |             |
 |   Escudero, Martin   |     Levin, Raul      |    3     |    0     |   cuartos   |   segunda   |
 |    Jaime, Gerardo    |  Palamedi, Cristian  |    0     |    3     |   cuartos   |   segunda   |
 |    Vetrano, Luca     |    Reniero, Gian     |    0     |    3     |   cuartos   |   segunda   |
@@ -40,6 +41,7 @@
 |   Vigouroux, Jorge   |    Vetrano, Luca     |    0     |    3     |    zona     |   segunda   |
 |   Vigouroux, Jorge   |   Escudero, Martin   |    0     |    3     |    zona     |   segunda   |
 |  Vigouroux, Manuel   |   Colavini, Daniel   |    0     |    3     |    zona     |   segunda   |
+|                      |                      |          |          |             |             |
 |    Larrosa, Jorge    |  Escalante, Samuel   |    3     |    0     |   16avos    |   tercera   |
 |  Vigouroux, Manuel   |    Palamedi, Uma     |    3     |    0     |   16avos    |   tercera   |
 |  Alvarez, Sebastian  |   Escudero, Martin   |    3     |    0     |   cuartos   |   tercera   |

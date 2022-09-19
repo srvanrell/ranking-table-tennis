@@ -11,6 +11,7 @@
 |  Schenquer, Diego  | Velazquez, Marcelo |    3     |    0     |    zona     |   primera   |
 |  Schenquer, Diego  |  Perot, Alejandro  |    3     |    0     |    zona     |   primera   |
 | Velazquez, Marcelo |  Perot, Alejandro  |    0     |    3     |    zona     |   primera   |
+|                    |                    |          |          |             |             |
 |  Bonelli, Marcos   |    Levin, Raul     |    0     |    3     |   cuartos   |   segunda   |
 | Ferretti, Gustavo  |    Goy, Gerardo    |    3     |    0     |   cuartos   |   segunda   |
 |  Fontana, Fausto   |   Prettis, Juan    |    3     |    0     |   cuartos   |   segunda   |
@@ -31,6 +32,7 @@
 |   Nohara, Andres   |   Prettis, Juan    |    3     |    0     |    zona     |   segunda   |
 |   Nohara, Andres   |    Levin, Raul     |    3     |    0     |    zona     |   segunda   |
 |   Prettis, Juan    |    Levin, Raul     |    0     |    3     |    zona     |   segunda   |
+|                    |                    |          |          |             |             |
 | Alvarez, Sebastian |  Savino, Leandro   |    3     |    0     |   cuartos   |   tercera   |
 |  Colavini, Daniel  |   Larrosa, Jorge   |    3     |    0     |   cuartos   |   tercera   |
 |   Godano, Lucas    |    Goy, Gerardo    |    0     |    3     |   cuartos   |   tercera   |
