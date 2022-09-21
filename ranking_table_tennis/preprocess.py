@@ -1,3 +1,4 @@
+import logging
 from urllib import request
 
 from ranking_table_tennis import helpers
@@ -17,7 +18,7 @@ def main(offline=True):
 
     If offline=True it will execute preprocessing locally (not retrieving or uploading updates).
     """
-    print("\n## Starting preprocess\n")
+    logging.info("\n## Starting preprocess\n")
 
     ConfigManager().set_current_config(date="220101")
     cfg = ConfigManager().current_config
@@ -27,7 +28,7 @@ def main(offline=True):
     if not offline:
         retrieve = input("Do you want to retrieve online sheet [Y/n]? (press Enter to continue)\n")
         if retrieve.lower() != "n":
-            print("Downloading and saving %s\n" % xlsx_file)
+            logging.info("Downloading and saving %s\n" % xlsx_file)
             request.urlretrieve(cfg.io.tournaments_gdrive, xlsx_file)
 
     # Loading all tournament data
@@ -47,7 +48,7 @@ def main(offline=True):
     players_temp, ranking_temp = helpers.load_temp_players_ranking()
 
     for tid in tournaments:
-        print("==", tid, "==")
+        logging.info("== %s ==", tid)
 
         for name in tournaments.get_players_names(tid):
             unknown_player = False
@@ -61,9 +62,9 @@ def main(offline=True):
                     # Save a temp player to resume preprocessing, if necessary
                     players_temp.add_player(players[players.get_pid(name)])
                 else:
-                    print(">>>>\tUNCOMPLETE preprocessing detected. Resuming...")
+                    logging.info(">>>>\tUNCOMPLETE preprocessing detected. Resuming...")
                     players.add_player(players_temp[players_temp.get_pid(name)])
-                print(f"\n{players[players.get_pid(name)]}\n")
+                logging.info(f"\n{players[players.get_pid(name)]}\n")
 
             pid = players.get_pid(name)
 
@@ -82,10 +83,10 @@ def main(offline=True):
                     # Save a temp ranking of the player to resume preprocessing, if necessary
                     ranking_temp.add_entry(rankings[initial_tid, pid])
                 else:
-                    print(">>>>\tUNCOMPLETE preprocessing detected. Resuming...")
+                    logging.info(">>>>\tUNCOMPLETE preprocessing detected. Resuming...")
                     rankings.add_entry(ranking_temp[initial_tid, pid])
 
-                print(
+                logging.info(
                     f"\n{rankings[initial_tid, pid][['tid', 'pid', 'rating', 'category']]}\n"
                     f"{players[pid]['name']}"
                 )
