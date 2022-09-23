@@ -9,6 +9,7 @@
 |  Palamedi, Cristian  |   primera   |    octavos    |          150           |
 |   Perot, Alejandro   |   primera   |   semifinal   |          500           |
 |  Heredia, Santiago   |   primera   |   semifinal   |          500           |
+|                      |             |               |                        |
 |   Escudero, Martin   |   segunda   |   semifinal   |          250           |
 |    Reniero, Gian     |   segunda   |   semifinal   |          250           |
 |     Levin, Raul      |   segunda   |    cuartos    |          125           |
@@ -21,6 +22,7 @@
 |  Vigouroux, Manuel   |   segunda   |    octavos    |           75           |
 |    Boetti, Genaro    |   segunda   |    octavos    |           75           |
 |   Bonelli, Marcos    |   segunda   |    segundo    |          375           |
+|                      |             |               |                        |
 |   Escudero, Martin   |   tercera   |    cuartos    |           65           |
 |   Colavini, Daniel   |   tercera   |    cuartos    |           65           |
 |   Savino, Leandro    |   tercera   |    cuartos    |           65           |

@@ -12,6 +12,7 @@
 |   primera   |    1352 (-7)     |   Fontana, Fausto    |   Parana    |   Aspatem    |
 |   primera   |     1347 (=)     |      Soto, Luis      |   Parana    | Tiro Federal |
 |   primera   |    1341 (-45)    |  Fernandez, Carlos   |   Parana    | Tiro Federal |
+|             |                  |                      |             |              |
 |   segunda   |    1278 (-11)    |   Gatti, Sebastian   |   Parana    |              |
 |   segunda   |    1278 (+15)    |     Maili, Elias     |   Parana    |   Aspatem    |
 |   segunda   |    1254 (+14)    |    Figueroa, Axel    |   Parana    |   Aspatem    |
@@ -36,6 +37,7 @@
 |   segunda   |    711 (-110)    |    Vetrano, Luca     |             |              |
 |   segunda   |     704 (=)      |   Savino, Leandro    |  Santa Fe   |   Atemeli    |
 |   segunda   |     704 (=)      |   Colavini, Daniel   | Santo Tome  |   Atemeli    |
+|             |                  |                      |             |              |
 |   tercera   |     694 (=)      |    Suarez, Milton    |  Santa Fe   |              |
 |   tercera   |    678 (+80)     |    Boetti, Genaro    |             |              |
 |   tercera   |    636 (+48)     | Dallinger, Humberto  |   Parana    | Tiro Federal |

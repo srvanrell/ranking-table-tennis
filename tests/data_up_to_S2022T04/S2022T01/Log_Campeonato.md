@@ -6,6 +6,7 @@
 | Lofeudo, Juan Jose |   primera   |    cuartos    |          250           |
 | Velazquez, Marcelo |   primera   |   semifinal   |          500           |
 |  Perot, Alejandro  |   primera   |   semifinal   |          500           |
+|                    |             |               |                        |
 |  Escudero, Martin  |   segunda   |    octavos    |           75           |
 |    Levin, Raul     |   segunda   |   semifinal   |          250           |
 | Ferretti, Gustavo  |   segunda   |   semifinal   |          250           |
@@ -16,6 +17,7 @@
 |    Goy, Gerardo    |   segunda   |    cuartos    |          125           |
 |   Prettis, Juan    |   segunda   |    cuartos    |          125           |
 |   Larrosa, Jorge   |   segunda   |     zona      |           50           |
+|                    |             |               |                        |
 |  Colavini, Daniel  |   tercera   |    segundo    |          190           |
 | Alvarez, Sebastian |   tercera   |   semifinal   |          125           |
 |   Jaime, Gerardo   |   tercera   |   semifinal   |          125           |

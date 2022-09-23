@@ -17,6 +17,7 @@
 |  Perot, Alejandro  | Velazquez, Marcelo |    3     |    0     |    zona     |   primera   |
 |    Perot, David    | Palamedi, Cristian |    3     |    0     |    zona     |   primera   |
 |    Perot, David    |   Nohara, Andres   |    3     |    0     |    zona     |   primera   |
+|                    |                    |          |          |             |             |
 |  Bonelli, Marcos   |    Levin, Raul     |    0     |    3     |   cuartos   |   segunda   |
 |  Fontana, Fausto   |    Goy, Gerardo    |    3     |    0     |   cuartos   |   segunda   |
 |   Nohara, Andres   | Palamedi, Cristian |    3     |    0     |   cuartos   |   segunda   |
@@ -34,6 +35,7 @@
 |   Nohara, Andres   |  Escudero, Martin  |    3     |    0     |    zona     |   segunda   |
 |     Soto, Luis     |  Bonelli, Marcos   |    3     |    0     |    zona     |   segunda   |
 |     Soto, Luis     | Palamedi, Cristian |    3     |    0     |    zona     |   segunda   |
+|                    |                    |          |          |             |             |
 |  Canhoto, Carlos   |   Prettis, Juan    |    0     |    3     |   cuartos   |   tercera   |
 |  Gandolfo, Carlos  |    Uziel, Yuri     |    0     |    3     |   cuartos   |   tercera   |
 |   Jaime, Gerardo   |  Savino, Leandro   |    3     |    0     |   cuartos   |   tercera   |

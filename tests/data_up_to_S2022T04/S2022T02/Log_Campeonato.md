@@ -9,6 +9,7 @@
 |   Nohara, Andres   |   primera   |   semifinal   |          500           |
 |  Perot, Alejandro  |   primera   |    segundo    |          750           |
 |  Bonelli, Marcos   |   primera   |    octavos    |          150           |
+|                    |             |               |                        |
 |  Escudero, Martin  |   segunda   |    octavos    |           75           |
 |     Soto, Luis     |   segunda   |   semifinal   |          250           |
 |    Levin, Raul     |   segunda   |   semifinal   |          250           |
@@ -18,6 +19,7 @@
 |   Acosta, Gaston   |   segunda   |    cuartos    |          125           |
 |   Nohara, Andres   |   segunda   |    segundo    |          375           |
 |  Fontana, Fausto   |   segunda   |    primero    |          500           |
+|                    |             |               |                        |
 |  Gandolfo, Carlos  |   tercera   |    cuartos    |           65           |
 | Alvarez, Sebastian |   tercera   |    cuartos    |           65           |
 |  Canhoto, Carlos   |   tercera   |    cuartos    |           65           |

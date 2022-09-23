@@ -15,6 +15,7 @@
 |     Perot, Alejandro     |   Fontana, Fausto   |    3     |    0     |    zona     |   primera   |
 |     Perot, Alejandro     |   Nohara, Andres    |    3     |    0     |    zona     |   primera   |
 |     Perot, Alejandro     |    Maili, Elias     |    3     |    0     |    zona     |   primera   |
+|                          |                     |          |          |             |             |
 |     Bonelli, Marcos      |     Levin, Raul     |    3     |    0     |   cuartos   |   segunda   |
 |    Fernandez, Carlos     |  Vigouroux, Jorge   |    3     |    0     |   cuartos   |   segunda   |
 |      Figueroa, Axel      |   Fontana, Fausto   |    3     |    0     |   cuartos   |   segunda   |
@@ -44,6 +45,7 @@
 |    Vigouroux, Manuel     |    Maili, Elias     |    1     |    3     |    zona     |   segunda   |
 |    Vigouroux, Manuel     |  Vigouroux, Jorge   |    2     |    3     |    zona     |   segunda   |
 |   Vigouroux, Santiago    |   Figueroa, Axel    |    0     |    3     |    zona     |   segunda   |
+|                          |                     |          |          |             |             |
 |   Dallinger, Humberto    |     Uziel, Yuri     |    0     |    3     |   cuartos   |   tercera   |
 |     Mendieta, Elias      |   Boetti, Genaro    |    0     |    3     |   cuartos   |   tercera   |
 |      Prettis, Juan       | Alvarez, Sebastian  |    3     |    0     |   cuartos   |   tercera   |

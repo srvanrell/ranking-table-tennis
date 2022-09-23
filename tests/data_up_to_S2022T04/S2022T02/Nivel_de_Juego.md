@@ -12,6 +12,7 @@
 |   primera   |     1488 (=)     |  Dupertuis, Gaston  |   Parana    |   Aspatem    |
 |   primera   |     1420 (=)     |   Aguirre, German   |   Parana    |   Aspatem    |
 |   primera   |    1420 (+45)    |   Nohara, Andres    |   Parana    |              |
+|             |                  |                     |             |              |
 |   segunda   |     1390 (=)     |    Mendez, Diego    |  Santa Fe   |   Atemeli    |
 |   segunda   |    1359 (+65)    |   Fontana, Fausto   |   Parana    |   Aspatem    |
 |   segunda   |    1347 (-15)    |     Soto, Luis      |   Parana    | Tiro Federal |
@@ -23,6 +24,7 @@
 |   segunda   |     999 (+5)     |     Levin, Raul     |   Parana    |              |
 |   segunda   |     960 (+6)     |    Goy, Gerardo     | Reconquista |    ATMAR     |
 |   segunda   |    951 (-15)     | Palamedi, Cristian  |  Santa Fe   |   Atemeli    |
+|             |                  |                     |             |              |
 |   tercera   |    929 (-22)     |   Bonelli, Marcos   |   Parana    |   Aspatem    |
 |   tercera   |     916 (=)      |   Godano, Franco    |  Santa Fe   |   ATEMELI    |
 |   tercera   |     912 (=)      |  Depaoli, Luciano   |  Santa Fe   |   Atemeli    |
