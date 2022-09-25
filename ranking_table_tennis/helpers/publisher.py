@@ -44,6 +44,9 @@ def publish_championship_details_sheet(
     championship_details = (
         rankings.get_championship_details(tid)
         .loc[:, columns]
+        .sort_values(
+            ["category", "points", "name"], ascending=[True, False, True], ignore_index=True
+        )
         .pipe(_insert_empty_row_between_categories)
     )
 
