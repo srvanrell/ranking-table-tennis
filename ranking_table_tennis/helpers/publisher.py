@@ -519,10 +519,12 @@ def publish_matches_sheet(
         "category",
     ]
 
-    matches = tournaments.get_matches(tid, False, [])
-    matches = matches.loc[:, columns]
-    matches = matches.sort_values(["category", "round", "player_a"], ascending=[True, True, True])
-    matches = _insert_empty_row_between_categories(matches)
+    matches = (
+        tournaments.get_matches(tid, False, [])
+        .loc[:, columns]
+        .sort_values(["category", "round", "player_a"], ascending=[True, True, True])
+        .pipe(_insert_empty_row_between_categories)
+    )
 
     with _get_writer(xlsx_filename, sheet_name) as writer:
         matches.to_excel(
