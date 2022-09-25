@@ -10,12 +10,12 @@
 |   Schenquer, Diego   |  Heredia, Santiago   |    3     |    0     |  semifinal  |   primera   |
 |    Nohara, Andres    |    Mendez, Carlos    |    3     |    0     |    zona     |   primera   |
 |  Palamedi, Cristian  |  Lofeudo, Juan Jose  |    0     |    3     |    zona     |   primera   |
-|   Perot, Alejandro   |    Nohara, Andres    |    3     |    0     |    zona     |   primera   |
 |   Perot, Alejandro   |    Mendez, Carlos    |    3     |    0     |    zona     |   primera   |
-|     Perot, David     |  Velazquez, Marcelo  |    3     |    0     |    zona     |   primera   |
+|   Perot, Alejandro   |    Nohara, Andres    |    3     |    0     |    zona     |   primera   |
 |     Perot, David     |  Heredia, Santiago   |    3     |    0     |    zona     |   primera   |
-|   Schenquer, Diego   |  Palamedi, Cristian  |    3     |    0     |    zona     |   primera   |
+|     Perot, David     |  Velazquez, Marcelo  |    3     |    0     |    zona     |   primera   |
 |   Schenquer, Diego   |  Lofeudo, Juan Jose  |    3     |    0     |    zona     |   primera   |
+|   Schenquer, Diego   |  Palamedi, Cristian  |    3     |    0     |    zona     |   primera   |
 |  Velazquez, Marcelo  |  Heredia, Santiago   |    0     |    3     |    zona     |   primera   |
 |                      |                      |          |          |             |             |
 |   Escudero, Martin   |     Levin, Raul      |    3     |    0     |   cuartos   |   segunda   |
@@ -32,14 +32,14 @@
 |    Boetti, Genaro    |    Jaime, Gerardo    |    0     |    3     |    zona     |   segunda   |
 |  Garcia, Francisco   |    Boetti, Genaro    |    0     |    3     |    zona     |   segunda   |
 |  Garcia, Francisco   |    Jaime, Gerardo    |    0     |    3     |    zona     |   segunda   |
-|     Levin, Raul      |  Vigouroux, Manuel   |    3     |    0     |    zona     |   segunda   |
 |     Levin, Raul      |   Colavini, Daniel   |    3     |    0     |    zona     |   segunda   |
-|  Palamedi, Cristian  |    Reniero, Gian     |    3     |    0     |    zona     |   segunda   |
+|     Levin, Raul      |  Vigouroux, Manuel   |    3     |    0     |    zona     |   segunda   |
 |  Palamedi, Cristian  |   Bonelli, Marcos    |    0     |    3     |    zona     |   segunda   |
+|  Palamedi, Cristian  |    Reniero, Gian     |    3     |    0     |    zona     |   segunda   |
 |    Reniero, Gian     |   Bonelli, Marcos    |    0     |    3     |    zona     |   segunda   |
 |    Vetrano, Luca     |   Escudero, Martin   |    3     |    0     |    zona     |   segunda   |
-|   Vigouroux, Jorge   |    Vetrano, Luca     |    0     |    3     |    zona     |   segunda   |
 |   Vigouroux, Jorge   |   Escudero, Martin   |    0     |    3     |    zona     |   segunda   |
+|   Vigouroux, Jorge   |    Vetrano, Luca     |    0     |    3     |    zona     |   segunda   |
 |  Vigouroux, Manuel   |   Colavini, Daniel   |    0     |    3     |    zona     |   segunda   |
 |                      |                      |          |          |             |             |
 |    Larrosa, Jorge    |  Escalante, Samuel   |    3     |    0     |   16avos    |   tercera   |
@@ -59,21 +59,21 @@
 |  Vigouroux, Manuel   |   Escudero, Martin   |    0     |    3     |   octavos   |   tercera   |
 |   Bonelli, Marcos    |  Alvarez, Sebastian  |    3     |    0     |  semifinal  |   tercera   |
 |    Prettis, Juan     |    Suarez, Milton    |    3     |    0     |  semifinal  |   tercera   |
-|  Alvarez, Sebastian  |    Reniero, Gian     |    3     |    0     |    zona     |   tercera   |
 |  Alvarez, Sebastian  |  Escalante, Samuel   |    3     |    0     |    zona     |   tercera   |
-|   Bonelli, Marcos    |    Vetrano, Luca     |    3     |    0     |    zona     |   tercera   |
+|  Alvarez, Sebastian  |    Reniero, Gian     |    3     |    0     |    zona     |   tercera   |
 |   Bonelli, Marcos    |    Palamedi, Uma     |    3     |    0     |    zona     |   tercera   |
+|   Bonelli, Marcos    |    Vetrano, Luca     |    3     |    0     |    zona     |   tercera   |
 |   Colavini, Daniel   | Musuruana, Francisco |    3     |    0     |    zona     |   tercera   |
 |   Colavini, Daniel   |    Suarez, Milton    |    0     |    3     |    zona     |   tercera   |
-|   Depaoli, Luciano   |    Prettis, Juan     |    0     |    3     |    zona     |   tercera   |
 |   Depaoli, Luciano   |    Larrosa, Jorge    |    3     |    0     |    zona     |   tercera   |
+|   Depaoli, Luciano   |    Prettis, Juan     |    0     |    3     |    zona     |   tercera   |
 |   Escudero, Martin   |   Morello, Manuel    |    3     |    0     |    zona     |   tercera   |
 |   Escudero, Martin   |     Pilotti, Paz     |    3     |    0     |    zona     |   tercera   |
 |   Morello, Manuel    |     Pilotti, Paz     |    0     |    3     |    zona     |   tercera   |
 | Musuruana, Francisco |    Suarez, Milton    |    0     |    3     |    zona     |   tercera   |
 |    Prettis, Juan     |    Larrosa, Jorge    |    3     |    0     |    zona     |   tercera   |
 |    Reniero, Gian     |  Escalante, Samuel   |    3     |    0     |    zona     |   tercera   |
-|   Savino, Leandro    |  Vigouroux, Manuel   |    3     |    0     |    zona     |   tercera   |
 |   Savino, Leandro    |    Boetti, Genaro    |    3     |    0     |    zona     |   tercera   |
+|   Savino, Leandro    |  Vigouroux, Manuel   |    3     |    0     |    zona     |   tercera   |
 |    Vetrano, Luca     |    Palamedi, Uma     |    3     |    0     |    zona     |   tercera   |
 |  Vigouroux, Manuel   |    Boetti, Genaro    |    0     |    3     |    zona     |   tercera   |

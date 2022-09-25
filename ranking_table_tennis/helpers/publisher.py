@@ -532,7 +532,7 @@ def publish_matches_sheet(
     matches = (
         tournaments.get_matches(tid, False, [])
         .loc[:, columns]
-        .sort_values(["category", "round", "player_a"], ascending=[True, True, True])
+        .sort_values(["category", "round", "player_a", "player_b"], ascending=True)
         .pipe(_insert_empty_row_between_categories)
     )
 
