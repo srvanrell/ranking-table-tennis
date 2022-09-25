@@ -470,7 +470,10 @@ def publish_rating_details_sheet(
             rating_to_winner=lambda df: df["rating_to_winner"].astype(int).astype(str),
             rating_to_loser=lambda df: df["rating_to_loser"].astype(int).astype(str),
         )
-        .sort_values(["category", "round", "winner_name_rating"], ascending=[True, True, True])
+        .sort_values(
+            ["category", "round", "winner_name_rating", "loser_name_rating"],
+            ascending=[True, True, True, True],
+        )
         .loc[:, columns]
         .pipe(_insert_empty_row_between_categories)
     )
