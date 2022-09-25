@@ -8,14 +8,14 @@
 | Palamedi, Cristian (966)  |   Bonelli, Marcos (951)   |      15      |        18        |        -18        |   octavos   |   primera   |    1     |
 |  Perot, Alejandro (1636)  |   Nohara, Andres (1375)   |     261      |        4         |        -4         |  semifinal  |   primera   |   0.5    |
 |    Perot, David (1977)    | Velazquez, Marcelo (1476) |     501      |        2         |        -2         |  semifinal  |   primera   |    1     |
-|   Mendez, Carlos (1552)   |  Migoni, Nicolas (1535)   |      17      |        18        |        -18        |    zona     |   primera   |    1     |
 |   Mendez, Carlos (1552)   |   Bonelli, Marcos (951)   |     601      |        1         |        -1         |    zona     |   primera   |   0.5    |
+|   Mendez, Carlos (1552)   |  Migoni, Nicolas (1535)   |      17      |        18        |        -18        |    zona     |   primera   |    1     |
 |  Migoni, Nicolas (1535)   |   Bonelli, Marcos (951)   |     584      |        1         |        -1         |    zona     |   primera   |   0.5    |
 |   Nohara, Andres (1375)   | Palamedi, Cristian (966)  |     409      |        4         |        -4         |    zona     |   primera   |    1     |
 |  Perot, Alejandro (1636)  |    Goy, Gerardo (954)     |     682      |        1         |        -1         |    zona     |   primera   |   0.5    |
 |  Perot, Alejandro (1636)  | Velazquez, Marcelo (1476) |     160      |        10        |        -10        |    zona     |   primera   |    1     |
-|    Perot, David (1977)    | Palamedi, Cristian (966)  |     1011     |        0         |         0         |    zona     |   primera   |   0.5    |
 |    Perot, David (1977)    |   Nohara, Andres (1375)   |     602      |        1         |        -1         |    zona     |   primera   |   0.5    |
+|    Perot, David (1977)    | Palamedi, Cristian (966)  |     1011     |        0         |         0         |    zona     |   primera   |   0.5    |
 | Velazquez, Marcelo (1476) |    Goy, Gerardo (954)     |     522      |        1         |        -1         |    zona     |   primera   |   0.5    |
 |                           |                           |              |                  |                   |             |             |          |
 |  Fontana, Fausto (1294)   |    Goy, Gerardo (954)     |     340      |        6         |        -6         |   cuartos   |   segunda   |    1     |
@@ -27,14 +27,14 @@
 |  Fontana, Fausto (1294)   |     Soto, Luis (1362)     |     -68      |        26        |        -26        |  semifinal  |   segunda   |    1     |
 |   Nohara, Andres (1375)   |     Levin, Raul (994)     |     381      |        6         |        -6         |  semifinal  |   segunda   |    1     |
 |   Bonelli, Marcos (951)   | Palamedi, Cristian (966)  |     -15      |        18        |        -18        |    zona     |   segunda   |    1     |
-|  Fontana, Fausto (1294)   |     Levin, Raul (994)     |     300      |        6         |        -6         |    zona     |   segunda   |    1     |
 |  Fontana, Fausto (1294)   |   Acosta, Gaston (478)    |     816      |        1         |        -1         |    zona     |   segunda   |   0.5    |
+|  Fontana, Fausto (1294)   |     Levin, Raul (994)     |     300      |        6         |        -6         |    zona     |   segunda   |    1     |
 |    Goy, Gerardo (954)     |  Escudero, Martin (956)   |      -2      |        18        |        -18        |    zona     |   segunda   |    1     |
 |     Levin, Raul (994)     |   Acosta, Gaston (478)    |     516      |        1         |        -1         |    zona     |   segunda   |   0.5    |
-|   Nohara, Andres (1375)   |    Goy, Gerardo (954)     |     421      |        4         |        -4         |    zona     |   segunda   |    1     |
 |   Nohara, Andres (1375)   |  Escudero, Martin (956)   |     419      |        4         |        -4         |    zona     |   segunda   |    1     |
-|     Soto, Luis (1362)     | Palamedi, Cristian (966)  |     396      |        6         |        -6         |    zona     |   segunda   |    1     |
+|   Nohara, Andres (1375)   |    Goy, Gerardo (954)     |     421      |        4         |        -4         |    zona     |   segunda   |    1     |
 |     Soto, Luis (1362)     |   Bonelli, Marcos (951)   |     411      |        4         |        -4         |    zona     |   segunda   |    1     |
+|     Soto, Luis (1362)     | Palamedi, Cristian (966)  |     396      |        6         |        -6         |    zona     |   segunda   |    1     |
 |                           |                           |              |                  |                   |             |             |          |
 |   Jaime, Gerardo (693)    |   Savino, Leandro (580)   |     113      |        12        |        -12        |   cuartos   |   tercera   |    1     |
 |   Larrosa, Jorge (525)    | Alvarez, Sebastian (920)  |     -395     |        48        |        -48        |   cuartos   |   tercera   |    1     |
@@ -53,8 +53,8 @@
 |   Acosta, Gaston (478)    |   Gomez, Gabriel (548)    |     -70      |        26        |        -26        |    zona     |   tercera   |    1     |
 | Alvarez, Sebastian (920)  |   Acosta, Gaston (478)    |     442      |        4         |        -4         |    zona     |   tercera   |    1     |
 | Alvarez, Sebastian (920)  |   Gomez, Gabriel (548)    |     372      |        6         |        -6         |    zona     |   tercera   |    1     |
-|   Canhoto, Carlos (509)   |   Migoni, Anibal (1010)   |     -501     |        64        |        -64        |    zona     |   tercera   |    1     |
 |   Canhoto, Carlos (509)   |   Larrosa, Jorge (525)    |     -16      |        18        |        -18        |    zona     |   tercera   |    1     |
+|   Canhoto, Carlos (509)   |   Migoni, Anibal (1010)   |     -501     |        64        |        -64        |    zona     |   tercera   |    1     |
 |  Colavini, Daniel (830)   |    Palamedi, Uma (410)    |     420      |        4         |        -4         |    zona     |   tercera   |    1     |
 |  Gandolfo, Carlos (914)   |   Benicio, Oscar (464)    |     450      |        4         |        -4         |    zona     |   tercera   |    1     |
 |  Gandolfo, Carlos (914)   |    Prettis, Juan (564)    |     350      |        6         |        -6         |    zona     |   tercera   |    1     |

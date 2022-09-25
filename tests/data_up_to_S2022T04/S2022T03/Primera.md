@@ -9,7 +9,7 @@
 |     7      |       500 (+250)       |         2         | Lofeudo, Juan Jose |  Santa Fe   |   Atemeli    |        250 (T03) + 250 (T01)         |
 |            |       500 (+250)       |         2         |   Mendez, Carlos   |  Santa Fe   |   Atemeli    |        250 (T03) + 250 (T02)         |
 |     9      |       400 (+150)       |         2         | Palamedi, Cristian |  Santa Fe   |   Atemeli    |        250 (T02) + 150 (T03)         |
-|     10     |        250 (=)         |         1         |  Migoni, Nicolas   |   Parana    |   Aspatem    |              250 (T02)               |
-|            |        250 (=)         |         1         | Ferretti, Gustavo  |  Santa Fe   |   Atemeli    |              250 (T01)               |
+|     10     |        250 (=)         |         1         | Ferretti, Gustavo  |  Santa Fe   |   Atemeli    |              250 (T01)               |
 |            |        250 (=)         |         1         |    Goy, Gerardo    | Reconquista |    ATMAR     |              250 (T02)               |
+|            |        250 (=)         |         1         |  Migoni, Nicolas   |   Parana    |   Aspatem    |              250 (T02)               |
 |     13     |        150 (=)         |         1         |  Bonelli, Marcos   |   Parana    |   Aspatem    |              150 (T02)               |

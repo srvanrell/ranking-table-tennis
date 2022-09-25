@@ -13,10 +13,10 @@
 |   Nohara, Andres (1420)   |   Mendez, Carlos (1517)    |     -97      |        26        |        -26        |    zona     |   primera   |    1     |
 |  Perot, Alejandro (1646)  |   Mendez, Carlos (1517)    |     129      |        12        |        -12        |    zona     |   primera   |    1     |
 |  Perot, Alejandro (1646)  |   Nohara, Andres (1420)    |     226      |        8         |        -8         |    zona     |   primera   |    1     |
-|    Perot, David (1986)    | Velazquez, Marcelo (1491)  |     495      |        4         |        -4         |    zona     |   primera   |    1     |
 |    Perot, David (1986)    |  Heredia, Santiago (1573)  |     413      |        4         |        -4         |    zona     |   primera   |    1     |
-|  Schenquer, Diego (2029)  |  Palamedi, Cristian (951)  |     1078     |        0         |         0         |    zona     |   primera   |   0.5    |
+|    Perot, David (1986)    | Velazquez, Marcelo (1491)  |     495      |        4         |        -4         |    zona     |   primera   |    1     |
 |  Schenquer, Diego (2029)  | Lofeudo, Juan Jose (1567)  |     462      |        4         |        -4         |    zona     |   primera   |    1     |
+|  Schenquer, Diego (2029)  |  Palamedi, Cristian (951)  |     1078     |        0         |         0         |    zona     |   primera   |   0.5    |
 |                           |                            |              |                  |                   |             |             |          |
 |   Bonelli, Marcos (929)   |  Vigouroux, Jorge (1040)   |     -111     |        45        |        -45        |   cuartos   |   segunda   |   1.5    |
 |  Escudero, Martin (850)   |     Levin, Raul (999)      |     -149     |        54        |        -54        |   cuartos   |   segunda   |   1.5    |
@@ -34,13 +34,13 @@
 |   Bonelli, Marcos (929)   |    Reniero, Gian (700)     |     229      |        8         |        -8         |    zona     |   segunda   |    1     |
 |  Colavini, Daniel (744)   |  Vigouroux, Manuel (527)   |     217      |        8         |        -8         |    zona     |   segunda   |    1     |
 |  Escudero, Martin (850)   |  Vigouroux, Jorge (1040)   |     -190     |        54        |        -54        |    zona     |   segunda   |   1.5    |
-|   Jaime, Gerardo (749)    |  Garcia, Francisco (958)   |     -209     |        42        |        -42        |    zona     |   segunda   |    1     |
 |   Jaime, Gerardo (749)    |    Boetti, Genaro (523)    |     226      |        8         |        -8         |    zona     |   segunda   |    1     |
+|   Jaime, Gerardo (749)    |  Garcia, Francisco (958)   |     -209     |        42        |        -42        |    zona     |   segunda   |    1     |
 |     Levin, Raul (999)     |   Colavini, Daniel (744)   |     255      |        4         |        -4         |    zona     |   segunda   |   0.5    |
 |     Levin, Raul (999)     |  Vigouroux, Manuel (527)   |     472      |        2         |        -2         |    zona     |   segunda   |   0.5    |
 | Palamedi, Cristian (951)  |    Reniero, Gian (700)     |     251      |        4         |        -4         |    zona     |   segunda   |   0.5    |
-|    Vetrano, Luca (800)    |  Vigouroux, Jorge (1040)   |     -240     |        63        |        -63        |    zona     |   segunda   |   1.5    |
 |    Vetrano, Luca (800)    |   Escudero, Martin (850)   |     -50      |        26        |        -26        |    zona     |   segunda   |    1     |
+|    Vetrano, Luca (800)    |  Vigouroux, Jorge (1040)   |     -240     |        63        |        -63        |    zona     |   segunda   |   1.5    |
 |                           |                            |              |                  |                   |             |             |          |
 |   Larrosa, Jorge (651)    |  Escalante, Samuel (516)   |     135      |        12        |        -12        |   16avos    |   tercera   |    1     |
 |  Vigouroux, Manuel (527)  |    Palamedi, Uma (386)     |     141      |        12        |        -12        |   16avos    |   tercera   |    1     |
@@ -59,11 +59,11 @@
 |   Suarez, Milton (636)    |    Larrosa, Jorge (651)    |     -15      |        18        |        -18        |   octavos   |   tercera   |    1     |
 |   Bonelli, Marcos (929)   |  Alvarez, Sebastian (886)  |      43      |        16        |        -16        |  semifinal  |   tercera   |    1     |
 |    Prettis, Juan (582)    |    Suarez, Milton (636)    |     -54      |        26        |        -26        |  semifinal  |   tercera   |    1     |
-| Alvarez, Sebastian (886)  |    Reniero, Gian (700)     |     186      |        10        |        -10        |    zona     |   tercera   |    1     |
 | Alvarez, Sebastian (886)  |  Escalante, Samuel (516)   |     370      |        6         |        -6         |    zona     |   tercera   |    1     |
+| Alvarez, Sebastian (886)  |    Reniero, Gian (700)     |     186      |        10        |        -10        |    zona     |   tercera   |    1     |
 |   Boetti, Genaro (523)    |  Vigouroux, Manuel (527)   |      -4      |        18        |        -18        |    zona     |   tercera   |    1     |
-|   Bonelli, Marcos (929)   |    Vetrano, Luca (800)     |     129      |        12        |        -12        |    zona     |   tercera   |    1     |
 |   Bonelli, Marcos (929)   |    Palamedi, Uma (386)     |     543      |        2         |        -2         |    zona     |   tercera   |    1     |
+|   Bonelli, Marcos (929)   |    Vetrano, Luca (800)     |     129      |        12        |        -12        |    zona     |   tercera   |    1     |
 |  Colavini, Daniel (744)   | Musuruana, Francisco (550) |     194      |        10        |        -10        |    zona     |   tercera   |    1     |
 |  Depaoli, Luciano (912)   |    Larrosa, Jorge (651)    |     261      |        8         |        -8         |    zona     |   tercera   |    1     |
 |  Escudero, Martin (850)   |   Morello, Manuel (600)    |     250      |        8         |        -8         |    zona     |   tercera   |    1     |
@@ -72,8 +72,8 @@
 |    Prettis, Juan (582)    |   Depaoli, Luciano (912)   |     -330     |        48        |        -48        |    zona     |   tercera   |    1     |
 |    Prettis, Juan (582)    |    Larrosa, Jorge (651)    |     -69      |        26        |        -26        |    zona     |   tercera   |    1     |
 |    Reniero, Gian (700)    |  Escalante, Samuel (516)   |     184      |        10        |        -10        |    zona     |   tercera   |    1     |
-|   Savino, Leandro (676)   |  Vigouroux, Manuel (527)   |     149      |        10        |        -10        |    zona     |   tercera   |    1     |
 |   Savino, Leandro (676)   |    Boetti, Genaro (523)    |     153      |        10        |        -10        |    zona     |   tercera   |    1     |
+|   Savino, Leandro (676)   |  Vigouroux, Manuel (527)   |     149      |        10        |        -10        |    zona     |   tercera   |    1     |
 |   Suarez, Milton (636)    |   Colavini, Daniel (744)   |     -108     |        30        |        -30        |    zona     |   tercera   |    1     |
 |   Suarez, Milton (636)    | Musuruana, Francisco (550) |      86      |        14        |        -14        |    zona     |   tercera   |    1     |
 |    Vetrano, Luca (800)    |    Palamedi, Uma (386)     |     414      |        4         |        -4         |    zona     |   tercera   |    1     |

@@ -15,8 +15,8 @@
 | Palamedi, Cristian |   Nohara, Andres   |    0     |    3     |    zona     |   primera   |
 |  Perot, Alejandro  |    Goy, Gerardo    |    3     |    0     |    zona     |   primera   |
 |  Perot, Alejandro  | Velazquez, Marcelo |    3     |    0     |    zona     |   primera   |
-|    Perot, David    | Palamedi, Cristian |    3     |    0     |    zona     |   primera   |
 |    Perot, David    |   Nohara, Andres   |    3     |    0     |    zona     |   primera   |
+|    Perot, David    | Palamedi, Cristian |    3     |    0     |    zona     |   primera   |
 |                    |                    |          |          |             |             |
 |  Bonelli, Marcos   |    Levin, Raul     |    0     |    3     |   cuartos   |   segunda   |
 |  Fontana, Fausto   |    Goy, Gerardo    |    3     |    0     |   cuartos   |   segunda   |
@@ -31,8 +31,8 @@
 |  Fontana, Fausto   |   Acosta, Gaston   |    3     |    0     |    zona     |   segunda   |
 |  Fontana, Fausto   |    Levin, Raul     |    3     |    0     |    zona     |   segunda   |
 |    Goy, Gerardo    |  Escudero, Martin  |    3     |    0     |    zona     |   segunda   |
-|   Nohara, Andres   |    Goy, Gerardo    |    3     |    0     |    zona     |   segunda   |
 |   Nohara, Andres   |  Escudero, Martin  |    3     |    0     |    zona     |   segunda   |
+|   Nohara, Andres   |    Goy, Gerardo    |    3     |    0     |    zona     |   segunda   |
 |     Soto, Luis     |  Bonelli, Marcos   |    3     |    0     |    zona     |   segunda   |
 |     Soto, Luis     | Palamedi, Cristian |    3     |    0     |    zona     |   segunda   |
 |                    |                    |          |          |             |             |
@@ -57,8 +57,8 @@
 |  Canhoto, Carlos   |   Larrosa, Jorge   |    3     |    0     |    zona     |   tercera   |
 |  Colavini, Daniel  |   Palamedi, Uma    |    3     |    0     |    zona     |   tercera   |
 |  Colavini, Daniel  |  Savino, Leandro   |    0     |    3     |    zona     |   tercera   |
-|  Gandolfo, Carlos  |   Prettis, Juan    |    3     |    0     |    zona     |   tercera   |
 |  Gandolfo, Carlos  |   Benicio, Oscar   |    3     |    0     |    zona     |   tercera   |
+|  Gandolfo, Carlos  |   Prettis, Juan    |    3     |    0     |    zona     |   tercera   |
 |   Migoni, Anibal   |  Canhoto, Carlos   |    0     |    3     |    zona     |   tercera   |
 |   Migoni, Anibal   |   Larrosa, Jorge   |    0     |    3     |    zona     |   tercera   |
 |   Palamedi, Uma    |  Savino, Leandro   |    0     |    3     |    zona     |   tercera   |

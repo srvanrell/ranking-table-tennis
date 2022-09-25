@@ -44,6 +44,9 @@ def publish_championship_details_sheet(
     championship_details = (
         rankings.get_championship_details(tid)
         .loc[:, columns]
+        .sort_values(
+            ["category", "points", "name"], ascending=[True, False, True], ignore_index=True
+        )
         .pipe(_insert_empty_row_between_categories)
     )
 
@@ -189,7 +192,7 @@ def publish_championship_sheets(
         # Filter inactive players or players that didn't played any tournament
         unsorted_ranking = this_ranking.loc[this_ranking.loc[:, point_col] > 0].copy()
         sorted_ranking = unsorted_ranking.sort_values(
-            [point_col, participations_col], ascending=[False, True]
+            [point_col, participations_col, "name"], ascending=[False, True, True]
         )
 
         if sorted_ranking.empty:
@@ -263,7 +266,7 @@ def publish_rating_sheet(
     xlsx_filename = cfg.io.data_folder + cfg.io.xlsx.publish_filename.replace("NN", tid)
 
     # Rankings sorted by rating
-    this_ranking_df = rankings[tid].sort_values("rating", ascending=False).copy()
+    this_ranking_df = rankings[tid].copy()
     prev_ranking_df = rankings[prev_tid].copy()
 
     # Filter inactive players or players that didn't played any tournament
@@ -292,8 +295,11 @@ def publish_rating_sheet(
     headers = [cfg.labels[key] for key in ["Category", "Rating", "Player", "City", "Association"]]
     columns = ["category", "formatted rating", "name", "city", "affiliation"]
 
-    this_ranking_df = this_ranking_df.loc[:, columns]
-    this_ranking_df = _insert_empty_row_between_categories(this_ranking_df)
+    this_ranking_df = (
+        this_ranking_df.sort_values(["rating", "name"], ascending=[False, True])
+        .loc[:, columns]
+        .pipe(_insert_empty_row_between_categories)
+    )
 
     with _get_writer(xlsx_filename, sheet_name) as writer:
         this_ranking_df.to_excel(
@@ -327,13 +333,14 @@ def publish_initial_rating_sheet(
 
     xlsx_filename = cfg.io.data_folder + cfg.io.xlsx.publish_filename.replace("NN", tid)
 
-    # Rankings sorted by rating
+    # Rankings sorted by rating and name
     initial_tid = cfg.initial_metadata.initial_tid
-    this_ranking_df = rankings[initial_tid].sort_values("rating", ascending=False)
-
-    # Format data and columns to write into the file
-    this_ranking_df = this_ranking_df.merge(
-        players.players_df.loc[:, ["name", "city", "affiliation"]], on="pid"
+    this_ranking_df = (
+        rankings[initial_tid]
+        # Format data and columns to write into the file
+        .merge(players.players_df.loc[:, ["name", "city", "affiliation"]], on="pid").sort_values(
+            ["rating", "name"], ascending=[False, True]
+        )
     )
 
     to_bold = ["A1", "B1", "C1", "D1"]
@@ -463,7 +470,10 @@ def publish_rating_details_sheet(
             rating_to_winner=lambda df: df["rating_to_winner"].astype(int).astype(str),
             rating_to_loser=lambda df: df["rating_to_loser"].astype(int).astype(str),
         )
-        .sort_values(["category", "round", "winner_name_rating"], ascending=[True, True, True])
+        .sort_values(
+            ["category", "round", "winner_name_rating", "loser_name_rating"],
+            ascending=[True, True, True, True],
+        )
         .loc[:, columns]
         .pipe(_insert_empty_row_between_categories)
     )
@@ -519,10 +529,12 @@ def publish_matches_sheet(
         "category",
     ]
 
-    matches = tournaments.get_matches(tid, False, [])
-    matches = matches.loc[:, columns]
-    matches = matches.sort_values(["category", "round", "player_a"], ascending=[True, True, True])
-    matches = _insert_empty_row_between_categories(matches)
+    matches = (
+        tournaments.get_matches(tid, False, [])
+        .loc[:, columns]
+        .sort_values(["category", "round", "player_a", "player_b"], ascending=True)
+        .pipe(_insert_empty_row_between_categories)
+    )
 
     with _get_writer(xlsx_filename, sheet_name) as writer:
         matches.to_excel(

@@ -1,15 +1,15 @@
 |          Ganador          |         Perdedor          |  Diferencia  |  Puntos Ganador  |  Puntos Perdedor  |  Instancia  |  Categoría  |  Factor  |
 |:-------------------------:|:-------------------------:|:------------:|:----------------:|:-----------------:|:-----------:|:-----------:|:--------:|
-|   Figueroa, Axel (1240)   |    Maili, Elias (1263)    |     -23      |        18        |        -18        |    zona     |   primera   |    1     |
 |   Figueroa, Axel (1240)   |  Fontana, Fausto (1359)   |     -119     |        30        |        -30        |    zona     |   primera   |    1     |
+|   Figueroa, Axel (1240)   |    Maili, Elias (1263)    |     -23      |        18        |        -18        |    zona     |   primera   |    1     |
 |  Fontana, Fausto (1359)   |    Maili, Elias (1263)    |      96      |        14        |        -14        |    zona     |   primera   |    1     |
 |  Fontana, Fausto (1359)   |   Nohara, Andres (1428)   |     -69      |        39        |        -39        |    zona     |   primera   |   1.5    |
-|   Nohara, Andres (1428)   |    Maili, Elias (1263)    |     165      |        5         |        -5         |    zona     |   primera   |   0.5    |
 |   Nohara, Andres (1428)   |   Figueroa, Axel (1240)   |     188      |        5         |        -5         |    zona     |   primera   |   0.5    |
-|  Perot, Alejandro (1674)  |    Maili, Elias (1263)    |     411      |        2         |        -2         |    zona     |   primera   |   0.5    |
-|  Perot, Alejandro (1674)  |   Nohara, Andres (1428)   |     246      |        8         |        -8         |    zona     |   primera   |    1     |
+|   Nohara, Andres (1428)   |    Maili, Elias (1263)    |     165      |        5         |        -5         |    zona     |   primera   |   0.5    |
 |  Perot, Alejandro (1674)  |   Figueroa, Axel (1240)   |     434      |        2         |        -2         |    zona     |   primera   |   0.5    |
 |  Perot, Alejandro (1674)  |  Fontana, Fausto (1359)   |     315      |        3         |        -3         |    zona     |   primera   |   0.5    |
+|  Perot, Alejandro (1674)  |    Maili, Elias (1263)    |     411      |        2         |        -2         |    zona     |   primera   |   0.5    |
+|  Perot, Alejandro (1674)  |   Nohara, Andres (1428)   |     246      |        8         |        -8         |    zona     |   primera   |    1     |
 |                           |                           |              |                  |                   |             |             |          |
 |  Bonelli, Marcos (1006)   |     Levin, Raul (951)     |      55      |        14        |        -14        |   cuartos   |   segunda   |    1     |
 | Fernandez, Carlos (1386)  |  Vigouroux, Jorge (879)   |     507      |        1         |        -1         |   cuartos   |   segunda   |   0.5    |
@@ -31,12 +31,12 @@
 |   Figueroa, Axel (1240)   | Vigouroux, Santiago (511) |     729      |        1         |        -1         |    zona     |   segunda   |   0.5    |
 |  Fontana, Fausto (1359)   |   Acosta, Gaston (573)    |     786      |        1         |        -1         |    zona     |   segunda   |   0.5    |
 |  Fontana, Fausto (1359)   |    Vetrano, Luca (821)    |     538      |        1         |        -1         |    zona     |   segunda   |   0.5    |
-|  Gatti, Sebastian (1289)  |   Ledesma, Jonas (422)    |     867      |        2         |        -2         |    zona     |   segunda   |    1     |
 |  Gatti, Sebastian (1289)  |  Bonelli, Marcos (1006)   |     283      |        8         |        -8         |    zona     |   segunda   |    1     |
-|     Levin, Raul (951)     | Vigouroux, Santiago (511) |     440      |        2         |        -2         |    zona     |   segunda   |   0.5    |
+|  Gatti, Sebastian (1289)  |   Ledesma, Jonas (422)    |     867      |        2         |        -2         |    zona     |   segunda   |    1     |
 |     Levin, Raul (951)     |   Figueroa, Axel (1240)   |     -289     |        42        |        -42        |    zona     |   segunda   |    1     |
-|    Maili, Elias (1263)    |  Vigouroux, Manuel (493)  |     770      |        1         |        -1         |    zona     |   segunda   |   0.5    |
+|     Levin, Raul (951)     | Vigouroux, Santiago (511) |     440      |        2         |        -2         |    zona     |   segunda   |   0.5    |
 |    Maili, Elias (1263)    |  Vigouroux, Jorge (879)   |     384      |        3         |        -3         |    zona     |   segunda   |   0.5    |
+|    Maili, Elias (1263)    |  Vigouroux, Manuel (493)  |     770      |        1         |        -1         |    zona     |   segunda   |   0.5    |
 |    Prettis, Juan (776)    |   Boetti, Genaro (598)    |     178      |        10        |        -10        |    zona     |   segunda   |    1     |
 |    Vetrano, Luca (821)    |   Acosta, Gaston (573)    |     248      |        8         |        -8         |    zona     |   segunda   |    1     |
 |  Vigouroux, Jorge (879)   |  Vigouroux, Manuel (493)  |     386      |        6         |        -6         |    zona     |   segunda   |    1     |
@@ -58,14 +58,14 @@
 |   Boetti, Genaro (598)    |   Benicio, Oscar (444)    |     154      |        10        |        -10        |    zona     |   tercera   |    1     |
 | Dallinger, Humberto (588) |    Prettis, Juan (776)    |     -188     |        36        |        -36        |    zona     |   tercera   |    1     |
 | Dallinger, Humberto (588) | Vigouroux, Santiago (511) |      77      |        14        |        -14        |    zona     |   tercera   |    1     |
-|  Mendieta, Elias (1000)   |  Vigouroux, Manuel (493)  |     507      |        2         |        -2         |    zona     |   tercera   |    1     |
 |  Mendieta, Elias (1000)   |   Acosta, Gaston (573)    |     427      |        4         |        -4         |    zona     |   tercera   |    1     |
-|     Neto, Leon (412)      |    Vetrano, Luca (821)    |     -409     |        56        |        -56        |    zona     |   tercera   |    1     |
+|  Mendieta, Elias (1000)   |  Vigouroux, Manuel (493)  |     507      |        2         |        -2         |    zona     |   tercera   |    1     |
 |     Neto, Leon (412)      |   Diaz, Benjamin (400)    |      12      |        18        |        -18        |    zona     |   tercera   |    1     |
+|     Neto, Leon (412)      |    Vetrano, Luca (821)    |     -409     |        56        |        -56        |    zona     |   tercera   |    1     |
 |    Prettis, Juan (776)    | Vigouroux, Santiago (511) |     265      |        8         |        -8         |    zona     |   tercera   |    1     |
-|     Uziel, Yuri (839)     |    Vetrano, Luca (821)    |      18      |        18        |        -18        |    zona     |   tercera   |    1     |
-|     Uziel, Yuri (839)     |     Neto, Leon (412)      |     427      |        4         |        -4         |    zona     |   tercera   |    1     |
 |     Uziel, Yuri (839)     |   Diaz, Benjamin (400)    |     439      |        4         |        -4         |    zona     |   tercera   |    1     |
+|     Uziel, Yuri (839)     |     Neto, Leon (412)      |     427      |        4         |        -4         |    zona     |   tercera   |    1     |
+|     Uziel, Yuri (839)     |    Vetrano, Luca (821)    |      18      |        18        |        -18        |    zona     |   tercera   |    1     |
 |    Vetrano, Luca (821)    |   Diaz, Benjamin (400)    |     421      |        4         |        -4         |    zona     |   tercera   |    1     |
 |  Vigouroux, Jorge (879)   | Dallinger, Humberto (588) |     291      |        8         |        -8         |    zona     |   tercera   |    1     |
 |  Vigouroux, Jorge (879)   |    Prettis, Juan (776)    |     103      |        12        |        -12        |    zona     |   tercera   |    1     |
