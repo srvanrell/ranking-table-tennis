@@ -16,8 +16,8 @@
 |   segunda   |    1006 (+77)    |   Bonelli, Marcos    |   Parana    |   Aspatem    |
 |   segunda   |    977 (+127)    |   Escudero, Martin   |  Santa Fe   |   Atemeli    |
 |   segunda   |     960 (=)      |     Goy, Gerardo     | Reconquista |    ATMAR     |
-|   segunda   |     951 (=)      |  Palamedi, Cristian  |  Santa Fe   |   Atemeli    |
 |   segunda   |    951 (-48)     |     Levin, Raul      |   Parana    |              |
+|   segunda   |     951 (=)      |  Palamedi, Cristian  |  Santa Fe   |   Atemeli    |
 |             |                  |                      |             |              |
 |   tercera   |    924 (+38)     |  Alvarez, Sebastian  |  Santa Fe   |   Atemeli    |
 |   tercera   |     916 (=)      |    Godano, Franco    |  Santa Fe   |   ATEMELI    |
@@ -31,8 +31,8 @@
 |   tercera   |    787 (-171)    |  Garcia, Francisco   |  Santa Fe   |   Atemeli    |
 |   tercera   |    776 (+194)    |    Prettis, Juan     |             |              |
 |   tercera   |    714 (+14)     |    Reniero, Gian     |             |              |
-|   tercera   |    704 (+28)     |   Savino, Leandro    |  Santa Fe   |   Atemeli    |
 |   tercera   |    704 (-40)     |   Colavini, Daniel   | Santo Tome  |   Atemeli    |
+|   tercera   |    704 (+28)     |   Savino, Leandro    |  Santa Fe   |   Atemeli    |
 |   tercera   |    694 (+58)     |    Suarez, Milton    |  Santa Fe   |              |
 |   tercera   |    611 (-40)     |    Larrosa, Jorge    |   Parana    | Tiro Federal |
 |   tercera   |     602 (=)      |    Godano, Lucas     |             |              |

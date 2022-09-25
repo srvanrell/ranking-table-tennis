@@ -266,7 +266,7 @@ def publish_rating_sheet(
     xlsx_filename = cfg.io.data_folder + cfg.io.xlsx.publish_filename.replace("NN", tid)
 
     # Rankings sorted by rating
-    this_ranking_df = rankings[tid].sort_values("rating", ascending=False).copy()
+    this_ranking_df = rankings[tid].copy()
     prev_ranking_df = rankings[prev_tid].copy()
 
     # Filter inactive players or players that didn't played any tournament
@@ -295,8 +295,11 @@ def publish_rating_sheet(
     headers = [cfg.labels[key] for key in ["Category", "Rating", "Player", "City", "Association"]]
     columns = ["category", "formatted rating", "name", "city", "affiliation"]
 
-    this_ranking_df = this_ranking_df.loc[:, columns]
-    this_ranking_df = _insert_empty_row_between_categories(this_ranking_df)
+    this_ranking_df = (
+        this_ranking_df.sort_values(["rating", "name"], ascending=[False, True])
+        .loc[:, columns]
+        .pipe(_insert_empty_row_between_categories)
+    )
 
     with _get_writer(xlsx_filename, sheet_name) as writer:
         this_ranking_df.to_excel(
@@ -330,13 +333,14 @@ def publish_initial_rating_sheet(
 
     xlsx_filename = cfg.io.data_folder + cfg.io.xlsx.publish_filename.replace("NN", tid)
 
-    # Rankings sorted by rating
+    # Rankings sorted by rating and name
     initial_tid = cfg.initial_metadata.initial_tid
-    this_ranking_df = rankings[initial_tid].sort_values("rating", ascending=False)
-
-    # Format data and columns to write into the file
-    this_ranking_df = this_ranking_df.merge(
-        players.players_df.loc[:, ["name", "city", "affiliation"]], on="pid"
+    this_ranking_df = (
+        rankings[initial_tid]
+        # Format data and columns to write into the file
+        .merge(players.players_df.loc[:, ["name", "city", "affiliation"]], on="pid").sort_values(
+            ["rating", "name"], ascending=[False, True]
+        )
     )
 
     to_bold = ["A1", "B1", "C1", "D1"]
