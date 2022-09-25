@@ -11,21 +11,21 @@
 |            |        190 (=)         |         1         |     Uziel, Yuri      |   Parana    | Tiro Federal |            190 (T02)             |
 |     10     |       165 (+125)       |         2         |    Suarez, Milton    |  Santa Fe   |              |       125 (T03) + 40 (T01)       |
 |     11     |        70 (+30)        |         2         |    Palamedi, Uma     |  Santa Fe   |   Atemeli    |       40 (T02) + 30 (T03)        |
-|     12     |        65 (+65)        |         1         |   Escudero, Martin   |  Santa Fe   |   Atemeli    |             65 (T03)             |
+|     12     |         65 (=)         |         1         |   Canhoto, Carlos    |  Santa Fe   |   Atemeli    |             65 (T02)             |
+|            |        65 (+65)        |         1         |   Escudero, Martin   |  Santa Fe   |   Atemeli    |             65 (T03)             |
 |            |         65 (=)         |         1         |   Gandolfo, Carlos   |   Parana    | Tiro Federal |             65 (T02)             |
-|            |        65 (+65)        |         1         |    Reniero, Gian     |             |              |             65 (T03)             |
 |            |         65 (=)         |         1         |    Godano, Lucas     |             |              |             65 (T01)             |
-|            |         65 (=)         |         1         |   Canhoto, Carlos    |  Santa Fe   |   Atemeli    |             65 (T02)             |
+|            |        65 (+65)        |         1         |    Reniero, Gian     |             |              |             65 (T03)             |
 |     17     |        55 (+30)        |         2         |  Escalante, Samuel   |             |              |       30 (T03) + 25 (T01)        |
-|     18     |         40 (=)         |         1         |    Migoni, Anibal    |   Parana    |   Aspatem    |             40 (T02)             |
-|            |        40 (+40)        |         1         |   Depaoli, Luciano   |  Santa Fe   |   Atemeli    |             40 (T03)             |
-|            |        40 (+40)        |         1         |    Vetrano, Luca     |             |              |             40 (T03)             |
-|            |        40 (+40)        |         1         |   Morello, Manuel    |             |              |             40 (T03)             |
-|            |        40 (+40)        |         1         |     Pilotti, Paz     |             |              |             40 (T03)             |
-|            |        40 (+40)        |         1         | Musuruana, Francisco |             |              |             40 (T03)             |
-|            |         40 (=)         |         1         |    Gomez, Gabriel    |   Parana    | Tiro Federal |             40 (T02)             |
-|            |        40 (+40)        |         1         |  Vigouroux, Manuel   |  San Justo  | Tiro Federal |             40 (T03)             |
-|            |        40 (+40)        |         1         |    Boetti, Genaro    |             |              |             40 (T03)             |
-|            |         40 (=)         |         1         |    Acosta, Gaston    |             |              |             40 (T02)             |
-|            |         40 (=)         |         1         |    Benicio, Oscar    |   Parana    |   Aspatem    |             40 (T02)             |
+|     18     |         40 (=)         |         1         |    Acosta, Gaston    |             |              |             40 (T02)             |
 |            |         40 (=)         |         1         |    Almada, Pablo     |             |              |             40 (T02)             |
+|            |         40 (=)         |         1         |    Benicio, Oscar    |   Parana    |   Aspatem    |             40 (T02)             |
+|            |        40 (+40)        |         1         |    Boetti, Genaro    |             |              |             40 (T03)             |
+|            |        40 (+40)        |         1         |   Depaoli, Luciano   |  Santa Fe   |   Atemeli    |             40 (T03)             |
+|            |         40 (=)         |         1         |    Gomez, Gabriel    |   Parana    | Tiro Federal |             40 (T02)             |
+|            |         40 (=)         |         1         |    Migoni, Anibal    |   Parana    |   Aspatem    |             40 (T02)             |
+|            |        40 (+40)        |         1         |   Morello, Manuel    |             |              |             40 (T03)             |
+|            |        40 (+40)        |         1         | Musuruana, Francisco |             |              |             40 (T03)             |
+|            |        40 (+40)        |         1         |     Pilotti, Paz     |             |              |             40 (T03)             |
+|            |        40 (+40)        |         1         |    Vetrano, Luca     |             |              |             40 (T03)             |
+|            |        40 (+40)        |         1         |  Vigouroux, Manuel   |  San Justo  | Tiro Federal |             40 (T03)             |

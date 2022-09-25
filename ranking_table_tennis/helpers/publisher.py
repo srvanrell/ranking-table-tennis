@@ -192,7 +192,7 @@ def publish_championship_sheets(
         # Filter inactive players or players that didn't played any tournament
         unsorted_ranking = this_ranking.loc[this_ranking.loc[:, point_col] > 0].copy()
         sorted_ranking = unsorted_ranking.sort_values(
-            [point_col, participations_col], ascending=[False, True]
+            [point_col, participations_col, "name"], ascending=[False, True, True]
         )
 
         if sorted_ranking.empty:
