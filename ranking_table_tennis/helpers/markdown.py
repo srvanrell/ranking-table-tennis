@@ -1,3 +1,4 @@
+import logging
 import os
 
 import matplotlib.pyplot as plt
@@ -5,13 +6,15 @@ import pandas as pd
 
 from ranking_table_tennis.configs import ConfigManager
 
+logger = logging.getLogger(__name__)
+
 
 def publish_sheet_as_markdown(df, headers, sheet_name, tid, index=False):
     cfg = ConfigManager().current_config
     # Create folder to publish markdowns
     os.makedirs(f"{cfg.io.data_folder}{tid}", exist_ok=True)
     markdown_filename = f"{cfg.io.data_folder}{tid}/{sheet_name.replace(' ', '_')}.md"
-    print("<<<Saving", sheet_name, "in", markdown_filename, sep="\t")
+    logger.info("<<<Saving\t%s\tin\t%s", sheet_name, markdown_filename)
     df.to_markdown(
         markdown_filename, index=index, headers=headers, stralign="center", numalign="center"
     )

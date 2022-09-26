@@ -3,6 +3,8 @@ import logging
 from ranking_table_tennis import helpers
 from ranking_table_tennis.configs import ConfigManager
 
+logger = logging.getLogger(__name__)
+
 
 def main():
     """Compute rating and championship points of loaded tournaments.
@@ -12,7 +14,7 @@ def main():
     It will read players, tournaments in pickles.
     It will save players, tournaments and rankings in pickles.
     """
-    logging.info("\n## Starting to compute rankings\n")
+    logger.info("## Starting to compute rankings")
 
     ConfigManager().set_current_config(date="220101")
     cfg = ConfigManager().current_config
@@ -32,7 +34,7 @@ def main():
     tids = [initial_tid] + [tid for tid in tournaments]
 
     for tid in tournaments:
-        logging.info("==", tid, "==")
+        logger.info("== %s ==", tid)
 
         # Get the tid of the previous tournament
         prev_tid = tids[tids.index(tid) - 1]

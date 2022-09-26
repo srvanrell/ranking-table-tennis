@@ -4,6 +4,8 @@ from urllib import request
 from ranking_table_tennis import helpers
 from ranking_table_tennis.configs import ConfigManager
 
+logger = logging.getLogger(__name__)
+
 
 def main(offline=True):
     """Preprocess matches on xlsx tournaments database.
@@ -18,7 +20,7 @@ def main(offline=True):
 
     If offline=True it will execute preprocessing locally (not retrieving or uploading updates).
     """
-    logging.info("\n## Starting preprocess\n")
+    logger.info("Starting preprocess")
 
     ConfigManager().set_current_config(date="220101")
     cfg = ConfigManager().current_config
@@ -26,9 +28,11 @@ def main(offline=True):
     xlsx_file = cfg.io.data_folder + cfg.io.xlsx.tournaments_filename
 
     if not offline:
-        retrieve = input("Do you want to retrieve online sheet [Y/n]? (press Enter to continue)\n")
+        retrieve = input(
+            "\nDo you want to retrieve online sheet [Y/n]? (press Enter to continue)\n"
+        )
         if retrieve.lower() != "n":
-            logging.info("Downloading and saving %s\n" % xlsx_file)
+            logger.info("Downloading and saving %s\n" % xlsx_file)
             request.urlretrieve(cfg.io.tournaments_gdrive, xlsx_file)
 
     # Loading all tournament data
@@ -48,7 +52,7 @@ def main(offline=True):
     players_temp, ranking_temp = helpers.load_temp_players_ranking()
 
     for tid in tournaments:
-        logging.info("== %s ==", tid)
+        logger.info("== %s ==", tid)
 
         for name in tournaments.get_players_names(tid):
             unknown_player = False
@@ -62,9 +66,9 @@ def main(offline=True):
                     # Save a temp player to resume preprocessing, if necessary
                     players_temp.add_player(players[players.get_pid(name)])
                 else:
-                    logging.info(">>>>\tUNCOMPLETE preprocessing detected. Resuming...")
+                    logger.info(">>>>\tUNCOMPLETE preprocessing detected. Resuming...")
                     players.add_player(players_temp[players_temp.get_pid(name)])
-                logging.info(f"\n{players[players.get_pid(name)]}\n")
+                logger.info(f"\n{players[players.get_pid(name)]}\n")
 
             pid = players.get_pid(name)
 
@@ -83,10 +87,10 @@ def main(offline=True):
                     # Save a temp ranking of the player to resume preprocessing, if necessary
                     ranking_temp.add_entry(rankings[initial_tid, pid])
                 else:
-                    logging.info(">>>>\tUNCOMPLETE preprocessing detected. Resuming...")
+                    logger.info(">>>>\tUNCOMPLETE preprocessing detected. Resuming...")
                     rankings.add_entry(ranking_temp[initial_tid, pid])
 
-                logging.info(
+                logger.info(
                     f"\n{rankings[initial_tid, pid][['tid', 'pid', 'rating', 'category']]}\n"
                     f"{players[pid]['name']}"
                 )
@@ -96,6 +100,11 @@ def main(offline=True):
                     "press Enter to continue or Kill this process to forget last player data\n"
                 )
                 helpers.save_temp_players_ranking(players_temp, ranking_temp)
+
+        # FIXME Update config but do not affect initial tid
+        # tournament_date = tournaments[tid].iloc[0].date.strftime("%y%m%d")
+        # ConfigManager().set_current_config(date=tournament_date)
+        # rankings.update_config()
 
     # Update the online version
     upload = False

@@ -25,10 +25,9 @@ class ConfigManager:
 
     def set_available_configs(self):
         ConfigManager._available_configs = []
-        logger.debug("\n## Available configs\n")
         for path in sorted(AVAILABLE_CONFIGS, reverse=True):
             ConfigManager._available_configs.append(Configuration(path))
-            logger.debug(ConfigManager._available_configs[-1])
+            logger.debug("Available config: %s", ConfigManager._available_configs[-1])
 
     def get_valid_config(self, date):
         self.initialize()
@@ -68,8 +67,7 @@ class Configuration:
     def get_config(self):
         """Load config from the config_path."""
         if self.dict_cfg is None:
-            logger.debug("\n## Loading config\n")
-            logger.debug(f"Config directory: {os.path.abspath(self._config_path)}\n")
+            logger.debug("Config directory: %s", os.path.abspath(self._config_path))
 
             base_cfg = self._load_base_config()
             tables_cfg = self._load_tables_config()
@@ -82,6 +80,7 @@ class Configuration:
         with hydra.initialize_config_dir(
             version_base=None, config_dir=config_dir, job_name="rtt_app"
         ):
+            logger.debug("Loading config: %s", self._config_name)
             return hydra.compose(config_name=self._config_name)
 
     def _load_tables_config(self):
