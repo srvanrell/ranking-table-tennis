@@ -20,13 +20,17 @@ def publish_sheet_as_markdown(df, headers, sheet_name, tid, index=False):
 def publish_stat_plot(stats_df, headers, tid, fig_filename):
     cfg = ConfigManager().current_config
     stats_df.columns = headers
-    stats_plot = stats_df.plot(
-        title=fig_filename.replace(cfg.sheetname.statistics_key, ""),
-        kind="bar",
-        xlabel=cfg.labels.tid,
-        ylabel=cfg.sheetname.players,
-        stacked=True,
-        rot=0,
+    stats_plot = (
+        stats_df.copy()
+        .set_index(pd.Index(stats_df.index.str.slice(start=5)))
+        .plot(
+            title=f"{fig_filename.replace(cfg.sheetname.statistics_key, '')} {tid[1:-3]}",
+            kind="bar",
+            xlabel=cfg.labels.tid,
+            ylabel=cfg.sheetname.players,
+            stacked=True,
+            rot=0,
+        )
     )
     for container in stats_plot.containers:
         stats_plot.bar_label(container, label_type="center")
