@@ -3,6 +3,8 @@ import logging
 import os
 import textwrap
 
+from ranking_table_tennis.helpers.logging import logger
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -50,9 +52,9 @@ def main():
     # command line argument. Convert to upper case to allow the user to
     # specify --log=DEBUG or --log=debug
     numeric_log_level = getattr(logging, args.log.upper())
-    logging.basicConfig(level=numeric_log_level)
-    logger = logging.getLogger(__name__)
-    logger.info(f"Working directory: {os.path.abspath(os.path.curdir)}")
+    logger.setLevel(numeric_log_level)
+
+    logger.debug(f"Working directory: {os.path.abspath(os.path.curdir)}")
 
     # FIXME calls are not performed in the best way.
     if args.cmd == "preprocess":
