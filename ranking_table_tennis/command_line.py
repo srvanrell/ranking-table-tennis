@@ -54,7 +54,7 @@ def main():
     numeric_log_level = getattr(logging, args.log.upper())
     logger.setLevel(numeric_log_level)
 
-    logger.debug(f"Working directory: {os.path.abspath(os.path.curdir)}")
+    logger.debug(f"Working directory: '{os.path.abspath(os.path.curdir)}'")
 
     # FIXME calls are not performed in the best way.
     if args.cmd == "preprocess":

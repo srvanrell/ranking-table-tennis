@@ -25,7 +25,7 @@ def load_players_sheet() -> models.Players:
     cfg = ConfigManager().current_config
     tournaments_xlsx = cfg.io.data_folder + cfg.io.xlsx.tournaments_filename
     players_df = pd.read_excel(tournaments_xlsx, sheet_name=cfg.sheetname.players, header=0)
-    logger.info("> Reading%s\tfrom\t%s", cfg.sheetname.players, tournaments_xlsx)
+    logger.info("> Reading '%s' @ '%s'", cfg.sheetname.players, cfg.io.xlsx.tournaments_filename)
 
     players_df.rename(
         columns={
@@ -48,7 +48,9 @@ def load_initial_ranking_sheet() -> models.Rankings:
     initial_ranking_df = pd.read_excel(
         tournaments_xlsx, sheet_name=cfg.sheetname.initial_ranking, header=0
     )
-    logger.info("> Reading%s\tfrom\t%s", cfg.sheetname.initial_ranking, tournaments_xlsx)
+    logger.info(
+        "> Reading '%s' @ '%s'", cfg.sheetname.initial_ranking, cfg.io.xlsx.tournaments_filename
+    )
 
     columns_translations = {
         cfg.labels.tid: "tid",
@@ -80,7 +82,7 @@ def load_tournaments_sheets() -> models.Tournaments:
 
     to_concat = []
     for sheet_name in sheet_names:
-        logger.info("> Reading%s\tfrom\t%s", sheet_name, tournaments_xlsx)
+        logger.info("> Reading '%s' @ '%s'", sheet_name, cfg.io.xlsx.tournaments_filename)
         raw_tournament = raw_tournaments[sheet_name]
 
         tournament_df = raw_tournament.iloc[5:].copy()
@@ -201,7 +203,7 @@ def save_raw_ranking(rankings: models.Rankings, players: models.Players, tid: st
     """Add players name to raw ranking to be save into a spreadsheet."""
     cfg = ConfigManager().current_config
     xlsx_filename = cfg.io.data_folder + f"raw_ranking_{tid}.xlsx"
-    logger.info("<<<Saving raw ranking in\t%s", xlsx_filename)
+    logger.info("< Saving raw ranking @ '%s'", xlsx_filename)
 
     # Rankings sorted by rating
     this_ranking_df = rankings[tid].sort_values("rating", ascending=False)
@@ -213,7 +215,7 @@ def save_raw_ranking(rankings: models.Rankings, players: models.Players, tid: st
 
 def _get_writer(xlsx_filename: str, sheet_name: str) -> pd.ExcelWriter:
     writer_mode = _get_writer_mode(xlsx_filename)
-    logger.info("<<<Saving%s\tin\t%s", sheet_name, xlsx_filename)
+    logger.info("< Saving '%s' @ '%s'", sheet_name, xlsx_filename)
     if writer_mode == "a":
         writer = pd.ExcelWriter(
             xlsx_filename, engine="openpyxl", mode=writer_mode, if_sheet_exists="replace"

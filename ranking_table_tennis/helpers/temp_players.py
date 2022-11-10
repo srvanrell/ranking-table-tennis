@@ -53,11 +53,7 @@ def remove_temp_players_ranking() -> None:
     cfg = ConfigManager().current_config
     players_temp_file = os.path.join(cfg.io.data_folder, cfg.io.pickle.players_temp)
     ranking_temp_file = os.path.join(cfg.io.data_folder, cfg.io.pickle.ranking_temp)
-    logger.info(
-        "Removing temp files created to resume preprocessing %s %s",
-        players_temp_file,
-        ranking_temp_file,
-    )
+    logger.info(">< Removing temp resume files %s %s", players_temp_file, ranking_temp_file)
     if os.path.exists(players_temp_file):
         os.remove(players_temp_file)
     if os.path.exists(ranking_temp_file):

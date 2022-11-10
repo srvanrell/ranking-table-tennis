@@ -14,7 +14,7 @@ def publish_sheet_as_markdown(df, headers, sheet_name, tid, index=False):
     # Create folder to publish markdowns
     os.makedirs(f"{cfg.io.data_folder}{tid}", exist_ok=True)
     markdown_filename = f"{cfg.io.data_folder}{tid}/{sheet_name.replace(' ', '_')}.md"
-    logger.info("<<<Saving\t%s\tin\t%s", sheet_name, markdown_filename)
+    logger.info("< Saving '%s' @ '%s'", sheet_name, markdown_filename)
     df.to_markdown(
         markdown_filename, index=index, headers=headers, stralign="center", numalign="center"
     )

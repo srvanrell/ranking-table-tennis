@@ -19,7 +19,7 @@ def main(offline=True, last=True, tournament_num=None):
 
     tournament_num (int): enter the number of a valid tournament. if given, last is ommited
     """
-    logger.info("## Starting publish")
+    logger.info("Starting publish!")
 
     ConfigManager().set_current_config(date="220101")
     cfg = ConfigManager().current_config

@@ -14,7 +14,7 @@ def main():
     It will read players, tournaments in pickles.
     It will save players, tournaments and rankings in pickles.
     """
-    logger.info("## Starting to compute rankings")
+    logger.info("Starting to compute rankings!")
 
     ConfigManager().set_current_config(date="220101")
     cfg = ConfigManager().current_config
@@ -34,7 +34,7 @@ def main():
     tids = [initial_tid] + [tid for tid in tournaments]
 
     for tid in tournaments:
-        logger.info("== %s ==", tid)
+        logger.info("** Computing %s", tid)
 
         # Get the tid of the previous tournament
         prev_tid = tids[tids.index(tid) - 1]

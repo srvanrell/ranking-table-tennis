@@ -20,7 +20,7 @@ def main(offline=True):
 
     If offline=True it will execute preprocessing locally (not retrieving or uploading updates).
     """
-    logger.info("Starting preprocess")
+    logger.info("Starting preprocess!")
 
     ConfigManager().set_current_config(date="220101")
     cfg = ConfigManager().current_config
@@ -32,7 +32,7 @@ def main(offline=True):
             "\nDo you want to retrieve online sheet [Y/n]? (press Enter to continue)\n"
         )
         if retrieve.lower() != "n":
-            logger.info("Downloading and saving %s\n" % xlsx_file)
+            logger.info("Downloading and saving '%s'" % xlsx_file)
             request.urlretrieve(cfg.io.tournaments_gdrive, xlsx_file)
 
     # Loading all tournament data
@@ -52,7 +52,7 @@ def main(offline=True):
     players_temp, ranking_temp = helpers.load_temp_players_ranking()
 
     for tid in tournaments:
-        logger.info("== %s ==", tid)
+        logger.info("** Processing %s", tid)
 
         for name in tournaments.get_players_names(tid):
             unknown_player = False
@@ -66,7 +66,7 @@ def main(offline=True):
                     # Save a temp player to resume preprocessing, if necessary
                     players_temp.add_player(players[players.get_pid(name)])
                 else:
-                    logger.info(">>>>\tUNCOMPLETE preprocessing detected. Resuming...")
+                    logger.info("~~ UNCOMPLETE preprocessing detected. Resuming...")
                     players.add_player(players_temp[players_temp.get_pid(name)])
                 logger.info(f"\n{players[players.get_pid(name)]}\n")
 
