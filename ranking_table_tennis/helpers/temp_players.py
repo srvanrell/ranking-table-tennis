@@ -38,8 +38,8 @@ def save_temp_players_ranking(players_temp: models.Players, ranking_temp: models
     # Loading temp ranking and players. It shuould be deleted after a successful preprocessing
     players_temp_file = os.path.join(cfg.io.data_folder, cfg.io.pickle.players_temp)
     ranking_temp_file = os.path.join(cfg.io.data_folder, cfg.io.pickle.ranking_temp)
-    logger.info(
-        "<Saving\t\tTemps to resume preprocessing (if necessary) %s %s",
+    logger.debug(
+        "< Saving temp resume files: '%s' '%s'",
         ranking_temp_file,
         players_temp_file,
     )
@@ -53,7 +53,7 @@ def remove_temp_players_ranking() -> None:
     cfg = ConfigManager().current_config
     players_temp_file = os.path.join(cfg.io.data_folder, cfg.io.pickle.players_temp)
     ranking_temp_file = os.path.join(cfg.io.data_folder, cfg.io.pickle.ranking_temp)
-    logger.info(">< Removing temp resume files %s %s", players_temp_file, ranking_temp_file)
+    logger.debug(">< Removing temp resume files '%s' '%s'", players_temp_file, ranking_temp_file)
     if os.path.exists(players_temp_file):
         os.remove(players_temp_file)
     if os.path.exists(ranking_temp_file):
