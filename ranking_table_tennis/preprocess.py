@@ -28,9 +28,7 @@ def main(offline=True):
     xlsx_file = cfg.io.data_folder + cfg.io.xlsx.tournaments_filename
 
     if not offline:
-        retrieve = input(
-            "\nDo you want to retrieve online sheet [Y/n]? (press Enter to continue)\n"
-        )
+        retrieve = input("\nDo you want to retrieve online sheet [Y/n]? ")
         if retrieve.lower() != "n":
             logger.info("Downloading and saving '%s'" % xlsx_file)
             request.urlretrieve(cfg.io.tournaments_gdrive, xlsx_file)
@@ -87,7 +85,7 @@ def main(offline=True):
                     # Save a temp ranking of the player to resume preprocessing, if necessary
                     ranking_temp.add_entry(rankings[initial_tid, pid])
                 else:
-                    logger.info(">>>>\tUNCOMPLETE preprocessing detected. Resuming...")
+                    logger.info("~~ UNCOMPLETE preprocessing detected. Resuming...")
                     rankings.add_entry(ranking_temp[initial_tid, pid])
 
                 logger.info(
@@ -109,7 +107,7 @@ def main(offline=True):
     # Update the online version
     upload = False
     if not offline:
-        answer = input("\nDo you want to update online sheets [Y/n]? (press Enter to continue)\n")
+        answer = input("\nDo you want to update online sheets [Y/n]? ")
         upload = answer.lower() != "n"
 
     # Saving complete list of players, including new ones

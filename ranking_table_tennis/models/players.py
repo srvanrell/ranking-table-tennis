@@ -1,7 +1,10 @@
+import logging
 from typing import List
 
 import pandas as pd
 from unidecode import unidecode
+
+logger = logging.getLogger(__name__)
 
 
 class Players:
@@ -29,8 +32,7 @@ class Players:
     def verify_and_normalize(self) -> None:
         duplicated = self.players_df.index.duplicated(keep=False)
         if duplicated.any():
-            print("Players entries duplicated")
-            print(self.players_df[duplicated])
+            logger.error("Players entries duplicated:\n%s", self.players_df[duplicated])
 
         self.players_df.fillna("", inplace=True)
 
@@ -47,7 +49,7 @@ class Players:
         uname = unidecode(name).title()
         pid = self.players_df[self.players_df.name == uname].first_valid_index()
         if pid is None:
-            print("WARNING: Unknown player:", uname)
+            logger.warn("WARNING: Unknown player: %s", uname)
 
         return pid
 

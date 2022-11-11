@@ -44,7 +44,7 @@ def main(offline=True, last=True, tournament_num=None):
         for tenum, tid in enumerate(tids[1:], 1):
             print(f"{tenum:d}\t->\t{tid}")
 
-        t_num = int(input("Enter the tournament number to publish (look above):\n"))
+        t_num = int(input("Enter the tournament number to publish: "))
         tid = tids[t_num]
     # An explicit tournament num will overwrite other options
     if tournament_num:
@@ -55,9 +55,7 @@ def main(offline=True, last=True, tournament_num=None):
 
     upload = False
     if not offline:
-        answer = input(
-            "\nDo you want to publish to backend online sheets [Y/n]? (press Enter to continue)\n"
-        )
+        answer = input("\nDo you want to publish to backend online sheets [Y/n]? ")
         upload = answer.lower() != "n"
 
     # Update config
@@ -95,7 +93,7 @@ def main(offline=True, last=True, tournament_num=None):
     helpers.publish_statistics_sheet(tournaments, rankings, players, tid, prev_tid, upload=upload)
 
     if not offline:
-        answer = input("\nDo you want to publish to the web [Y/n]? (press Enter to continue)\n")
+        answer = input("\nDo you want to publish to the web [Y/n]? ")
         show_on_web = (answer.lower() != "n") and (tid != tids[1])
 
         helpers.publish_to_web(tid, show_on_web)

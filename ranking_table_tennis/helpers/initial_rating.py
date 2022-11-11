@@ -1,7 +1,11 @@
+import logging
+
 import pandas as pd
 
 from ranking_table_tennis import helpers, models
 from ranking_table_tennis.configs import ConfigManager
+
+logger = logging.getLogger(__name__)
 
 
 def print_rating_context(
@@ -11,8 +15,8 @@ def print_rating_context(
     tid: str,
 ) -> None:
     # Helper to assign an initial rating to name
-    print("> Information that should help you assign rating")
-    print("\n> Matches")
+    print("# Information that should help you assign rating")
+    print("\n# Matches")
 
     cfg = ConfigManager().current_config
 
@@ -30,11 +34,11 @@ def print_rating_context(
             .dropna()
             .unique()
         )
-        print("\n> Known ratings")
+        print("\n# Known ratings")
         for pid in pids_selected:
             print(
-                f"> {tids[-2]}, {players[pid]['name']}, "
+                f"# {tids[-2]}, {players[pid]['name']}, "
                 f"rating: {known_rankings.get_entries(tids[-2], pid).get('rating')}"
             )
     except FileNotFoundError:
-        print("> Sorry, not available data to help you\n")
+        logger.warn("Sorry, previous rankings not available to help you")
