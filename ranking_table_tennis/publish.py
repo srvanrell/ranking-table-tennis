@@ -1,5 +1,9 @@
+import logging
+
 from ranking_table_tennis import helpers
 from ranking_table_tennis.configs import ConfigManager
+
+logger = logging.getLogger(__name__)
 
 
 def main(offline=True, last=True, tournament_num=None):
@@ -15,7 +19,7 @@ def main(offline=True, last=True, tournament_num=None):
 
     tournament_num (int): enter the number of a valid tournament. if given, last is ommited
     """
-    print("\n## Starting publish\n")
+    logger.info("Starting publish!")
 
     ConfigManager().set_current_config(date="220101")
     cfg = ConfigManager().current_config
@@ -40,7 +44,7 @@ def main(offline=True, last=True, tournament_num=None):
         for tenum, tid in enumerate(tids[1:], 1):
             print(f"{tenum:d}\t->\t{tid}")
 
-        t_num = int(input("Enter the tournament number to publish (look above):\n"))
+        t_num = int(input("Enter the tournament number to publish: "))
         tid = tids[t_num]
     # An explicit tournament num will overwrite other options
     if tournament_num:
@@ -51,10 +55,12 @@ def main(offline=True, last=True, tournament_num=None):
 
     upload = False
     if not offline:
-        answer = input(
-            "\nDo you want to publish to backend online sheets [Y/n]? (press Enter to continue)\n"
-        )
+        answer = input("\nDo you want to publish to backend online sheets [Y/n]? ")
         upload = answer.lower() != "n"
+
+    # Update config
+    tournament_date = tournaments[tid].iloc[0].date.strftime("%y%m%d")
+    ConfigManager().set_current_config(date=tournament_date)
 
     # Publish formated rating of selected tournament
     helpers.publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=upload)
@@ -87,7 +93,7 @@ def main(offline=True, last=True, tournament_num=None):
     helpers.publish_statistics_sheet(tournaments, rankings, players, tid, prev_tid, upload=upload)
 
     if not offline:
-        answer = input("\nDo you want to publish to the web [Y/n]? (press Enter to continue)\n")
+        answer = input("\nDo you want to publish to the web [Y/n]? ")
         show_on_web = (answer.lower() != "n") and (tid != tids[1])
 
         helpers.publish_to_web(tid, show_on_web)

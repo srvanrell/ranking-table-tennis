@@ -1,6 +1,9 @@
 import argparse
+import logging
 import os
 import textwrap
+
+from ranking_table_tennis.helpers.logging import logger
 
 
 def main():
@@ -21,6 +24,12 @@ def main():
         choices=["preprocess", "compute", "publish"],
     )
     parser.add_argument(
+        "--log",
+        help="Define the level of logging from string.",
+        choices=["debug", "info", "warning", "error", "critical"],
+        default="info",
+    )
+    parser.add_argument(
         "--offline",
         help="Execute the given command locally. Compute is always offline.",
         action="store_true",
@@ -39,7 +48,13 @@ def main():
     )
     args = parser.parse_args()
 
-    print(f"Working directory: {os.path.abspath(os.path.curdir)}")
+    # assuming loglevel is bound to the string value obtained from the
+    # command line argument. Convert to upper case to allow the user to
+    # specify --log=DEBUG or --log=debug
+    numeric_log_level = getattr(logging, args.log.upper())
+    logger.setLevel(numeric_log_level)
+
+    logger.debug("~ Working directory: '%s'", os.path.abspath(os.path.curdir))
 
     # FIXME calls are not performed in the best way.
     if args.cmd == "preprocess":
@@ -55,7 +70,7 @@ def main():
 
         publish.main(args.offline, args.last, args.tournament_num)
     else:
-        print("you shouldn't see this message")
+        logger.error("you shouldn't see this message")
 
 
 if __name__ == "__main__":

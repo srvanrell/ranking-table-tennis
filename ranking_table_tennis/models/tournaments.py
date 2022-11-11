@@ -1,3 +1,4 @@
+import logging
 from typing import Iterator, List
 
 import pandas as pd
@@ -6,6 +7,8 @@ from unidecode import unidecode
 
 from ranking_table_tennis.configs import ConfigManager
 from ranking_table_tennis.models import Players
+
+logger = logging.getLogger(__name__)
 
 
 class Tournaments:
@@ -84,7 +87,7 @@ class Tournaments:
             match_row["winner"] = match_row["player_b"]
             match_row["loser"] = match_row["player_a"]
         else:
-            print("Failed to process matches, a tie was found at:\n", match_row)
+            logger.error("Failed to process matches, a tie was found at:\n%s", match_row)
             raise ImportError
 
         # changing labels of finals round match

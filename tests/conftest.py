@@ -1,10 +1,13 @@
 import glob
+import logging
 import os
 import shutil
 
 import pandas as pd
 import pytest
 from pandas.testing import assert_frame_equal
+
+logger = logging.getLogger(__name__)
 
 
 def pytest_sessionstart(session):
@@ -14,9 +17,9 @@ def pytest_sessionstart(session):
     """
     data_rtt_folder = os.path.join(os.path.dirname(__file__), "data_rtt")
 
-    print("\n## Before starting tests\n")
+    logger.debug("## Before starting tests...")
     if os.path.exists(data_rtt_folder):
-        print(f"\nRemoving data folder before tests: remove {data_rtt_folder}")
+        logger.debug("Removing data folder before tests: remove %", data_rtt_folder)
         shutil.rmtree(data_rtt_folder)
 
 
@@ -27,9 +30,9 @@ def pytest_sessionfinish(session, exitstatus):
     """
     data_rtt_folder = os.path.join(os.path.dirname(__file__), "data_rtt")
 
-    print("\n## After tests have finalized\n")
+    logger.debug("## After tests have finalized...")
     if os.path.exists(data_rtt_folder):
-        print(f"\nRemoving data folder after test: remove {data_rtt_folder}")
+        logger.debug("Removing data folder after test: remove %s", data_rtt_folder)
         shutil.rmtree(data_rtt_folder)
 
 
@@ -45,7 +48,7 @@ def assert_equals_xlsx(reference_folder, output_folder, name_pattern):
         assert sorted(dfs_expected.keys()) == sorted(dfs_output.keys()), "Sheetname differences"
 
         for name, df in dfs_expected.items():
-            print(fn, name)
+            logger.info("Verifying: %s : %s", fn, name)
             assert_frame_equal(df, dfs_output[name])
 
 

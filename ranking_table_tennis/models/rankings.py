@@ -1,3 +1,4 @@
+import logging
 from typing import List, Tuple
 
 import pandas as pd
@@ -5,6 +6,8 @@ from omegaconf import OmegaConf
 
 from ranking_table_tennis.configs import ConfigManager
 from ranking_table_tennis.models.tournaments import Tournaments
+
+logger = logging.getLogger(__name__)
 
 
 class Rankings:
@@ -108,8 +111,7 @@ class Rankings:
     def verify_and_normalize(self) -> None:
         duplicated = self.ranking_df.duplicated(["tid", "pid"], keep=False)
         if duplicated.any():
-            print("Ranking entries duplicated")
-            print(self.ranking_df[duplicated])
+            logger.error("Ranking entries duplicated:\n%s", self.ranking_df[duplicated])
 
         default_rating = -1000
         default_active = False
@@ -472,14 +474,16 @@ class Rankings:
         tournament_df = tournaments[tid]
         for match_index, match in tournament_df[tournament_df.promote].iterrows():
             self[tid, match.winner_pid, "category"] = match.category
-            print(match.winner, "promoted to", match.category)
+            logger.debug("%s promoted to %s", match.winner, match.category)
 
     def apply_sanction(self, tid: str, tournaments: "Tournaments") -> None:
         tournament_df = tournaments[tid]
         for match_index, match in tournament_df[tournament_df.sanction].iterrows():
             for cat_col in self.points_cat_columns():
                 self[tid, match.loser_pid, cat_col] *= self.cfg.compute.sanction_factor
-            print("Apply sanction factor", self.cfg.compute.sanction_factor, "on:", match.winner)
+            logger.debug(
+                "Apply sanction factor %s on: %s", self.cfg.compute.sanction_factor, match.winner
+            )
 
     def get_rating_details(self, tid: str) -> pd.DataFrame:
         return self.rating_details_df.loc[self.rating_details_df.tid == tid].copy()
