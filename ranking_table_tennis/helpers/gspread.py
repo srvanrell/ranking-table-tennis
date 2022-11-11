@@ -1,3 +1,4 @@
+import logging
 from typing import List
 
 import gspread
@@ -5,6 +6,8 @@ import pandas as pd
 from gspread_dataframe import set_with_dataframe
 
 from ranking_table_tennis.configs import ConfigManager
+
+logger = logging.getLogger(__name__)
 
 
 def upload_sheet_from_df(
@@ -25,7 +28,7 @@ def upload_sheet_from_df(
     :param headers: This list will replace df column names and must have the same length.
     If headers are given, include_df_headers is turn to True.
     """
-    print("<<<Saving", sheet_name, "in", spreadsheet_id, sep="\t")
+    logger.info("< Saving '%s' @ '%s'", sheet_name, spreadsheet_id)
     try:
         worksheet = _get_ws_from_spreadsheet(sheet_name, spreadsheet_id)
 
@@ -44,7 +47,7 @@ def upload_sheet_from_df(
         )
 
     except ConnectionError:
-        print("<<<FAILED to upload", sheet_name, "in", spreadsheet_id, sep="\t")
+        logger.warn("!! FAILED to upload '%s' @ '%s'", sheet_name, spreadsheet_id)
 
 
 def load_and_upload_sheet(filename: str, sheet_name: str, spreadsheet_id: str) -> None:
@@ -82,12 +85,14 @@ def create_n_tour_sheet(spreadsheet_id: str, tid: str) -> None:
             dup_ws = wb.duplicate_sheet(ws.id, new_sheet_name=new_sheetname)
             dup_cell_value = dup_ws.acell("A1", value_render_option="FORMULA").value
             dup_ws.update_acell("A1", dup_cell_value.replace(first_key, replacement_key))
-            print("<<<Creating", new_sheetname, "from", sheetname, "in", spreadsheet_id, sep="\t")
+            logger.info(
+                "> Creating '%s' @ '%s' from '%s'", new_sheetname, spreadsheet_id, sheetname
+            )
         else:
-            print("FAILED TO DUPLICATE", first_key, "do not exist in", spreadsheet_id, sep="\t")
+            logger.warn("!! FAIL TO DUPLICATE '%s' do not exist @ '%s'", first_key, spreadsheet_id)
 
     except ConnectionError:
-        print("<<<Connection Error. FAILED TO DUPLICATE", first_key, "in", spreadsheet_id, sep="\t")
+        logger.warn("!! Connection Error. FAIL TO DUPLICATE '%s' @ '%s'", first_key, spreadsheet_id)
 
 
 def publish_to_web(tid: str, show_on_web=False) -> None:
@@ -121,10 +126,10 @@ def _get_gc() -> gspread.Client:
         else:
             gc = gspread.oauth()
     except FileNotFoundError:
-        print("The .json key file has not been configured. Upload will fail.")
+        logger.warn("!! The .json key file has not been configured. Upload will fail.")
         raise ConnectionError
     # except OSError:
-    #     print("Connection failure. Upload will fail.")
+    #     logger.warn("!!Connection failure. Upload will fail.")
 
     return gc
 
