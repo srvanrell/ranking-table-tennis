@@ -66,6 +66,8 @@ without needing to re-install):
 
     pip3 install --user --editable .
 
+    sudo apt install graphviz
+
 Update version at `setup.py` and then create a source distribution
 
     python3 setup.py sdist bdist_wheel

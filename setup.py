@@ -41,6 +41,7 @@ setup(
             "pytest-shell-utilities==1.5.*",
             "tox==3.*",
             "pyclean==2.2.*",
+            "pytest_profiling==1.7.*",
         ]
     },
     classifiers=[
