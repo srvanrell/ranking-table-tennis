@@ -103,6 +103,51 @@ class Tournaments:
 
         return match_row
 
+    def _batch_process_match(self, matches: pd.DataFrame) -> pd.DataFrame:
+        # workaround to add extra bonus points from match list
+        matches["winner"] = matches["player_b"]
+        matches["loser"] = matches["player_b"]
+        # Promotions
+        matches["promote"] = (matches["sets_a"] >= 10) & (matches["sets_b"] >= 10)
+        # Sanctions
+        matches["sanction"] = (matches["sets_a"] <= -10) & (matches["sets_b"] <= -10)
+        # Bonus points
+        matches["bonus"] = (
+            (matches["sets_a"] < 0) & (matches["sets_b"] < 0) & (~matches["sanction"])
+        )
+
+        # Real matches
+        real_matches = ~(matches["bonus"] | matches["sanction"] | matches["promote"])
+        # Win player A
+        win_a = (matches["sets_a"] > matches["sets_b"]) & real_matches
+        matches.loc[win_a, "winner"] = matches.loc[win_a, "player_a"]
+        matches.loc[win_a, "loser"] = matches.loc[win_a, "player_b"]
+        # Win player B
+        win_b = (matches["sets_a"] < matches["sets_b"]) & real_matches
+        matches.loc[win_b, "winner"] = matches.loc[win_b, "player_b"]
+        matches.loc[win_b, "loser"] = matches.loc[win_b, "player_a"]
+        # Unexpected ties
+        tied_matches = (matches["sets_a"] == matches["sets_b"]) & real_matches
+        if tied_matches.any():
+            logger.error(
+                "Failed to process matches, ties were found at:\n%s", matches.loc[tied_matches]
+            )
+            raise ImportError
+
+        # Do not change other rounds
+        matches["winner_round"] = matches["round"]
+        matches["loser_round"] = matches["round"]
+        # Modify labels of finals round match
+        final_matches = matches["round"] == self.cfg.roundnames.final
+        matches.loc[final_matches, "winner_round"] = self.cfg.roundnames.champion
+        matches.loc[final_matches, "loser_round"] = self.cfg.roundnames.second
+        # Modify labels of third_place_playoff round match
+        third_place_matches = matches["round"] == self.cfg.roundnames.third_place_playoff
+        matches.loc[third_place_matches, "winner_round"] = self.cfg.roundnames.third
+        matches.loc[third_place_matches, "loser_round"] = self.cfg.roundnames.fourth
+
+        return matches
+
     def _assign_tid(self) -> None:
         def tid_str(grp):
             dates_ordered = sorted(grp["date"].unique())
@@ -128,10 +173,10 @@ class Tournaments:
 
         self.tournaments_df = self.tournaments_df.astype(
             {
-                "round": "category",
+                # "round": "category",
                 "category": "category",
-                "location": "category",
-                "tournament_name": "category",
+                # "location": "category",
+                # "tournament_name": "category",
             }
         )
 
@@ -140,7 +185,8 @@ class Tournaments:
             lambda row: row["date"].year, axis="columns"
         )
         self._assign_tid()
-        self.tournaments_df = self.tournaments_df.apply(self._process_match, axis="columns")
+        # self.tournaments_df = self.tournaments_df.apply(self._process_match, axis="columns")
+        self.tournaments_df = self.tournaments_df.pipe(self._batch_process_match)
 
     def get_players_names(self, tid: str, category: str = "") -> List[str]:
         """
