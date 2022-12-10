@@ -1,6 +1,9 @@
 config/key-for-gspread.json
 config/gspreadids.yaml
 
+# Tests profile
+tests/prof/*
+
 # Data folder
 data/
 old_data/
