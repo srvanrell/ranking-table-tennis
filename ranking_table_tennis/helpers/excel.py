@@ -65,8 +65,8 @@ def load_initial_ranking_sheet() -> models.Rankings:
     }
 
     initial_ranking_df.rename(columns=columns_translations, inplace=True)
-    initial_ranking_df.loc[:, "active"] = initial_ranking_df.loc[:, "active"].apply(
-        lambda x: x == cfg.activeplayer[True]
+    initial_ranking_df.loc[:, "active"] = (
+        initial_ranking_df.loc[:, "active"] == cfg.activeplayer[True]
     )
     initial_ranking = models.Rankings(initial_ranking_df)
 
