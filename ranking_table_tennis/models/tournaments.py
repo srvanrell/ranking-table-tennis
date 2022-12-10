@@ -133,11 +133,9 @@ class Tournaments:
                 round=lambda df: df["round"].str.strip().str.lower(),
                 category=lambda df: df.category.str.strip().str.lower(),
                 # Columns to title
-                tournament_name=lambda df: df.tournament_name.apply(unidecode)
-                .str.strip()
-                .str.title(),
+                tournament_name=lambda df: df.tournament_name.str.strip().str.title(),
                 date=lambda df: pd.to_datetime(df.date.str.strip().str.title()),
-                location=lambda df: df.location.apply(unidecode).str.strip().str.title(),
+                location=lambda df: df.location.str.strip().str.title(),
                 player_a=lambda df: df.player_a.apply(unidecode).str.strip().str.title(),
                 player_b=lambda df: df.player_b.apply(unidecode).str.strip().str.title(),
                 year=lambda df: df.date.dt.year,

@@ -3,6 +3,7 @@ import os
 from typing import List
 
 import pandas as pd
+from unidecode import unidecode
 
 from ranking_table_tennis import models
 from ranking_table_tennis.configs import ConfigManager
@@ -85,8 +86,7 @@ def load_tournaments_sheets() -> models.Tournaments:
         logger.debug("> Reading '%s' @ '%s'", sheet_name, cfg.io.xlsx.tournaments_filename)
         raw_tournament = raw_tournaments[sheet_name]
 
-        tournament_df = raw_tournament.iloc[5:].copy()
-        tournament_df.rename(
+        tournament_df = raw_tournament.iloc[5:].rename(
             columns={
                 0: "player_a",
                 1: "player_b",
@@ -94,12 +94,11 @@ def load_tournaments_sheets() -> models.Tournaments:
                 3: "sets_b",
                 4: "round",
                 5: "category",
-            },
-            inplace=True,
+            }
         )
-        tournament_df.insert(0, "location", raw_tournament.iat[2, 1])
-        tournament_df.insert(0, "date", raw_tournament.iat[1, 1])
-        tournament_df.insert(0, "tournament_name", raw_tournament.iat[0, 1])
+        tournament_df.insert(0, "location", unidecode(raw_tournament.iat[2, 1]))
+        tournament_df.insert(0, "date", unidecode(raw_tournament.iat[1, 1]))
+        tournament_df.insert(0, "tournament_name", unidecode(raw_tournament.iat[0, 1]))
         tournament_df.insert(0, "sheet_name", sheet_name)
 
         to_concat.append(tournament_df)
@@ -149,15 +148,12 @@ def save_ranking_sheet(
         sheet_name = tournaments[tid].iloc[0].sheet_name
         sheet_name = sheet_name.replace(cfg.sheetname.tournaments_key, cfg.sheetname.rankings_key)
 
-    sorted_rankings_df = rankings.ranking_df.sort_values("rating", ascending=False)
-    sorted_rankings_df.loc[:, "active"] = sorted_rankings_df.loc[:, "active"].apply(
-        lambda x: cfg.activeplayer[x]
+    sorted_rankings_df = rankings.ranking_df.sort_values("rating", ascending=False).assign(
+        active=lambda df: df["active"].map(cfg.activeplayer),
+        date=lambda df: df["date"].dt.strftime("%Y %m %d"),
     )
     sorted_rankings_df.insert(
-        2, "name", sorted_rankings_df.loc[:, "pid"].apply(lambda pid: players[pid]["name"])
-    )
-    sorted_rankings_df.loc[:, "date"] = sorted_rankings_df.loc[:, "date"].apply(
-        lambda d: d.strftime("%Y %m %d")
+        2, "name", sorted_rankings_df.loc[:, "pid"].map(players.pid2name_mapper)
     )
 
     with _get_writer(xlsx_filename, sheet_name) as writer:

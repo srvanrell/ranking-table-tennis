@@ -60,6 +60,11 @@ class Players:
 
         return name2pid.loc[:, "pid"]
 
+    @property
+    def pid2name_mapper(self) -> pd.Series:
+        """Map a pid to corresponding name"""
+        return self.players_df["name"]
+
     def add_player(self, player: pd.Series) -> None:
         self.players_df = self.players_df.append(player)
         self.verify_and_normalize()
