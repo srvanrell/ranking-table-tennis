@@ -37,17 +37,18 @@ class Tournaments:
                 "round",
                 "category",
             ],
+        ).assign(
+            winner=None,
+            winner_round=None,
+            loser=None,
+            loser_round=None,
+            promote=False,
+            sanction=False,
+            bonus=False,
+            winner_pid=None,
+            loser_pid=None,
         )
         self.tournaments_df.insert(4, "year", None)
-        self.tournaments_df.insert(len(self.tournaments_df.columns), "winner", None)
-        self.tournaments_df.insert(len(self.tournaments_df.columns), "winner_round", None)
-        self.tournaments_df.insert(len(self.tournaments_df.columns), "loser", None)
-        self.tournaments_df.insert(len(self.tournaments_df.columns), "loser_round", None)
-        self.tournaments_df.insert(len(self.tournaments_df.columns), "promote", False)
-        self.tournaments_df.insert(len(self.tournaments_df.columns), "sanction", False)
-        self.tournaments_df.insert(len(self.tournaments_df.columns), "bonus", False)
-        self.tournaments_df.insert(len(self.tournaments_df.columns), "winner_pid", None)
-        self.tournaments_df.insert(len(self.tournaments_df.columns), "loser_pid", None)
 
         self.update_config()
 
@@ -70,7 +71,7 @@ class Tournaments:
     def update_config(self):
         self.cfg = ConfigManager().current_config
 
-    def _batch_process_match(self, matches: pd.DataFrame) -> pd.DataFrame:
+    def _batch_process_matches(self, matches: pd.DataFrame) -> pd.DataFrame:
         # workaround to add extra bonus points from match list
         matches["winner"] = matches["player_b"]
         matches["loser"] = matches["player_b"]
@@ -115,42 +116,45 @@ class Tournaments:
 
         return matches
 
-    def _assign_tid(self) -> None:
-        def tid_str(grp):
-            dates_ordered = sorted(grp["date"].unique())
-            numbered = {pd.Timestamp(date): num for num, date in enumerate(dates_ordered, 1)}
-            tids = grp["date"].transform(lambda row: "S%sT%02d" % (row.year, numbered[row]))
+    @staticmethod
+    def tid_str(year_grp):
+        tids = year_grp["date"].dt.strftime("S%Y").rename("tid")
+        dates_ordered = sorted(year_grp["date"].unique())
+        for num, date in enumerate(dates_ordered, 1):
+            filtered_rows = year_grp["date"] == date
+            tids.loc[filtered_rows] += "T%02d" % num
 
-            return tids
-
-        # TODO verify, groupby gives an unexpected result and need to be transposed
-        tid = self.tournaments_df.groupby("year", as_index=False, group_keys=False).apply(tid_str)
-        self.tournaments_df["tid"] = tid.transpose()
+        return tids
 
     def verify_and_normalize(self) -> None:
-        self.tournaments_df = self.tournaments_df.assign(
-            # Columns to lower
-            round=lambda df: df["round"].str.strip().str.lower(),
-            category=lambda df: df.category.str.strip().str.lower(),
-            # Columns to title
-            tournament_name=lambda df: df.tournament_name.apply(unidecode).str.strip().str.title(),
-            date=lambda df: pd.to_datetime(df.date.str.strip().str.title()),
-            location=lambda df: df.location.apply(unidecode).str.strip().str.title(),
-            player_a=lambda df: df.player_a.apply(unidecode).str.strip().str.title(),
-            player_b=lambda df: df.player_b.apply(unidecode).str.strip().str.title(),
-            year=lambda df: df.date.dt.year,
-        ).astype(
-            {
-                "sets_a": int,
-                "sets_b": int
-                # "round": "category",
-                # "category": "category",
-                # "location": "category",
-                # "tournament_name": "category",
-            }
+        self.tournaments_df = (
+            self.tournaments_df.assign(
+                # Columns to lower
+                round=lambda df: df["round"].str.strip().str.lower(),
+                category=lambda df: df.category.str.strip().str.lower(),
+                # Columns to title
+                tournament_name=lambda df: df.tournament_name.apply(unidecode)
+                .str.strip()
+                .str.title(),
+                date=lambda df: pd.to_datetime(df.date.str.strip().str.title()),
+                location=lambda df: df.location.apply(unidecode).str.strip().str.title(),
+                player_a=lambda df: df.player_a.apply(unidecode).str.strip().str.title(),
+                player_b=lambda df: df.player_b.apply(unidecode).str.strip().str.title(),
+                year=lambda df: df.date.dt.year,
+                tid=lambda df: self.tid_str(df),
+            )
+            .astype(
+                {
+                    "sets_a": int,
+                    "sets_b": int
+                    # "round": "category",
+                    # "category": "category",
+                    # "location": "category",
+                    # "tournament_name": "category",
+                }
+            )
+            .pipe(self._batch_process_matches)
         )
-        self._assign_tid()
-        self.tournaments_df = self.tournaments_df.pipe(self._batch_process_match)
 
     def get_players_names(self, tid: str, category: str = "") -> List[str]:
         """
