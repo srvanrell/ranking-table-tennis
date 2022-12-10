@@ -231,12 +231,8 @@ class Tournaments:
 
     def assign_pid_from_players(self, players: Players) -> None:
         name2pid = players.get_name2pid()
-        self.tournaments_df["winner_pid"] = self.tournaments_df["winner"].apply(
-            lambda name: name2pid.get(name)
-        )
-        self.tournaments_df["loser_pid"] = self.tournaments_df["loser"].apply(
-            lambda name: name2pid.get(name)
-        )
+        self.tournaments_df["winner_pid"] = self.tournaments_df["winner"].map(name2pid)
+        self.tournaments_df["loser_pid"] = self.tournaments_df["loser"].map(name2pid)
 
     def get_matches(
         self, tid: str, exclude_fan_category: bool = True, to_exclude: List[str] = None
