@@ -23,18 +23,18 @@ def test_preprocess_xlsx_output():
     )
 
 
-def test_preprocess_outputs_players_and_histories(players_df):
+def test_preprocess_outputs_players_and_histories(ref_players_df):
     cfg = ConfigManager().current_config
     # Load output from preprocess
     players_output = helpers.load_from_pickle(cfg.io.pickle.players)
 
-    assert_frame_equal(players_output.players_df, players_df)
+    assert_frame_equal(players_output.players_df, ref_players_df)
     assert players_output.history_df.empty
 
 
-def test_preprocess_outputs_tournaments(tournaments_df):
+def test_preprocess_outputs_tournaments(ref_tournaments_df):
     cfg = ConfigManager().current_config
     # Load output from preprocess
     tournaments_output = helpers.load_from_pickle(cfg.io.pickle.tournaments)
 
-    assert_frame_equal(tournaments_output.tournaments_df, tournaments_df)
+    assert_frame_equal(tournaments_output.tournaments_df, ref_tournaments_df)

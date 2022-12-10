@@ -84,30 +84,30 @@ def load_expected_output(csv_filename, parse_dates=False):
 
 
 @pytest.fixture(scope="session")
-def tournaments_df():
+def ref_tournaments_df():
     return load_expected_output("tournaments_df.csv", parse_dates=True)
 
 
 @pytest.fixture(scope="session")
-def players_df():
+def ref_players_df():
     return load_expected_output("players_df.csv")
 
 
 @pytest.fixture(scope="session")
-def history_df():
+def ref_history_df():
     return load_expected_output("history_df.csv")
 
 
 @pytest.fixture(scope="session")
-def rating_details_df():
+def ref_rating_details_df():
     return load_expected_output("rating_details_df.csv", parse_dates=True)
 
 
 @pytest.fixture(scope="session")
-def ranking_df():
+def ref_ranking_df():
     return load_expected_output("ranking_df.csv", parse_dates=True)
 
 
 @pytest.fixture(scope="session")
-def championship_details_df():
+def ref_championship_details_df():
     return load_expected_output("championship_details_df.csv")
