@@ -34,6 +34,12 @@ def main():
         help="Execute the given command locally. Compute is always offline.",
         action="store_true",
     )
+    parser.add_argument(
+        "--config-initial-date",
+        help="Set the initial date to get the right configs and setup.",
+        choices=["220101"],
+        default="220101",
+    )
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
         "--last",
@@ -60,15 +66,15 @@ def main():
     if args.cmd == "preprocess":
         from ranking_table_tennis import preprocess
 
-        preprocess.main(args.offline)
+        preprocess.main(args.offline, args.config_initial_date)
     elif args.cmd == "compute":
         from ranking_table_tennis import compute_rankings
 
-        compute_rankings.main()
+        compute_rankings.main(args.config_initial_date)
     elif args.cmd == "publish":
         from ranking_table_tennis import publish
 
-        publish.main(args.offline, args.last, args.tournament_num)
+        publish.main(args.offline, args.last, args.tournament_num, args.config_initial_date)
     else:
         logger.error("you shouldn't see this message")
 

@@ -6,7 +6,7 @@ from ranking_table_tennis.configs import ConfigManager
 logger = logging.getLogger(__name__)
 
 
-def main(offline=True, last=True, tournament_num=None):
+def main(offline=True, last=True, tournament_num=None, config_initial_date="220101"):
     """Publish the results to anew spreadsheet and upload it.
 
     Function to run after compute_rankings.main().
@@ -21,7 +21,7 @@ def main(offline=True, last=True, tournament_num=None):
     """
     logger.info("Starting publish!")
 
-    ConfigManager().set_current_config(date="220101")
+    ConfigManager().set_current_config(date=config_initial_date)
     cfg = ConfigManager().current_config
 
     # Loading all tournament data

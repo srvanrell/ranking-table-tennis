@@ -7,7 +7,7 @@ from ranking_table_tennis.configs import ConfigManager
 logger = logging.getLogger(__name__)
 
 
-def main(offline=True):
+def main(offline=True, config_initial_date="220101"):
     """Preprocess matches on xlsx tournaments database.
 
     Function to run before compute_rankings.main().
@@ -22,7 +22,7 @@ def main(offline=True):
     """
     logger.info("Starting preprocess!")
 
-    ConfigManager().set_current_config(date="220101")
+    ConfigManager().set_current_config(date=config_initial_date)
     cfg = ConfigManager().current_config
 
     xlsx_file = cfg.io.data_folder + cfg.io.xlsx.tournaments_filename
