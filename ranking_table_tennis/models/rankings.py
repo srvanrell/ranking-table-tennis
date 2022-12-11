@@ -151,13 +151,18 @@ class Rankings:
         new_ranking.loc[:, self.cum_tids_cat_columns()] = ""
         self.ranking_df = pd.concat([self.ranking_df, new_ranking], ignore_index=True)
 
-    def _rating_to_category(self, rating: float) -> str:
-        thresholds = self.cfg.compute.categories_thresholds
-        category = self.cfg.categories[-2]  # Last category that it's not fan
-        for j, th in enumerate(thresholds):
-            if rating >= th:
-                category = self.cfg.categories[j]
-                break
+    def _batch_rating_to_category(self, rating: pd.Series) -> pd.Series:
+        # Order reversed to assign first category as last option
+        category_names = reversed(
+            self.cfg.categories[:-2]
+        )  # Last and fan categories are not required
+        thresholds = reversed(self.cfg.compute.categories_thresholds)
+        # Default to last category that it's not fan
+        category = pd.Series(self.cfg.categories[-2], index=rating.index, name="category")
+        for cat, th in zip(category_names, thresholds):
+            greater_rating = rating >= th
+            category.loc[greater_rating] = cat
+
         return category
 
     def update_categories(self, tid) -> None:
@@ -172,9 +177,9 @@ class Rankings:
         """
         # FIXME it is not working for players of the fan category
         tid_entries = self.ranking_df.tid == tid
-        self.ranking_df.loc[tid_entries, "category"] = self.ranking_df.loc[
-            tid_entries, "rating"
-        ].apply(self._rating_to_category)
+        self.ranking_df.loc[tid_entries, "category"] = self._batch_rating_to_category(
+            self.ranking_df.loc[tid_entries, "rating"]
+        )
 
     def _points_to_assign(self, rating_winner: float, rating_loser: float) -> Tuple[float, float]:
         """Points to add to winner and to deduce from loser given ratings of winner and loser."""
@@ -382,7 +387,7 @@ class Rankings:
                 n_best[points_cat_col].astype(int).astype(str) + " (" + n_best["tid"] + ") + "
             )
             selected_tids_cat_values = (
-                n_best.groupby("pid")[cum_tids_cat_col].sum().apply(lambda x: x[:-3])
+                n_best.groupby("pid")[cum_tids_cat_col].sum().str.slice(stop=-3)
             )
             rows_reordered = self.merge_preserve_left_index(
                 self.ranking_df.loc[tid_indexes, "pid"],
