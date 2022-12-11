@@ -37,7 +37,7 @@ def main():
     parser.add_argument(
         "--config-initial-date",
         help="Set the initial date to get the right configs and setup.",
-        choices=["220101"],
+        choices=["220101", "210101"],
         default="220101",
     )
     group = parser.add_mutually_exclusive_group()
