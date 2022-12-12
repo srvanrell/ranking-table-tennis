@@ -6,7 +6,7 @@ from ranking_table_tennis.configs import ConfigManager
 logger = logging.getLogger(__name__)
 
 
-def main():
+def main(config_initial_date="220101"):
     """Compute rating and championship points of loaded tournaments.
 
     Function to run after preprocess.main().
@@ -16,7 +16,7 @@ def main():
     """
     logger.info("Starting to compute rankings!")
 
-    ConfigManager().set_current_config(date="220101")
+    ConfigManager().set_current_config(date=config_initial_date)
     cfg = ConfigManager().current_config
 
     # Loading all tournament data
