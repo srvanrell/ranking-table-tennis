@@ -22,6 +22,7 @@ class Rankings:
             "rating",
             "category",
             "active",
+            "first_tid",
         ]
         all_columns += (
             self.points_cat_columns()
@@ -33,6 +34,8 @@ class Rankings:
         self.rating_details_df = pd.DataFrame()
         self.championship_details_df = pd.DataFrame()
         self.verify_and_normalize()
+
+        print(self.ranking_df.columns)
 
     def __len__(self) -> int:
         return len(self.ranking_df)
@@ -118,6 +121,7 @@ class Rankings:
         default_category = ""
         default_cat_value = 0
         default_cum_tid_value = ""
+        default_first_tid = "Unknown"
 
         cat_columns = (
             self.points_cat_columns()
@@ -135,6 +139,7 @@ class Rankings:
             "tournament_name": self.cfg.initial_metadata.tournament_name,
             "date": self.cfg.initial_metadata.date,
             "location": self.cfg.initial_metadata.location,
+            "first_tid": default_first_tid,
             **cat_col_values,
             **cum_tid_values,
         }
