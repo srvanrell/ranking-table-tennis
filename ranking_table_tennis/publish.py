@@ -92,6 +92,9 @@ def main(offline=True, last=True, tournament_num=None, config_initial_date="2201
     # Publish statistics
     helpers.publish_statistics_sheet(tournaments, rankings, players, tid, prev_tid, upload=upload)
 
+    # Save raw rankings
+    helpers.save_raw_ranking(rankings, players, tid)
+
     # Create and save interactive figures
     helpers.plot_ratings()
     helpers.plot_championships()
@@ -101,5 +104,3 @@ def main(offline=True, last=True, tournament_num=None, config_initial_date="2201
         show_on_web = (answer.lower() != "n") and (tid != tids[1])
 
         helpers.publish_to_web(tid, show_on_web)
-
-    helpers.save_raw_ranking(rankings, players, tid)
