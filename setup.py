@@ -8,7 +8,7 @@ def readme():
 
 setup(
     name="ranking_table_tennis",
-    version="2023.03.19",
+    version="2023.10.8",
     description="A ranking table tennis system",
     long_description=readme(),
     long_description_content_type="text/markdown",
@@ -33,6 +33,7 @@ setup(
         "matplotlib==3.*",
         "omegaconf==2.2.*",
         "hydra-core==1.2.*",
+        "plotly==5.*",
     ],
     extras_require={
         "dev": [
