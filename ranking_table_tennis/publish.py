@@ -92,6 +92,10 @@ def main(offline=True, last=True, tournament_num=None, config_initial_date="2201
     # Publish statistics
     helpers.publish_statistics_sheet(tournaments, rankings, players, tid, prev_tid, upload=upload)
 
+    # Create and save interactive figures
+    helpers.plot_ratings()
+    helpers.plot_championships()
+
     if not offline:
         answer = input("\nDo you want to publish to the web [Y/n]? ")
         show_on_web = (answer.lower() != "n") and (tid != tids[1])
