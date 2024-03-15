@@ -42,5 +42,5 @@ def print_rating_context(
                 f"# {tids[-2]}, {players[pid]['name']}, "
                 f"rating: {known_rankings.get_entries(tids[-2], pid).get('rating')}"
             )
-    except FileNotFoundError:
+    except (FileNotFoundError, AttributeError):
         logger.warn("Sorry, previous rankings not available to help you")
