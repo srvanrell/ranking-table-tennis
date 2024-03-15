@@ -20,11 +20,12 @@ RENAMER = {
 }
 
 
-def get_df_complete():
+def get_df_complete(max_tid):
     cfg = ConfigManager().current_config
     year = cfg.year
+    max_tid_num = int(max_tid[-2:])
 
-    tids = [f"S{yr}T{tt:02d}" for yr in range(year, year + 1) for tt in range(1, 20)]
+    tids = [f"S{yr}T{tt:02d}" for yr in range(year, year + 1) for tt in range(1, max_tid_num + 1)]
     dfs_to_concat = []
     for tid in tids:
         xlsx_filename = os.path.join(cfg.io.data_folder, f"raw_ranking_{tid}.xlsx")
@@ -40,9 +41,9 @@ def get_df_complete():
     return df_complete
 
 
-def plot_ratings():
+def plot_ratings(tid):
     """Plot and save rating interactive figure"""
-    df_complete = get_df_complete()
+    df_complete = get_df_complete(tid)
     # Mascara para filtrado
     mask_active_players_rating = df_complete.iloc[:, 13 : 13 + 4].sum(axis="columns") > 0
     df = df_complete.loc[mask_active_players_rating]
@@ -75,9 +76,9 @@ def plot_ratings():
         updatemenus=[
             {
                 "type": "buttons",
-                "x": 0.5,
+                "x": 0.25,
                 "xanchor": "center",
-                "y": 1.05,
+                "y": 0.95,
                 "yanchor": "top",
                 "borderwidth": 0,
                 "direction": "right",
@@ -113,7 +114,7 @@ def plot_ratings():
         )
 
     # fig.show(config=dict(displayModeBar=False))
-    fig.show()
+    # fig.show()
 
     # Saves a html doc that you can copy paste
     cfg = ConfigManager().current_config
@@ -122,9 +123,9 @@ def plot_ratings():
     fig.write_html(html_filename, full_html=False, include_plotlyjs="cdn")
 
 
-def plot_championships():
+def plot_championships(tid):
     """Plot and save interactive figures of all championships."""
-    df_complete = get_df_complete()
+    df_complete = get_df_complete(tid)
     # Mascaras para filtrado
     mask_active_players_cat1 = df_complete.iloc[:, 13 : 13 + 1].sum(axis="columns") > 0
     mask_active_players_cat2 = df_complete.iloc[:, 14 : 14 + 1].sum(axis="columns") > 0
@@ -167,9 +168,9 @@ def plot_championships():
             updatemenus=[
                 {
                     "type": "buttons",
-                    "x": 0.5,
+                    "x": 0.25,
                     "xanchor": "center",
-                    "y": 1.05,
+                    "y": 0.95,
                     "yanchor": "top",
                     "borderwidth": 0,
                     "direction": "right",
@@ -192,7 +193,7 @@ def plot_championships():
         )
 
         # fig.show(config=dict(displayModeBar=False))
-        fig.show()
+        # fig.show()
 
         # Saves a html doc that you can copy paste
         cfg = ConfigManager().current_config

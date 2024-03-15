@@ -96,8 +96,8 @@ def main(offline=True, last=True, tournament_num=None, config_initial_date="2201
     helpers.save_raw_ranking(rankings, players, tid)
 
     # Create and save interactive figures
-    helpers.plot_ratings()
-    helpers.plot_championships()
+    helpers.plot_ratings(tid)
+    helpers.plot_championships(tid)
 
     if not offline:
         answer = input("\nDo you want to publish to the web [Y/n]? ")
