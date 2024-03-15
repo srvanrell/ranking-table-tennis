@@ -8,7 +8,7 @@ def readme():
 
 setup(
     name="ranking_table_tennis",
-    version="2023.10.16",
+    version="2024.03.15",
     description="A ranking table tennis system",
     long_description=readme(),
     long_description_content_type="text/markdown",
