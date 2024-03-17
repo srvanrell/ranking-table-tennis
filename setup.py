@@ -38,7 +38,7 @@ setup(
     extras_require={
         "dev": [
             "pre-commit==2.18.*",
-            "pytest==7.1.*",
+            "pytest==7.2.*",
             "pytest-shell-utilities==1.5.*",
             "tox==3.*",
             "pyclean==2.2.*",
