@@ -2,6 +2,7 @@ import argparse
 import logging
 import os
 import textwrap
+from datetime import datetime
 
 from ranking_table_tennis.helpers.logging import logger
 
@@ -43,7 +44,7 @@ def main():
         "--config-initial-date",
         help="Set the initial date to get the right configs and setup.",
         choices=["240101", "230101", "220101", "210101"],
-        default="240101",
+        default=datetime.today().strftime("%y0101"),
     )
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
