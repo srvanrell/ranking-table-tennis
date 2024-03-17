@@ -30,8 +30,13 @@ def main():
         default="info",
     )
     parser.add_argument(
+        "--online-publish",
+        help="Execute publish to update online public sheets (not available since 2023).",
+        action="store_true",
+    )
+    parser.add_argument(
         "--offline",
-        help="Execute the given command locally. Compute is always offline.",
+        help="Execute preprocessing command locally. Compute is always offline.",
         action="store_true",
     )
     parser.add_argument(
@@ -74,7 +79,7 @@ def main():
     elif args.cmd == "publish":
         from ranking_table_tennis import publish
 
-        publish.main(args.offline, args.last, args.tournament_num, args.config_initial_date)
+        publish.main(args.online_publish, args.last, args.tournament_num, args.config_initial_date)
     else:
         logger.error("you shouldn't see this message")
 

@@ -6,7 +6,7 @@ from ranking_table_tennis.configs import ConfigManager
 logger = logging.getLogger(__name__)
 
 
-def main(offline=True, last=True, tournament_num=None, config_initial_date="220101"):
+def main(online=True, last=True, tournament_num=None, config_initial_date="220101"):
     """Publish the results to anew spreadsheet and upload it.
 
     Function to run after compute_rankings.main().
@@ -14,7 +14,7 @@ def main(offline=True, last=True, tournament_num=None, config_initial_date="2201
     It will output an xlsx to publish a single ranking (the tournament indicated).
     It will output a raw ranking xlsx corresponding to the one indicated.
 
-    If offline=True it will publish locally (not uploading results).
+    If online=True it will upload results (otherwise only local files will be created).
     If last=True it will publish results of the last tournament.
 
     tournament_num (int): enter the number of a valid tournament. if given, last is ommited
@@ -54,7 +54,7 @@ def main(offline=True, last=True, tournament_num=None, config_initial_date="2201
     prev_tid = tids[tids.index(tid) - 1]
 
     upload = False
-    if not offline:
+    if online:
         answer = input("\nDo you want to publish to backend online sheets [Y/n]? ")
         upload = answer.lower() != "n"
 
@@ -99,7 +99,7 @@ def main(offline=True, last=True, tournament_num=None, config_initial_date="2201
     helpers.plot_ratings(tid)
     helpers.plot_championships(tid)
 
-    if not offline:
+    if online:
         answer = input("\nDo you want to publish to the web [Y/n]? ")
         show_on_web = (answer.lower() != "n") and (tid != tids[1])
 
