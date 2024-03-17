@@ -1,0 +1,11 @@
+defaults:
+  # Configs in this file
+  - _self_
+  # Configs that might change with date
+  - io: io_2024
+  - compute: compute_2024_1
+  # Static configurations (might be parametrized)
+  - base_config/base_config@_here_
+
+# Main configs
+year: 2024

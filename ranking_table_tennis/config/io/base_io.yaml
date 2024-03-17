@@ -4,10 +4,10 @@ xlsx:
   rankings_filename: Liga Dos Orillas ${year} - Rankings Crudos.xlsx
   publish_filename: Torneo NN para publicar.xlsx
 pickle:
-  players_temp: temp_players.pk
-  ranking_temp: temp_ranking.pk
-  players: players.pk
-  tournaments: tournaments.pk
-  rankings: rankings.pk
+  players_temp: temp_players${year}.pk
+  ranking_temp: temp_ranking${year}.pk
+  players: players${year}.pk
+  tournaments: tournaments${year}.pk
+  rankings: rankings${year}.pk
 md:
   tournament_metadata: Metadata

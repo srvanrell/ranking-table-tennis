@@ -8,7 +8,7 @@ def readme():
 
 setup(
     name="ranking_table_tennis",
-    version="2023.10.16",
+    version="2024.03.17",
     description="A ranking table tennis system",
     long_description=readme(),
     long_description_content_type="text/markdown",
@@ -38,7 +38,7 @@ setup(
     extras_require={
         "dev": [
             "pre-commit==2.18.*",
-            "pytest==7.1.*",
+            "pytest==7.2.*",
             "pytest-shell-utilities==1.5.*",
             "tox==3.*",
             "pyclean==2.2.*",

@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 def print_rating_context(
     tournaments: models.Tournaments,
     players: models.Players,
+    initial_ranking: models.Rankings,
     name: str,
     tid: str,
 ) -> None:
@@ -28,6 +29,13 @@ def print_rating_context(
     # Print rating of known players, if available
     try:
         known_rankings = helpers.load_from_pickle(cfg.io.pickle.rankings)
+    except (FileNotFoundError):
+        logger.warn(
+            "WARNING: Previous rankings are not available. Initial rankings will be loaded."
+        )
+        known_rankings = initial_ranking
+
+    try:
         tids = [cfg.initial_metadata.initial_tid] + [t for t in tournaments]  # to use prev_tid
         pids_with_rating = known_rankings.get_entries(tids[-2]).pid.to_list()
         pids_selected = (
@@ -36,11 +44,11 @@ def print_rating_context(
             .pipe(lambda s: s[s.isin(pids_with_rating)])  # filter pids with known rating
             .unique()
         )
-        print("\n# Known ratings")
+        print(f"\n# Known ratings (categories thresholds: {cfg.compute.categories_thresholds})")
         for pid in pids_selected:
             print(
                 f"# {tids[-2]}, {players[pid]['name']}, "
                 f"rating: {known_rankings.get_entries(tids[-2], pid).get('rating')}"
             )
-    except FileNotFoundError:
-        logger.warn("Sorry, previous rankings not available to help you")
+    except AttributeError:
+        logger.warn("Sorry, no previous ranking is available to help you")

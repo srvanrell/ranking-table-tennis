@@ -76,7 +76,7 @@ def main(offline=True, config_initial_date="220101"):
                     unknown_player = True
 
                     # Will print available ratings of known players
-                    helpers.print_rating_context(tournaments, players, name, tid)
+                    helpers.print_rating_context(tournaments, players, rankings, name, tid)
 
                     text_to_show = f"\nEnter the initial rating points for {name}"
                     text_to_show += " (category will be auto-assigned):\n"

@@ -118,7 +118,7 @@ def plot_ratings(tid):
 
     # Saves a html doc that you can copy paste
     cfg = ConfigManager().current_config
-    html_filename = os.path.join(cfg.io.data_folder, f"rating{cfg.year}.html")
+    html_filename = os.path.join(cfg.io.data_folder, f"{tid}/rating{cfg.year}.html")
     logger.info("< Saving figure @ '%s'", html_filename)
     fig.write_html(html_filename, full_html=False, include_plotlyjs="cdn")
 
@@ -197,6 +197,6 @@ def plot_championships(tid):
 
         # Saves a html doc that you can copy paste
         cfg = ConfigManager().current_config
-        html_filename = os.path.join(cfg.io.data_folder, f"championship{cfg.year}{name}.html")
+        html_filename = os.path.join(cfg.io.data_folder, f"{tid}/championship{cfg.year}{name}.html")
         logger.info("< Saving figure @ '%s'", html_filename)
         fig.write_html(html_filename, full_html=False, include_plotlyjs="cdn")
