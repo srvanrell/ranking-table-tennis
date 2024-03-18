@@ -2,6 +2,7 @@ from conftest import (
     assert_equals_xlsx,
     base_cli_run_after_tests,
     base_run_before_tests,
+    config_initial_date_for_cli,
     get_expected_folder_path,
 )
 from pandas.testing import assert_frame_equal
@@ -15,7 +16,7 @@ def test_cli_preprocess_run_before_tests(shell):
     base_run_before_tests()
     # Repeat twice, it should provide consistent results
     for _ in range(2):
-        ret = shell.run("rtt", "preprocess", "--offline")
+        ret = shell.run("rtt", "preprocess", "--offline", *config_initial_date_for_cli())
         assert ret.returncode == 0
         print(ret.stdout)
     base_cli_run_after_tests()

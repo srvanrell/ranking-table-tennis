@@ -60,7 +60,16 @@ def get_tournaments_xlsx():
     return "Liga Dos Orillas 2022 - Carga de partidos.xlsx"
 
 
+def get_config_initial_date():
+    return "220101"
+
+
+def config_initial_date_for_cli():
+    return ["--config-initial-date", get_config_initial_date()]
+
+
 def base_run_before_tests():
+    """Copy golden data to expected folder (imitates downloading it)"""
     example_data = os.path.join(get_expected_folder_path(), get_tournaments_xlsx())
     if not os.path.exists("data_rtt/"):
         os.mkdir("data_rtt")
@@ -68,9 +77,13 @@ def base_run_before_tests():
 
 
 def base_cli_run_after_tests():
+    """Set current config with expected initial date based on golden data"""
+    from ranking_table_tennis.helpers.logging import logger as rtt_logger
+
+    rtt_logger.setLevel(logging.DEBUG)
     from ranking_table_tennis.configs import ConfigManager
 
-    ConfigManager().set_current_config(date="220101")
+    ConfigManager().set_current_config(date=get_config_initial_date())
 
 
 def load_expected_output(csv_filename, parse_dates=False):
