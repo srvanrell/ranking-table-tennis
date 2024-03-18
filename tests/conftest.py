@@ -78,9 +78,6 @@ def base_run_before_tests():
 
 def base_cli_run_after_tests():
     """Set current config with expected initial date based on golden data"""
-    from ranking_table_tennis.helpers.logging import logger as rtt_logger
-
-    rtt_logger.setLevel(logging.DEBUG)
     from ranking_table_tennis.configs import ConfigManager
 
     ConfigManager().set_current_config(date=get_config_initial_date())
