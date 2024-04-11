@@ -16,7 +16,7 @@ gspread==5.4.0
 gspread-dataframe==3.3.0
 httplib2==0.20.4
 identify==2.5.2
-idna==3.3
+idna==3.7
 iniconfig==1.1.1
 kiwisolver==1.4.4
 matplotlib==3.5.2
