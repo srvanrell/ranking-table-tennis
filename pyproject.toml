@@ -17,7 +17,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.7.1"
+python = ">=3.8"
 PyYAML = ">=5.4.1"
 Unidecode = "==1.*"
 gspread-dataframe = "==3.*"
@@ -32,24 +32,17 @@ plotly = "==5.*"
 tabulate = "==0.8.*"
 urllib3 = "==1.*"
 
-#[project.optional-dependencies]
-#dev = [
-#    "pre-commit==2.18.*",
-#    "pyclean==2.2.*",
-#    "pytest-shell-utilities==1.5.*",
-#    "pytest==7.2.*",
-#    "pytest_profiling==1.7.*",
-#    "tox==3.*",
-#]
+[tool.poetrygroup.test.dependencies]
+pre-commit = "2.18.*"
+pyclean = "2.2.*"
+pytest = "7.2.*"
+pytest-shell-utilities ="1.5.*"
+pytest_profiling = "1.7.*"
 
-# [project.scripts]
 [tool.poetry.scripts]
 rtt = "ranking_table_tennis.command_line:main"
 
-# [build-system]
-# requires = ["pdm-backend"]
-# build-backend = "pdm.backend"
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
