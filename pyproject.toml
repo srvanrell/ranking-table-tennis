@@ -1,5 +1,3 @@
-
-# [project]
 [tool.poetry]
 name = "ranking_table_tennis"
 version = "2024.5.12"
@@ -11,7 +9,12 @@ classifiers = [
     "Operating System :: POSIX :: Linux",
     "Programming Language :: Python :: 3",
 ]
-# requires-python = ">=3.6"
+license = "GPL-2.0-or-later"
+homepage = "https://srvanrell.github.io/ranking-table-tennis/"
+repository = "http://github.com/srvanrell/ranking-table-tennis"
+packages = [
+    { include = "ranking_table_tennis" },
+]
 
 [tool.poetry.dependencies]
 python = ">=3.7.1"
@@ -28,9 +31,6 @@ pandas = "==1.3.*"
 plotly = "==5.*"
 tabulate = "==0.8.*"
 urllib3 = "==1.*"
-
-[project.urls]
-Homepage = "http://github.com/srvanrell/ranking-table-tennis"
 
 #[project.optional-dependencies]
 #dev = [
