@@ -14,27 +14,31 @@ Their computation is based on the outcomes of one-versus-one matches.
 
 This system has been developed for a Linux environment.
 
+Poetry installation (recommended)
+
+    poetry install
+
 System-wide installation
 
-    sudo pip3 install ranking-table-tennis
+    sudo pip install ranking-table-tennis
 
-Single-user installation (recommended)
+Single-user installation
 
-    pip3 install --user ranking-table-tennis
+    pip install --user ranking-table-tennis
 
 Uninstallation
 
-    [sudo] pip3 uninstall ranking-table-tennis
+    [sudo] pip uninstall ranking-table-tennis
 
 ## Update
 
 System-wide update
 
-    sudo pip3 install -U ranking-table-tennis
+    sudo pip install -U ranking-table-tennis
 
 Single-user update (recommended)
 
-    pip3 install --user -U ranking-table-tennis
+    pip install --user -U ranking-table-tennis
 
 ## Usage
 
@@ -64,18 +68,18 @@ The outcome will be saved in a new spreadsheet.
 Install locally from source (source directory will immediately affect the installed package
 without needing to re-install):
 
-    pip3 install --user --editable .
+    pip install --user --editable .
 
-    sudo apt install graphviz
+    sudo apt install graphviz (still required?)
 
-Update version at `setup.py` and then create a source distribution
+Update version at `pyproject.toml` and then create a source distribution
 
-    python3 setup.py sdist bdist_wheel
+    poetry build
 
 Upload to PyPI
 
-    twine upload dist/*
+    poetry publish [--dry-run] [--build]
 
 Upload to TestPyPI
 
-    twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+    poetry publish -r testpypi [--dry-run] [--build]

@@ -80,7 +80,7 @@ class Configuration:
         with hydra.initialize_config_dir(
             version_base=None, config_dir=config_dir, job_name="rtt_app"
         ):
-            logger.debug("~ Loading '%s'", self._config_name)
+            logger.debug("~ Loading '%s' @ '%s'", self._config_name, config_dir)
             return hydra.compose(config_name=self._config_name)
 
     def _load_tables_config(self):

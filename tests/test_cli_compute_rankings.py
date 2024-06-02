@@ -1,4 +1,4 @@
-from conftest import base_cli_run_after_tests, base_run_before_tests
+from conftest import base_cli_run_after_tests, base_run_before_tests, config_initial_date_for_cli
 from pandas.testing import assert_frame_equal
 
 from ranking_table_tennis import helpers
@@ -8,12 +8,12 @@ from ranking_table_tennis.configs import ConfigManager
 def test_cli_compute_run_before_tests(shell):
     """To be run once before all tests"""
     base_run_before_tests()
-    ret = shell.run("rtt", "preprocess", "--offline")
+    ret = shell.run("rtt", "preprocess", "--offline", *config_initial_date_for_cli())
     assert ret.returncode == 0
     print(ret.stdout)
     # Repeat twice, it should provide consistent results
     for _ in range(2):
-        ret = shell.run("rtt", "compute")
+        ret = shell.run("rtt", "compute", *config_initial_date_for_cli())
         assert ret.returncode == 0
         print(ret.stdout)
     base_cli_run_after_tests()
