@@ -41,6 +41,11 @@ def main():
         action="store_true",
     )
     parser.add_argument(
+        "--download-only",
+        help="Download sheet for preprocessing but do not upload updates. No questions are asked.",
+        action="store_true",
+    )
+    parser.add_argument(
         "--config-initial-date",
         help="Set the initial date to get the right configs and setup.",
         choices=["240101", "230101", "220101", "210101"],
@@ -72,7 +77,7 @@ def main():
     if args.cmd == "preprocess":
         from ranking_table_tennis import preprocess
 
-        preprocess.main(args.offline, args.config_initial_date)
+        preprocess.main(args.offline, args.download_only, args.config_initial_date)
     elif args.cmd == "compute":
         from ranking_table_tennis import compute_rankings
 
