@@ -46,8 +46,8 @@ def upload_sheet_from_df(
             include_column_header=include_df_headers,
         )
 
-    except ConnectionError:
-        logger.warn("!! FAILED to upload '%s' @ '%s'", sheet_name, spreadsheet_id)
+    except PermissionError:
+        logger.warn("!! Permission Error. FAILED to upload '%s' @ '%s'", sheet_name, spreadsheet_id)
 
 
 def load_and_upload_sheet(filename: str, sheet_name: str, spreadsheet_id: str) -> None:
@@ -91,8 +91,8 @@ def create_n_tour_sheet(spreadsheet_id: str, tid: str) -> None:
         else:
             logger.warn("!! FAIL TO DUPLICATE '%s' do not exist @ '%s'", first_key, spreadsheet_id)
 
-    except ConnectionError:
-        logger.warn("!! Connection Error. FAIL TO DUPLICATE '%s' @ '%s'", first_key, spreadsheet_id)
+    except PermissionError:
+        logger.warn("!! Permission Error. FAIL TO DUPLICATE '%s' @ '%s'", first_key, spreadsheet_id)
 
 
 def publish_to_web(tid: str, show_on_web=False) -> None:
@@ -115,21 +115,36 @@ def _in_colab() -> bool:
 
 
 def _get_gc() -> gspread.Client:
+    gc = None
+
     try:
-        if _in_colab():
+        gc = gspread.service_account()
+    except FileNotFoundError:
+        logger.warn(
+            "!! The service account .json key file has not been configured. Upload might fail."
+        )
+
+    try:
+        if gc is None:
+            gc = gspread.oauth()
+    except FileNotFoundError:
+        logger.warn("!! The end user .json key file has not been configured. Upload might fail.")
+    # except OSError:
+    #     logger.warn("!!Connection failure. Upload will fail.")
+
+    try:
+        if gc is None and _in_colab():
             from google.colab import auth
 
             auth.authenticate_user()
             from oauth2client.client import GoogleCredentials  # type: ignore
 
             gc = gspread.authorize(GoogleCredentials.get_application_default())
-        else:
-            gc = gspread.oauth()
     except FileNotFoundError:
-        logger.warn("!! The .json key file has not been configured. Upload will fail.")
-        raise ConnectionError
-    # except OSError:
-    #     logger.warn("!!Connection failure. Upload will fail.")
+        logger.warn("!! Colab user authentication has failed. Upload might fail.")
+
+    if gc is None:
+        raise PermissionError("Cannot authenticate to read and write using gspread")
 
     return gc
 
