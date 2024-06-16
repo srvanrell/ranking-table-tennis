@@ -1,4 +1,6 @@
+import json
 import logging
+import os
 from typing import List
 
 import gspread
@@ -118,7 +120,15 @@ def _get_gc() -> gspread.Client:
     gc = None
 
     try:
-        gc = gspread.service_account()
+        github_secret_name = "GCP_SA_KEY"
+        credentials_str = os.getenv(github_secret_name)
+        if credentials_str:
+            logger.debug("Loading GCP credentials from %s", github_secret_name)
+            credentials_dict = json.loads(credentials_str)
+            gc = gspread.service_account_from_dict(credentials_dict)
+        else:
+            logger.debug("Loading GCP credentials from standard path")
+            gc = gspread.service_account()
     except FileNotFoundError:
         logger.warn(
             "!! The service account .json key file has not been configured. Upload might fail."
