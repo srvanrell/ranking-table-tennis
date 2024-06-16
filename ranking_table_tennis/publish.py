@@ -93,7 +93,8 @@ def main(online=False, last=True, tournament_num=None, config_initial_date="2201
     helpers.publish_statistics_sheet(tournaments, rankings, players, tid, prev_tid, upload=upload)
 
     # Save raw rankings as xlsx
-    helpers.save_raw_ranking(rankings, players, tid)
+    for raw_tid in tids[1:]:
+        helpers.save_raw_ranking(rankings, players, raw_tid)
 
     # Create and save interactive figures
     helpers.plot_ratings(tid)
