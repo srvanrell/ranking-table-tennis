@@ -26,7 +26,7 @@ def main(config_initial_date="220101"):
     cfg = ConfigManager().current_config
 
     # Stop preprocess if there were no recent updates on the spreadsheet
-    helpers.stop_workflow_if_no_updates(cfg.io.tournaments_spreadsheet_id)
+    helpers.no_updates_stop_workflow(cfg.io.tournaments_spreadsheet_id)
 
     xlsx_file = cfg.io.data_folder + cfg.io.xlsx.tournaments_filename
     logger.info("Downloading and saving '%s'" % xlsx_file)

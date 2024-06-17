@@ -8,7 +8,7 @@ from ranking_table_tennis.helpers.excel import (
     save_ranking_sheet,
     save_raw_ranking,
 )
-from ranking_table_tennis.helpers.github import stop_workflow_if_no_updates
+from ranking_table_tennis.helpers.github import no_updates_stop_workflow
 from ranking_table_tennis.helpers.gspread import publish_to_web
 from ranking_table_tennis.helpers.initial_rating import print_rating_context
 from ranking_table_tennis.helpers.pickle import load_from_pickle, save_to_pickle

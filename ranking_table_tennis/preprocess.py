@@ -29,7 +29,7 @@ def main(offline=True, assume_yes=False, config_initial_date="220101"):
 
     if not offline:
         # Stop preprocess if there were no recent updates on the spreadsheet
-        helpers.stop_workflow_if_no_updates(cfg.io.tournaments_spreadsheet_id)
+        helpers.no_updates_stop_workflow(cfg.io.tournaments_spreadsheet_id)
 
         if assume_yes:
             retrieve = "yes"
