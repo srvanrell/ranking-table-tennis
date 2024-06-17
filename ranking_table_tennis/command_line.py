@@ -46,6 +46,11 @@ def main():
         action="store_true",
     )
     parser.add_argument(
+        "--unattended",
+        help="Preprocessing is resolved unattended. --config-initial-date is the only valid param.",
+        action="store_true",
+    )
+    parser.add_argument(
         "--config-initial-date",
         help="Set the initial date to get the right configs and setup.",
         choices=["240101", "230101", "220101", "210101"],
@@ -74,7 +79,11 @@ def main():
     logger.debug("~ Working directory: '%s'", os.path.abspath(os.path.curdir))
 
     # FIXME calls are not performed in the best way.
-    if args.cmd == "preprocess":
+    if args.cmd == "preprocess" and args.unattended:
+        from ranking_table_tennis import preprocess_unattended
+
+        preprocess_unattended.main(args.config_initial_date)
+    elif args.cmd == "preprocess":
         from ranking_table_tennis import preprocess
 
         preprocess.main(args.offline, args.assume_yes, args.config_initial_date)
