@@ -36,6 +36,14 @@ def main(offline=True, assume_yes=False, config_initial_date="220101"):
             logger.info("Downloading and saving '%s'" % xlsx_file)
             request.urlretrieve(cfg.io.tournaments_gdrive, xlsx_file)
 
+    # Help to stop the workflow if there are no updates on the file
+    # TODO exit if there are no updates.
+    new_data_available = True
+    if new_data_available:
+        print("::set-output name=stop_workflow::false")
+    else:
+        print("::set-output name=stop_workflow::true")
+
     # Loading all tournament data
     tournaments = helpers.load_tournaments_sheets()
 
@@ -52,12 +60,15 @@ def main(offline=True, assume_yes=False, config_initial_date="220101"):
     # Loading temp ranking and players. It will be deleted after a successful preprocessing
     players_temp, ranking_temp = helpers.load_temp_players_ranking()
 
+    unknown_player_should_update = False
+
     for tid in tournaments:
         logger.info("** Processing %s", tid)
 
         for name in tournaments.get_players_names(tid):
             unknown_player = False
             if players.get_pid(name) is None:
+                unknown_player_should_update = True
                 if players_temp.get_pid(name) is None:
                     unknown_player = True
                     association = input("\nEnter the affiliation of %s: (optional field)\n" % name)
@@ -75,6 +86,7 @@ def main(offline=True, assume_yes=False, config_initial_date="220101"):
 
             # Category will be asigned
             if rankings[initial_tid, pid] is None:
+                unknown_player_should_update = True
                 if ranking_temp[initial_tid, pid] is None:
                     unknown_player = True
 
@@ -114,6 +126,9 @@ def main(offline=True, assume_yes=False, config_initial_date="220101"):
         upload = answer.lower() != "n"
     elif not offline and assume_yes:
         upload = True
+
+    # Update the online version if an unknown player was found during preprocessing
+    upload = upload and unknown_player_should_update
 
     # Saving complete list of players, including new ones
     helpers.save_players_sheet(players, upload=upload)
