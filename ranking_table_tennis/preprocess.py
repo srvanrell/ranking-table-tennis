@@ -7,7 +7,7 @@ from ranking_table_tennis.configs import ConfigManager
 logger = logging.getLogger(__name__)
 
 
-def main(offline=True, download_only=False, config_initial_date="220101"):
+def main(offline=True, assume_yes=False, config_initial_date="220101"):
     """Preprocess matches on xlsx tournaments database.
 
     Function to run before compute_rankings.main().
@@ -28,7 +28,7 @@ def main(offline=True, download_only=False, config_initial_date="220101"):
     xlsx_file = cfg.io.data_folder + cfg.io.xlsx.tournaments_filename
 
     if not offline:
-        if download_only:
+        if assume_yes:
             retrieve = "yes"
         else:
             retrieve = input("\nDo you want to retrieve online sheet [Y/n]? ")
@@ -109,9 +109,11 @@ def main(offline=True, download_only=False, config_initial_date="220101"):
 
     # Update the online version
     upload = False
-    if not offline and not download_only:
+    if not offline and not assume_yes:
         answer = input("\nDo you want to update online sheets [Y/n]? ")
         upload = answer.lower() != "n"
+    elif not offline and assume_yes:
+        upload = True
 
     # Saving complete list of players, including new ones
     helpers.save_players_sheet(players, upload=upload)
