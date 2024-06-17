@@ -25,17 +25,12 @@ def main(config_initial_date="220101"):
     ConfigManager().set_current_config(date=config_initial_date)
     cfg = ConfigManager().current_config
 
-    xlsx_file = cfg.io.data_folder + cfg.io.xlsx.tournaments_filename
+    # Stop preprocess if there were no recent updates on the spreadsheet
+    helpers.stop_workflow_if_no_updates(cfg.io.tournaments_spreadsheet_id)
 
+    xlsx_file = cfg.io.data_folder + cfg.io.xlsx.tournaments_filename
     logger.info("Downloading and saving '%s'" % xlsx_file)
     request.urlretrieve(cfg.io.tournaments_gdrive, xlsx_file)
-    # Help to stop the workflow if there are no updates on the file
-    # TODO exit if there are no updates.
-    new_data_available = True
-    if new_data_available:
-        print("::set-output name=stop_workflow::false")
-    else:
-        print("::set-output name=stop_workflow::true")
 
     # Loading all tournament data
     tournaments = helpers.load_tournaments_sheets()
