@@ -7,7 +7,7 @@ from ranking_table_tennis.configs import ConfigManager
 logger = logging.getLogger(__name__)
 
 
-def main(offline=True, download_only=False, config_initial_date="220101"):
+def main(offline=True, assume_yes=False, config_initial_date="220101"):
     """Preprocess matches on xlsx tournaments database.
 
     Function to run before compute_rankings.main().
@@ -28,13 +28,21 @@ def main(offline=True, download_only=False, config_initial_date="220101"):
     xlsx_file = cfg.io.data_folder + cfg.io.xlsx.tournaments_filename
 
     if not offline:
-        if download_only:
+        if assume_yes:
             retrieve = "yes"
         else:
             retrieve = input("\nDo you want to retrieve online sheet [Y/n]? ")
         if retrieve.lower() != "n":
             logger.info("Downloading and saving '%s'" % xlsx_file)
             request.urlretrieve(cfg.io.tournaments_gdrive, xlsx_file)
+
+    # Help to stop the workflow if there are no updates on the file
+    # TODO exit if there are no updates.
+    new_data_available = True
+    if new_data_available:
+        print("::set-output name=stop_workflow::false")
+    else:
+        print("::set-output name=stop_workflow::true")
 
     # Loading all tournament data
     tournaments = helpers.load_tournaments_sheets()
@@ -52,12 +60,15 @@ def main(offline=True, download_only=False, config_initial_date="220101"):
     # Loading temp ranking and players. It will be deleted after a successful preprocessing
     players_temp, ranking_temp = helpers.load_temp_players_ranking()
 
+    unknown_player_should_update = False
+
     for tid in tournaments:
         logger.info("** Processing %s", tid)
 
         for name in tournaments.get_players_names(tid):
             unknown_player = False
             if players.get_pid(name) is None:
+                unknown_player_should_update = True
                 if players_temp.get_pid(name) is None:
                     unknown_player = True
                     association = input("\nEnter the affiliation of %s: (optional field)\n" % name)
@@ -75,6 +86,7 @@ def main(offline=True, download_only=False, config_initial_date="220101"):
 
             # Category will be asigned
             if rankings[initial_tid, pid] is None:
+                unknown_player_should_update = True
                 if ranking_temp[initial_tid, pid] is None:
                     unknown_player = True
 
@@ -109,9 +121,14 @@ def main(offline=True, download_only=False, config_initial_date="220101"):
 
     # Update the online version
     upload = False
-    if not offline and not download_only:
+    if not offline and not assume_yes:
         answer = input("\nDo you want to update online sheets [Y/n]? ")
         upload = answer.lower() != "n"
+    elif not offline and assume_yes:
+        upload = True
+
+    # Update the online version if an unknown player was found during preprocessing
+    upload = upload and unknown_player_should_update
 
     # Saving complete list of players, including new ones
     helpers.save_players_sheet(players, upload=upload)

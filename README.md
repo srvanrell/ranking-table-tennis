@@ -30,6 +30,11 @@ Uninstallation
 
     [sudo] pip uninstall ranking-table-tennis
 
+### Authentication for gspread
+
+To start using the upload spreadsheets capabilities, gspread requires authentication.
+Please, follow the [recommended steps](https://docs.gspread.org/en/latest/oauth2.html) to get your system ready to upload.
+
 ## Update
 
 System-wide update
