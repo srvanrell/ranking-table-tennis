@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+from datetime import datetime, timezone
 from typing import List
 
 import gspread
@@ -104,6 +105,21 @@ def publish_to_web(tid: str, show_on_web=False) -> None:
             create_n_tour_sheet(spreadsheet_id, tid)
 
 
+def days_since_last_update(spreadsheet_id) -> str:
+    try:
+        gc = _get_gc()
+        spreadsheet = gc.open_by_key(spreadsheet_id)
+        last_update_time = spreadsheet.get_lastUpdateTime()
+    except PermissionError:
+        logger.warn("!! Permission Error. FAIL TO GET last updated time @ '%s'", spreadsheet_id)
+
+    # Parse the ISO 8601 datetime string into a datetime at UTC
+    last_update_utc = datetime.fromisoformat(last_update_time[:-1]).replace(tzinfo=timezone.utc)
+    difference = datetime.now(timezone.utc) - last_update_utc
+
+    return difference.days
+
+
 def _in_colab() -> bool:
     # Verify if it is running on colab
     try:
@@ -123,11 +139,11 @@ def _get_gc() -> gspread.Client:
         github_secret_name = "GCP_SA_KEY"
         credentials_str = os.getenv(github_secret_name)
         if credentials_str:
-            logger.debug("Loading GCP credentials from %s", github_secret_name)
+            logger.debug("Loading GCP SA credentials from %s", github_secret_name)
             credentials_dict = json.loads(credentials_str)
             gc = gspread.service_account_from_dict(credentials_dict)
         else:
-            logger.debug("Loading GCP credentials from standard path")
+            logger.debug("Loading GCP SA credentials from standard path")
             gc = gspread.service_account()
     except FileNotFoundError:
         logger.warn(
@@ -136,6 +152,7 @@ def _get_gc() -> gspread.Client:
 
     try:
         if gc is None:
+            logger.debug("Loading GCP End User credentials from standard path")
             gc = gspread.oauth()
     except FileNotFoundError:
         logger.warn("!! The end user .json key file has not been configured. Upload might fail.")

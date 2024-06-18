@@ -28,21 +28,17 @@ def main(offline=True, assume_yes=False, config_initial_date="220101"):
     xlsx_file = cfg.io.data_folder + cfg.io.xlsx.tournaments_filename
 
     if not offline:
+        # Stop preprocess if there were no recent updates on the spreadsheet
+        helpers.no_updates_stop_workflow(cfg.io.tournaments_spreadsheet_id)
+
         if assume_yes:
             retrieve = "yes"
         else:
             retrieve = input("\nDo you want to retrieve online sheet [Y/n]? ")
+
         if retrieve.lower() != "n":
             logger.info("Downloading and saving '%s'" % xlsx_file)
             request.urlretrieve(cfg.io.tournaments_gdrive, xlsx_file)
-
-    # Help to stop the workflow if there are no updates on the file
-    # TODO exit if there are no updates.
-    new_data_available = True
-    if new_data_available:
-        print("::set-output name=stop_workflow::false")
-    else:
-        print("::set-output name=stop_workflow::true")
 
     # Loading all tournament data
     tournaments = helpers.load_tournaments_sheets()
