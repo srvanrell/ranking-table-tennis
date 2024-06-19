@@ -87,7 +87,7 @@ def main(offline=True, assume_yes=False, config_initial_date="220101"):
                     unknown_player = True
 
                     # Will print available ratings of known players
-                    helpers.print_rating_context(tournaments, players, rankings, name, tid)
+                    helpers.suggest_initial_rating(tournaments, players, rankings, name, tid)
 
                     text_to_show = f"\nEnter the initial rating points for {name}"
                     text_to_show += " (category will be auto-assigned):\n"
@@ -103,6 +103,14 @@ def main(offline=True, assume_yes=False, config_initial_date="220101"):
                     f"\n{rankings[initial_tid, pid][['tid', 'pid', 'rating', 'category']]}\n"
                     f"{players[pid]['name']}"
                 )
+            elif rankings[initial_tid, pid, "rating"] < 0:
+                # Will print available ratings of known players
+                helpers.suggest_initial_rating(tournaments, players, rankings, name, tid)
+
+                text_to_show = f"\nEnter the initial rating points for {name}"
+                text_to_show += " (category will be auto-assigned):\n"
+                initial_rating = int(input(text_to_show))
+                rankings[initial_tid, pid, "rating"] = initial_rating
 
             if unknown_player:
                 retrieve = input(
