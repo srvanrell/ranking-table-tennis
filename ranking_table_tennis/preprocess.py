@@ -104,6 +104,7 @@ def main(offline=True, assume_yes=False, config_initial_date="220101"):
                     f"{players[pid]['name']}"
                 )
             elif rankings[initial_tid, pid, "rating"] < 0:
+                unknown_player_should_update = True
                 # Will print available ratings of known players
                 helpers.suggest_initial_rating(tournaments, players, rankings, name, tid)
 
