@@ -86,6 +86,7 @@ def fill_rating_column(
         known_rankings = helpers.load_from_pickle(cfg.io.pickle.rankings)
     except FileNotFoundError:
         logger.warn("Sorry, no previous rating is available to help you")
+        return
 
     for ix, row in matches_df.iterrows():
         rival_pid = row[f"{winner_or_loser}_pid"]
