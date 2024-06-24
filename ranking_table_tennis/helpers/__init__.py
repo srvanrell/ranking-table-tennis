@@ -10,7 +10,7 @@ from ranking_table_tennis.helpers.excel import (
 )
 from ranking_table_tennis.helpers.github import no_updates_stop_workflow
 from ranking_table_tennis.helpers.gspread import publish_to_web
-from ranking_table_tennis.helpers.initial_rating import print_rating_context
+from ranking_table_tennis.helpers.initial_rating import suggest_initial_rating
 from ranking_table_tennis.helpers.pickle import load_from_pickle, save_to_pickle
 from ranking_table_tennis.helpers.plotter import plot_championships, plot_ratings
 from ranking_table_tennis.helpers.publisher import (

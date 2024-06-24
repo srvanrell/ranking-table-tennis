@@ -7,7 +7,7 @@ from ranking_table_tennis.configs import ConfigManager
 logger = logging.getLogger(__name__)
 
 
-def main(config_initial_date="220101"):
+def main(config_initial_date="220101", download=True):
     """Preprocess matches on xlsx tournaments database. Resolves with no human interaction
 
     Function to run before compute_rankings.main().
@@ -28,9 +28,10 @@ def main(config_initial_date="220101"):
     # Stop preprocess if there were no recent updates on the spreadsheet
     helpers.no_updates_stop_workflow(cfg.io.tournaments_spreadsheet_id)
 
-    xlsx_file = cfg.io.data_folder + cfg.io.xlsx.tournaments_filename
-    logger.info("Downloading and saving '%s'" % xlsx_file)
-    request.urlretrieve(cfg.io.tournaments_gdrive, xlsx_file)
+    if download:
+        xlsx_file = cfg.io.data_folder + cfg.io.xlsx.tournaments_filename
+        logger.info("Downloading and saving '%s'" % xlsx_file)
+        request.urlretrieve(cfg.io.tournaments_gdrive, xlsx_file)
 
     # Loading all tournament data
     tournaments = helpers.load_tournaments_sheets()
@@ -65,9 +66,30 @@ def main(config_initial_date="220101"):
                 unknown_player_should_update = True
                 rankings.add_new_entry(initial_tid, pid)
                 logger.info(
+                    f"Initial rating to be revised"
                     f"\n{rankings[initial_tid, pid][['tid', 'pid', 'rating', 'category']]}\n"
                     f"{players[pid]['name']}"
                 )
+            elif rankings[initial_tid, pid, "rating"] < 0:
+                # Will print available ratings of known players
+                suggested_rating = helpers.suggest_initial_rating(
+                    tournaments, players, rankings, name, tid
+                )
+
+                if suggested_rating > 0:
+                    unknown_player_should_update = True
+                    rankings[initial_tid, pid, "rating"] = suggested_rating
+                    logger.info(
+                        f"Filled with suggested ranking "
+                        f"\n{rankings[initial_tid, pid][['tid', 'pid', 'rating', 'category']]}\n"
+                        f"{players[pid]['name']}"
+                    )
+                else:
+                    logger.info(
+                        f"Initial rating to be revised"
+                        f"\n{rankings[initial_tid, pid][['tid', 'pid', 'rating', 'category']]}\n"
+                        f"{players[pid]['name']}"
+                    )
 
         # FIXME Update config but do not affect initial tid
         # tournament_date = tournaments[tid].iloc[0].date.strftime("%y%m%d")

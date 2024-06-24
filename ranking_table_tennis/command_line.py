@@ -47,7 +47,15 @@ def main():
     )
     parser.add_argument(
         "--unattended",
-        help="Preprocessing is resolved unattended. --config-initial-date is the only valid param.",
+        help=(
+            "Preprocessing is resolved unattended. "
+            "--config-initial-date and --dont-download are the only valid param."
+        ),
+        action="store_true",
+    )
+    parser.add_argument(
+        "--dont-download",
+        help="Preprocessing unattended and dont't downloading tournaments.",
         action="store_true",
     )
     parser.add_argument(
@@ -82,7 +90,7 @@ def main():
     if args.cmd == "preprocess" and args.unattended:
         from ranking_table_tennis import preprocess_unattended
 
-        preprocess_unattended.main(args.config_initial_date)
+        preprocess_unattended.main(args.config_initial_date, not args.dont_download)
     elif args.cmd == "preprocess":
         from ranking_table_tennis import preprocess
 
