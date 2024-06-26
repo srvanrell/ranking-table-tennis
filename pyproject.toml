@@ -17,7 +17,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.8"
+python = ">=3.9"
 PyYAML = ">=5.4.1"
 Unidecode = "==1.*"
 gspread-dataframe = "==3.*"
