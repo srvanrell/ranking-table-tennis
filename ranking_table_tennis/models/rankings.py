@@ -116,7 +116,7 @@ class Rankings:
         default_rating = -1000.0
         default_active = False
         default_category = ""
-        default_cat_value = 0
+        default_cat_value = 0.0
         default_cum_tid_value = ""
 
         cat_columns = (
