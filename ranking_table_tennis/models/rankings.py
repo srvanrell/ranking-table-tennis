@@ -91,7 +91,7 @@ class Rankings:
         self,
         tid: str,
         pid: int,
-        initial_rating: float = -1000,
+        initial_rating: float = -1000.0,
         active: bool = False,
         initial_category: str = "",
     ) -> None:
@@ -113,10 +113,10 @@ class Rankings:
         if duplicated.any():
             logger.error("Ranking entries duplicated:\n%s", self.ranking_df[duplicated])
 
-        default_rating = -1000
+        default_rating = -1000.0
         default_active = False
         default_category = ""
-        default_cat_value = 0
+        default_cat_value = 0.0
         default_cum_tid_value = ""
 
         cat_columns = (
@@ -146,8 +146,8 @@ class Rankings:
         entries_indexes = self.ranking_df.tid == prev_tid
         new_ranking = self.ranking_df.loc[entries_indexes].copy()
         new_ranking.loc[:, "tid"] = new_tid
-        new_ranking.loc[:, self.points_cat_columns() + self.cum_points_cat_columns()] = 0
-        new_ranking.loc[:, self.participations_cat_columns()] = 0
+        new_ranking.loc[:, self.points_cat_columns() + self.cum_points_cat_columns()] = 0.0
+        new_ranking.loc[:, self.participations_cat_columns()] = 0.0
         new_ranking.loc[:, self.cum_tids_cat_columns()] = ""
         self.ranking_df = pd.concat([self.ranking_df, new_ranking], ignore_index=True)
 

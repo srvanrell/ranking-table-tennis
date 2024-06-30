@@ -47,7 +47,11 @@ def load_initial_ranking_sheet() -> models.Rankings:
     cfg = ConfigManager().current_config
     tournaments_xlsx = cfg.io.data_folder + cfg.io.xlsx.tournaments_filename
     initial_ranking_df = pd.read_excel(
-        tournaments_xlsx, sheet_name=cfg.sheetname.initial_ranking, header=0
+        tournaments_xlsx,
+        sheet_name=cfg.sheetname.initial_ranking,
+        header=0,
+        true_values=[cfg.activeplayer[True]],
+        false_values=[cfg.activeplayer[False]],
     )
     logger.debug(
         "> Reading '%s' @ '%s'", cfg.sheetname.initial_ranking, cfg.io.xlsx.tournaments_filename
@@ -66,9 +70,6 @@ def load_initial_ranking_sheet() -> models.Rankings:
     }
 
     initial_ranking_df.rename(columns=columns_translations, inplace=True)
-    initial_ranking_df.loc[:, "active"] = (
-        initial_ranking_df.loc[:, "active"] == cfg.activeplayer[True]
-    )
     initial_ranking = models.Rankings(initial_ranking_df)
 
     return initial_ranking
