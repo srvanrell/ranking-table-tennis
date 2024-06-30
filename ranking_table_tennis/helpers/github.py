@@ -6,7 +6,7 @@ from ranking_table_tennis.helpers.gspread import days_since_last_update
 logger = logging.getLogger(__name__)
 
 
-def no_updates_stop_workflow(spreadsheet_id, max_days_since_last_update=3):
+def no_updates_stop_workflow(spreadsheet_id, max_days_since_last_update=1):
     """If spreasheet_id has not been modified recently GITHUB_OUTPUT env var will stop workflow"""
 
     days_since_update = days_since_last_update(spreadsheet_id)
