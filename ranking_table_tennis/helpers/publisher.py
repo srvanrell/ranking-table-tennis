@@ -612,7 +612,7 @@ def _insert_empty_row_between_categories(df: pd.DataFrame) -> pd.DataFrame:
 
 def _insert_empty_row(df: pd.DataFrame) -> pd.DataFrame:
     """Function to insert empty row in the dataframe"""
-    empty_row = df.iloc[:1].copy()
+    empty_row = df.iloc[:1].copy().astype(str)
     empty_row.iloc[0] = ""
 
     return pd.concat([empty_row, df])

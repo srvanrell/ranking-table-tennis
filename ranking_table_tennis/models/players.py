@@ -37,11 +37,11 @@ class Players:
         self.players_df.fillna("", inplace=True)
 
         # cols_to_upper = ["affiliation"]
-        # self.players_df.loc[:, cols_to_upper] = self.players_df.loc[:, cols_to_upper].applymap(
+        # self.players_df.loc[:, cols_to_upper] = self.players_df.loc[:, cols_to_upper].map(
         #     lambda cell: cell.strip().upper())
 
         cols_to_title = ["name", "city"]
-        self.players_df.loc[:, cols_to_title] = self.players_df.loc[:, cols_to_title].applymap(
+        self.players_df.loc[:, cols_to_title] = self.players_df.loc[:, cols_to_title].map(
             lambda cell: unidecode(cell).strip().title()
         )
 
