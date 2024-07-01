@@ -519,7 +519,7 @@ class Rankings:
         stats_cat = (
             self.ranking_df.loc[tids_to_consider, columns]
             .groupby("tid")
-            .apply(lambda df: (df > 0).sum(axis=0))
+            .apply(lambda df: (df > 0).sum(axis=0), include_groups=False)
             .rename(lambda col: col.replace("points", "participation"), axis="columns")
         )
 
@@ -528,7 +528,7 @@ class Rankings:
         cum_participation_total = (
             self.ranking_df.loc[tids_to_consider, columns]
             .groupby("tid")
-            .apply(self._count_unique_pids, self.cum_points_cat_columns())
+            .apply(self._count_unique_pids, self.cum_points_cat_columns(), include_groups=False)
             .rename("cum_participation_total")
         )
 
@@ -537,7 +537,7 @@ class Rankings:
         participation_total = (
             self.ranking_df.loc[:, columns]
             .groupby("tid")
-            .apply(self._count_unique_pids, self.points_cat_columns())
+            .apply(self._count_unique_pids, self.points_cat_columns(), include_groups=False)
             .rename("participation_total")
         )
 
