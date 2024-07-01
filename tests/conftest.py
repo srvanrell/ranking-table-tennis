@@ -15,9 +15,13 @@ def pytest_sessionstart(session):
     Called after the Session object has been created and
     before performing collection and entering the run test loop.
     """
-    data_rtt_folder = os.path.join(os.path.dirname(__file__), "data_rtt")
+    test_folder = os.path.dirname(__file__)
+    data_rtt_folder = os.path.join(test_folder, "data_rtt")
 
     logger.debug("## Before starting tests...")
+    os.chdir(test_folder)
+    logger.debug(f"Moved to: {test_folder=}")
+
     if os.path.exists(data_rtt_folder):
         logger.debug("Removing data folder before tests: remove %", data_rtt_folder)
         shutil.rmtree(data_rtt_folder)

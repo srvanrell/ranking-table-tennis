@@ -138,7 +138,7 @@ class Tournaments:
                 location=lambda df: df.location.str.strip().str.title(),
                 player_a=lambda df: df.player_a.apply(unidecode).str.strip().str.title(),
                 player_b=lambda df: df.player_b.apply(unidecode).str.strip().str.title(),
-                year=lambda df: df.date.dt.year,
+                year=lambda df: df.date.dt.year.astype(int),
                 tid=lambda df: self.tid_str(df),
             )
             .astype(
