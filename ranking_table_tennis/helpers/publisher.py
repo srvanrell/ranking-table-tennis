@@ -389,7 +389,9 @@ def publish_histories_sheet(
     # Remove repeated strings to show a cleaner sheet
     history_df.loc[history_df["name"] == history_df["name"].shift(1), "name"] = ""
     # insert an empty row into history. This is a format workaround
-    history_df = history_df.groupby("pid", sort=False, group_keys=False).apply(_keep_name_new_row)
+    history_df = history_df.groupby("pid", sort=False, group_keys=False)[history_df.columns].apply(
+        _keep_name_new_row
+    )
     # Remove repeated strings to show a cleaner sheet
     history_df.loc[history_df["category"] == history_df["category"].shift(1), "category"] = ""
 
@@ -607,7 +609,11 @@ def _keep_name_new_row(df: pd.DataFrame) -> pd.DataFrame:
 def _insert_empty_row_between_categories(df: pd.DataFrame) -> pd.DataFrame:
     """Insert empty row between categories in the dataframe"""
     # First row is ommited because is an empty row
-    return df.groupby("category", sort=False, group_keys=False).apply(_insert_empty_row).iloc[1:]
+    return (
+        df.groupby("category", sort=False, as_index=False)[df.columns]
+        .apply(_insert_empty_row)
+        .iloc[1:]
+    )
 
 
 def _insert_empty_row(df: pd.DataFrame) -> pd.DataFrame:
@@ -615,4 +621,4 @@ def _insert_empty_row(df: pd.DataFrame) -> pd.DataFrame:
     empty_row = df.iloc[:1].copy().astype(str)
     empty_row.iloc[0] = ""
 
-    return pd.concat([empty_row, df])
+    return pd.concat([empty_row, df], ignore_index=True)
