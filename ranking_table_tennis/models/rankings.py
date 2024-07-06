@@ -319,7 +319,7 @@ class Rankings:
 
         best_rounds_pointed = best_rounds.merge(
             points_assignation_table, on=["category", "best_round"]
-        )
+        ).sort_values(["category", "points", "pid"], ascending=[True, False, True])
         best_rounds_pointed.insert(0, "tid", tid)
 
         for cat, points_cat_col in zip(self.cfg.categories, self.points_cat_columns()):
