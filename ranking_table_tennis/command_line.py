@@ -20,9 +20,11 @@ def main():
             (1) preprocess: downloads tournament data and preprocess it
             (2) compute: generates rankings from preprocessed data
             (3) publish: provides formatted spreadsheets to upload rankings
+            or
+            automatic: combines (1) (2) (3) to resolve automatically
             """
         ),
-        choices=["preprocess", "compute", "publish"],
+        choices=["preprocess", "compute", "publish", "automatic"],
     )
     parser.add_argument(
         "--log",
@@ -103,6 +105,21 @@ def main():
         from ranking_table_tennis import publish
 
         publish.main(args.online_publish, args.last, args.tournament_num, args.config_initial_date)
+    elif args.cmd == "automatic":
+        from ranking_table_tennis import compute_rankings, preprocess_unattended, publish
+
+        # Download and preprocess with no prev rankings
+        preprocess_unattended.main(args.config_initial_date, download=True)
+        # Computing ratings so suggestions to new players can be given and assigned
+        compute_rankings.main(args.config_initial_date)
+        # preprocessing twice to assign rating as much as possible
+        preprocess_unattended.main(args.config_initial_date, download=False)
+        # New players that played only with new players might not be resolved. Try it one more time
+        preprocess_unattended.main(args.config_initial_date, download=False)
+        # Computing ratings to publish
+        compute_rankings.main(args.config_initial_date)
+        # Publish last tournament
+        publish.main(online=False, last=True, config_initial_date=args.config_initial_date)
     else:
         logger.error("you shouldn't see this message")
 
