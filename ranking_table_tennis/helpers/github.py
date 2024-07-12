@@ -19,7 +19,7 @@ def no_updates_stop_workflow(spreadsheet_id, max_days_since_last_update=1):
     var_value = f"stop_workflow={str(stop_workflow).lower()}"  # true or false
 
     ghoutput = os.getenv(GITHUB_OUTPUT_VAR_NAME)
-    if ghoutput is not None:
+    if ghoutput is not None and ghoutput != var_value:
         logger.debug("Set env var '%s': '%s'", GITHUB_OUTPUT_VAR_NAME, var_value)
 
         with open(ghoutput, "a") as fh:
