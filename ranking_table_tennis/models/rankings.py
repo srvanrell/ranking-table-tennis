@@ -84,7 +84,7 @@ class Rankings:
             return self.ranking_df.loc[entries_indexes]
 
     def add_entry(self, ranking_entry: pd.Series) -> None:
-        self.ranking_df = self.ranking_df.append(ranking_entry)
+        self.ranking_df = pd.concat([self.ranking_df, ranking_entry], axis="index")
         self.verify_and_normalize()
 
     def add_new_entry(
@@ -95,7 +95,7 @@ class Rankings:
         active: bool = False,
         initial_category: str = "",
     ) -> None:
-        self.ranking_df = self.ranking_df.append(
+        new_entry = pd.DataFrame(
             {
                 "tid": tid,
                 "pid": pid,
@@ -103,8 +103,9 @@ class Rankings:
                 "active": active,
                 "category": initial_category,
             },
-            ignore_index=True,
+            index=[-1],
         )
+        self.ranking_df = pd.concat([self.ranking_df, new_entry], ignore_index=True, axis="index")
         self.verify_and_normalize()
         self.update_categories(tid)
 

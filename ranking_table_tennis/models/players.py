@@ -66,7 +66,7 @@ class Players:
         return self.players_df["name"]
 
     def add_player(self, player: pd.Series) -> None:
-        self.players_df = self.players_df.append(player)
+        self.players_df = pd.concat([self.players_df, player], axis="index")
         self.verify_and_normalize()
 
     def add_new_player(self, name: str, affiliation: str = "", city: str = "") -> None:
