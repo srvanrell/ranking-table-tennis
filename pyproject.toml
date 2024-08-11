@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ranking_table_tennis"
-version = "2024.7.12"
+version = "2024.8.11"
 description = "A ranking table tennis system"
 readme = "README.md"
 authors = [ "Sebastian Vanrell srvanrell_gmail_com" ]
@@ -17,7 +17,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.9"
+python = ">=3.9, <4"
 PyYAML = ">=5.4.1"
 Unidecode = "==1.*"
 gspread-dataframe = "==3.*"
@@ -30,13 +30,13 @@ openpyxl = "==3.1.*"
 pandas = "==2.2.*"
 plotly = "==5.*"
 tabulate = "==0.9.*"
-urllib3 = "==1.*"
+urllib3 = "==2.*"
 numpy = ">=1.24,<2"
 
 [tool.poetry.group.test.dependencies]
-pre-commit = "2.*"
-pyclean = "2.2.*"
-pytest = "7.*"
+pre-commit = "3.*"
+pyclean = "3.*"
+pytest = "8.*"
 pytest-shell-utilities ="1.9.*"
 pytest_profiling = "1.7.*"
 
