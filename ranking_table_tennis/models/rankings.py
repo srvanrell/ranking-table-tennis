@@ -84,7 +84,8 @@ class Rankings:
             return self.ranking_df.loc[entries_indexes]
 
     def add_entry(self, ranking_entry: pd.Series) -> None:
-        self.ranking_df = pd.concat([self.ranking_df, ranking_entry], axis="index")
+        ranking_entry_df = ranking_entry.to_frame().T
+        self.ranking_df = pd.concat([self.ranking_df, ranking_entry_df], axis="index")
         self.verify_and_normalize()
 
     def add_new_entry(
