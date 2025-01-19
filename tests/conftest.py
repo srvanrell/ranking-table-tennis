@@ -37,7 +37,7 @@ def pytest_sessionfinish(session, exitstatus):
     logger.debug("## After tests have finalized...")
     if os.path.exists(data_rtt_folder):
         logger.debug("Removing data folder after test: remove %s", data_rtt_folder)
-        shutil.rmtree(data_rtt_folder)
+        # shutil.rmtree(data_rtt_folder)
 
 
 def assert_equals_xlsx(reference_folder, output_folder, name_pattern):

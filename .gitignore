@@ -1,3 +1,5 @@
+.DS_Store
+
 config/key-for-gspread.json
 config/gspreadids.yaml
 
