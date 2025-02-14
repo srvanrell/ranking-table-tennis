@@ -83,6 +83,7 @@ def main(config_initial_date="220101"):
         ConfigManager().set_current_config(date=tournament_date)
         rankings.update_config()
         rankings.update_categories(tid)
+        rankings.sort_rankings()
 
     helpers.save_to_pickle(players=players, tournaments=tournaments, rankings=rankings)
 
