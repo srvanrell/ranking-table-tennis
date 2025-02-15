@@ -2,7 +2,7 @@
 |:----------:|:----------------------:|:-----------------:|:------------------:|:-----------:|:------------:|:---------------------:|
 |     1      |       875 (+500)       |         2         |  Fontana, Fausto   |   Parana    |   Aspatem    | 500 (T02) + 375 (T01) |
 |            |       875 (+375)       |         2         |   Nohara, Andres   |   Parana    |              | 500 (T01) + 375 (T02) |
-|     3      |       500 (+250)       |         2         |    Levin, Raul     |   Parana    |              | 250 (T01) + 250 (T02) |
+|     3      |       500 (+250)       |         2         |    Levin, Raul     |   Parana    |              | 250 (T02) + 250 (T01) |
 |     4      |        250 (=)         |         1         | Ferretti, Gustavo  |  Santa Fe   |   Atemeli    |       250 (T01)       |
 |            |       250 (+250)       |         1         |     Soto, Luis     |   Parana    | Tiro Federal |       250 (T02)       |
 |     6      |       250 (+125)       |         2         |  Bonelli, Marcos   |   Parana    |   Aspatem    | 125 (T02) + 125 (T01) |
