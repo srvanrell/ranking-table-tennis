@@ -2,7 +2,7 @@
 |:----------:|:----------------------:|:-----------------:|:--------------------:|:-----------:|:------------:|:--------------------------------:|
 |     1      |       440 (+250)       |         3         |    Prettis, Juan     |             |              | 250 (T03) + 125 (T02) + 65 (T01) |
 |     2      |        375 (=)         |         2         |    Jaime, Gerardo    |   Parana    |   Aspatem    |      250 (T02) + 125 (T01)       |
-|     3      |       315 (+125)       |         3         |  Alvarez, Sebastian  |  Santa Fe   |   Atemeli    | 125 (T01) + 125 (T03) + 65 (T02) |
+|     3      |       315 (+125)       |         3         |  Alvarez, Sebastian  |  Santa Fe   |   Atemeli    | 125 (T03) + 125 (T01) + 65 (T02) |
 |     4      |       295 (+65)        |         3         |   Colavini, Daniel   | Santo Tome  |   Atemeli    | 190 (T01) + 65 (T03) + 40 (T02)  |
 |     5      |        250 (=)         |         1         |     Goy, Gerardo     | Reconquista |    ATMAR     |            250 (T01)             |
 |     6      |       230 (+40)        |         3         |    Larrosa, Jorge    |   Parana    | Tiro Federal | 125 (T02) + 65 (T01) + 40 (T03)  |

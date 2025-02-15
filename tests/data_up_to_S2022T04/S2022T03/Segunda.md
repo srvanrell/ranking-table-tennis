@@ -4,7 +4,7 @@
 |            |        875 (=)         |         2         |   Nohara, Andres   |   Parana    |              |       500 (T01) + 375 (T02)       |
 |     3      |       625 (+500)       |         2         | Palamedi, Cristian |  Santa Fe   |   Atemeli    |       500 (T03) + 125 (T02)       |
 |     4      |       625 (+375)       |         3         |  Bonelli, Marcos   |   Parana    |   Aspatem    | 375 (T03) + 125 (T02) + 125 (T01) |
-|            |       625 (+125)       |         3         |    Levin, Raul     |   Parana    |              | 250 (T01) + 250 (T02) + 125 (T03) |
+|            |       625 (+125)       |         3         |    Levin, Raul     |   Parana    |              | 250 (T02) + 250 (T01) + 125 (T03) |
 |     6      |       400 (+250)       |         3         |  Escudero, Martin  |  Santa Fe   |   Atemeli    |  250 (T03) + 75 (T02) + 75 (T01)  |
 |     7      |        250 (=)         |         1         | Ferretti, Gustavo  |  Santa Fe   |   Atemeli    |             250 (T01)             |
 |            |       250 (+250)       |         1         |   Reniero, Gian    |             |              |             250 (T03)             |

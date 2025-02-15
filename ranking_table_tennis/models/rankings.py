@@ -183,6 +183,15 @@ class Rankings:
             self.ranking_df.loc[tid_entries, "rating"]
         )
 
+    def sort_rankings(self):
+        """Sort rankings DataFrame by tid ascending, rating descending, pid ascending."""
+        self.ranking_df = (
+            self.ranking_df
+            .sort_values(["tid", "rating", "pid"], ascending=[True, False, True])
+            .reset_index(drop=True)
+        )
+
+
     def _points_to_assign(self, rating_winner: float, rating_loser: float) -> Tuple[float, float]:
         """Points to add to winner and to deduce from loser given ratings of winner and loser."""
         rating_diff = rating_winner - rating_loser
@@ -365,7 +374,7 @@ class Rankings:
             # Best n_tournaments, not consider null points data to accelerate processing
             rankings_not_null = rankings[rankings[points_cat_col] > 0].copy()
             n_best = (
-                rankings_not_null.sort_values(by=[points_cat_col], ascending=False)
+                rankings_not_null.sort_values(by=[points_cat_col, "tid"], ascending=[False, False])
                 .groupby("pid")
                 .head(n_tournaments)
             )
