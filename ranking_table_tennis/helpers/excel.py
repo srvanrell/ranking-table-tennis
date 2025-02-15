@@ -149,7 +149,9 @@ def save_ranking_sheet(
         sheet_name = tournaments[tid].iloc[0].sheet_name
         sheet_name = sheet_name.replace(cfg.sheetname.tournaments_key, cfg.sheetname.rankings_key)
 
-    sorted_rankings_df = rankings.ranking_df.sort_values(["rating", "pid"], ascending=[False, True]).assign(
+    sorted_rankings_df = rankings.ranking_df.sort_values(
+        ["rating", "pid"], ascending=[False, True]
+    ).assign(
         active=lambda df: df["active"].map(cfg.activeplayer),
         date=lambda df: df["date"].dt.strftime("%Y %m %d"),
     )

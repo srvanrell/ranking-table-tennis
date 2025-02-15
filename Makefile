@@ -7,6 +7,7 @@ test-and-logs:
 install:
 	poetry --version
 	poetry install
+	poetry run pre-commit install
 
 clean:
 	pyclean .

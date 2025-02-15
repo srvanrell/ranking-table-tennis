@@ -144,7 +144,7 @@ class Tournaments:
             .astype(
                 {
                     "sets_a": int,
-                    "sets_b": int
+                    "sets_b": int,
                     # "round": "category",
                     # "category": "category",
                     # "location": "category",
