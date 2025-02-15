@@ -204,9 +204,9 @@ def publish_championship_sheets(
         criteria &= sorted_ranking[participations_col] == sorted_ranking[participations_col].shift(
             1
         )
-        sorted_ranking.loc[
-            criteria, "position"
-        ] = None  # Equivalent positions will be deleted to avoid misleading
+        sorted_ranking.loc[criteria, "position"] = (
+            None  # Equivalent positions will be deleted to avoid misleading
+        )
 
         sorted_ranking = sorted_ranking.merge(
             prev_ranking.loc[:, ["pid", point_col]], on="pid", suffixes=("", "_prev")
