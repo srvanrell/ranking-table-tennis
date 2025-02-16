@@ -63,7 +63,7 @@ def main():
     parser.add_argument(
         "--config-initial-date",
         help="Set the initial date to get the right configs and setup.",
-        choices=["240101", "230101", "220101", "210101"],
+        choices=[f"{YY % 100}0101" for YY in range(2021, datetime.now().year + 1)],
         default=datetime.today().strftime("%y0101"),
     )
     group = parser.add_mutually_exclusive_group()
