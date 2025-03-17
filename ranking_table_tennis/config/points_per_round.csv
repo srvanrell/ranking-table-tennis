@@ -1,12 +1,12 @@
-priority,round_reached,primera,segunda,tercera,cuarta
-0,zona,100,50,25,10
-1,16avos,120,60,30,12
-2,octavos,150,75,40,15
-3,cuartos,250,125,65,25
-4,semifinal,500,250,125,50
-5,tercer puesto,0,0,0,0
-6,cuarto,350,175,90,35
-7,tercero,500,250,125,50
-8,final,0,0,0,0
-9,segundo,750,375,190,75
-10,primero,1000,500,250,100
+priority,round_reached,primera,segunda,tercera,cuarta,quinta
+0,zona,100,50,25,10,1
+1,16avos,120,60,30,12,2
+2,octavos,150,75,40,15,3
+3,cuartos,250,125,65,25,4
+4,semifinal,500,250,125,50,6
+5,tercer puesto,0,0,0,0,0
+6,cuarto,350,175,90,35,5
+7,tercero,500,250,125,50,6
+8,final,0,0,0,0,0
+9,segundo,750,375,190,75,8
+10,primero,1000,500,250,100,10
