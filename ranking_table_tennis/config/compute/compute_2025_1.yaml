@@ -8,5 +8,6 @@ tournament_window_to_inactivate: 4
 categories_thresholds:
   - 1300  # minimo de primera
   - 700  # minimo de segunda
+  - 400  # minimo de tercera
 masters_N_tournaments_to_consider: 8
 masters_N_classified_to_list: 10000
