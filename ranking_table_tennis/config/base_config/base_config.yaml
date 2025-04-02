@@ -9,7 +9,6 @@ defaults:
   - sheetname
 
 # To be defined and completed from csv tables
-category: ???
 expected_result_table: ???
 unexpected_result_table: ???
 categories: ???
