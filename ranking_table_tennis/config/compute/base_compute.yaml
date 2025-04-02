@@ -1,0 +1,13 @@
+points_per_round_csv: "points_per_round.csv"
+expected_result_csv: "expected_result.csv"
+unexpected_result_csv: "unexpected_result.csv"
+fan_category: 4  # position of fan category from 2 to 5
+sanction_factor: 0.5
+rating_factor: 2.0
+category_expected_factor: 0.5
+category_unexpected_factor: 1.5
+tournament_window_to_activate: 4
+tournaments_to_activate: 2
+tournament_window_to_inactivate: 4
+masters_N_tournaments_to_consider: 8
+masters_N_classified_to_list: 10000

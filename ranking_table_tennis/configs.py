@@ -70,7 +70,7 @@ class Configuration:
             logger.debug("~ Config directory: '%s'", os.path.abspath(self._config_path))
 
             base_cfg = self._load_base_config()
-            tables_cfg = self._load_tables_config()
+            tables_cfg = self._load_tables_config(base_cfg)
             self.dict_cfg = OmegaConf.merge(base_cfg, tables_cfg)
 
         return self.dict_cfg
@@ -83,30 +83,32 @@ class Configuration:
             logger.debug("~ Loading '%s' @ '%s'", self._config_name, config_dir)
             return hydra.compose(config_name=self._config_name)
 
-    def _load_tables_config(self):
+    def _load_tables_config(self, base_cfg):
         """Load dict_cfg with tables to assign championship and rating points"""
 
         # Tables to assign points
 
         # difference, points to winner, points to loser
-        expected_result_table = pd.read_csv(os.path.join(self._config_path, "expected_result.csv"))
+        expected_result_table = pd.read_csv(
+            os.path.join(self._config_path, base_cfg.compute.expected_result_csv)
+        )
 
         # negative difference, points to winner, points to loser
         unexpected_result_table = pd.read_csv(
-            os.path.join(self._config_path, "unexpected_result.csv")
+            os.path.join(self._config_path, base_cfg.compute.unexpected_result_csv)
         )
 
         # points to be assigned by round and by participation
         raw_points_per_round_table = pd.read_csv(
-            os.path.join(self._config_path, "points_per_round.csv")
+            os.path.join(self._config_path, base_cfg.compute.points_per_round_csv)
         )
         best_rounds_points = raw_points_per_round_table.drop(columns="priority")
 
         # Priority of rounds in a tournament
         best_rounds_priority = raw_points_per_round_table.set_index("round_reached")["priority"]
 
-        # List of categories
-        categories = raw_points_per_round_table.columns[2:]
+        # List of categories, the last category must be the fan category
+        categories = raw_points_per_round_table.columns[2:][: base_cfg.compute.fan_category]
 
         # Convert to simpler types so they can be configs
         extra_cfg = OmegaConf.create(
