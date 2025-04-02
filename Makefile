@@ -11,3 +11,6 @@ install:
 
 clean:
 	pyclean .
+
+publish:
+	poetry publish --build
