@@ -64,6 +64,9 @@ def main(online=False, last=True, tournament_num=None, config_initial_date="2201
 
     # Publish formated rating of selected tournament
     helpers.publish_rating_sheet(tournaments, rankings, players, tid, prev_tid, upload=upload)
+    helpers.publish_rating_sheet(
+        tournaments, rankings, players, tid, prev_tid, upload=upload, all_players=True
+    )
 
     # Publish points assigned in each match
     helpers.publish_rating_details_sheet(
