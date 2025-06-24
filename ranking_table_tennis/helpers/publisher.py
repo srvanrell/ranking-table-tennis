@@ -257,11 +257,14 @@ def publish_rating_sheet(
     tid: str,
     prev_tid: str,
     upload=False,
+    all_players: bool = False,
 ) -> None:
     """Format a ranking to be published into a rating sheet"""
     cfg = ConfigManager().current_config
     sheet_name = tournaments[tid]["sheet_name"].iloc[0]
     sheet_name = sheet_name.replace(cfg.sheetname.tournaments_key, cfg.labels.Rating)
+    if all_players:
+        sheet_name += "_a"
 
     xlsx_filename = cfg.io.data_folder + cfg.io.xlsx.publish_filename.replace("NN", tid)
 
@@ -270,9 +273,12 @@ def publish_rating_sheet(
     prev_ranking_df = rankings[prev_tid].copy()
 
     # Filter inactive players or players that didn't played any tournament
-    nonzero_points = this_ranking_df.loc[:, rankings.cum_points_cat_columns()].any(axis="columns")
-    this_ranking_df = this_ranking_df.loc[this_ranking_df.active | nonzero_points]
-    # FIXME there must be a special treatment for fan category
+    if not all_players:
+        nonzero_points = this_ranking_df.loc[:, rankings.cum_points_cat_columns()].any(
+            axis="columns"
+        )
+        this_ranking_df = this_ranking_df.loc[this_ranking_df.active | nonzero_points]
+    # # FIXME there must be a special treatment for fan category
 
     # Format data and columns to write into the file
     this_ranking_df = this_ranking_df.merge(
@@ -315,6 +321,8 @@ def publish_rating_sheet(
         load_and_upload_sheet(xlsx_filename, sheet_name, cfg.io.temporal_spreadsheet_id)
 
     sheet_name_for_md = cfg.labels.Rating
+    if all_players:
+        sheet_name_for_md += "_Ampliado"
     publish_sheet_as_markdown(this_ranking_df[columns], headers, sheet_name_for_md, tid)
     publish_tournament_metadata_as_markdown(tid, tournaments[tid])
 
