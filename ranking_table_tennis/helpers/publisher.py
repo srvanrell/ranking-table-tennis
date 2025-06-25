@@ -301,11 +301,14 @@ def publish_rating_sheet(
     headers = [cfg.labels[key] for key in ["Category", "Rating", "Player", "City", "Association"]]
     columns = ["category", "formatted rating", "name", "city", "affiliation"]
 
-    this_ranking_df = (
-        this_ranking_df.sort_values(["rating", "name"], ascending=[False, True])
-        .loc[:, columns]
-        .pipe(_insert_empty_row_between_categories)
-    )
+    if all_players:
+        this_ranking_df = this_ranking_df.sort_values(["name"], ascending=[True]).loc[:, columns]
+    else:
+        this_ranking_df = (
+            this_ranking_df.sort_values(["rating", "name"], ascending=[False, True])
+            .loc[:, columns]
+            .pipe(_insert_empty_row_between_categories)
+        )
 
     with _get_writer(xlsx_filename, sheet_name) as writer:
         this_ranking_df.to_excel(
