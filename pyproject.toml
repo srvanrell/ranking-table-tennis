@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ranking_table_tennis"
-version = "2025.6.25"
+version = "2025.7.13"
 description = "A ranking table tennis system"
 readme = "README.md"
 authors = [ "Sebastian Vanrell srvanrell_gmail_com" ]
@@ -17,7 +17,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.9, <4"
+python = ">=3.10, <4"
 PyYAML = ">=5.4.1"
 Unidecode = "==1.*"
 gspread-dataframe = "==3.*"

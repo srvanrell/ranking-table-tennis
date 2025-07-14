@@ -67,7 +67,7 @@ class Rankings:
     def update_config(self):
         self.cfg = ConfigManager().current_config
 
-    def get_entries(self, tid: str, pid: int = None, col: str = None):
+    def get_entries(self, tid: str, pid: int | None = None, col: str | None = None):
         entries_indexes = self.ranking_df.tid == tid
 
         if pid:

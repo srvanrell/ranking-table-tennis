@@ -233,7 +233,7 @@ class Tournaments:
         self.tournaments_df["loser_pid"] = self.tournaments_df["loser"].map(name2pid)
 
     def get_matches(
-        self, tid: str, exclude_fan_category: bool = True, to_exclude: List[str] = None
+        self, tid: str, exclude_fan_category: bool = True, to_exclude: List[str] | None = None
     ) -> pd.DataFrame:
         if to_exclude is None:
             to_exclude = ["sanction", "promote", "bonus"]

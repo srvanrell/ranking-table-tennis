@@ -1,3 +1,5 @@
+.PHONY: test test-and-logs install clean publish
+
 test:
 	poetry run pytest -vv tests
 
