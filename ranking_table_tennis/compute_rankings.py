@@ -6,13 +6,15 @@ from ranking_table_tennis.configs import ConfigManager
 logger = logging.getLogger(__name__)
 
 
-def main(config_initial_date="220101"):
+def main(config_initial_date="220101") -> int:
     """Compute rating and championship points of loaded tournaments.
 
     Function to run after preprocess.main().
 
     It will read players, tournaments in pickles.
     It will save players, tournaments and rankings in pickles.
+
+    Returns the number of tournaments processed.
     """
     logger.info("Starting to compute rankings!")
 
@@ -86,6 +88,8 @@ def main(config_initial_date="220101"):
         rankings.sort_rankings()
 
     helpers.save_to_pickle(players=players, tournaments=tournaments, rankings=rankings)
+
+    return len(tids) - 1  # Exclude initial tid
 
 
 if __name__ == "__main__":

@@ -117,9 +117,14 @@ def main():
         # New players that played only with new players might not be resolved. Try it one more time
         preprocess_unattended.main(args.config_initial_date, download=False)
         # Computing ratings to publish
-        compute_rankings.main(args.config_initial_date)
-        # Publish last tournament
-        publish.main(online=False, last=True, config_initial_date=args.config_initial_date)
+        n_processed_tournaments = compute_rankings.main(args.config_initial_date)
+        # Publish tournament
+        for tournament_n in range(1, n_processed_tournaments + 1):
+            publish.main(
+                online=False,
+                tournament_num=tournament_n,
+                config_initial_date=args.config_initial_date,
+            )
     else:
         logger.error("you shouldn't see this message")
 
