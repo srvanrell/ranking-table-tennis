@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ranking_table_tennis"
-version = "2025.7.13"
+version = "2025.9.24"
 description = "A ranking table tennis system"
 readme = "README.md"
 authors = [ "Sebastian Vanrell srvanrell_gmail_com" ]
