@@ -1,15 +1,15 @@
 .PHONY: test test-and-logs install clean publish
 
 test:
-	poetry run pytest -vv tests
+	uv run pytest -vv tests
 
 test-and-logs:
-	poetry run pytest -vvv tests -s --log-level debug -o log_cli=true --log-cli-level=DEBUG
+	uv run pytest -vvv tests -s --log-level debug -o log_cli=true --log-cli-level=DEBUG
 
 install:
-	poetry --version
-	poetry install
-	poetry run pre-commit install
+	uv --version
+	uv sync --extra test
+	uv run pre-commit install
 
 clean:
 	pyclean .
