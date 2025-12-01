@@ -15,4 +15,5 @@ clean:
 	pyclean .
 
 publish:
-	poetry publish --build
+    uv build
+	uv publish
