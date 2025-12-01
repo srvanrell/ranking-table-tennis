@@ -14,21 +14,22 @@ Their computation is based on the outcomes of one-versus-one matches.
 
 This system has been developed for a Linux environment.
 
-Poetry installation (recommended)
+### Using uv (recommended)
 
-    poetry install
+    uv venv [-p 3.12]
+    uv sync
 
-System-wide installation
+Install the package globally (not recommended):
 
-    sudo pip install ranking-table-tennis
+    uv pip install ranking-table-tennis
 
-Single-user installation
+### Using pip (single user)
 
     pip install --user ranking-table-tennis
 
 Uninstallation
 
-    [sudo] pip uninstall ranking-table-tennis
+    pip uninstall ranking-table-tennis
 
 ### Authentication for gspread
 
@@ -37,17 +38,17 @@ Please, follow the [recommended steps](https://docs.gspread.org/en/latest/oauth2
 
 ## Update
 
-System-wide update
+Using uv (recommended):
 
-    sudo pip install -U ranking-table-tennis
+    uv sync
 
-Single-user update (recommended)
+Using pip (single user):
 
-    pip install --user -U ranking-table-tennis
+    pip install --user --upgrade ranking-table-tennis
 
 ## Usage
 
-The commands must be run in a bash terminal.
+The commands must be run in a bash terminal. Use `uv run ...` if you have installed with uv.
 
 1. Fill a sheet with the tournament matches. It must be saved in the Tournaments spreadsheet (xlsx).
 
@@ -70,21 +71,19 @@ The outcome will be saved in a new spreadsheet.
 
 ## Development
 
-Install locally from source (source directory will immediately affect the installed package
-without needing to re-install):
+Install locally from source (editable mode):
 
-    pip install --user --editable .
+    uv sync --group test
+    uv run pytest
 
-    sudo apt install graphviz (still required?)
+Install with pip (editable mode):
 
-Update version at `pyproject.toml` and then create a source distribution
+    pip install --editable ".[test]"
+    pytest
 
-    poetry build
+Update version at `pyproject.toml` and push it to github. We follow date versions like `vYYYY.MM.DD`
 
-Upload to PyPI
+Once it is merged on master you must tag the commit so a github actions will be triggered to do the rest:
 
-    poetry publish [--dry-run] [--build]
-
-Upload to TestPyPI
-
-    poetry publish -r testpypi [--dry-run] [--build]
+    uv build
+    uv publish
