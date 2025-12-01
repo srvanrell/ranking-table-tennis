@@ -1,6 +1,6 @@
 [project]
 name = "ranking_table_tennis"
-version = "2025.9.24"
+version = "2025.11.30"
 description = "A ranking table tennis system"
 readme = "README.md"
 requires-python = ">=3.10"
