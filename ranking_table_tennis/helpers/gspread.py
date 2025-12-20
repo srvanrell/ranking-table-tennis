@@ -120,18 +120,6 @@ def days_since_last_update(spreadsheet_id) -> int:
     return difference.days
 
 
-def _in_colab() -> bool:
-    # Verify if it is running on colab
-    try:
-        import google.colab  # noqa
-
-        _in_colab = True
-    except ModuleNotFoundError:
-        _in_colab = False
-
-    return _in_colab
-
-
 def _get_gc() -> gspread.Client:
     gc = None
 
@@ -158,17 +146,6 @@ def _get_gc() -> gspread.Client:
         logger.warn("!! The end user .json key file has not been configured. Upload might fail.")
     # except OSError:
     #     logger.warn("!!Connection failure. Upload will fail.")
-
-    try:
-        if gc is None and _in_colab():
-            from google.colab import auth
-
-            auth.authenticate_user()
-            from oauth2client.client import GoogleCredentials  # type: ignore
-
-            gc = gspread.authorize(GoogleCredentials.get_application_default())
-    except FileNotFoundError:
-        logger.warn("!! Colab user authentication has failed. Upload might fail.")
 
     if gc is None:
         raise PermissionError("Cannot authenticate to read and write using gspread")
