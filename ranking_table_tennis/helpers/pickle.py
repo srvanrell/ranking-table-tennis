@@ -10,9 +10,9 @@ logger = logging.getLogger(__name__)
 
 
 def save_to_pickle(
-    players: models.Players = None,
-    rankings: models.Rankings = None,
-    tournaments: models.Tournaments = None,
+    players: models.Players | None = None,
+    rankings: models.Rankings | None = None,
+    tournaments: models.Tournaments | None = None,
 ) -> None:
     cfg = ConfigManager().current_config
     objects = [players, rankings, tournaments]

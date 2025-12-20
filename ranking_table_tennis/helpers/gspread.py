@@ -17,7 +17,7 @@ def upload_sheet_from_df(
     spreadsheet_id: str,
     sheet_name: str,
     df: pd.DataFrame,
-    headers: List[str] = None,
+    headers: List[str] | None = None,
     include_index: bool = False,
     include_df_headers: bool = True,
 ) -> None:
@@ -105,7 +105,7 @@ def publish_to_web(tid: str, show_on_web=False) -> None:
             create_n_tour_sheet(spreadsheet_id, tid)
 
 
-def days_since_last_update(spreadsheet_id) -> str:
+def days_since_last_update(spreadsheet_id) -> int:
     try:
         gc = _get_gc()
         spreadsheet = gc.open_by_key(spreadsheet_id)
