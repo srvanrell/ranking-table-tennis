@@ -11,6 +11,9 @@ install:
 	uv sync --extra test
 	uv run pre-commit install
 
+update-deps:
+	uv sync --upgrade --extra test
+
 clean:
 	pyclean .
 
