@@ -52,7 +52,6 @@ def main(config_initial_date="220101", download=True):
         logger.info("** Processing %s", tid)
 
         for name in tournaments.get_players_names(tid):
-
             if players.get_pid(name) is None:
                 unknown_player_should_update = True
                 # Assign a pid for the new given player and add it to the list

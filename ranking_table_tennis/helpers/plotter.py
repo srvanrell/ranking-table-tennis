@@ -137,7 +137,6 @@ def plot_championships(tid):
         ["cum_points_cat_1", "cum_points_cat_2", "cum_points_cat_3"],
         ["Primera", "Segunda", "Tercera"],
     ):
-
         df = df_complete.loc[mask]
 
         fig = px.line(
