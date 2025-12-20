@@ -96,14 +96,16 @@ def publish_statistics_sheet(
         ws.insert_rows(0, 1)
 
         n_headers = len(headers)
-        starting_cell, ending_cell = rowcol_to_a1(row=1, col=2), rowcol_to_a1(
-            row=1, col=n_headers / 2 + 1
+        starting_cell, ending_cell = (
+            rowcol_to_a1(row=1, col=2),
+            rowcol_to_a1(row=1, col=n_headers / 2 + 1),
         )
         ws[starting_cell] = cfg.labels.Cumulated
         ws.merge_cells(f"{starting_cell}:{ending_cell}")
 
-        starting_cell, ending_cell = rowcol_to_a1(row=1, col=n_headers / 2 + 2), rowcol_to_a1(
-            row=1, col=n_headers + 1
+        starting_cell, ending_cell = (
+            rowcol_to_a1(row=1, col=n_headers / 2 + 2),
+            rowcol_to_a1(row=1, col=n_headers + 1),
         )
         ws[starting_cell] = cfg.labels.By_Tournament
         ws.merge_cells(f"{starting_cell}:{ending_cell}")
@@ -349,9 +351,8 @@ def publish_initial_rating_sheet(
     this_ranking_df = (
         rankings[initial_tid]
         # Format data and columns to write into the file
-        .merge(players.players_df.loc[:, ["name", "city", "affiliation"]], on="pid").sort_values(
-            ["rating", "name"], ascending=[False, True]
-        )
+        .merge(players.players_df.loc[:, ["name", "city", "affiliation"]], on="pid")
+        .sort_values(["rating", "name"], ascending=[False, True])
     )
 
     to_bold = ["A1", "B1", "C1", "D1"]

@@ -367,7 +367,6 @@ class Rankings:
             self.cum_tids_cat_columns(),
             self.participations_cat_columns(),
         ):
-
             # Best n_tournaments, not consider null points data to accelerate processing
             rankings_not_null = rankings[rankings[points_cat_col] > 0].copy()
             n_best = (
@@ -460,10 +459,12 @@ class Rankings:
 
         tids_list = self._get_tids_list()
         active_window_tids = tids_list[
-            max(0, tids_list.index(tid) - activate_window + 1) : tids_list.index(tid) + 1  # noqa
+            max(0, tids_list.index(tid) - activate_window + 1) : tids_list.index(tid)
+            + 1  # noqa
         ]
         inactive_window_tids = tids_list[
-            max(0, tids_list.index(tid) - inactivate_window + 1) : tids_list.index(tid) + 1  # noqa
+            max(0, tids_list.index(tid) - inactivate_window + 1) : tids_list.index(tid)
+            + 1  # noqa
         ]
 
         tid_criteria = self.ranking_df.tid == tid

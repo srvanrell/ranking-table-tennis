@@ -52,3 +52,7 @@ include = ["ranking_table_tennis"]
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+# Set the maximum line length
+line-length = 100

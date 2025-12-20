@@ -15,5 +15,5 @@ clean:
 	pyclean .
 
 publish:
-    uv build
+	uv build
 	uv publish
