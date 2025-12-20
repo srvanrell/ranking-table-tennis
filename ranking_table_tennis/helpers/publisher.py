@@ -98,13 +98,13 @@ def publish_statistics_sheet(
         n_headers = len(headers)
         starting_cell, ending_cell = (
             rowcol_to_a1(row=1, col=2),
-            rowcol_to_a1(row=1, col=n_headers / 2 + 1),
+            rowcol_to_a1(row=1, col=int(n_headers / 2 + 1)),
         )
         ws[starting_cell] = cfg.labels.Cumulated
         ws.merge_cells(f"{starting_cell}:{ending_cell}")
 
         starting_cell, ending_cell = (
-            rowcol_to_a1(row=1, col=n_headers / 2 + 2),
+            rowcol_to_a1(row=1, col=int(n_headers / 2 + 2)),
             rowcol_to_a1(row=1, col=n_headers + 1),
         )
         ws[starting_cell] = cfg.labels.By_Tournament
