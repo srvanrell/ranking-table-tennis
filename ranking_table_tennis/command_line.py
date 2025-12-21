@@ -33,11 +33,6 @@ def main():
         default="info",
     )
     parser.add_argument(
-        "--online-publish",
-        help="Execute publish to update online public sheets (not available since 2023).",
-        action="store_true",
-    )
-    parser.add_argument(
         "--offline",
         help="Execute preprocessing command locally. Compute is always offline.",
         action="store_true",
@@ -104,7 +99,7 @@ def main():
     elif args.cmd == "publish":
         from ranking_table_tennis import publish
 
-        publish.main(args.online_publish, args.last, args.tournament_num, args.config_initial_date)
+        publish.main(args.last, args.tournament_num, args.config_initial_date)
     elif args.cmd == "automatic":
         from ranking_table_tennis import compute_rankings, preprocess_unattended, publish
 
@@ -121,7 +116,6 @@ def main():
         # Publish tournament
         for tournament_n in range(1, n_processed_tournaments + 1):
             publish.main(
-                online=False,
                 tournament_num=tournament_n,
                 config_initial_date=args.config_initial_date,
             )
