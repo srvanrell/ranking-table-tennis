@@ -7,7 +7,6 @@ from openpyxl.styles import Alignment, Font
 from ranking_table_tennis import models
 from ranking_table_tennis.configs import ConfigManager
 from ranking_table_tennis.helpers.excel import _get_writer
-from ranking_table_tennis.helpers.gspread import load_and_upload_sheet
 from ranking_table_tennis.helpers.markdown import (
     publish_sheet_as_markdown,
     publish_stat_plot,
@@ -21,7 +20,6 @@ def publish_championship_details_sheet(
     players: models.Players,
     tid: str,
     prev_tid: str,
-    upload: bool,
 ) -> None:
     """Format and publish championship details of given tournament into sheets"""
     cfg = ConfigManager().current_config
@@ -60,9 +58,6 @@ def publish_championship_details_sheet(
         _publish_tournament_metadata(ws, tournaments[tid])
         _bold_and_center(ws, to_bold, to_center)
 
-    if upload:
-        load_and_upload_sheet(xlsx_filename, sheet_name, cfg.io.temporal_spreadsheet_id)
-
     sheet_name_for_md = cfg.sheetname.championship_details_key
     publish_sheet_as_markdown(championship_details[columns], headers, sheet_name_for_md, tid)
 
@@ -73,7 +68,6 @@ def publish_statistics_sheet(
     players: models.Players,
     tid: str,
     prev_tid: str,
-    upload: bool = False,
 ) -> None:
     """Copy details from log and output details of given tournament"""
     cfg = ConfigManager().current_config
@@ -110,9 +104,6 @@ def publish_statistics_sheet(
         ws[starting_cell] = cfg.labels.By_Tournament
         ws.merge_cells(f"{starting_cell}:{ending_cell}")
 
-    if upload:
-        load_and_upload_sheet(xlsx_filename, sheet_name, cfg.io.temporal_spreadsheet_id)
-
     sheet_name_for_md = f"{cfg.sheetname.statistics_key} {cfg.labels.Cumulated}"
     publish_sheet_as_markdown(
         stats.iloc[:, : stats.shape[1] // 2], headers, sheet_name_for_md, tid, index=True
@@ -142,7 +133,6 @@ def publish_championship_sheets(
     players: models.Players,
     tid: str,
     prev_tid: str,
-    upload: bool = False,
 ) -> None:
     """Publish championship sheets, per category"""
     cfg = ConfigManager().current_config
@@ -239,9 +229,6 @@ def publish_championship_sheets(
                 ws, to_bold, to_center
             )  # FIXME This should be part of publish metadata, to merge the right cells
 
-        if upload:
-            load_and_upload_sheet(xlsx_filename, sheet_name, cfg.io.temporal_spreadsheet_id)
-
         # Workaround to remove nans before converting to as markdown
         sorted_rankind_md = (
             sorted_ranking.fillna({_columns[0]: "0"})
@@ -258,7 +245,6 @@ def publish_rating_sheet(
     players: models.Players,
     tid: str,
     prev_tid: str,
-    upload=False,
     all_players: bool = False,
 ) -> None:
     """Format a ranking to be published into a rating sheet"""
@@ -322,9 +308,6 @@ def publish_rating_sheet(
         _publish_tournament_metadata(ws, tournaments[tid])
         _bold_and_center(ws, to_bold, to_center)
 
-    if upload:
-        load_and_upload_sheet(xlsx_filename, sheet_name, cfg.io.temporal_spreadsheet_id)
-
     sheet_name_for_md = cfg.labels.Rating
     if all_players:
         sheet_name_for_md += "_Ampliado"
@@ -337,7 +320,6 @@ def publish_initial_rating_sheet(
     rankings: models.Rankings,
     players: models.Players,
     tid: str,
-    upload=False,
 ) -> None:
     """Format a ranking to be published into a rating sheet"""
     cfg = ConfigManager().current_config
@@ -370,9 +352,6 @@ def publish_initial_rating_sheet(
         ws = writer.book[sheet_name]
         _bold_and_center(ws, to_bold, to_center)
 
-    if upload:
-        load_and_upload_sheet(xlsx_filename, sheet_name, cfg.io.temporal_spreadsheet_id)
-
     # Adds a label for initial rating so it does not overwrite current rating file
     sheet_name_for_md = f"{cfg.labels.Rating}_{cfg.initial_metadata.tournament_name.split()[0]}"
     publish_sheet_as_markdown(this_ranking_df[columns], headers, sheet_name_for_md, tid)
@@ -384,7 +363,6 @@ def publish_histories_sheet(
     players: models.Players,
     tid: str,
     prev_tid: str,
-    upload=False,
 ) -> None:
     """Format histories to be published into a sheet"""
     cfg = ConfigManager().current_config
@@ -415,9 +393,6 @@ def publish_histories_sheet(
             writer, sheet_name=sheet_name, index=False, header=headers, columns=columns
         )
 
-    if upload:
-        load_and_upload_sheet(xlsx_filename, sheet_name, cfg.io.temporal_spreadsheet_id)
-
     sheet_name_for_md = cfg.sheetname.histories
     publish_sheet_as_markdown(history_df[columns], headers, sheet_name_for_md, tid)
 
@@ -428,7 +403,6 @@ def publish_rating_details_sheet(
     players: models.Players,
     tid: str,
     prev_tid: str,
-    upload,
 ) -> None:
     """Format and publish rating details of given tournament into a sheet"""
     cfg = ConfigManager().current_config
@@ -502,9 +476,6 @@ def publish_rating_details_sheet(
         _publish_tournament_metadata(ws, tournaments[tid])
         _bold_and_center(ws, to_bold, to_center)
 
-    if upload:
-        load_and_upload_sheet(xlsx_filename, sheet_name, cfg.io.temporal_spreadsheet_id)
-
     sheet_name_for_md = cfg.sheetname.rating_details_key
     publish_sheet_as_markdown(details[columns], headers, sheet_name_for_md, tid)
 
@@ -514,7 +485,6 @@ def publish_matches_sheet(
     rankings: models.Rankings,
     players: models.Players,
     tid: str,
-    upload,
 ) -> None:
     """Format and publish matches of given tournament into a sheet"""
     cfg = ConfigManager().current_config
