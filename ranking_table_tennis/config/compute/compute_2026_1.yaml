@@ -1,0 +1,8 @@
+defaults:
+  - base_compute
+
+fan_category: 5
+categories_thresholds:
+  - 1050  # minimo de primera
+  - 700  # minimo de segunda
+  - 400  # minimo de tercera

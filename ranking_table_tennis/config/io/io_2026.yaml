@@ -1,0 +1,5 @@
+defaults:
+  - base_io
+
+tournaments_gdrive: https://docs.google.com/spreadsheets/d/e/2PACX-1vRXlkjEZx1Bt6DhNE8KXcbKcametB5YBDYTQ5-vlyiueh8Xfhmc5Ty2Wst-3Ybpa7Jj5kCGDcFdx6xT/pub?output=xlsx
+tournaments_spreadsheet_id: 1fP9oHTvy_03MCfsxiC1xIm_VlLwxaKUTNn6_mxFJeaM
