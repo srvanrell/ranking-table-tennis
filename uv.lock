@@ -1607,7 +1607,7 @@ wheels = [
 
 [[package]]
 name = "ranking-table-tennis"
-version = "2026.2.21"
+version = "2026.3.8"
 source = { editable = "." }
 dependencies = [
     { name = "gspread" },
