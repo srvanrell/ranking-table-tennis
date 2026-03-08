@@ -1,15 +1,15 @@
 .PHONY: test test-and-logs install clean publish
 
 test:
-    uv sync --extra test
+	uv sync --extra test
 	uv run pytest -vv tests
 
 test-and-logs:
-    uv sync --extra test
+	uv sync --extra test
 	uv run pytest -vvv tests -s --log-level debug -o log_cli=true --log-cli-level=DEBUG
 
 test-coverage:
-    uv sync --extra test
+	uv sync --extra test
 	uv run pytest -vv tests --cov=ranking_table_tennis --cov-report=term-missing
 
 install:
