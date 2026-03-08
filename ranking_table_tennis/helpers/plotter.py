@@ -17,6 +17,9 @@ RENAMER = {
     "cum_points_cat_1": "Puntos de campeonato",
     "cum_points_cat_2": "Puntos de campeonato",
     "cum_points_cat_3": "Puntos de campeonato",
+    "cum_points_cat_4": "Puntos de campeonato",
+    "cum_points_cat_5": "Puntos de campeonato",
+    "cum_points_cat_6": "Puntos de campeonato",
 }
 
 
@@ -43,9 +46,13 @@ def get_df_complete(max_tid):
 
 def plot_ratings(tid):
     """Plot and save rating interactive figure"""
+    cfg = ConfigManager().current_config
+    num_categories = len(cfg.categories)
     df_complete = get_df_complete(tid)
     # Mascara para filtrado
-    mask_active_players_rating = df_complete.iloc[:, 13 : 13 + 4].sum(axis="columns") > 0
+    mask_active_players_rating = (
+        df_complete.iloc[:, 8 + num_categories : 8 + num_categories * 2].sum(axis="columns") > 0
+    )
     df = df_complete.loc[mask_active_players_rating]
 
     fig = px.line(
@@ -60,7 +67,7 @@ def plot_ratings(tid):
             "name": sorted(df.name.unique()),
         },
         height=400,
-        width=400,
+        width=1000,
     )
 
     # hide and lock down axes
@@ -69,39 +76,13 @@ def plot_ratings(tid):
 
     # strip down the rest of the plot
     fig.update_layout(
-        showlegend=False,
+        showlegend=True,
         plot_bgcolor="white",
         margin=dict(t=10, l=10, b=10, r=10),
-        legend=dict(title=None),
-        updatemenus=[
-            {
-                "type": "buttons",
-                "x": 0.25,
-                "xanchor": "center",
-                "y": 0.95,
-                "yanchor": "top",
-                "borderwidth": 0,
-                "direction": "right",
-                "buttons": [
-                    {
-                        "label": "≡",
-                        "method": "relayout",
-                        "args": ["showlegend", False],
-                        "args2": ["showlegend", True],  # NEW attribute !
-                    },
-                    {
-                        "label": "<>",
-                        "method": "relayout",
-                        "args": ["width", 400],
-                        "args2": ["width", 1000],  # NEW attribute !
-                    },
-                ],
-            }
-        ],
     )
 
     # Agrega corte por categoría
-    for threshold in [700, 1300]:
+    for threshold in cfg.compute.categories_thresholds:
         fig.add_trace(
             go.Scatter(
                 x=[df["tid"].min(), df["tid"].max()],
@@ -125,24 +106,24 @@ def plot_ratings(tid):
 
 def plot_championships(tid):
     """Plot and save interactive figures of all championships."""
+    cfg = ConfigManager().current_config
+    num_categories = len(cfg.categories)
     df_complete = get_df_complete(tid)
-    # Mascaras para filtrado
-    mask_active_players_cat1 = df_complete.iloc[:, 13 : 13 + 1].sum(axis="columns") > 0
-    mask_active_players_cat2 = df_complete.iloc[:, 14 : 14 + 1].sum(axis="columns") > 0
-    mask_active_players_cat3 = df_complete.iloc[:, 15 : 15 + 1].sum(axis="columns") > 0
 
     # === Figura campeonato cat# ===
-    for mask, col, name in zip(
-        [mask_active_players_cat1, mask_active_players_cat2, mask_active_players_cat3],
-        ["cum_points_cat_1", "cum_points_cat_2", "cum_points_cat_3"],
-        ["Primera", "Segunda", "Tercera"],
-    ):
-        df = df_complete.loc[mask]
+    for num_cat, name_cat in enumerate(cfg.categories[:-1], 1):
+        col_cat = f"cum_points_cat_{num_cat}"
+        num_col_cat = 8 + num_categories + num_cat
+        mask_active_players = (
+            df_complete.iloc[:, num_col_cat : num_col_cat + 1].sum(axis="columns") > 0
+        )
+
+        df = df_complete.loc[mask_active_players]
 
         fig = px.line(
             df,
             x="tid",
-            y=col,
+            y=col_cat,
             color="name",
             symbol="name",
             labels=RENAMER,
@@ -151,7 +132,7 @@ def plot_championships(tid):
                 "name": sorted(df.name.unique()),
             },
             height=400,
-            width=400,
+            width=1000,
         )
 
         # hide and lock down axes
@@ -160,35 +141,9 @@ def plot_championships(tid):
 
         # strip down the rest of the plot
         fig.update_layout(
-            showlegend=False,
+            showlegend=True,
             plot_bgcolor="white",
             margin=dict(t=10, l=10, b=10, r=10),
-            legend=dict(title=None),
-            updatemenus=[
-                {
-                    "type": "buttons",
-                    "x": 0.25,
-                    "xanchor": "center",
-                    "y": 0.95,
-                    "yanchor": "top",
-                    "borderwidth": 0,
-                    "direction": "right",
-                    "buttons": [
-                        {
-                            "label": "≡",
-                            "method": "relayout",
-                            "args": ["showlegend", False],
-                            "args2": ["showlegend", True],  # NEW attribute !
-                        },
-                        {
-                            "label": "<>",
-                            "method": "relayout",
-                            "args": ["width", 400],
-                            "args2": ["width", 1000],  # NEW attribute !
-                        },
-                    ],
-                }
-            ],
         )
 
         # fig.show(config=dict(displayModeBar=False))
@@ -196,6 +151,8 @@ def plot_championships(tid):
 
         # Saves a html doc that you can copy paste
         cfg = ConfigManager().current_config
-        html_filename = os.path.join(cfg.io.data_folder, f"{tid}/championship{cfg.year}{name}.html")
+        html_filename = os.path.join(
+            cfg.io.data_folder, f"{tid}/championship{cfg.year}{name_cat.title()}.html"
+        )
         logger.info("< Saving figure @ '%s'", html_filename)
         fig.write_html(html_filename, full_html=False, include_plotlyjs="cdn")
