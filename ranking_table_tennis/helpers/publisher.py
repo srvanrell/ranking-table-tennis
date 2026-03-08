@@ -441,20 +441,20 @@ def publish_rating_details_sheet(
     details = (
         rankings.get_rating_details(tid)
         .assign(
-            winner_name_rating=lambda df: df["winner"]
-            + " ("
-            + df["winner_rating"].astype(int).astype(str)
-            + ")",
-            loser_name_rating=lambda df: df["loser"]
-            + " ("
-            + df["loser_rating"].astype(int).astype(str)
-            + ")",
-            diff_rating=lambda df: (df["winner_rating"] - df["loser_rating"])
-            .astype(int)
-            .astype(str),
-            factor=lambda df: (df["factor"] / cfg.compute.rating_factor)
-            .astype(str)
-            .str.replace(".0", "", regex=False),
+            winner_name_rating=lambda df: (
+                df["winner"] + " (" + df["winner_rating"].astype(int).astype(str) + ")"
+            ),
+            loser_name_rating=lambda df: (
+                df["loser"] + " (" + df["loser_rating"].astype(int).astype(str) + ")"
+            ),
+            diff_rating=lambda df: (
+                (df["winner_rating"] - df["loser_rating"]).astype(int).astype(str)
+            ),
+            factor=lambda df: (
+                (df["factor"] / cfg.compute.rating_factor)
+                .astype(str)
+                .str.replace(".0", "", regex=False)
+            ),
             rating_to_winner=lambda df: df["rating_to_winner"].astype(int).astype(str),
             rating_to_loser=lambda df: df["rating_to_loser"].astype(int).astype(str),
         )
