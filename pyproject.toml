@@ -1,6 +1,6 @@
 [project]
 name = "ranking_table_tennis"
-version = "2026.3.10"
+version = "2026.3.11"
 description = "A ranking table tennis system"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -47,7 +47,12 @@ test = [
 rtt = "ranking_table_tennis.command_line:main"
 
 [tool.setuptools]
-packages = ["ranking_table_tennis"]
+packages = [
+    "ranking_table_tennis",
+    "ranking_table_tennis.config",
+    "ranking_table_tennis.helpers",
+    "ranking_table_tennis.models",
+]
 
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
