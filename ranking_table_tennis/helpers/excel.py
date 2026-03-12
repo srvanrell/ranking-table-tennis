@@ -158,6 +158,7 @@ def save_ranking_sheet(
     sorted_rankings_df.insert(
         2, "name", sorted_rankings_df.loc[:, "pid"].map(players.pid2name_mapper)
     )
+    sorted_rankings_df = sorted_rankings_df.round({"rating": 0}).astype({"rating": "int"})
 
     with _get_writer(xlsx_filename, sheet_name) as writer:
         headers = [
@@ -209,6 +210,7 @@ def save_raw_ranking(rankings: models.Rankings, players: models.Players, tid: st
 
     # Format data and columns to write into the file
     this_ranking_df = this_ranking_df.merge(players.players_df.loc[:, ["name"]], on="pid")
+    this_ranking_df = this_ranking_df.round({"rating": 0}).astype({"rating": "int"})
     this_ranking_df.to_excel(xlsx_filename)
 
 
