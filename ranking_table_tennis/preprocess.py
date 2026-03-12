@@ -53,7 +53,7 @@ def main(offline=True, assume_yes=False, config_initial_date="220101"):
     # Loading temp ranking and players. It will be deleted after a successful preprocessing
     players_temp, ranking_temp = helpers.load_temp_players_ranking()
 
-    unknown_player_should_update = False
+    # unknown_player_should_update = False
 
     for tid in tournaments:
         logger.info("** Processing %s", tid)
@@ -61,7 +61,7 @@ def main(offline=True, assume_yes=False, config_initial_date="220101"):
         for name in tournaments.get_players_names(tid):
             unknown_player = False
             if players.get_pid(name) is None:
-                unknown_player_should_update = True
+                # unknown_player_should_update = True
                 if players_temp.get_pid(name) is None:
                     unknown_player = True
                     association = input("\nEnter the affiliation of %s: (optional field)\n" % name)
@@ -79,7 +79,7 @@ def main(offline=True, assume_yes=False, config_initial_date="220101"):
 
             # Category will be asigned
             if rankings[initial_tid, pid] is None:
-                unknown_player_should_update = True
+                # unknown_player_should_update = True
                 if ranking_temp[initial_tid, pid] is None:
                     unknown_player = True
 
@@ -101,7 +101,7 @@ def main(offline=True, assume_yes=False, config_initial_date="220101"):
                     f"{players[pid]['name']}"
                 )
             elif rankings[initial_tid, pid, "rating"] < 0:
-                unknown_player_should_update = True
+                # unknown_player_should_update = True
                 # Will print available ratings of known players
                 helpers.suggest_initial_rating(tournaments, players, rankings, name, tid)
 
@@ -130,7 +130,8 @@ def main(offline=True, assume_yes=False, config_initial_date="220101"):
         upload = True
 
     # Update the online version if an unknown player was found during preprocessing
-    upload = upload and unknown_player_should_update
+    # disable unknown player detection impidding sheet automatic sorting and fixing
+    upload = upload  # and unknown_player_should_update
 
     # Saving complete list of players, including new ones
     helpers.save_players_sheet(players, upload=upload)
