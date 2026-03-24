@@ -10,6 +10,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Data flows through a 3-step pipeline: **preprocess → compute → publish**
 
+The **preprocess** step reads tournament data **online** from Google Sheets. The **compute** and **publish** steps run entirely **offline/locally**, reading from and writing to local pickle and Excel/Markdown files.
+
 ## Commands
 
 ### Setup
@@ -26,7 +28,7 @@ uv run rtt automatic    # Run all steps non-interactively (to be used in prodcti
 ```
 
 ### Testing
-Golden datasets are used to test that no change in the output is introduced.
+Tests run **offline** using golden datasets — no network access or Google Sheets connection required. They verify that no unintended change in output is introduced by comparing results against pre-saved reference files.
 ```bash
 uv run pytest -vv tests                          # Run all tests
 uv run pytest -vv tests/test_models.py           # Run a single test file
@@ -55,7 +57,7 @@ uv publish
 
 2. **Compute** (`compute_rankings.py`): Loads pickled data, processes matches to compute winner/loser outcomes, applies rating changes using expected result tables, computes championship points from best rounds, handles promotions/sanctions/categories, updates rankings.
 
-3. **Publish** (`publish.py` + `helpers/publisher.py`): Generates formatted Excel and Markdown output with rankings, match details, championship breakdowns, and interactive Plotly visualizations.
+3. **Publish** (`publish.py` + `helpers/publisher.py`): Generates formatted **Excel** and **Markdown** output with rankings, match details, championship breakdowns, and interactive Plotly visualizations. Output Markdown files are intended for publishing (e.g., to a website or repo), while Excel files are used for internal review.
 
 ### Core Models (`ranking_table_tennis/models/`)
 
@@ -72,10 +74,13 @@ Uses **Hydra** with date-ranged YAML files (e.g., `config_220101_220723.yaml`) s
 - `excel.py`: Excel I/O (load/save tournaments, players, rankings via openpyxl/pandas)
 - `gspread.py`: Google Sheets integration (OAuth2 via oauth2client)
 - `publisher.py`: All output sheet generation logic
+- `markdown.py`: Generates Markdown files from DataFrames (rankings, match details, tournament metadata) and stat plots as PNG images; output is organized per tournament in the data folder
 - `plotter.py`: Plotly-based interactive visualizations
 - `pickle.py`: Intermediate data serialization between pipeline stages
 - `initial_rating.py`: Suggests initial ratings for new players
 - `temp_players.py`: Manages resumable state during interactive preprocessing
+- `github.py`: Sets GitHub Actions output variables (e.g., to skip workflow if no recent Sheets update)
+- `logging.py`: Logging configuration helpers
 
 ### Intermediate Data
 
