@@ -74,7 +74,7 @@ def _get_gc() -> gspread.Client:
         github_secret_name = "GCP_SA_KEY"
         credentials_str = os.getenv(github_secret_name)
         if credentials_str:
-            logger.debug("Loading GCP SA credentials from %s", github_secret_name)
+            logger.debug("Loading GCP SA credentials from configured environment variable")
             credentials_dict = json.loads(credentials_str)
             gc = gspread.service_account_from_dict(credentials_dict)
         else:
