@@ -70,7 +70,7 @@ class Rankings:
     def get_entries(self, tid: str, pid: int | None = None, col: str | None = None):
         entries_indexes = self.ranking_df.tid == tid
 
-        if pid:
+        if pid is not None:
             pid_indexes = self.ranking_df.pid == pid
             entries_indexes = entries_indexes & pid_indexes
             if not col and entries_indexes.any():
