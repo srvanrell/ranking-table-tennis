@@ -3,7 +3,7 @@ name = "ranking_table_tennis"
 version = "2026.5.21"
 description = "A ranking table tennis system"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12,<3.15"
 authors = [ { name = "Sebastian Vanrell"} ]
 classifiers = [
     "License :: OSI Approved :: MIT License",
@@ -19,7 +19,6 @@ dependencies = [
     'gspread>=6.0,<7.0',
     'hydra-core>=1.3,<2.0',
     'matplotlib>=3.0,<4.0',
-    'oauth2client>=4.0,<5.0',
     'omegaconf>=2.3,<3.0',
     'openpyxl>=3.1,<4.0',
     'pandas>=2.2,<3.0',
