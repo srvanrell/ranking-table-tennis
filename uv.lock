@@ -1239,7 +1239,7 @@ wheels = [
 
 [[package]]
 name = "ranking-table-tennis"
-version = "2026.5.21"
+version = "2026.11.14"
 source = { editable = "." }
 dependencies = [
     { name = "gspread" },
