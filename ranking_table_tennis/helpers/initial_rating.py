@@ -28,7 +28,7 @@ def suggest_initial_rating(
 
     matches_as_winner = matches.loc[(matches.winner == name_unknown_player), :].copy()
     if matches_as_winner.empty:
-        logger.warn("no matches as winner")
+        logger.warning("no matches as winner")
     else:
         fill_rating_column(matches_as_winner, players, tournaments, initial_ranking, tid, "loser")
         matches_str = str(
@@ -42,7 +42,7 @@ def suggest_initial_rating(
 
     matches_as_loser = matches.loc[(matches.loser == name_unknown_player), :].copy()
     if matches_as_loser.empty:
-        logger.warn("no matches as loser")
+        logger.warning("no matches as loser")
     else:
         fill_rating_column(matches_as_loser, players, tournaments, initial_ranking, tid, "winner")
         matches_str = str(
@@ -60,7 +60,7 @@ def suggest_initial_rating(
     VIRTUAL_RANGE_NO_LIMIT = 60
     if np.isnan(limits_suggested_rating).all():
         # If no limits are available, cannot suggest a rating
-        logger.warn("no rating to suggest")
+        logger.warning("no rating to suggest")
     elif np.isnan(limits_suggested_rating[0]):
         limits_suggested_rating[0] = limits_suggested_rating[1] - VIRTUAL_RANGE_NO_LIMIT
     elif np.isnan(limits_suggested_rating[1]):
@@ -85,7 +85,7 @@ def fill_rating_column(
     try:
         known_rankings = helpers.load_from_pickle(cfg.io.pickle.rankings)
     except FileNotFoundError:
-        logger.warn("Sorry, no previous rating is available to help you")
+        logger.warning("Sorry, no previous rating is available to help you")
         return
 
     for ix, row in matches_df.iterrows():
@@ -99,7 +99,7 @@ def fill_rating_column(
             if rival_rating < 0:
                 rival_rating = pd.NA
         except (AttributeError, UnboundLocalError):
-            logger.warn("Sorry, no previous rating is available to help you with %s", rival_name)
+            logger.warning("Sorry, no previous rating is available to help you with %s", rival_name)
 
         # If it is a new player, try to use the initial rating (that could be already defined)
         assigned_pid = players.get_pid(rival_name)
@@ -110,6 +110,8 @@ def fill_rating_column(
                 if rival_rating < 0:
                     rival_rating = pd.NA
             except (AttributeError, UnboundLocalError):
-                logger.warn("Sorry, no initial rating is available to help you with %s", rival_pid)
+                logger.warning(
+                    "Sorry, no initial rating is available to help you with %s", rival_pid
+                )
 
         matches_df.loc[ix, "rival_rating"] = rival_rating

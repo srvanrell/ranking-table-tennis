@@ -34,7 +34,7 @@ def main(offline=True, assume_yes=False, config_initial_date="220101"):
             retrieve = input("\nDo you want to retrieve online sheet [Y/n]? ")
 
         if retrieve.lower() != "n":
-            logger.info("Downloading and saving '%s'" % xlsx_file)
+            logger.info("Downloading and saving '%s'", xlsx_file)
             request.urlretrieve(cfg.io.tournaments_gdrive, xlsx_file)
 
     # Loading all tournament data
@@ -64,8 +64,8 @@ def main(offline=True, assume_yes=False, config_initial_date="220101"):
                 # unknown_player_should_update = True
                 if players_temp.get_pid(name) is None:
                     unknown_player = True
-                    association = input("\nEnter the affiliation of %s: (optional field)\n" % name)
-                    city = input("\nEnter the city of %s: (optional field)\n" % name)
+                    association = input(f"\nEnter the affiliation of {name}: (optional field)\n")
+                    city = input(f"\nEnter the city of {name}: (optional field)\n")
                     # Assign a pid for the new given player and add it to the list
                     players.add_new_player(name, association, city)
                     # Save a temp player to resume preprocessing, if necessary
@@ -131,7 +131,7 @@ def main(offline=True, assume_yes=False, config_initial_date="220101"):
 
     # Update the online version if an unknown player was found during preprocessing
     # disable unknown player detection impidding sheet automatic sorting and fixing
-    upload = upload  # and unknown_player_should_update
+    # upload = upload and unknown_player_should_update
 
     # Saving complete list of players, including new ones
     helpers.save_players_sheet(players, upload=upload)

@@ -1,5 +1,5 @@
 import logging
-from typing import Iterator, List
+from collections.abc import Iterator
 
 import pandas as pd
 from omegaconf import OmegaConf
@@ -122,7 +122,7 @@ class Tournaments:
         dates_ordered = sorted(year_grp["date"].unique())
         for num, date in enumerate(dates_ordered, 1):
             filtered_rows = year_grp["date"] == date
-            tids.loc[filtered_rows] += "T%02d" % num
+            tids.loc[filtered_rows] += f"T{num:02d}"
 
         return tids
 
@@ -154,7 +154,7 @@ class Tournaments:
             .pipe(self._batch_process_matches)
         )
 
-    def get_players_names(self, tid: str, category: str = "") -> List[str]:
+    def get_players_names(self, tid: str, category: str = "") -> list[str]:
         """
         Return a sorted list of players that played the tournament
 
@@ -166,11 +166,11 @@ class Tournaments:
 
         winner = self.tournaments_df.loc[criteria, "winner"]
         loser = self.tournaments_df.loc[criteria, "loser"]
-        all_players = pd.concat([winner, loser], ignore_index=True).unique()
+        all_players = pd.concat([winner, loser], ignore_index=True).unique().tolist()
 
-        return sorted(list(all_players))
+        return sorted(all_players)
 
-    def get_players_pids(self, tid: str, category: str = "") -> List[int]:
+    def get_players_pids(self, tid: str, category: str = "") -> list[int]:
         """
         Return a list of pid players that played the tournament
 
@@ -182,9 +182,9 @@ class Tournaments:
 
         winner = self.tournaments_df.loc[criteria, "winner_pid"]
         loser = self.tournaments_df.loc[criteria, "loser_pid"]
-        all_players = pd.concat([winner, loser], ignore_index=True).unique()
+        all_players = pd.concat([winner, loser], ignore_index=True).unique().tolist()
 
-        return sorted(list(all_players))
+        return sorted(all_players)
 
     def compute_best_rounds(self, tid: str, players: Players) -> pd.DataFrame:
         """
@@ -233,7 +233,7 @@ class Tournaments:
         self.tournaments_df["loser_pid"] = self.tournaments_df["loser"].map(name2pid)
 
     def get_matches(
-        self, tid: str, exclude_fan_category: bool = True, to_exclude: List[str] | None = None
+        self, tid: str, exclude_fan_category: bool = True, to_exclude: list[str] | None = None
     ) -> pd.DataFrame:
         if to_exclude is None:
             to_exclude = ["sanction", "promote", "bonus"]

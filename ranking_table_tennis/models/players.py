@@ -1,5 +1,4 @@
 import logging
-from typing import List
 
 import pandas as pd
 from unidecode import unidecode
@@ -49,7 +48,7 @@ class Players:
         uname = unidecode(name).title()
         pid = self.players_df[self.players_df.name == uname].first_valid_index()
         if pid is None:
-            logger.warn("WARNING: Unknown player: %s", uname)
+            logger.warning("WARNING: Unknown player: %s", uname)
 
         return pid
 
@@ -87,7 +86,7 @@ class Players:
             .infer_objects()
         )
 
-    def played_tournaments(self, pid: int) -> List[str]:
+    def played_tournaments(self, pid: int) -> list[str]:
         """Return sorted list of played tournaments. Empty history will result in an empty list."""
         tids = self.history_df.loc[self.history_df.pid == float(pid), "tid"]
         if not tids.empty:

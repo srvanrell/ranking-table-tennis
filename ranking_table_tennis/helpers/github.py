@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 
 from ranking_table_tennis.helpers.gspread import days_since_last_update
 
@@ -27,4 +28,4 @@ def no_updates_stop_workflow(spreadsheet_id, max_days_since_last_update=1):
 
     if stop_workflow:
         logger.info("Stopping preprocess!")
-        exit(0)
+        sys.exit(0)

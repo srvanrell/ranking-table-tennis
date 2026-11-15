@@ -1,7 +1,7 @@
 import glob
 import logging
 import os
-from typing import List, Optional
+from typing import ClassVar
 
 import hydra
 import pandas as pd
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 class Configuration:
     def __init__(self, config_path: str = "") -> None:
-        self.dict_cfg: Optional[OmegaConf] = None
+        self.dict_cfg: OmegaConf | None = None
         self.start_valid_date: str = ""
         self.end_valid_date: str = ""
         self._config_path, basename = os.path.split(config_path)
@@ -94,7 +94,7 @@ class Configuration:
 
 class ConfigManager:
     _current_config = None
-    _available_configs: List[Configuration] = []
+    _available_configs: ClassVar[list[Configuration]] = []
 
     def __init__(self) -> None:
         pass

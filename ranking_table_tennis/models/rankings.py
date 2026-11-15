@@ -1,5 +1,4 @@
 import logging
-from typing import List, Tuple
 
 import pandas as pd
 from omegaconf import OmegaConf
@@ -46,23 +45,23 @@ class Rankings:
         else:
             return self.get_entries(*tidpidcol)
 
-    def __setitem__(self, tidpidcol: Tuple[str, int, str], value):
+    def __setitem__(self, tidpidcol: tuple[str, int, str], value):
         tid, pid, col = tidpidcol
         entries_indexes = (self.ranking_df.tid == tid) & (self.ranking_df.pid == pid)
         self.ranking_df.loc[entries_indexes, col] = value
         self.verify_and_normalize()
 
-    def points_cat_columns(self) -> List[str]:
-        return ["points_cat_%d" % d for d, _ in enumerate(self.cfg.categories, 1)]
+    def points_cat_columns(self) -> list[str]:
+        return [f"points_cat_{d}" for d, _ in enumerate(self.cfg.categories, 1)]
 
-    def cum_points_cat_columns(self) -> List[str]:
-        return ["cum_points_cat_%d" % d for d, _ in enumerate(self.cfg.categories, 1)]
+    def cum_points_cat_columns(self) -> list[str]:
+        return [f"cum_points_cat_{d}" for d, _ in enumerate(self.cfg.categories, 1)]
 
-    def cum_tids_cat_columns(self) -> List[str]:
-        return ["cum_tids_cat_%d" % d for d, _ in enumerate(self.cfg.categories, 1)]
+    def cum_tids_cat_columns(self) -> list[str]:
+        return [f"cum_tids_cat_{d}" for d, _ in enumerate(self.cfg.categories, 1)]
 
-    def participations_cat_columns(self) -> List[str]:
-        return ["participations_cat_%d" % d for d, _ in enumerate(self.cfg.categories, 1)]
+    def participations_cat_columns(self) -> list[str]:
+        return [f"participations_cat_{d}" for d, _ in enumerate(self.cfg.categories, 1)]
 
     def update_config(self):
         self.cfg = ConfigManager().current_config
@@ -189,7 +188,7 @@ class Rankings:
             ["tid", "rating", "pid"], ascending=[True, False, True]
         ).reset_index(drop=True)
 
-    def _points_to_assign(self, rating_winner: float, rating_loser: float) -> Tuple[float, float]:
+    def _points_to_assign(self, rating_winner: float, rating_loser: float) -> tuple[float, float]:
         """Points to add to winner and to deduce from loser given ratings of winner and loser."""
         rating_diff = rating_winner - rating_loser
 
@@ -203,7 +202,7 @@ class Rankings:
         ).to_numpy()
 
         # Select first row that is appropiate for given rating_diff
-        diff_threshold, points_to_winner, points_to_loser = assignation_table[
+        _diff_threshold, points_to_winner, points_to_loser = assignation_table[
             assignation_table[:, 0] > rating_diff
         ][0]
 
@@ -256,7 +255,7 @@ class Rankings:
         new_tid: str,
         old_tid: str,
         tournaments: "Tournaments",
-        pid_not_own_category: List[int],
+        pid_not_own_category: list[int],
     ):
         """Compute ratings(new_tid) based on matches(new_tid) and ratings(old_tid).
         Details of rating changes per match are stored in rating_details_df.
@@ -459,12 +458,10 @@ class Rankings:
 
         tids_list = self._get_tids_list()
         active_window_tids = tids_list[
-            max(0, tids_list.index(tid) - activate_window + 1) : tids_list.index(tid)
-            + 1  # noqa
+            max(0, tids_list.index(tid) - activate_window + 1) : tids_list.index(tid) + 1
         ]
         inactive_window_tids = tids_list[
-            max(0, tids_list.index(tid) - inactivate_window + 1) : tids_list.index(tid)
-            + 1  # noqa
+            max(0, tids_list.index(tid) - inactivate_window + 1) : tids_list.index(tid) + 1
         ]
 
         tid_criteria = self.ranking_df.tid == tid
@@ -481,8 +478,8 @@ class Rankings:
             ),
         )
 
-    def _get_tids_list(self) -> List[str]:
-        return sorted(list(self.ranking_df.tid.unique()))
+    def _get_tids_list(self) -> list[str]:
+        return sorted(self.ranking_df.tid.unique().tolist())
 
     def promote_players(self, tid: str, tournaments: "Tournaments") -> None:
         tournament_df = tournaments[tid]

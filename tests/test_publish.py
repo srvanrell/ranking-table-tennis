@@ -46,10 +46,12 @@ def test_publish_markdown_outputs():
 
     # Print mismatch to ease debugging
     for filename in mismatch:
-        with open(os.path.join(expected_folder_path, filename)) as exp_f:
-            with open(os.path.join(cfg.io.data_folder, filename)) as out_f:
-                diff = difflib.ndiff(exp_f.readlines(), out_f.readlines())
-                print("".join(diff), end="")
+        with (
+            open(os.path.join(expected_folder_path, filename)) as exp_f,
+            open(os.path.join(cfg.io.data_folder, filename)) as out_f,
+        ):
+            diff = difflib.ndiff(exp_f.readlines(), out_f.readlines())
+            print("".join(diff), end="")
 
     # Assert for errors, messages to help debugging
     ftmstr = f"{len(match)} match, {len(mismatch)} mismatch, {len(errors)} errors"

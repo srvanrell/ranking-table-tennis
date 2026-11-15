@@ -1,5 +1,3 @@
-from typing import List
-
 import pandas as pd
 from gspread.utils import rowcol_to_a1
 from openpyxl.styles import Alignment, Font
@@ -207,7 +205,10 @@ def publish_championship_sheets(
             6,
             "formatted points",
             sorted_ranking.apply(
-                lambda row: _format_diff(row[point_col], row[point_col + "_prev"]), axis="columns"
+                lambda row, point_col=point_col: _format_diff(
+                    row[point_col], row[point_col + "_prev"]
+                ),
+                axis="columns",
             ),
         )
         sorted_ranking.loc[:, selected_tids_col] = sorted_ranking.loc[
@@ -215,7 +216,7 @@ def publish_championship_sheets(
         ].str.replace(tid[:-3], "")
 
         replacements = {"participations": participations_col, "selected_tids": selected_tids_col}
-        _columns = [replacements[c] if c in replacements else c for c in columns]
+        _columns = [replacements.get(c, c) for c in columns]
 
         with _get_writer(xlsx_filename, sheet_name) as writer:
             sorted_ranking.to_excel(
@@ -548,7 +549,7 @@ def _publish_tournament_metadata(ws, tournament_tid: pd.DataFrame) -> None:
     ws.merge_cells("B3:E3")
 
 
-def _bold_and_center(ws, to_bold: List[str], to_center: List[str]) -> None:
+def _bold_and_center(ws, to_bold: list[str], to_center: list[str]) -> None:
     """Bold and center cells in given worksheet (ws)"""
     for colrow in to_bold:
         cell = ws[colrow]
