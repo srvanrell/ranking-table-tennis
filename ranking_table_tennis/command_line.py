@@ -59,7 +59,7 @@ def main():
         "--config-initial-date",
         help="Set the initial date to get the right configs and setup.",
         choices=[f"{YY % 100}0101" for YY in range(2021, datetime.now().year + 1)],
-        default=datetime.today().strftime("%y0101"),
+        default=datetime.now(datetime.timezone.utc).strftime("%y0101"),
     )
     group = parser.add_mutually_exclusive_group()
     group.add_argument(

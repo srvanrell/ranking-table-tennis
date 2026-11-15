@@ -30,7 +30,7 @@ def main(config_initial_date="220101", download=True):
 
     if download:
         xlsx_file = cfg.io.data_folder + cfg.io.xlsx.tournaments_filename
-        logger.info("Downloading and saving '%s'" % xlsx_file)
+        logger.info("Downloading and saving '%s'", xlsx_file)
         request.urlretrieve(cfg.io.tournaments_gdrive, xlsx_file)
 
     # Loading all tournament data

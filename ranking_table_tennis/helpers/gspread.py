@@ -1,13 +1,11 @@
 import json
 import logging
 import os
-from datetime import datetime, timezone
-from typing import List
+from datetime import UTC, datetime
 
 import gspread
 import pandas as pd
 from gspread_dataframe import set_with_dataframe
-
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +14,7 @@ def upload_sheet_from_df(
     spreadsheet_id: str,
     sheet_name: str,
     df: pd.DataFrame,
-    headers: List[str] | None = None,
+    headers: list[str] | None = None,
     include_index: bool = False,
     include_df_headers: bool = True,
 ) -> None:
@@ -49,7 +47,9 @@ def upload_sheet_from_df(
         )
 
     except PermissionError:
-        logger.warn("!! Permission Error. FAILED to upload '%s' @ '%s'", sheet_name, spreadsheet_id)
+        logger.warning(
+            "!! Permission Error. FAILED to upload '%s' @ '%s'", sheet_name, spreadsheet_id
+        )
 
 
 def days_since_last_update(spreadsheet_id) -> int:
@@ -58,11 +58,11 @@ def days_since_last_update(spreadsheet_id) -> int:
         spreadsheet = gc.open_by_key(spreadsheet_id)
         last_update_time = spreadsheet.get_lastUpdateTime()
     except PermissionError:
-        logger.warn("!! Permission Error. FAIL TO GET last updated time @ '%s'", spreadsheet_id)
+        logger.warning("!! Permission Error. FAIL TO GET last updated time @ '%s'", spreadsheet_id)
 
     # Parse the ISO 8601 datetime string into a datetime at UTC
-    last_update_utc = datetime.fromisoformat(last_update_time[:-1]).replace(tzinfo=timezone.utc)
-    difference = datetime.now(timezone.utc) - last_update_utc
+    last_update_utc = datetime.fromisoformat(last_update_time[:-1]).replace(tzinfo=UTC)
+    difference = datetime.now(UTC) - last_update_utc
 
     return difference.days
 
@@ -81,7 +81,7 @@ def _get_gc() -> gspread.Client:
             logger.debug("Loading GCP SA credentials from standard path")
             gc = gspread.service_account()
     except FileNotFoundError:
-        logger.warn(
+        logger.warning(
             "!! The service account .json key file has not been configured. Upload might fail."
         )
 
@@ -90,7 +90,7 @@ def _get_gc() -> gspread.Client:
             logger.debug("Loading GCP End User credentials from standard path")
             gc = gspread.oauth()
     except FileNotFoundError:
-        logger.warn("!! The end user .json key file has not been configured. Upload might fail.")
+        logger.warning("!! The end user .json key file has not been configured. Upload might fail.")
     # except OSError:
     #     logger.warn("!!Connection failure. Upload will fail.")
 

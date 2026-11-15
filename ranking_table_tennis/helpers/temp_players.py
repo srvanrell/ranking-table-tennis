@@ -1,7 +1,6 @@
 import logging
 import os
 import pickle
-from typing import Tuple
 
 from ranking_table_tennis import models
 from ranking_table_tennis.configs import ConfigManager
@@ -10,7 +9,7 @@ from ranking_table_tennis.helpers.pickle import load_from_pickle
 logger = logging.getLogger(__name__)
 
 
-def load_temp_players_ranking() -> Tuple[models.Players, models.Rankings]:
+def load_temp_players_ranking() -> tuple[models.Players, models.Rankings]:
     """returns players_temp, ranking_temp"""
     cfg = ConfigManager().current_config
     # Loading temp ranking and players. It should be deleted after a successful preprocessing

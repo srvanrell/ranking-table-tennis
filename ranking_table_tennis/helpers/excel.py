@@ -1,6 +1,5 @@
 import logging
 import os
-from typing import List
 
 import pandas as pd
 from unidecode import unidecode
@@ -12,12 +11,12 @@ from ranking_table_tennis.helpers.gspread import upload_sheet_from_df
 logger = logging.getLogger(__name__)
 
 
-def get_tournament_sheet_names_ordered() -> List[str]:
+def get_tournament_sheet_names_ordered() -> list[str]:
     cfg = ConfigManager().current_config
     tournaments_xlsx = cfg.io.data_folder + cfg.io.xlsx.tournaments_filename
     filter_key = cfg.sheetname.tournaments_key
-    df_tournaments = pd.read_excel(tournaments_xlsx, sheet_name=None, header=None)
-    sheet_names = [s for s in df_tournaments.keys() if filter_key in s]
+    dfs_tournaments = pd.read_excel(tournaments_xlsx, sheet_name=None, header=None)
+    sheet_names = [s for s in dfs_tournaments if filter_key in s]
 
     return sorted(sheet_names)
 
@@ -80,7 +79,7 @@ def load_tournaments_sheets() -> models.Tournaments:
     tournaments_xlsx = cfg.io.data_folder + cfg.io.xlsx.tournaments_filename
     filter_key = cfg.sheetname.tournaments_key
     raw_tournaments = pd.read_excel(tournaments_xlsx, sheet_name=None, header=None)
-    sheet_names = sorted([s for s in raw_tournaments.keys() if filter_key in s])
+    sheet_names = sorted([s for s in raw_tournaments if filter_key in s])
 
     to_concat = []
     for sheet_name in sheet_names:

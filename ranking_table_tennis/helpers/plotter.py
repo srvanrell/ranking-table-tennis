@@ -78,7 +78,7 @@ def plot_ratings(tid):
     fig.update_layout(
         showlegend=True,
         plot_bgcolor="white",
-        margin=dict(t=10, l=10, b=10, r=10),
+        margin={"t": 10, "l": 10, "b": 10, "r": 10},
     )
 
     # Agrega corte por categoría
@@ -143,7 +143,7 @@ def plot_championships(tid):
         fig.update_layout(
             showlegend=True,
             plot_bgcolor="white",
-            margin=dict(t=10, l=10, b=10, r=10),
+            margin={"t": 10, "l": 10, "b": 10, "r": 10},
         )
 
         # fig.show(config=dict(displayModeBar=False))
